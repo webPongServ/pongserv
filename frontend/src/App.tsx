@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "pages/login";
-import NavBar from "components/common/NavBar";
+import AppHeader from "components/common/AppHeader";
 import "styles/App.scss";
 
 function App() {
@@ -9,7 +9,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />
-          <Route path="/*" element={<NavBar />} />
+          <Route path="/*" element={<AppHeader />} />
         </Routes>
       </BrowserRouter>
     </>
