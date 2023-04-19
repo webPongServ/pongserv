@@ -1,0 +1,40 @@
+.profile-container {
+  width: 50%;
+  height: 200px;
+}
+
+.profile-image img {
+  width: 100px;
+  height: 100px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  border: 0px solid #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.profile-flex {
+  display: flex;
+}
+
+.profile-center {
+  flex-direction: column;
+  justify-content: center;
+}
+
+.profile-align {
+  align-items: center;
+}
+
+.profile-container .medium-size {
+  width: 150px;
+}
+
+.profile-container .gap {
+  margin: 1px;
+}
+
+.profile-container .title {
+  font-size: 30px;
+}
