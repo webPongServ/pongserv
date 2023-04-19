@@ -1,0 +1,22 @@
+.modal-button-group {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.modal-button-group .medium-size {
+  width: 150px;
+}
+
+.modal-message {
+  width: 400px;
+  height: 100px;
+}
+
+.modal-flex {
+  display: flex;
+}
+
+.modal-center {
+  flex-direction: column;
+  justify-content: center;
+}
