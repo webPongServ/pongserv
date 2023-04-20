@@ -26,7 +26,7 @@ const Profile = () => {
           <TabList
             variant="plain"
             sx={{
-              width: "20%",
+              width: "250px",
               "--List-padding": "0px",
               "--List-radius": "0px",
               "--ListItem-minHeight": "48px",
