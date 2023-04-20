@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import "styles/AppHeader.scss";
 import { ChattingDrawerWidth } from "constant";
 
 import Toolbar from "@mui/material/Toolbar";
@@ -40,16 +41,27 @@ const AppBar = (props: HandleOpen) => {
   return (
     <TopBar position="fixed" open={props.open}>
       <Toolbar>
-        <Link to="/" style={{ textDecoration: "none", flexGrow: 1 }}>
-          <Typography
-            variant="h6"
-            component="h1"
-            align="center"
-            sx={{ color: "#ffffff" }}
-          >
+        <Link to="/" className=" app-bar-container app-bar-link">
+          <Typography variant="h6" component="h1" align="center">
             WebPongServ
           </Typography>
         </Link>
+        <div className="app-bar-container">
+          <Link
+            to={`/profile/0`}
+            className="app-bar-image app-bar-flex app-bar-link"
+          >
+            <img src="../image.png" alt="profile_image" />
+            <div className="app-bar-flex">
+              <Typography
+                align="center"
+                className="app-bar-flex app-bar-center font"
+              >
+                susong
+              </Typography>
+            </div>
+          </Link>
+        </div>
         <IconButton
           color="inherit"
           aria-label="open drawer"
