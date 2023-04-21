@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import "styles/AppHeader.scss";
+import "styles/global.scss";
 import { ChattingDrawerWidth } from "constant";
 
 import Toolbar from "@mui/material/Toolbar";
@@ -49,17 +50,12 @@ const AppBar = (props: HandleOpen) => {
         <div className="app-bar-container">
           <Link
             to={`/profile/0`}
-            className="app-bar-image app-bar-flex app-bar-link"
+            className="app-bar-image flex-container app-bar-link"
           >
             <img src="../image.png" alt="profile_image" />
-            <div className="app-bar-flex">
-              <Typography
-                align="center"
-                className="app-bar-flex app-bar-center font"
-              >
-                susong
-              </Typography>
-            </div>
+            <Typography align="center" className="app-bar-center font">
+              susong
+            </Typography>
           </Link>
         </div>
         <IconButton
