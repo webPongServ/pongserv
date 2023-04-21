@@ -49,3 +49,19 @@
   border: 0px solid #fff;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
+
+.achievement-container {
+  width: 400px;
+  height: 300px;
+}
+
+.achievement-container img {
+  width: 100px;
+  height: 100px;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  border: 0px solid #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
