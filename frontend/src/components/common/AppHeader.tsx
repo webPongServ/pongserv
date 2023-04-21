@@ -5,6 +5,7 @@ import AppBar from "./AppBar";
 import FriendDrawer from "./FriendDrawer";
 import ChattingDrawer from "./ChattingDrawer";
 import { ChattingDrawerWidth } from "constant";
+import "styles/global.scss";
 
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
@@ -33,7 +34,7 @@ export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box className="flex-container">
       <CssBaseline />
       <AppBar open={open} setOpen={setOpen} />
       <FriendDrawer />

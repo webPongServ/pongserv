@@ -1,4 +1,5 @@
 import { ChattingDrawerWidth } from "constant";
+import "styles/global.scss";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -47,7 +48,7 @@ const ChattingDrawer = (props: HandleOpen) => {
           )}
         </IconButton>
         <div style={{ flexGrow: 1, justifyContent: "center" }}>
-          <div style={{ display: "flex", justifyContent: "center" }}>
+          <div className="flex-container">
             <div style={{ fontSize: "20px" }}>채팅</div>
           </div>
         </div>
