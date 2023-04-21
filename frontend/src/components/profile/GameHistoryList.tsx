@@ -55,17 +55,18 @@ const GameHistoryList = () => {
             <Card
               variant="outlined"
               className="history-container flex-container gap"
+              sx={{ flexDirection: "row" }} // why?
             >
               <Typography>{value.isWin ? "승리" : "패배"}</Typography>
               <Link to={`/profile/${value.myId}`} className="history-image">
-                <img src={value.myImg} alt="profile_image" />
+                <img src={value.myImg} alt="history_myimage" />
                 <Typography>{value.myNick}</Typography>
               </Link>
               <div>{value.myScore}</div>
               <div>vs.</div>
               <div>{value.opScore}</div>
               <Link to={`/profile/${value.opId}`} className="history-image">
-                <img src={value.opImg} alt="profile_image" />
+                <img src={value.opImg} alt="history_opimage" />
                 <Typography>{value.opNick}</Typography>
               </Link>
             </Card>
