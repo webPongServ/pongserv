@@ -12,19 +12,6 @@
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
-.app-bar-flex {
-  display: flex;
-}
-
-.app-bar-center {
-  flex-direction: column;
-  justify-content: center;
-}
-
-.app-bar-align {
-  align-items: center;
-}
-
 .app-bar-link {
   text-decoration: none;
   flex-grow: 1;

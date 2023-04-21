@@ -1,6 +1,7 @@
 import UserInfo from "components/profile/UserInfo";
 import ProfileButton from "components/profile/ProfileButton";
 import "styles/Profile.scss";
+import "styles/global.scss";
 
 import Tabs from "@mui/joy/Tabs";
 import TabList from "@mui/joy/TabList";
@@ -11,11 +12,11 @@ import AchievementList from "components/profile/AchievementList";
 const Profile = () => {
   return (
     <>
-      <div className="profile-flex profile-fullcontainer">
-        <div className="profile-container profile-flex">
+      <div className="flex-container profile-fullcontainer">
+        <div className="profile-container flex-container">
           <UserInfo />
         </div>
-        <div className="profile-container profile-flex profile-center profile-align">
+        <div className="profile-container flex-container direction-column">
           <ProfileButton name="DM" />
           <ProfileButton name="친구 추가" />
           <ProfileButton name="차단" />

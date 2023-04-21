@@ -4,6 +4,7 @@ import TabPanel from "@mui/joy/TabPanel";
 import Card from "@mui/joy/Card";
 import Typography from "@mui/joy/Typography";
 import { Link } from "react-router-dom";
+import "styles/global.scss";
 
 export type History = {
   isWin: boolean;
@@ -46,14 +47,14 @@ const GameHistoryList = () => {
     <TabPanel
       value={0}
       sx={{ p: 3 }}
-      className="profile-flex profile-center profile-fullcontainer"
+      className="flex-container profile-fullcontainer"
     >
       {historyList.map((value) => {
         return (
-          <div className="profile-flex profile-center profile-align">
+          <div className="flex-container">
             <Card
               variant="outlined"
-              className="history-container gap direction-row"
+              className="history-container flex-container gap"
             >
               <Typography>{value.isWin ? "승리" : "패배"}</Typography>
               <Link to={`/profile/${value.myId}`} className="history-image">

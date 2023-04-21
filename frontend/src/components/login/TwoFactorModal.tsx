@@ -6,6 +6,7 @@ import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
 import { Input } from "@mui/joy";
 import "styles/Modal.scss";
+import "styles/global.scss";
 
 type HandleModalStatus = { modalStatus: string; setModalStatus: Function };
 
@@ -21,7 +22,7 @@ const TwoFactorModal = (props: HandleModalStatus) => {
         aria-labelledby="variant-modal-title"
         aria-describedby="variant-modal-description"
       >
-        <Box className="modal-message modal-flex modal-center">
+        <Box className="modal-message flex-container flex-column">
           <Typography>2차 인증 비밀번호를 입력하세요.</Typography>
           <Input type="password" />
         </Box>
