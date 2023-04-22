@@ -34,12 +34,12 @@ export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <Box className="flex-container">
+    <Box className="flex-container" style={{ height: "100%" }}>
       <CssBaseline />
       <AppBar open={open} setOpen={setOpen} />
       <FriendDrawer />
-      <Main open={open}>
-        <Box component="main" sx={{ flexGrow: 1, p: 5 }}>
+      <Main open={open} sx={{ height: "90%" }}>
+        <Box component="main" sx={{ flexGrow: 1, height: "100%" }}>
           <Routes>
             <Route path="/*" element={<MainRoute />} />
           </Routes>

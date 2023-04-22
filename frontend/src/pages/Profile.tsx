@@ -22,8 +22,8 @@ const Profile = () => {
           <ProfileButton name="차단" />
         </div>
       </div>
-      <div className="profile-fullcontainer">
-        <Tabs aria-label="tabs" defaultValue={0}>
+      <div className="profile-fullcontainer" style={{ height: "70%" }}>
+        <Tabs aria-label="tabs" defaultValue={0} sx={{ height: "100%" }}>
           <TabList
             variant="plain"
             sx={{
@@ -50,7 +50,7 @@ const Profile = () => {
             <Tab>전적</Tab>
             <Tab>업적</Tab>
           </TabList>
-          <div className="profile-fullcontainer">
+          <div className="profile-fullcontainer overflow">
             <GameHistoryList />
             <AchievementList />
           </div>
