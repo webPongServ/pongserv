@@ -42,11 +42,55 @@ const GameHistoryList = () => {
       opImg: "../favicon.ico",
       opScore: 3,
     },
+    {
+      isWin: false,
+      myId: 0,
+      myNick: "susong",
+      myImg: "../image.png",
+      myScore: 2,
+      opId: 5,
+      opNick: "noname_12",
+      opImg: "../favicon.ico",
+      opScore: 3,
+    },
+    {
+      isWin: false,
+      myId: 0,
+      myNick: "susong",
+      myImg: "../image.png",
+      myScore: 2,
+      opId: 5,
+      opNick: "noname_12",
+      opImg: "../favicon.ico",
+      opScore: 3,
+    },
+    {
+      isWin: false,
+      myId: 0,
+      myNick: "susong",
+      myImg: "../image.png",
+      myScore: 2,
+      opId: 5,
+      opNick: "noname_12",
+      opImg: "../favicon.ico",
+      opScore: 3,
+    },
+    {
+      isWin: false,
+      myId: 0,
+      myNick: "susong",
+      myImg: "../image.png",
+      myScore: 2,
+      opId: 5,
+      opNick: "noname_12",
+      opImg: "../favicon.ico",
+      opScore: 3,
+    },
   ]);
   return (
     <TabPanel
       value={0}
-      sx={{ p: 3 }}
+      sx={{ p: 3, autoflow: "auto" }}
       className="flex-container profile-fullcontainer"
     >
       {historyList.map((value) => {

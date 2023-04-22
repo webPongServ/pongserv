@@ -33,6 +33,26 @@ const Achievements = () => {
       achvContent: "42승 업적에 관한 내용입니다.",
       achvImg: "../image.png",
     },
+    {
+      achvTitle: "1승 업적",
+      achvContent: "1승 업적에 관한 내용입니다.",
+      achvImg: "../image.png",
+    },
+    {
+      achvTitle: "42승 업적",
+      achvContent: "42승 업적에 관한 내용입니다.",
+      achvImg: "../image.png",
+    },
+    {
+      achvTitle: "1승 업적",
+      achvContent: "1승 업적에 관한 내용입니다.",
+      achvImg: "../image.png",
+    },
+    {
+      achvTitle: "42승 업적",
+      achvContent: "42승 업적에 관한 내용입니다.",
+      achvImg: "../image.png",
+    },
   ]);
   return (
     <TabPanel
