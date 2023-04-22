@@ -15,7 +15,7 @@ type ChatRoomInfo = {
 
 type HandleRoomID = { roomID: number; setRoomID: Function };
 
-const WaitingPage = (props: HandleRoomID) => {
+const WaitingRoom = (props: HandleRoomID) => {
   const [chatRoomList, setChatRoomList] = useState<ChatRoomInfo[]>([
     {
       id: 1,
@@ -59,4 +59,4 @@ const WaitingPage = (props: HandleRoomID) => {
   );
 };
 
-export default WaitingPage;
+export default WaitingRoom;
