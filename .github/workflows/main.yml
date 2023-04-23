@@ -1,0 +1,45 @@
+name: Deploy to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 18
+
+    - name: Install dependencies and build backend
+      run: |
+        cd backend
+        npm ci
+        npm run build
+
+    - name: Install dependencies and build frontend
+      run: |
+        cd frontend
+        npm ci
+        npm run build
+
+    - name: Deploy to AWS EC2
+      env:
+        PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        HOST: ${{ secrets.EC2_HOST }}
+        USER: ${{ secrets.EC2_USER }}
+      run: |
+        echo "$PRIVATE_KEY" > private_key.pem
+        chmod 600 private_key.pem
+        scp -i private_key.pem -r backend/dist $USER@$HOST:/home/ubuntu/pongserv/backend
+        scp -i private_key.pem -r frontend/build $USER@$HOST:/home/ubuntu/pongserv/frontend
+        ssh -i private_key.pem -o StrictHostKeyChecking=no $USER@$HOST "pm2 restart backend && pm2 restart frontend"
+        rm -f private_key.pem
+
