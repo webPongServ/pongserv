@@ -1,4 +1,13 @@
-import { Controller, Get, Patch, Post } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  HttpException,
+  HttpStatus,
+  Patch,
+  Post,
+  UseFilters,
+} from '@nestjs/common';
+import { HttpExceptionFilter } from 'src/http-exception.filter';
 import { GamesService } from './games.service';
 
 @Controller('games')
@@ -10,6 +19,7 @@ export class GamesController {
   getAllGames() {
     // return this.gamesService.getAllGames();
     return 'Hello World! it is getAllGames()';
+    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
   // gameroom_id: string	일반 게임 입장	201, 403
