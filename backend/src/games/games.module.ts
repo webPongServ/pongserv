@@ -1,7 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { GamesController } from './games.controller';
-import { LoggerMiddleware } from './logger.middleware';
+import { LoggerMiddleware } from '../common/middlewares/logger.middleware';
 
 @Module({
   providers: [GamesService],
