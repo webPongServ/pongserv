@@ -1,9 +1,14 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { GamesController } from './games.controller';
+import { LoggerMiddleware } from '../common/middlewares/logger.middleware';
 
 @Module({
   providers: [GamesService],
-  controllers: [GamesController]
+  controllers: [GamesController],
 })
-export class GamesModule {}
+export class GamesModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(LoggerMiddleware).forRoutes('games');
+  }
+}
