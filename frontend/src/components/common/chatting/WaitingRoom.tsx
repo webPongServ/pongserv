@@ -1,61 +1,114 @@
 import { useState } from "react";
 import RoomCard from "components/common/chatting/RoomCard";
+
 import { Box } from "@mui/material";
 import { Button } from "@mui/joy";
 
-type ChatRoomInfo = {
-  id: number;
+export type ChatRoomInfo = {
+  id: string;
   title: string;
   owner: string;
-  isPublic: boolean;
+  type: string;
   current: number;
   max: number;
   createdAt: Date;
 };
 
-type HandleRoomID = { roomID: number; setRoomID: Function };
+type HandleRoomID = { roomID: string; setRoomID: Function };
 
 const WaitingRoom = (props: HandleRoomID) => {
   const [chatRoomList, setChatRoomList] = useState<ChatRoomInfo[]>([
     {
-      id: 1,
+      id: "202304230001",
       title: "이기면 100만원~",
       owner: "noname_12",
-      isPublic: true,
+      type: "public",
       current: 4,
       max: 5,
       createdAt: new Date(),
     },
     {
-      id: 2,
-      title: "mgo님의 채팅방",
+      id: "202304230002",
+      title: "옥상으로 따라와",
       owner: "mgo",
-      isPublic: false,
+      type: "protected",
       current: 4,
-      max: 10,
+      max: 9,
+      createdAt: new Date(),
+    },
+    {
+      id: "202304230003",
+      title: "[DM] mgo님과의 채팅방",
+      owner: "mgo",
+      type: "private",
+      current: 1,
+      max: 2,
+      createdAt: new Date(),
+    },
+    {
+      id: "202304230003",
+      title: "[DM] mgo님과의 채팅방",
+      owner: "mgo",
+      type: "private",
+      current: 1,
+      max: 2,
+      createdAt: new Date(),
+    },
+    {
+      id: "202304230003",
+      title: "[DM] mgo님과의 채팅방",
+      owner: "mgo",
+      type: "private",
+      current: 1,
+      max: 2,
+      createdAt: new Date(),
+    },
+    {
+      id: "202304230003",
+      title: "[DM] mgo님과의 채팅방",
+      owner: "mgo",
+      type: "private",
+      current: 1,
+      max: 2,
+      createdAt: new Date(),
+    },
+    {
+      id: "202304230003",
+      title: "[DM] mgo님과의 채팅방",
+      owner: "mgo",
+      type: "private",
+      current: 1,
+      max: 2,
       createdAt: new Date(),
     },
   ]);
+
   return (
-    <>
-      <Box className="width-center overflow" sx={{ p: 2, height: "85%" }}>
+    <Box sx={{ p: 2, height: "90%" }}>
+      <Box className="width-center overflow" sx={{ p: 2, height: "90%" }}>
         {chatRoomList.map((value) => (
           <RoomCard
             id={value.id}
             title={value.title}
             owner={value.owner}
-            isPublic={value.isPublic}
+            type={value.type}
             current={value.current}
             max={value.max}
             createdAt={value.createdAt}
+            roomID={props.roomID}
             setRoomID={props.setRoomID}
           />
         ))}
       </Box>
-      <div className="center">
-        <Button className="chat-container">체팅방 생성</Button>
-      </div>
-    </>
+      <Box className="flex-container" sx={{ height: "10%" }}>
+        <Button
+          className="chat-container"
+          onClick={() => props.setRoomID("creator")}
+        >
+          체팅방 생성
+        </Button>
+      </Box>
+    </Box>
   );
 };
 

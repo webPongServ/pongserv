@@ -12,6 +12,7 @@ import IconButton from "@mui/material/IconButton";
 
 import WaitingRoom from "./chatting/WaitingRoom";
 import ChattingRoom from "./chatting/ChattingRoom";
+import RoomCreator from "components/common/chatting/RoomCreator";
 
 type HandleOpen = { open: boolean; setOpen: Function };
 
@@ -25,7 +26,7 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const ChattingDrawer = (props: HandleOpen) => {
-  const [roomID, setRoomID] = useState<number>(0);
+  const [roomID, setRoomID] = useState<string>("waiting");
 
   const theme = useTheme();
 
@@ -37,6 +38,7 @@ const ChattingDrawer = (props: HandleOpen) => {
     <Drawer
       sx={{
         width: ChattingDrawerWidth,
+        height: "100%",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
           width: ChattingDrawerWidth,
@@ -46,7 +48,7 @@ const ChattingDrawer = (props: HandleOpen) => {
       anchor="right"
       open={props.open}
     >
-      <DrawerHeader>
+      <DrawerHeader sx={{ height: "8%" }}>
         <IconButton onClick={handleDrawerClose}>
           {theme.direction === "rtl" ? (
             <ChevronLeftIcon />
@@ -61,9 +63,13 @@ const ChattingDrawer = (props: HandleOpen) => {
         </div>
       </DrawerHeader>
       <Divider />
-      {roomID === 0 ? (
+      {roomID === "waiting" && (
         <WaitingRoom roomID={roomID} setRoomID={setRoomID} />
-      ) : (
+      )}
+      {roomID === "creator" && (
+        <RoomCreator roomID={roomID} setRoomID={setRoomID} />
+      )}
+      {!(roomID === "waiting" || roomID === "creator") && (
         <ChattingRoom roomID={roomID} setRoomID={setRoomID} />
       )}
     </Drawer>

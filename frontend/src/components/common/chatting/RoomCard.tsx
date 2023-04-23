@@ -7,13 +7,14 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Person from "@mui/icons-material/Person";
 
 type ChatRoomInfoProps = {
-  id: number;
+  id: string;
   title: string;
   owner: string;
-  isPublic: boolean;
+  type: string;
   current: number;
   max: number;
   createdAt: Date;
+  roomID: string;
   setRoomID: Function;
 };
 
@@ -67,7 +68,9 @@ const RoomCard = (props: ChatRoomInfoProps) => {
         }}
       >
         <Typography sx={{ color: "#aaaaaa" }}>
-          {props.isPublic ? "공개" : "비공개"}
+          {props.type === "public" && "공개"}
+          {props.type === "protected" && "비공개"}
+          {props.type === "private" && "DM"}
         </Typography>
         <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
         <Typography sx={{ color: "#aaaaaa" }}>9 hours ago</Typography>
