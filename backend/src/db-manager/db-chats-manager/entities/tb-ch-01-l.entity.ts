@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { TbCh02LEntity } from "./tb-ch-02-l.entity";
 
 @Entity({ name: 'TB_CH01L' })
 export class TbCh01LEntity {
@@ -28,4 +29,8 @@ export class TbCh01LEntity {
 
 	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
 	lastDttm: Date;
+
+	//REVIEW - ch02ls 대신 chatroomUsers 라고 지어야할지 고민
+	@OneToMany(()=>TbCh02LEntity, (ch02l)=>ch02l.tbCh01L)
+	ch02ls: TbCh02LEntity[];
 }
