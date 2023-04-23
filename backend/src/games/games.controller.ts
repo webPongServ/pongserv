@@ -3,11 +3,10 @@ import {
   Get,
   HttpException,
   HttpStatus,
+  Param,
   Patch,
   Post,
-  UseFilters,
 } from '@nestjs/common';
-import { HttpExceptionFilter } from 'src/http-exception.filter';
 import { GamesService } from './games.service';
 
 @Controller('games')
@@ -22,20 +21,21 @@ export class GamesController {
     throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 
-  // gameroom_id: string	일반 게임 입장	201, 403
-  @Post('/normal/entrance')
-  entryGame() {
+  // POST gameroom_id: string	일반 게임 입장	201, 403
+  @Post('/normal/entrance/:gameroom_id')
+  entryGame(@Param('gameroom_id') gameroom_id: string) {
+    console.log(gameroom_id);
     return 'Hello World! it is entryGame()';
   }
 
-  // gameroom_name: string, score: number, difficulty: string	일반 게임 생성	201, 403	gameroom_id: string
-  @Post('/normal/create')
+  // POST gameroom_name: string, score: number, difficulty: string	일반 게임 생성	201, 403	gameroom_id: string
+  @Post('/normal/create/:gameroom_name/:score/:difficulty')
   createGame() {
     return 'Hello World! it is createGame()';
   }
 
   // gameroom_id: string, gameroom_name: string, score: number, difficulty: string	일반 게임 수정	201, 403
-  @Patch('/normal/info')
+  @Patch('/normal/info/:gameroom_id/:gameroom_name/:score/:difficulty')
   changeGameInfo() {
     return 'Hello World! it is changeGameInfo()';
   }
@@ -50,5 +50,11 @@ export class GamesController {
   @Patch('/ladder/deregistration')
   ladderDeregistration() {
     return 'Hello World! it is ladderDeregistration()';
+  }
+
+  // gameroom_id: string	게임 결과 화면	200	this_info: {game_result: string, game_type: string, user_score: number, opposite_user_id: string, opposite_user_score: number, result_llvl: number}, total_info: {cnt_vct: number, cnt_dft: number, llvl: number}
+  @Get('result/:gameroom_id')
+  getGameResult() {
+    return 'Hello World! it is getGameResult()';
   }
 }
