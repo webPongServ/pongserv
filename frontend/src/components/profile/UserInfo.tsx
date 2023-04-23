@@ -23,6 +23,8 @@ const UserInfo = () => {
     ELO: 100,
     winRate: 0.9,
   });
+  console.log(setUserInfo);
+
   return (
     <Box className="profile-flex">
       <div className="profile-center profile-flex">
