@@ -38,8 +38,9 @@ jobs:
       run: |
         echo "$PRIVATE_KEY" > private_key.pem
         chmod 600 private_key.pem
-        scp -i private_key.pem -r backend/dist $USER@$HOST:/home/$HOST/pongserv/backend
-        scp -i private_key.pem -r frontend/build $USER@$HOST:/home/$HOST/pongserv/frontend
-        ssh -i private_key.pem -o StrictHostKeyChecking=no $USER@$HOST "pm2 restart backend && pm2 restart frontend"
+        echo "Fetching remote SSH server public key"
+        ssh-keyscan $HOST >> ~/.ssh/known_hosts
+        scp -i private_key.pem -o BatchMode=yes -o StrictHostKeyChecking=yes -r backend/dist $USER@$HOST:/home/$HOST/pongserv/backend
+        scp -i private_key.pem -o BatchMode=yes -o StrictHostKeyChecking=yes -r frontend/build $USER@$HOST:/home/$HOST/pongserv/frontend
+        ssh -i private_key.pem -o BatchMode=yes -o StrictHostKeyChecking=yes $USER@$HOST "pm2 restart backend && pm2 restart frontend"
         rm -f private_key.pem
-
