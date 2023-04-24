@@ -40,11 +40,11 @@ const Search = () => {
   return (
     <Box
       className="flex-container"
-      sx={{ flexDirection: "column", height: "100%", marginTop: "10%", gap: 1 }}
+      sx={{ flexDirection: "column", height: "100%", gap: 1 }}
     >
       <Box
         className="flex-container"
-        sx={{ width: "100%", height: "20%", gap: 1 }}
+        sx={{ width: "100%", height: "10%", gap: 1 }}
       >
         <SearchIcon />
         <Input
