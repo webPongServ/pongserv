@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import MainRoute from "Route";
+import MainRoute from "components/common/MainRoute";
 import AppBar from "./AppBar";
 import FriendDrawer from "./FriendDrawer";
 import ChattingDrawer from "./ChattingDrawer";
