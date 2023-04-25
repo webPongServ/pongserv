@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryColumn } from "typeorm";
 
+// user agent acheivement master - 유저업적기본
 @Entity({ name: 'TB_UA03M' })
 export class TbUa03MEntity {
 	// ACHV_CD
@@ -7,15 +8,15 @@ export class TbUa03MEntity {
 	achvCd: string;
 
 	// ACHV_NM
-	@PrimaryColumn({ name: "ACHV_NM", type: 'varchar', length: 200 })
+	@Column({ name: "ACHV_NM", type: 'varchar', length: 200 })
 	achvNm: string;
 
 	// ACHV_CMT
-	@PrimaryColumn({ name: "ACHV_CMT", type: 'varchar', length: 1000 })
+	@Column({ name: "ACHV_CMT", type: 'varchar', length: 1000 })
 	achvCmt: string;
 
 	// ACHV_IMG_PATH
-	@PrimaryColumn({ name: "ACHV_IMG_PATH", type: 'varchar', length: 200 })
+	@Column({ name: "ACHV_IMG_PATH", type: 'varchar', length: 200 })
 	achvImgPath: string;
 
 	// DEL_TF
