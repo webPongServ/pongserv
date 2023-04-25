@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { TbUa03DEntity } from "./tb-ua-03-d.entity";
 
 // user agent acheivement master - 유저업적기본
 @Entity({ name: 'TB_UA03M' })
@@ -30,4 +31,7 @@ export class TbUa03MEntity {
 	// LAST_DTTM
 	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
 	lastDttm: Date;
+
+	@OneToMany(()=>TbUa03DEntity, (ua03d)=>ua03d.ua03mEntity) //NOTE - 이거 안 넣어도 돌아가는데 돌아가는 이유를 정확히 모르므로 혹시 몰라서 넣음..
+	ua03dEntities: TbUa03DEntity[];
 }
