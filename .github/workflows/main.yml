@@ -35,7 +35,6 @@ jobs:
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
-        # port: ${{ secrets.PORT }}
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         source: "backend/dist"
         target: /home/ubuntu/pongserv
@@ -45,22 +44,14 @@ jobs:
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
-        # port: ${{ secrets.PORT }}
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         source: "frontend/build"
         target: /home/ubuntu/pongserv
   
-    # - name: Deploy to AWS EC2
-    #   env:
-    #     PRIVATE_KEY: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-    #     HOST: ${{ secrets.EC2_HOST }}
-    #     USER: ${{ secrets.EC2_USER }}
-    #   run: |
-    #     echo "$PRIVATE_KEY" > private_key.pem
-    #     chmod 600 private_key.pem
-    #     echo "Fetching remote SSH server public key"
-    #     ssh-keyscan $HOST >> ~/.ssh/known_hosts
-    #     scp -i private_key.pem -o BatchMode=yes -o StrictHostKeyChecking=yes -r backend/dist $USER@$HOST:/home/$HOST/pongserv/backend
-    #     scp -i private_key.pem -o BatchMode=yes -o StrictHostKeyChecking=yes -r frontend/build $USER@$HOST:/home/$HOST/pongserv/frontend
-    #     ssh -i private_key.pem -o BatchMode=yes -o StrictHostKeyChecking=yes $USER@$HOST "pm2 restart backend && pm2 restart frontend"
-    #     rm -f private_key.pem
+    - name: reload pm2 with new build files
+      uses: appleboy/ssh-action@v0.1.10
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        script: sh /home/ubuntu/pongserv/reload.sh
