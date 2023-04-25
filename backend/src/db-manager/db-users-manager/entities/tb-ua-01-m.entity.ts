@@ -1,3 +1,4 @@
+import { TbCh02LEntity } from "src/db-manager/db-chats-manager/entities/tb-ch-02-l.entity";
 import { Column, Entity, OneToMany, PrimaryColumn, Unique } from "typeorm";
 import { TbUa01LEntity } from "./tb-ua-01-l.entity";
 import { TbUa02LEntity } from "./tb-ua-02-l.entity";
@@ -65,4 +66,10 @@ export class TbUa01MEntity {
 		onDelete: 'RESTRICT',
 	})
 	ua03dEntities: TbUa03DEntity[];
+
+	@OneToMany(()=>TbCh02LEntity, (ch02l)=>ch02l.ua01mEntity, {
+		onUpdate: 'CASCADE', 
+		onDelete: 'RESTRICT',
+	})
+	ch02lEntities: TbCh02LEntity[];
 }
