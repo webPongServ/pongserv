@@ -38,7 +38,7 @@ jobs:
         # port: ${{ secrets.PORT }}
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         source: "backend/dist"
-        target: /home/ubuntu/pongserv/backend
+        target: /home/ubuntu/pongserv
     
     - name: copy file via ssh key
       uses: appleboy/scp-action@v0.1.4
@@ -48,7 +48,7 @@ jobs:
         # port: ${{ secrets.PORT }}
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         source: "frontend/build"
-        target: /home/ubuntu/pongserv/frontend
+        target: /home/ubuntu/pongserv
   
     # - name: Deploy to AWS EC2
     #   env:
