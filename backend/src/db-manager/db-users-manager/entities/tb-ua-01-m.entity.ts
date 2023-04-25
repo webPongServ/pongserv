@@ -1,8 +1,10 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn, Unique } from "typeorm";
 import { TbUa01LEntity } from "./tb-ua-01-l.entity";
 import { TbUa02LEntity } from "./tb-ua-02-l.entity";
 import { TbUa03DEntity } from "./tb-ua-03-d.entity";
 
+// user agent master - 유저 기본
+@Unique(['nickname'])
 @Entity({ name: 'TB_UA01M' })
 export class TbUa01MEntity {
 	// USER_ID
@@ -11,7 +13,7 @@ export class TbUa01MEntity {
 
 	// NICKNAME
 	@Column({ name: "NICKNAME", type: 'varchar', length: 8 })
-	nickname: string; // TODO - Set as unique
+	nickname: string;
 	
 	// TWOFACTOR
 	@Column({ name: "TWOFACTOR", type: 'boolean' })
@@ -38,15 +40,24 @@ export class TbUa01MEntity {
 	lastDttm: Date;
 
 	/**!SECTION
-	 * Relation Join
+	 * OneToManys
 	 */
-	@OneToMany(()=>TbUa01LEntity, (ua01l)=>ua01l.userId)
+	@OneToMany(()=>TbUa01LEntity, (ua01l)=>ua01l.userId, {
+		onUpdate: 'CASCADE', 
+		onDelete: 'RESTRICT',
+	})
 	ua01lEntities: TbUa01LEntity[];
 
-	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.userId)
+	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.userId, {
+		onUpdate: 'CASCADE', 
+		onDelete: 'RESTRICT',
+	})
 	ua02lEntities: TbUa02LEntity[];
 
-	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.frUserId)
+	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.frUserId, {
+		onUpdate: 'CASCADE', 
+		onDelete: 'RESTRICT',
+	})
 	ua02lEntitiesAsFr: TbUa02LEntity[];
 
 	@OneToMany(()=>TbUa03DEntity, (ua03d)=>ua03d.ua01mEntity, {
