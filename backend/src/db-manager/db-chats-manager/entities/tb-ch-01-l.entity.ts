@@ -3,9 +3,10 @@ import { TbCh02DEntity } from "./tb-ch-02-d.entity";
 import { TbCh02LEntity } from "./tb-ch-02-l.entity";
 import { TbCh03LEntity } from "./tb-ch-03-l.entity";
 
+// chatroom list
 @Entity({ name: 'TB_CH01L' })
 export class TbCh01LEntity {
-	// CHT_RM_ID
+	// CHT_RM_ID - YYYYMMDDNNNN
 	@PrimaryColumn({ name: "CHT_RM_ID", type: 'varchar', length: 12 })
 	chtRmId: string;
 
@@ -34,15 +35,15 @@ export class TbCh01LEntity {
 	delTf: boolean;
 
 	// FRST_DTTM
-	@Column({ name: "FRST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "FRST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	frstDttm: Date;
 
 	// LAST_DTTM
-	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "LAST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	lastDttm: Date;
 
 	/**!SECTION
-	 * Relation Join
+	 * OneToManys
 	 */
 	@OneToMany(()=>TbCh02LEntity, (ch02l)=>ch02l.chtRmId)
 	ch02lEntities: TbCh02LEntity[];

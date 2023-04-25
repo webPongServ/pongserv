@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { TbCh01LEntity } from "./tb-ch-01-l.entity";
 
+// chatroom user list
 @Entity({ name: 'TB_CH02D' })
 export class TbCh02DEntity {
 	// CHT_RM_ID
@@ -25,7 +26,7 @@ export class TbCh02DEntity {
 	chtRmRstrCd: string;
 
 	// RSTR_CRTN_DTTM
-	@Column({ name: 'RSTR_CRTN_DTTM', type: 'timestamp', precision: 0 })
+	@Column({ name: 'RSTR_CRTN_DTTM', type: 'timestamp with time zone', precision: 0 })
 	rstrCrtnDttm: Date;
 
 	// RSTR_TM
@@ -41,10 +42,10 @@ export class TbCh02DEntity {
 	delTf: boolean;
 
 	// FRST_DTTM
-	@Column({ name: "FRST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "FRST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	frstDttm: Date;
 
 	// LAST_DTTM
-	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "LAST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	lastDttm: Date;
 }
