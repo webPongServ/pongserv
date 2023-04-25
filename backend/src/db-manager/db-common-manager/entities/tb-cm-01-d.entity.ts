@@ -1,7 +1,11 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity({ name: 'TB_CM01D' })
 export class TbCm01DEntity {
+	// TODO - Clean TMP_ID and Set PK
+	@PrimaryColumn()
+	tmpId: number;
+
 	// CMMN_CD
 	@Column({ name: "CMMN_CD", type: 'varchar', length: 100 })
 	cmmnCd: string;

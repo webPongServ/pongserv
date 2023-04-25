@@ -1,5 +1,6 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { TbUa01LEntity } from "./tb-ua-01-l.entity";
+import { TbUa02LEntity } from "./tb-ua-02-l.entity";
 
 @Entity({ name: 'TB_UA01M' })
 export class TbUa01MEntity {
@@ -40,4 +41,10 @@ export class TbUa01MEntity {
 	 */
 	@OneToMany(()=>TbUa01LEntity, (ua01l)=>ua01l.userId)
 	ua01lEntities: TbUa01LEntity[];
+
+	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.userId)
+	ua02lEntities: TbUa01LEntity[];
+
+	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.frUserId)
+	ua02lEntitiesAsFr: TbUa01LEntity[];
 }

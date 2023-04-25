@@ -12,8 +12,8 @@ import { TbUa03MEntity } from './entities/tb-ua-03-m.entity';
 		TbUa01MEntity,
 		TbUa01LEntity,
 		TbUa02LEntity,
-		TbUa03MEntity,
-		TbUa03DEntity
+		// TbUa03MEntity,
+		// TbUa03DEntity
 	  ]),
 	],
 	providers: []

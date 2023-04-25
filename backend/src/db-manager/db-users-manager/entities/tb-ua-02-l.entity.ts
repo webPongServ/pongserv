@@ -1,23 +1,26 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { TbUa01MEntity } from "./tb-ua-01-m.entity";
 
+// user agent friend list - 유저친구내역
 @Entity({ name: 'TB_UA02L' })
 export class TbUa02LEntity {
 	// USER_ID
+	@PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 12 })
 	@ManyToOne(()=>TbUa01MEntity, (ua01m)=>ua01m.userId)
 	@JoinColumn({
 		name: 'USER_ID',
-		referencedColumnName: 'USER_ID'
+		referencedColumnName: 'userId'
 	})
-	userId: string; //REVIEW - or TbUa01MEntity ?
+	userId: TbUa01MEntity; // REVIEW - or TbUa01MEntity ?
 
 	// FR_USER_ID
+	@PrimaryColumn({ name: 'FR_USER_ID', type: 'varchar', length: 12 })
 	@ManyToOne(()=>TbUa01MEntity, (ua01m)=>ua01m.userId)
 	@JoinColumn({
 		name: 'FR_USER_ID',
-		referencedColumnName: 'USER_ID'
+		referencedColumnName: 'userId'
 	})
-	frUserId: string; //REVIEW - or TbUa01MEntity ?
+	frUserId: TbUa01MEntity; // REVIEW - or TbUa01MEntity ?
 
 	// ST_CD
 	@Column({ name: "ST_CD", type: 'varchar', length: 2 })
