@@ -61,9 +61,10 @@ const Achievements = () => {
       className="flex-container profile-fullcontainer"
     >
       <div className="flex-wrap-container">
-        {achievementList.map((value) => {
+        {achievementList.map((value, index) => {
           return (
             <Card
+              key={value.achvTitle + index}
               variant="outlined"
               className="achievement-container flex-container gap"
             >

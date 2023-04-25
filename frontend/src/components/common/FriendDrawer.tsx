@@ -71,8 +71,12 @@ const FriendDrawer = () => {
         </IconButton>
       </Box>
       <List sx={{ height: "80%", overflow: "auto" }}>
-        {loginFriends.map((text, index) => (
-          <ListItem key={text} disablePadding sx={{ display: "block" }}>
+        {loginFriends.map((value, index) => (
+          <ListItem
+            key={value + index}
+            disablePadding
+            sx={{ display: "block" }}
+          >
             <ListItemButton
               sx={{
                 minHeight: 48,
@@ -92,12 +96,16 @@ const FriendDrawer = () => {
               >
                 <AccountCircleIcon fontSize="large" />
               </ListItemIcon>
-              <ListItemText primary={text} sx={{ opacity: true ? 1 : 0 }} />
+              <ListItemText primary={value} sx={{ opacity: true ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
         ))}
-        {logoutFriends.map((text, index) => (
-          <ListItem key={text} disablePadding sx={{ display: "block" }}>
+        {logoutFriends.map((value, index) => (
+          <ListItem
+            key={value + index}
+            disablePadding
+            sx={{ display: "block" }}
+          >
             <ListItemButton
               sx={{
                 minHeight: 48,
@@ -118,7 +126,7 @@ const FriendDrawer = () => {
                 <AccountCircleIcon fontSize="large" sx={{ color: "#cccccc" }} />
               </ListItemIcon>
               <ListItemText
-                primary={text}
+                primary={value}
                 sx={{ opacity: true ? 1 : 0, color: "#cccccc" }}
               />
             </ListItemButton>

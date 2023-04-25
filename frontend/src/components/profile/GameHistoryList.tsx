@@ -93,9 +93,9 @@ const GameHistoryList = () => {
       sx={{ p: 3, autoflow: "auto" }}
       className="flex-container profile-fullcontainer"
     >
-      {historyList.map((value) => {
+      {historyList.map((value, index) => {
         return (
-          <div className="flex-container">
+          <div className="flex-container" key={value.myId + index}>
             <Card
               variant="outlined"
               className="history-container flex-container gap"
