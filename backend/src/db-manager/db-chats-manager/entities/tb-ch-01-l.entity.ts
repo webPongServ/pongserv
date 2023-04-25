@@ -50,6 +50,6 @@ export class TbCh01LEntity {
 	@OneToMany(()=>TbCh02DEntity, (ch02d)=>ch02d.chtRmId)
 	ch02dEntities: TbCh02DEntity[];
 
-	// @OneToMany(()=>TbCh03LEntity, (ch03l)=>ch03l.chtRmId)
-	// ch03lEntities: TbCh03LEntity[];
+	@OneToMany(()=>TbCh03LEntity, (ch03l)=>ch03l.chtRmId)
+	ch03lEntities: TbCh03LEntity[];
 }
