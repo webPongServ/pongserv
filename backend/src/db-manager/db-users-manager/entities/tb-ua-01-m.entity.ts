@@ -48,13 +48,13 @@ export class TbUa01MEntity {
 	})
 	ua01lEntities: TbUa01LEntity[];
 
-	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.userId, {
+	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.ua01mEntity, {
 		onUpdate: 'CASCADE', 
 		onDelete: 'RESTRICT',
 	})
 	ua02lEntities: TbUa02LEntity[];
 
-	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.frUserId, {
+	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.ua01mEntityAsFr, {
 		onUpdate: 'CASCADE', 
 		onDelete: 'RESTRICT',
 	})
