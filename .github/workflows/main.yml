@@ -21,13 +21,13 @@ jobs:
     - name: Install dependencies and build backend
       run: |
         cd backend
-        npm ci
+        npm ci --production
         npm run build
 
     - name: Install dependencies and build frontend
       run: |
         cd frontend
-        npm ci
+        npm ci --production
         npm run build
 
     - name: copy file via ssh key
@@ -39,6 +39,16 @@ jobs:
         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
         source: "backend/dist"
         target: /home/ubuntu/pongserv/backend
+    
+    - name: copy file via ssh key
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        # port: ${{ secrets.PORT }}
+        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+        source: "frontend/build"
+        target: /home/ubuntu/pongserv/frontend
   
     # - name: Deploy to AWS EC2
     #   env:
