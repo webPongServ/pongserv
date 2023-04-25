@@ -2,7 +2,7 @@ import { TbUa01MEntity } from "src/db-manager/db-users-manager/entities/tb-ua-01
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { TbCh01LEntity } from "./tb-ch-01-l.entity";
 
-// chatroom restriction detail
+// chatroom user list
 @Entity({ name: 'TB_CH02L' })
 export class TbCh02LEntity {
 	// CHT_RM_ID
