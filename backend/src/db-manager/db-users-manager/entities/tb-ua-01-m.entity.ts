@@ -1,5 +1,6 @@
 import { TbCh02DEntity } from "src/db-manager/db-chats-manager/entities/tb-ch-02-d.entity";
 import { TbCh02LEntity } from "src/db-manager/db-chats-manager/entities/tb-ch-02-l.entity";
+import { TbCh03LEntity } from "src/db-manager/db-chats-manager/entities/tb-ch-03-l.entity";
 import { Column, Entity, OneToMany, PrimaryColumn, Unique } from "typeorm";
 import { TbUa01LEntity } from "./tb-ua-01-l.entity";
 import { TbUa02LEntity } from "./tb-ua-02-l.entity";
@@ -79,4 +80,10 @@ export class TbUa01MEntity {
 		onDelete: 'RESTRICT',
 	})
 	ch02dEntities: TbCh02DEntity[];
+
+	@OneToMany(()=>TbCh03LEntity, (ch03l)=>ch03l.ua01mEntity, {
+		onUpdate: 'CASCADE', 
+		onDelete: 'RESTRICT',
+	})
+	ch03lEntities: TbCh03LEntity[];
 }
