@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { TbUa01LEntity } from "./tb-ua-01-l.entity";
 
 @Entity({ name: 'TB_UA01M' })
 export class TbUa01MEntity {
@@ -33,4 +34,10 @@ export class TbUa01MEntity {
 	// LAST_DTTM
 	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
 	lastDttm: Date;
+
+	/**!SECTION
+	 * Relation Join
+	 */
+	@OneToMany(()=>TbUa01LEntity, (ua01l)=>ua01l.userId)
+	ua01lEntities: TbUa01LEntity[];
 }

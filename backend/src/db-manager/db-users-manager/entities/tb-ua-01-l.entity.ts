@@ -1,18 +1,21 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { TbUa01MEntity } from "./tb-ua-01-m.entity";
 
+// user agent state list - 유저 상태 내역
 @Entity({ name: 'TB_UA01L' })
 export class TbUa01LEntity {
 	// USER_ID
-	@ManyToOne(()=>TbUa01MEntity, (ua01m)=>ua01m.userId)
+	@PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
+	userId: string;
+	
+	@ManyToOne(()=>TbUa01MEntity, (ua01m)=>ua01m.ua01lEntities)
 	@JoinColumn({
 		name: 'USER_ID',
-		referencedColumnName: 'USER_ID'
 	})
-	userId: string; //REVIEW - or TbUa01MEntity ?
+	ua01mEntity: TbUa01MEntity; //REVIEW - or TbUa01MEntity ?
 
 	// LOGIN_SEQ
-	@Column({ name: "LOGIN_SEQ", type: 'number' })
+	@Column({ name: "LOGIN_SEQ", type: 'integer' })
 	loginSeq: number;
 
 	// LOGIN_DTTM
