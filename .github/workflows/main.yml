@@ -3,7 +3,7 @@ name: Deploy to AWS EC2
 on:
   push:
     branches:
-      - FIX-Github-action-login-failed-problem
+      - main
 
 jobs:
   deploy:
