@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { TbGm01LEntity } from "./tb-gm-01-l.entity";
 
 @Entity({ name: 'TB_GM04L' })
@@ -7,7 +7,7 @@ export class TbGm04LEntity {
 	//TODO - set
 
 	// LDDR_RDY_SRNO
-	@Column({ name: "LDDR_RDY_SRNO", type: 'varchar', length: 12 })
+	@PrimaryColumn({ name: "LDDR_RDY_SRNO", type: 'varchar', length: 12 })
 	gmRsltCd: string;
 
 	// MTCH_APLY_DTTM
@@ -29,7 +29,7 @@ export class TbGm04LEntity {
 	@ManyToOne(()=>TbGm01LEntity, (gm01l)=>gm01l.gmSrno)
 	@JoinColumn({
 		name: 'GM_SRNO',
-		referencedColumnName: 'GM_SRNO'
+		referencedColumnName: 'gmSrno'
 	})
 	gmSrno: string; //REVIEW - or TbGm01LEntity ?
 	
