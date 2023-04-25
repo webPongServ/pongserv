@@ -15,6 +15,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
+  height: "90%",
   padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
@@ -38,7 +39,7 @@ export default function AppHeader() {
       <CssBaseline />
       <AppBar open={open} setOpen={setOpen} />
       <FriendDrawer />
-      <Main open={open} sx={{ height: "90%" }}>
+      <Main open={open}>
         <Box component="main" sx={{ flexGrow: 1, height: "100%" }}>
           <Routes>
             <Route path="/*" element={<MainRoute />} />
