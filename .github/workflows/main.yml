@@ -21,13 +21,13 @@ jobs:
     - name: Install dependencies and build backend
       run: |
         cd backend
-        npm ci --only=production
+        npm ci
         npm run build
 
     - name: Install dependencies and build frontend
       run: |
         cd frontend
-        npm ci --only=production
+        npm ci
         npm run build
 
     - name: copy file via ssh key
