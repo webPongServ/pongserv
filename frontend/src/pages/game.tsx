@@ -38,6 +38,30 @@ const Game = () => {
       difficulty: "hard",
       createdAt: new Date(),
     },
+    {
+      id: "202304250002",
+      title: "옥상으로 따라와",
+      owner: "seongtki",
+      maxScore: 5,
+      difficulty: "hard",
+      createdAt: new Date(),
+    },
+    {
+      id: "202304250002",
+      title: "옥상으로 따라와",
+      owner: "seongtki",
+      maxScore: 5,
+      difficulty: "hard",
+      createdAt: new Date(),
+    },
+    {
+      id: "202304250002",
+      title: "옥상으로 따라와",
+      owner: "seongtki",
+      maxScore: 5,
+      difficulty: "hard",
+      createdAt: new Date(),
+    },
   ]);
   return (
     <>

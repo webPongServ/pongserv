@@ -24,17 +24,19 @@ const GameCard = (props: GameCardProps) => {
         props.setRoomStatus("normal-game");
         props.setSelectedID(props.id);
       }}
-      sx={{ cursor: "pointer" }}
+      sx={{
+        cursor: "pointer",
+        width: 280,
+        height: 250,
+      }}
     >
       <Card
         variant="outlined"
         sx={{
-          width: 250,
-          height: 250,
           "&:hover": { border: "3px solid skyblue" },
         }}
       >
-        <Box className="flex-container outframe" sx={{ height: 150, gap: 3 }}>
+        <Box className="flex-container outframe" sx={{ height: 130, gap: 3 }}>
           <Box
             className=" flex-container direction-column game-image"
             sx={{ gap: 1 }}
