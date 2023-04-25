@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 import { TbUa01LEntity } from "./tb-ua-01-l.entity";
 import { TbUa02LEntity } from "./tb-ua-02-l.entity";
+import { TbUa03DEntity } from "./tb-ua-03-d.entity";
 
 @Entity({ name: 'TB_UA01M' })
 export class TbUa01MEntity {
@@ -43,8 +44,14 @@ export class TbUa01MEntity {
 	ua01lEntities: TbUa01LEntity[];
 
 	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.userId)
-	ua02lEntities: TbUa01LEntity[];
+	ua02lEntities: TbUa02LEntity[];
 
 	@OneToMany(()=>TbUa02LEntity, (ua02l)=>ua02l.frUserId)
-	ua02lEntitiesAsFr: TbUa01LEntity[];
+	ua02lEntitiesAsFr: TbUa02LEntity[];
+
+	@OneToMany(()=>TbUa03DEntity, (ua03d)=>ua03d.ua01mEntity, {
+		onUpdate: 'CASCADE', 
+		onDelete: 'RESTRICT',
+	})
+	ua03dEntities: TbUa03DEntity[];
 }
