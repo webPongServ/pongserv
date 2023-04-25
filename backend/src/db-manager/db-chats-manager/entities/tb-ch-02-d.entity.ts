@@ -7,9 +7,9 @@ export class TbCh02DEntity {
 	@ManyToOne(()=>TbCh01LEntity, (ch01l)=>ch01l.chtRmId)
 	@JoinColumn({
 		name: 'CHT_RM_ID', 
-		referencedColumnName: 'CHT_RM_ID'
+		referencedColumnName: 'chtRmId'
 	})
-	chRmId: TbCh01LEntity;
+	chtRmId: TbCh01LEntity;
 	
 	// USER_ID
 	/* TODO - 
@@ -17,7 +17,7 @@ export class TbCh02DEntity {
 		- CHT_RM_ID와 USER_ID를 복합키로 사용해서 PK를 만들 계획.
 	*/
 	// NOTE - 우선은 PK가 필요하기 때문에 임시로 TMP_ID를 사용.
-	@PrimaryGeneratedColumn({ name: 'TMP_ID', type: 'number' })
+	@PrimaryGeneratedColumn({ name: 'TMP_ID', type: 'integer' })
 	tmpId: number;
 
 	// CHT_RM_RSTR_CD
@@ -29,7 +29,7 @@ export class TbCh02DEntity {
 	rstrCrtnDttm: Date;
 
 	// RSTR_TM
-	@Column({ name: 'RSTR_TM', type: 'number' })
+	@Column({ name: 'RSTR_TM', type: 'integer' })
 	rstrTm: number;
 
 	// VLD_TF
