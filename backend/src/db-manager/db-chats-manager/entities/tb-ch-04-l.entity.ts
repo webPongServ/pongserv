@@ -1,8 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
-import { TbCh01LEntity } from "./tb-ch-01-l.entity";
 
-@Entity({ name: 'TB_CH03L' })
-export class TbCh03LEntity {
+@Entity({ name: 'TB_CH04L' })
+export class TbCh04LEntity {
 	// USER_ID
 	/* TODO - 
 		- USER_ID 생기면 FK(ManyToOne)로 넣을 예정.
