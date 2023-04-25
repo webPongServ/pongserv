@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { TbGm01LEntity } from "./tb-gm-01-l.entity";
 
+// ladder ready list - 레더대기내역
 @Entity({ name: 'TB_GM04L' })
 export class TbGm04LEntity {
 	// USER_ID

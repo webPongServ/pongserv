@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { TbGm01LEntity } from "./tb-gm-01-l.entity";
 
+// game detail - 게임상세
 @Entity({ name: 'TB_GM01D' })
 export class TbGm01DEntity {
 	// GM_SRNO
@@ -31,11 +32,11 @@ export class TbGm01DEntity {
 	rsltLlvl: number;
 
 	// ENTRY_DTTM
-	@Column({ name: "ENTRY_DTTM", type: 'timestamp', precision: 0 })
+	@Column({ name: "ENTRY_DTTM", type: 'timestamp with time zone', precision: 0 })
 	entryDttm: Date;
 
 	// EXIT_DTTM
-	@Column({ name: "EXIT_DTTM", type: 'timestamp', precision: 0 })
+	@Column({ name: "EXIT_DTTM", type: 'timestamp with time zone', precision: 0 })
 	exitDttm: Date;
 
 	// DEL_TF
@@ -43,10 +44,10 @@ export class TbGm01DEntity {
 	delTf: boolean;
 
 	// FRST_DTTM
-	@Column({ name: "FRST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "FRST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	frstDttm: Date;
 
 	// LAST_DTTM
-	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "LAST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	lastDttm: Date;
 }
