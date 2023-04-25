@@ -20,6 +20,14 @@ body,
   flex-direction: row;
 }
 
+.align-normal {
+  align-items: normal;
+}
+
+.justify-normal {
+  justify-content: normal;
+}
+
 .flex-wrap-container {
   display: flex;
   flex-wrap: wrap;
@@ -27,4 +35,12 @@ body,
 
 .overflow {
   overflow: auto;
+}
+
+.width-center {
+  margin: 0 auto;
+}
+
+.center {
+  margin: auto auto;
 }

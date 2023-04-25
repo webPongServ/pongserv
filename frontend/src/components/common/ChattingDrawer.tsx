@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { ChattingDrawerWidth } from "constant";
 import "styles/global.scss";
+import "styles/Chatting.scss";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
@@ -7,6 +9,10 @@ import Drawer from "@mui/material/Drawer";
 import { styled, useTheme } from "@mui/material/styles";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
+
+import WaitingRoom from "./chatting/WaitingRoom";
+import ChattingRoom from "./chatting/ChattingRoom";
+import RoomCreator from "components/common/chatting/RoomCreator";
 
 type HandleOpen = { open: boolean; setOpen: Function };
 
@@ -20,6 +26,8 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const ChattingDrawer = (props: HandleOpen) => {
+  const [roomID, setRoomID] = useState<string>("waiting");
+
   const theme = useTheme();
 
   const handleDrawerClose = () => {
@@ -30,6 +38,7 @@ const ChattingDrawer = (props: HandleOpen) => {
     <Drawer
       sx={{
         width: ChattingDrawerWidth,
+        height: "100%",
         flexShrink: 0,
         "& .MuiDrawer-paper": {
           width: ChattingDrawerWidth,
@@ -39,7 +48,7 @@ const ChattingDrawer = (props: HandleOpen) => {
       anchor="right"
       open={props.open}
     >
-      <DrawerHeader>
+      <DrawerHeader sx={{ height: "8%" }}>
         <IconButton onClick={handleDrawerClose}>
           {theme.direction === "rtl" ? (
             <ChevronLeftIcon />
@@ -54,6 +63,15 @@ const ChattingDrawer = (props: HandleOpen) => {
         </div>
       </DrawerHeader>
       <Divider />
+      {roomID === "waiting" && (
+        <WaitingRoom roomID={roomID} setRoomID={setRoomID} />
+      )}
+      {roomID === "creator" && (
+        <RoomCreator roomID={roomID} setRoomID={setRoomID} />
+      )}
+      {!(roomID === "waiting" || roomID === "creator") && (
+        <ChattingRoom roomID={roomID} setRoomID={setRoomID} />
+      )}
     </Drawer>
   );
 };
