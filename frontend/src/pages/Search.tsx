@@ -37,6 +37,23 @@ const Search = () => {
     "chanhyle",
     "seongyle",
   ]);
+
+  let typingTimer: NodeJS.Timeout;
+  let doneTypingInterval: number = 300;
+
+  const doneTyping = () => {
+    console.log(123);
+  };
+
+  const HandleKeyUP = () => {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(doneTyping, doneTypingInterval);
+  };
+
+  const HandleKeyDown = () => {
+    clearTimeout(typingTimer);
+  };
+
   return (
     <Box
       className="flex-container"
@@ -50,14 +67,17 @@ const Search = () => {
         <Input
           placeholder="유저 이름을 입력하세요."
           sx={{ width: "50%" }}
-          onChange={(e) => {
-            setValue(e.target.value);
-          }}
+          onKeyUp={HandleKeyUP}
+          onKeyDown={HandleKeyDown}
         />
       </Box>
       <List sx={{ height: "60%", width: "50%", overflow: "auto" }}>
         {searchedUser.map((value, index) => (
-          <ListItem key={value} disablePadding sx={{ display: "block" }}>
+          <ListItem
+            key={value + index}
+            disablePadding
+            sx={{ display: "block" }}
+          >
             <ListItemButton
               sx={{
                 minHeight: 48,
