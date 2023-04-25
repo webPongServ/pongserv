@@ -42,7 +42,7 @@ const AppBar = (props: HandleOpen) => {
   return (
     <TopBar position="fixed" open={props.open}>
       <Toolbar>
-        <Link to="/" className=" app-bar-container app-bar-link">
+        <Link to="/game" className=" app-bar-container app-bar-link">
           <Typography variant="h6" component="h1" align="center">
             WebPongServ
           </Typography>
