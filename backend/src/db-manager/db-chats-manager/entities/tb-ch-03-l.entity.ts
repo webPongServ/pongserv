@@ -2,7 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedC
 import { TbCh01LEntity } from "./tb-ch-01-l.entity";
 
 @Entity({ name: 'TB_CH03L' })
-export class TbCh02LEntity {
+export class TbCh03LEntity {
 	// CHT_RM_ID
 	@ManyToOne(()=>TbCh01LEntity, (ch01l)=>ch01l.chtRmId)
 	@JoinColumn({
