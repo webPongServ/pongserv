@@ -1,4 +1,4 @@
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity({ name: 'TB_GM01L' })
 export class TbGm01LEntity {
@@ -46,4 +46,3 @@ export class TbGm01LEntity {
 	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
 	lastDttm: Date;
 }
-
