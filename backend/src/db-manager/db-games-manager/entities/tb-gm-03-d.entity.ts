@@ -1,13 +1,13 @@
-import { Column, Entity } from "typeorm";
+import { Column, Entity, PrimaryColumn } from "typeorm";
 
 @Entity({ name: 'TB_GM03D' })
 export class TbGm03DEntity {
 	// OPT_CD
-	@Column({ name: "OPT_CD", type: 'varchar', length: 100 })
+	@PrimaryColumn({ name: "OPT_CD", type: 'varchar', length: 100 })
 	optCd: string;
 
 	// OPT_DTL_CD
-	@Column({ name: "OPT_DTL_CD", type: 'varchar', length: 100 })
+	@PrimaryColumn({ name: "OPT_DTL_CD", type: 'varchar', length: 100 })
 	optDTlCd: string;
 
 	// OPT_NM
