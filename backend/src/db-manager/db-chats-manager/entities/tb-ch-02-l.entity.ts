@@ -18,24 +18,31 @@ export class TbCh02LEntity {
 	@PrimaryGeneratedColumn({ name: 'TMP_ID', type: 'number' })
 	tmpId: number;
 
+	// CHT_RM_AUTH
 	@Column({ name: 'CHT_RM_AUTH', type: 'varchar', length: 2 })
 	chtRmAuth: string;
 
+	// CHT_RM_JOIN_TF
 	@Column({ name: 'CHT_RM_JOIN_TF', type: 'boolean' })
-	chtRmJoinTf: string;
+	chtRmJoinTf: boolean;
 
+	// ENTRY_DTTM
 	@Column({ name: 'ENTRY_DTTM', type: 'timestamp', precision: 0 })
 	entryDttm: Date;
 
+	// AUTH_CHG_DTTM
 	@Column({ name: 'AUTH_CHG_DTTM', type: 'timestamp', precision: 0 })
 	authChgDttm: Date;
 
+	// DEL_FT
 	@Column({ name: 'DEL_FT', type: 'boolean' })
-	chtRmTf: boolean;
+	delTf: boolean;
 
+	// FRST_DTTM
 	@Column({ name: "FRST_DTTM", type: 'timestamp', precision: 6 })
 	frstDttm: Date;
 
+	// LAST_DTTM
 	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
 	lastDttm: Date;
 }
