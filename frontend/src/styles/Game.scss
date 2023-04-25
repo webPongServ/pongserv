@@ -1,0 +1,32 @@
+.game-button-group {
+  width: 100%;
+}
+
+.game-button-group .large-size {
+  width: 50%;
+  margin-bottom: 5px;
+}
+
+.game-image img {
+  width: 75px;
+  height: 75px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  border: 0px solid #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.sword img {
+  width: 30px;
+  height: 30px;
+}
+
+.game-link {
+  text-decoration: none;
+}
+
+.game-modal {
+  width: 400px;
+  height: 400px;
+}
