@@ -25,11 +25,11 @@ export class TbUa03MEntity {
 	delTf: boolean;
 
 	// FRST_DTTM
-	@Column({ name: "FRST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "FRST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	frstDttm: Date;
 
 	// LAST_DTTM
-	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "LAST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	lastDttm: Date;
 
 	@OneToMany(()=>TbUa03DEntity, (ua03d)=>ua03d.ua03mEntity) //NOTE - 이거 안 넣어도 돌아가는데 돌아가는 이유를 정확히 모르므로 혹시 몰라서 넣음..
