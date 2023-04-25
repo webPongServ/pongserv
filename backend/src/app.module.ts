@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { GamesModule } from './games/games.module';
 import { DbManagerModule } from './db-manager/db-manager.module';
 import { ChatsModule } from './chats/chats.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { ChatsModule } from './chats/chats.module';
       port: 5432,
       username: '',
       password: '',
-      database: '',
+      database: 'pongserv',
       autoLoadEntities: true,
       synchronize: true,
     }),
