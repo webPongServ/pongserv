@@ -8,7 +8,7 @@ export class TbCh02LEntity {
 		name: 'CHT_RM_ID', 
 		referencedColumnName: 'CHT_RM_ID'
 	})
-	tbCh01L: TbCh01LEntity;
+	chRmId: TbCh01LEntity;
 
 	/* TODO - 
 		- USER_ID 생기면 FK(ManyToOne)로 넣을 예정.
