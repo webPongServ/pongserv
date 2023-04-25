@@ -1,21 +1,25 @@
-import { Column, Entity, JoinColumn, ManyToOne } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { TbGm01LEntity } from "./tb-gm-01-l.entity";
 
 @Entity({ name: 'TB_GM01D' })
 export class TbGm01DEntity {
 	// GM_SRNO
-	@ManyToOne(()=>TbGm01LEntity, (gm01l)=>gm01l.gmSrno)
+	@PrimaryColumn({ name: "GM_SRNO", type: 'varchar', length: 12 })
+	gmSrno: string;
+
+	@ManyToOne(()=>TbGm01LEntity, (gm01l)=>gm01l.gm01dEntities) // REVIEW - trial composite primary key
 	@JoinColumn({
 		name: 'GM_SRNO',
-		referencedColumnName: 'GM_SRNO'
+		referencedColumnName: 'gmSrno'
 	})
-	gmSrno: string; //REVIEW - or TbGm01LEntity ?
+	gm01lEntity: TbGm01LEntity;
+	// gmSrno: string; //REVIEW - or TbGm01LEntity ?
 
 	// USER_ID
 	//TODO - set
 
 	// GET_SCR
-	@Column({ name: "GET_SCR", type: 'number' })
+	@Column({ name: "GET_SCR", type: 'integer' })
 	getScr: number;
 
 	// GM_RSLT_CD
@@ -23,7 +27,7 @@ export class TbGm01DEntity {
 	gmRsltCd: string;
 
 	// RSLT_LLVL
-	@Column({ name: "RSLT_LLVL", type: 'number' })
+	@Column({ name: "RSLT_LLVL", type: 'integer' })
 	rsltLlvl: number;
 
 	// ENTRY_DTTM

@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { TbGm01DEntity } from "./tb-gm-01-d.entity";
 
 @Entity({ name: 'TB_GM01L' })
 export class TbGm01LEntity {
@@ -23,11 +24,11 @@ export class TbGm01LEntity {
 	endType: string;
 
 	// TRGT_SCR
-	@Column({ name: "TRGT_SCR", type: 'number' })
+	@Column({ name: "TRGT_SCR", type: 'integer' })
 	trgtScr: number;
 
 	// LV_DFCT
-	@Column({ name: "LV_DFCT", type: 'number' })
+	@Column({ name: "LV_DFCT", type: 'integer' })
 	lvDfct: number;
 
 	// BGRD_IMG_PAT
@@ -45,4 +46,10 @@ export class TbGm01LEntity {
 	// LAST_DTTM
 	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
 	lastDttm: Date;
+
+	/**!SECTION
+	 * Relation Join
+	 */
+	@OneToMany(()=>TbGm01DEntity, (gm01d)=>gm01d.gmSrno)
+	gm01dEntities: TbGm01DEntity[];
 }
