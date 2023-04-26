@@ -63,6 +63,9 @@ const Game = () => {
       createdAt: new Date(),
     },
   ]);
+
+  console.log(setGameList);
+
   return (
     <>
       <Box

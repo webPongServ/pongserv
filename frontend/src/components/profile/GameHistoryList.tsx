@@ -87,6 +87,9 @@ const GameHistoryList = () => {
       opScore: 3,
     },
   ]);
+
+  console.log(setHistoryList);
+
   return (
     <TabPanel
       value={0}

@@ -38,6 +38,8 @@ const Search = () => {
     "seongyle",
   ]);
 
+  console.log(value, setValue, setSearchedUser);
+
   let typingTimer: NodeJS.Timeout;
   let doneTypingInterval: number = 300;
 

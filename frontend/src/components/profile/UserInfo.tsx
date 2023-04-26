@@ -24,6 +24,9 @@ const UserInfo = () => {
     ELO: 100,
     winRate: 0.9,
   });
+
+  console.log(setUserInfo);
+
   return (
     <Box className="flex-container">
       <div className="profile-image">

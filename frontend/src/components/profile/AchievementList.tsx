@@ -54,6 +54,9 @@ const Achievements = () => {
       achvImg: "../image.png",
     },
   ]);
+
+  console.log(setAchievementList);
+
   return (
     <TabPanel
       value={1}
