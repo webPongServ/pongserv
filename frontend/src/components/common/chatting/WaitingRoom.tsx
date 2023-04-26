@@ -107,7 +107,7 @@ const WaitingRoom = (props: HandleRoomID) => {
           className="chat-container"
           onClick={() => props.setRoomID("creator")}
         >
-          체팅방 생성
+          채팅방 생성
         </Button>
       </Box>
     </Box>
