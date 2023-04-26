@@ -5,6 +5,7 @@ import { DbGamesManagerModule } from './db-games-manager/db-games-manager.module
 import { DbCommonManagerModule } from './db-common-manager/db-common-manager.module';
 import { DbManagerController } from './db-manager.controller';
 import { DbManagerService } from './db-manager.service';
+import { DbUsersManagerService } from './db-users-manager/db-users-manager.service';
 
 @Module({
   imports: [

@@ -6,6 +6,7 @@ import { GamesModule } from './games/games.module';
 import { DbManagerModule } from './db-manager/db-manager.module';
 import { ChatsModule } from './chats/chats.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { DbUsersManagerService } from './db-manager/db-users-manager/db-users-manager.service';
 
 @Module({
   imports: [
@@ -25,6 +26,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class AppModule {}
