@@ -1,3 +1,4 @@
+import { TbUa01MEntity } from "src/db-manager/db-users-manager/entities/tb-ua-01-m.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from "typeorm";
 import { TbGm01LEntity } from "./tb-gm-01-l.entity";
 
@@ -5,7 +6,14 @@ import { TbGm01LEntity } from "./tb-gm-01-l.entity";
 @Entity({ name: 'TB_GM04L' })
 export class TbGm04LEntity {
 	// USER_ID
-	//TODO - set
+	@PrimaryColumn({ name: "USER_ID", type: 'varchar', length: 8 })
+	@ManyToOne(()=>TbUa01MEntity, (ua01m)=>ua01m.userId, {
+		nullable: false,
+		onUpdate: 'CASCADE', 
+		onDelete: 'RESTRICT'
+	})
+	@JoinColumn({ name: 'USER_ID' })
+	ua01mEntity: TbUa01MEntity; // NOTE - TB_UA01M 에서는 설정 안해도 돌아감
 
 	// LDDR_RDY_SRNO
 	@PrimaryColumn({ name: "LDDR_RDY_SRNO", type: 'varchar', length: 12 })
@@ -24,7 +32,13 @@ export class TbGm04LEntity {
 	rddrRdyTf: boolean;
 
 	// MTCH_USER_ID
-	//TODO - set
+	@ManyToOne(()=>TbUa01MEntity, (ua01m)=>ua01m.userId, {
+		nullable: false,
+		onUpdate: 'CASCADE', 
+		onDelete: 'RESTRICT'
+	})
+	@JoinColumn({ name: 'MTCH_USER_ID' }) // , type: 'varchar', length: 8 })
+	ua01mEntityAsMtch: TbUa01MEntity; // NOTE - TB_UA01M 에서는 설정 안해도 돌아감
 
 	// GM_SRNO
 	@ManyToOne(()=>TbGm01LEntity, (gm01l)=>gm01l.gmSrno)
