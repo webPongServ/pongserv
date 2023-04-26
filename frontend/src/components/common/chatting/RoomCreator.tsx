@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { Typography } from "@mui/material";
 import { Button } from "@mui/joy";
@@ -16,6 +16,7 @@ type HandleRoomID = { roomID: string; setRoomID: Function };
 
 const RoomCreator = (props: HandleRoomID) => {
   const [isPublic, setIsPublic] = useState<boolean>(true);
+  const divRef = useRef<HTMLDivElement>(null);
 
   const CreatorInput = (type: string) => {
     let name, input;
@@ -128,8 +129,23 @@ const RoomCreator = (props: HandleRoomID) => {
     );
   };
 
+  const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Escape" || event.key === "Esc") {
+      props.setRoomID("waiting");
+    }
+  };
+
+  useEffect(() => {
+    if (divRef.current !== null) divRef.current.focus();
+  }, []);
+
   return (
-    <Box sx={{ p: 5, height: "90%" }}>
+    <Box
+      sx={{ p: 5, height: "90%" }}
+      onKeyDown={pressESC}
+      tabIndex={0}
+      ref={divRef}
+    >
       <Box className="flex-container" sx={{ height: "10%" }}>
         <Typography sx={{ fontSize: "20px" }}>
           <b>채팅방 생성</b>
