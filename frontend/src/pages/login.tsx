@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+// import { useNavigate } from "react-router-dom";
+// import axios from "axios";
 import NewSessionModal from "components/login/NewSessionModal";
 import TwoFactorModal from "components/login/TwoFactorModal";
 
@@ -8,7 +8,7 @@ import { Box } from "@mui/material";
 import Button from "@mui/joy/Button";
 
 const Login = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [modalStatus, setModalStatus] = useState<string>("Closed");
 
   console.log(navigate, axios);

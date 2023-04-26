@@ -55,6 +55,7 @@ const FriendDrawer = () => {
     "seongyle",
   ]);
   const [logoutFriends, setLogoutFriends] = useState<string[]>(["noname_12"]);
+  
   console.log(setLoginFriends, setLogoutFriends);
 
   return (
