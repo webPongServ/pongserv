@@ -4,6 +4,8 @@ import GameWaiting from "./GameWaiting";
 const GameRoom = () => {
   const [isWaiting, setIsWaiting] = useState<boolean>(true);
 
+  console.log(setIsWaiting);
+
   return isWaiting ? (
     <GameWaiting
       type="일반 게임"

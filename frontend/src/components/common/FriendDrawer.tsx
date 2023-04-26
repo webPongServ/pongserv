@@ -55,8 +55,8 @@ const FriendDrawer = () => {
     "seongyle",
   ]);
   const [logoutFriends, setLogoutFriends] = useState<string[]>(["noname_12"]);
-  console.log(setLoginFriends);
-  console.log(setLogoutFriends);
+  
+  console.log(setLoginFriends, setLogoutFriends);
 
   return (
     <Drawer variant="permanent" open={true}>

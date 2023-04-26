@@ -11,6 +11,8 @@ const Login = () => {
   // const navigate = useNavigate();
   const [modalStatus, setModalStatus] = useState<string>("Closed");
 
+  console.log(navigate, axios);
+
   return (
     <>
       <Box>

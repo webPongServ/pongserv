@@ -21,6 +21,8 @@ const ChattingRoom = (props: HandleRoomID) => {
   });
   const [roomStatus, setRoomStatus] = useState<string>("chat");
 
+  console.log(setRoomDetail);
+
   return (
     <Box sx={{ p: 5, height: "90%" }}>
       {roomStatus === "chat" && (

@@ -83,6 +83,8 @@ const WaitingRoom = (props: HandleRoomID) => {
     },
   ]);
 
+  console.log(setChatRoomList);
+
   return (
     <Box sx={{ p: 2, height: "90%" }}>
       <Box className="width-center overflow" sx={{ p: 2, height: "90%" }}>

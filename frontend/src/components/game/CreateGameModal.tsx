@@ -16,6 +16,9 @@ type CreateGameModalProps = {
 const CreateGameModal = (props: CreateGameModalProps) => {
   const navigate = useNavigate();
   const [roomID, setRoomID] = useState<string>("203404250001");
+
+  console.log(setRoomID);
+
   return (
     <Modal
       open={props.roomStatus === "create-game"}
