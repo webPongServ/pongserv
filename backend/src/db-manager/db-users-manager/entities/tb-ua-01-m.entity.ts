@@ -46,6 +46,7 @@ export class TbUa01MEntity {
 	/**!SECTION
 	 * OneToManys
 	 */
+		// TB_UA
 	@OneToMany(()=>TbUa01LEntity, (ua01l)=>ua01l.ua01mEntity, {
 		onUpdate: 'CASCADE', 
 		onDelete: 'RESTRICT',
@@ -74,6 +75,7 @@ export class TbUa01MEntity {
 		onUpdate: 'CASCADE', 
 		onDelete: 'RESTRICT',
 	})
+		// TB_CH
 	ch02lEntities: TbCh02LEntity[];
 
 	@OneToMany(()=>TbCh02DEntity, (ch02d)=>ch02d.ua01mEntity, {
