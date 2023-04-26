@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
+import "styles/Game.scss";
 
 import { Typography } from "@mui/material";
 import { Button } from "@mui/joy";
 import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
-import "styles/Game.scss";
+import IconButton from "@mui/joy/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
 
 type NormalGameModalProps = {
   roomStatus: string;
@@ -20,15 +22,21 @@ const NormalGameModal = (props: NormalGameModalProps) => {
       open={props.roomStatus === "normal-game"}
       onClose={() => props.setRoomStatus("game")}
     >
-      <ModalDialog className="game-modal" variant="outlined">
-        <Typography
-          sx={{ height: "10%", fontSize: "30px", margin: "auto auto" }}
-        >
-          일반 게임
-        </Typography>
+      <ModalDialog className="game-modal" variant="outlined" sx={{ p: 5 }}>
+        <Box className="flex-container" sx={{ height: "10%" }}>
+          <Typography sx={{ fontSize: "30px" }}>
+            <b>일반 게임</b>
+          </Typography>
+          <IconButton
+            sx={{ marginLeft: "auto" }}
+            onClick={() => props.setRoomStatus("game")}
+          >
+            <CloseIcon />
+          </IconButton>
+        </Box>
         <Box
           className="flex-container direction-column"
-          sx={{ height: "70%", gap: 1 }}
+          sx={{ height: "80%", gap: 1 }}
         >
           <Typography>입장과 동시에 게임이 시작됩니다.</Typography>
           <Typography>
@@ -37,19 +45,12 @@ const NormalGameModal = (props: NormalGameModalProps) => {
         </Box>
         <Box className="modal-button-group">
           <Button
-            className="medium-size"
+            sx={{ width: "80%" }}
             onClick={() => {
               navigate(`/game/${props.selectedID}`);
             }}
           >
             입장
-          </Button>
-          <Button
-            variant="outlined"
-            className="medium-size"
-            onClick={() => props.setRoomStatus("game")}
-          >
-            취소
           </Button>
         </Box>
       </ModalDialog>
