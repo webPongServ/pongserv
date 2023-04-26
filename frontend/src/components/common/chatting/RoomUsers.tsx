@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { Box } from "@mui/material";
 import Select from "@mui/joy/Select";
@@ -14,9 +14,27 @@ type HandleRoomDetail = {
 
 const RoomUsers = (props: HandleRoomDetail) => {
   const [selected, setSelected] = useState<string>("users");
+  const divRef = useRef<HTMLDivElement>(null);
+
+  const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Escape" || event.key === "Esc") {
+      props.setRoomStatus("chat");
+    }
+  };
+
+  useEffect(() => {
+    if (divRef.current) divRef.current.focus();
+  }, []);
+
   return (
     <>
-      <Box className="flex-container" sx={{ height: "10%" }}>
+      <Box
+        className="flex-container"
+        sx={{ height: "10%" }}
+        onKeyDown={pressESC}
+        tabIndex={0}
+        ref={divRef}
+      >
         <Select
           defaultValue={selected}
           // onChange={(e) => {

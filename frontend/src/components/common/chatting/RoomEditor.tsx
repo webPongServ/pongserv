@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 import { Typography } from "@mui/material";
 import { Button } from "@mui/joy";
@@ -21,6 +21,7 @@ type HandleRoomDetail = {
 
 const RoomEditor = (props: HandleRoomDetail) => {
   const [isPublic, setIsPublic] = useState<boolean>(props.type === "public");
+  const divRef = useRef<HTMLDivElement>(null);
 
   const CreatorInput = (type: string) => {
     let name, input;
@@ -134,9 +135,25 @@ const RoomEditor = (props: HandleRoomDetail) => {
     );
   };
 
+  const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === "Escape" || event.key === "Esc") {
+      props.setRoomStatus("chat");
+    }
+  };
+
+  useEffect(() => {
+    if (divRef.current) divRef.current.focus();
+  }, []);
+
   return (
     <>
-      <Box className="flex-container" sx={{ height: "10%" }}>
+      <Box
+        className="flex-container"
+        sx={{ height: "10%" }}
+        onKeyDown={pressESC}
+        tabIndex={0}
+        ref={divRef}
+      >
         <Typography sx={{ fontSize: "20px" }}>
           <b>채팅방 정보 수정</b>
         </Typography>
