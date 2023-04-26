@@ -11,11 +11,14 @@ import MuiDrawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Theme, CSSObject } from "@mui/material/styles";
+import SearchIcon from "@mui/icons-material/Search";
+import { Box, IconButton } from "@mui/material";
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   width: FriendDrawerWidth,
+  height: "100%",
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
@@ -57,11 +60,25 @@ const FriendDrawer = () => {
 
   return (
     <Drawer variant="permanent" open={true}>
-      <DrawerHeader />
-      <div style={{ fontSize: "20px" }}>친구 목록</div>
-      <List>
-        {loginFriends.map((text, index) => (
-          <ListItem key={text} disablePadding sx={{ display: "block" }}>
+      <DrawerHeader sx={{ height: "10%" }} />
+      <Box className="flex-container" sx={{ height: "3%", gap: 5 }}>
+        <Box style={{ fontSize: "20px", marginLeft: "30%" }}>친구 목록</Box>
+        <IconButton
+          sx={{ backgroundColor: "skyblue", borderRadius: "10px" }}
+          onClick={() => {
+            navigate(`/search`);
+          }}
+        >
+          <SearchIcon />
+        </IconButton>
+      </Box>
+      <List sx={{ height: "80%", overflow: "auto" }}>
+        {loginFriends.map((value, index) => (
+          <ListItem
+            key={value + index}
+            disablePadding
+            sx={{ display: "block" }}
+          >
             <ListItemButton
               sx={{
                 minHeight: 48,
@@ -81,17 +98,24 @@ const FriendDrawer = () => {
               >
                 <AccountCircleIcon fontSize="large" />
               </ListItemIcon>
-              <ListItemText primary={text} sx={{ opacity: true ? 1 : 0 }} />
+              <ListItemText primary={value} sx={{ opacity: true ? 1 : 0 }} />
             </ListItemButton>
           </ListItem>
         ))}
-        {logoutFriends.map((text, index) => (
-          <ListItem key={text} disablePadding sx={{ display: "block" }}>
+        {logoutFriends.map((value, index) => (
+          <ListItem
+            key={value + index}
+            disablePadding
+            sx={{ display: "block" }}
+          >
             <ListItemButton
               sx={{
                 minHeight: 48,
                 justifyContent: true ? "initial" : "center",
                 px: 2.5,
+              }}
+              onClick={() => {
+                navigate(`/profile/${index}`);
               }}
             >
               <ListItemIcon
@@ -104,7 +128,7 @@ const FriendDrawer = () => {
                 <AccountCircleIcon fontSize="large" sx={{ color: "#cccccc" }} />
               </ListItemIcon>
               <ListItemText
-                primary={text}
+                primary={value}
                 sx={{ opacity: true ? 1 : 0, color: "#cccccc" }}
               />
             </ListItemButton>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "styles/Profile.scss";
+import "styles/global.scss";
 
 import { Box } from "@mui/material";
 
@@ -26,13 +27,11 @@ const UserInfo = () => {
   console.log(setUserInfo);
 
   return (
-    <Box className="profile-flex">
-      <div className="profile-center profile-flex">
-        <div className="profile-image">
-          <img src={userInfo.imgURL} alt="profile_image" />
-        </div>
+    <Box className="flex-container">
+      <div className="profile-image">
+        <img src={userInfo.imgURL} alt="profile_image" />
       </div>
-      <div className="profile-center profile-flex">
+      <div>
         <div className="title">{userInfo.nickname}</div>
         <div>
           전적 : {userInfo.total}G {userInfo.win}W {userInfo.lose}L

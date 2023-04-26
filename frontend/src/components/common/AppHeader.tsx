@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import MainRoute from "Route";
+import MainRoute from "components/common/MainRoute";
 import AppBar from "./AppBar";
 import FriendDrawer from "./FriendDrawer";
 import ChattingDrawer from "./ChattingDrawer";
 import { ChattingDrawerWidth } from "constant";
+import "styles/global.scss";
 
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
@@ -14,6 +15,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
   flexGrow: 1,
+  height: "90%",
   padding: theme.spacing(3),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
@@ -33,12 +35,12 @@ export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box className="flex-container" style={{ height: "100%" }}>
       <CssBaseline />
       <AppBar open={open} setOpen={setOpen} />
       <FriendDrawer />
       <Main open={open}>
-        <Box component="main" sx={{ flexGrow: 1, p: 5 }}>
+        <Box component="main" sx={{ flexGrow: 1, height: "100%" }}>
           <Routes>
             <Route path="/*" element={<MainRoute />} />
           </Routes>

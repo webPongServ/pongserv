@@ -1,0 +1,46 @@
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+}
+
+.flex-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.direction-column {
+  flex-direction: column;
+}
+
+.direction-row {
+  flex-direction: row;
+}
+
+.align-normal {
+  align-items: normal;
+}
+
+.justify-normal {
+  justify-content: normal;
+}
+
+.flex-wrap-container {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.overflow {
+  overflow: auto;
+}
+
+.width-center {
+  margin: 0 auto;
+}
+
+.center {
+  margin: auto auto;
+}
