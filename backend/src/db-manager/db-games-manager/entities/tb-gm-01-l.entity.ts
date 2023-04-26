@@ -4,7 +4,7 @@ import { TbGm01DEntity } from "./tb-gm-01-d.entity";
 // game list - 게임내역
 @Entity({ name: 'TB_GM01L' })
 export class TbGm01LEntity {
-	// GM_SRNO
+	// GM_SRNO - YYYYMMDDNNNN
 	@PrimaryColumn({ name: "GM_SRNO", type: 'varchar', length: 12 })
 	gmSrno: string;
 
@@ -51,6 +51,6 @@ export class TbGm01LEntity {
 	/**!SECTION
 	 * OneToManys
 	 */
-	@OneToMany(()=>TbGm01DEntity, (gm01d)=>gm01d.gmSrno)
+	@OneToMany(()=>TbGm01DEntity, (gm01d)=>gm01d.gm01lEntity)
 	gm01dEntities: TbGm01DEntity[];
 }
