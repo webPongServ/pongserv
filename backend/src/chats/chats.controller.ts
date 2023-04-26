@@ -1,82 +1,169 @@
 import { ChatsService } from './chats.service';
 import { Controller, Get, Patch, Post, Put } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('chats')
 @Controller('chats')
 export class ChatsController {
   constructor(private readonly ChatsService: ChatsService) {}
 
-  //POST /chats/dm	user_id	DM 요청	201
+  @ApiResponse({
+    status: 201,
+    description: 'DM 요청 성공',
+  })
+  @ApiOperation({ summary: 'DM 요청' })
   @Post('dm/:user_id')
   dmRequest() {
     return 'Hello World! it is dmRequest()';
   }
-  //GET /chats/rooms-list		채팅방 목록	200	{chatroom_id: string, chatroom_name: string, owner: string, type: string, curr_user_count: number, max_user_count: number}, ...
+
+  @ApiResponse({
+    status: 200,
+    description: '채팅방 목록 반환해주는 API',
+    // type: ChatDto,
+  })
+  @ApiOperation({ summary: '채팅방 목록' })
   @Get('rooms-list')
   getAllChats() {
     return 'Hello World! it is getAllChats()';
   }
 
-  // POST /chats/entrance	chatroom_id : string password: string	채팅방 입장 (public일 경우에 password 검증 안 함)	201, 403(입장 불가)
+  @ApiResponse({
+    status: 200,
+    description: '채팅방 입장해주는 API',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '채팅방 입장 실패',
+  })
+  @ApiOperation({ summary: '채팅방 입장' })
   @Post('entrance/:chatroom_id/:password')
   entryChat() {
     return 'Hello World! it is entryChat()';
   }
 
-  //	POST /chats/create	chatroom_name: string, chatroom_type: string, password: string	채팅방 생성	201, 403(형식 제한)	chatroom_id: string
+  @ApiResponse({
+    status: 201,
+    description: '채팅방 생성 성공',
+    type: String, // 성공시 Chatroom_id string 반환
+  })
+  @ApiOperation({ summary: '채팅방 생성' })
   @Post('create/:chatroom_name/:chatroom_type/:password')
   createChat() {
     return 'Hello World! it is createChat()';
   }
 
-  //PATCH /chats/edit	chatroom_id: string, chatroom_name: string, chatroom_type: string, password: string	채팅방 정보 수정	201, 403(권한 없음)
+  @ApiResponse({
+    status: 201,
+    description: '채팅방 정보 수정 성공',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '채팅방 정보 수정 실패',
+  })
+  @ApiOperation({ summary: '채팅방 정보 수정' })
   @Patch('edit/:chatroom_id/:chatroom_name/:chatroom_type/:password')
   editChat() {
     return 'Hello World! it is editChat()';
   }
 
-  //GET /chats/users	chatroom_id: string	채팅방 유저목록	201, 403(권한 없음)	{user_id: string, user_auth: string}, ...
+  @ApiResponse({
+    status: 200,
+    description: '채팅방 유저목록 반환해주는 API',
+    // type: ChatDto,  향후 추가
+  })
+  @ApiResponse({
+    status: 403,
+    description: '채팅방 유저목록 반환 실패',
+  })
+  @ApiOperation({ summary: '채팅방 유저목록' })
   @Get('users/:chatroom_id')
   getChatUsers() {
     return 'Hello World! it is getChatUsers()';
   }
 
-  //PUT /chats/kick	chatroom_id: string, user_id_to_kick: string	채팅방 내보내기	201, 403(권한 없음)
+  @ApiResponse({
+    status: 201,
+    description: '채팅방 내보내기 성공',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '채팅방 내보내기 실패',
+  })
+  @ApiOperation({ summary: '채팅방 내보내기' })
   @Put('kick/:chatroom_id/:user_id_to_kick')
   kickChatUser() {
     return 'Hello World! it is kickChatUser()';
   }
 
-  //POST /chats/ban	chatroom_id: string, user_id_to_ban: string	채팅방 차단	201, 403(권한 없음)
+  @ApiResponse({
+    status: 201,
+    description: '채팅방 차단 성공',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '채팅방 차단 실패(권한 부족)',
+  })
+  @ApiOperation({ summary: '채팅방 차단' })
   @Post('ban/:chatroom_id/:user_id_to_ban')
   banChatUser() {
     return 'Hello World! it is banChatUser()';
   }
 
-  // POST /chats/mute	chatroom_id: string, user_id_to_mute: string	벙어리 적용	201, 403(권한 없음)
+  @ApiResponse({
+    status: 201,
+    description: '벙어리 적용 성공',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '벙어리 적용 실패(권한 부족)',
+  })
+  @ApiOperation({ summary: '벙어리 적용' })
   @Post('mute/:chatroom_id/:user_id_to_mute')
   muteChatUser() {
     return 'Hello World! it is muteChatUser()';
   }
 
-  //POST /chats/empowerment	chatroom_id: string, user_id_to_empower: string	관리자 권한 부여	201, 403(권한 없음)
+  @ApiResponse({
+    status: 201,
+    description: '관리자 권한 부여 성공',
+  })
+  @ApiResponse({
+    status: 403,
+    description: '관리자 권한 부여 실패(권한 부족)',
+  })
+  @ApiOperation({ summary: '관리자 권한 부여' })
   @Post('empowerment/:chatroom_id/:user_id_to_empower')
   empowermentChatUser() {
     return 'Hello World! it is empowermentChatUser()';
   }
 
-  //POST /chats/game-request	chatroom_id: string, user_id_to_game: string	대결 신청	201
+  @ApiResponse({
+    status: 201,
+    description: '대결 신청 성공',
+  })
+  @ApiOperation({ summary: '대결 신청' })
   @Post('game-request/:chatroom_id/:user_id_to_game')
   gameRequestChatUser() {
     return 'Hello World! it is gameRequestChatUser()';
   }
 
-  //GET /chats/bans	chatroom_id: string	채팅방 차단 유저목록	200	{user_id: string, auth: string}, ...
+  @ApiResponse({
+    status: 200,
+    description: '채팅방 차단 유저목록 반환해주는 API',
+    // type: ChatDto,  향후 추가
+  })
+  @ApiOperation({ summary: '채팅방 차단 유저목록' })
   @Get('bans/:chatroom_id')
   getChatBans() {
     return 'Hello World! it is getChatBans()';
   }
 
-  // PATCH /chats/ban-removal	chatroom_id: string, userid_to_free: string	채팅방 차단 해제	201
+  @ApiResponse({
+    status: 201,
+    description: '채팅방 차단 해제 성공',
+  })
+  @ApiOperation({ summary: '채팅방 차단 해제' })
   @Patch('ban-removal/:chatroom_id/:userid_to_free')
   banRemovalChatUser() {
     return 'Hello World! it is banRemovalChatUser()';

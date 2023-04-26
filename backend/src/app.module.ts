@@ -7,6 +7,7 @@ import { DbManagerModule } from './db-manager/db-manager.module';
 import { ChatsModule } from './chats/chats.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+
 @Module({
   imports: [
     UserModule,
@@ -19,12 +20,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       port: 5432,
       username: '',
       password: '',
-      database: '',
+      database: 'pongserv',
       autoLoadEntities: true,
       synchronize: true,
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService]
 })
 export class AppModule {}
