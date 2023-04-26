@@ -1,9 +1,12 @@
 import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { TbCh02DEntity } from "./tb-ch-02-d.entity";
 import { TbCh02LEntity } from "./tb-ch-02-l.entity";
+import { TbCh03LEntity } from "./tb-ch-03-l.entity";
 
+// chatroom list
 @Entity({ name: 'TB_CH01L' })
 export class TbCh01LEntity {
-	// CHT_RM_ID
+	// CHT_RM_ID - YYYYMMDDNNNN
 	@PrimaryColumn({ name: "CHT_RM_ID", type: 'varchar', length: 12 })
 	chtRmId: string;
 
@@ -16,7 +19,7 @@ export class TbCh01LEntity {
 	chtRmType: string;
 
 	// MAX_USER_CNT
-	@Column({ name: "MAX_USER_CNT", type: 'number' })
+	@Column({ name: "MAX_USER_CNT", type: 'integer' })
 	maxUserCnt: number;
 
 	// CHT_RM_PWD
@@ -32,14 +35,22 @@ export class TbCh01LEntity {
 	delTf: boolean;
 
 	// FRST_DTTM
-	@Column({ name: "FRST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "FRST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	frstDttm: Date;
 
 	// LAST_DTTM
-	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "LAST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	lastDttm: Date;
 
-	//REVIEW - ch02ls 대신 chatroomUsers 라고 지어야할지 고민
-	@OneToMany(()=>TbCh02LEntity, (ch02l)=>ch02l.tbCh01L)
-	ch02ls: TbCh02LEntity[];
+	/**!SECTION
+	 * OneToManys
+	 */
+	@OneToMany(()=>TbCh02LEntity, (ch02l)=>ch02l.ch01lEntity)
+	ch02lEntities: TbCh02LEntity[];
+
+	@OneToMany(()=>TbCh02DEntity, (ch02d)=>ch02d.ch01lEntity)
+	ch02dEntities: TbCh02DEntity[];
+
+	@OneToMany(()=>TbCh03LEntity, (ch03l)=>ch03l.ch01lEntity)
+	ch03lEntities: TbCh03LEntity[];
 }

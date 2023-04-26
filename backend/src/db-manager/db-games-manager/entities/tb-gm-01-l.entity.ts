@@ -1,17 +1,19 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { TbGm01DEntity } from "./tb-gm-01-d.entity";
 
+// game list - 게임내역
 @Entity({ name: 'TB_GM01L' })
 export class TbGm01LEntity {
-	// GM_SRNO
+	// GM_SRNO - YYYYMMDDNNNN
 	@PrimaryColumn({ name: "GM_SRNO", type: 'varchar', length: 12 })
 	gmSrno: string;
 
 	// GM_STRT_DTTM
-	@Column({ name: "GM_STRT_DTTM", type: 'timestamp', precision: 0 })
+	@Column({ name: "GM_STRT_DTTM", type: 'timestamp with time zone', precision: 0 })
 	gmStrtDttm: Date;
 
 	// GM_END_DTTM
-	@Column({ name: "GM_END_DTTM", type: 'timestamp', precision: 0 })
+	@Column({ name: "GM_END_DTTM", type: 'timestamp with time zone', precision: 0 })
 	gmEndDttm: Date;
 
 	// GM_TYPE
@@ -23,11 +25,11 @@ export class TbGm01LEntity {
 	endType: string;
 
 	// TRGT_SCR
-	@Column({ name: "TRGT_SCR", type: 'number' })
+	@Column({ name: "TRGT_SCR", type: 'integer' })
 	trgtScr: number;
 
 	// LV_DFCT
-	@Column({ name: "LV_DFCT", type: 'number' })
+	@Column({ name: "LV_DFCT", type: 'integer' })
 	lvDfct: number;
 
 	// BGRD_IMG_PAT
@@ -39,10 +41,16 @@ export class TbGm01LEntity {
 	delTf: boolean;
 
 	// FRST_DTTM
-	@Column({ name: "FRST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "FRST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	frstDttm: Date;
 
 	// LAST_DTTM
-	@Column({ name: "LAST_DTTM", type: 'timestamp', precision: 6 })
+	@Column({ name: "LAST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	lastDttm: Date;
+
+	/**!SECTION
+	 * OneToManys
+	 */
+	@OneToMany(()=>TbGm01DEntity, (gm01d)=>gm01d.gm01lEntity)
+	gm01dEntities: TbGm01DEntity[];
 }
