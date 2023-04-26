@@ -2,7 +2,7 @@ import { TbCh02DEntity } from "src/db-manager/db-chats-manager/entities/tb-ch-02
 import { TbCh02LEntity } from "src/db-manager/db-chats-manager/entities/tb-ch-02-l.entity";
 import { TbCh03LEntity } from "src/db-manager/db-chats-manager/entities/tb-ch-03-l.entity";
 import { TbCh04LEntity } from "src/db-manager/db-chats-manager/entities/tb-ch-04-l.entity";
-import { Column, Entity, OneToMany, PrimaryColumn, Unique } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, Unique, UpdateDateColumn } from "typeorm";
 import { TbUa01LEntity } from "./tb-ua-01-l.entity";
 import { TbUa02LEntity } from "./tb-ua-02-l.entity";
 import { TbUa03DEntity } from "./tb-ua-03-d.entity";
@@ -36,11 +36,11 @@ export class TbUa01MEntity {
 	delTf: boolean;
 
 	// FRST_DTTM
-	@Column({ name: "FRST_DTTM", type: 'timestamp with time zone', precision: 6 })
+	@CreateDateColumn({ name: "FRST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	frstDttm: Date;
 
 	// LAST_DTTM
-	@Column({ name: "LAST_DTTM", type: 'timestamp with time zone', precision: 6 })
+	@UpdateDateColumn({ name: "LAST_DTTM", type: 'timestamp with time zone', precision: 6 })
 	lastDttm: Date;
 
 	/**!SECTION
