@@ -1,6 +1,6 @@
 import { combineReducers, createStore } from "redux";
-import { MyInfoReducer } from "./type/MyInfo";
-import { FriendsReducer } from "components/common/type/Friends";
+import { MyInfoReducer } from "types/MyInfo";
+import { FriendsReducer } from "types/Friends";
 
 const rootReducer = combineReducers({
   myInfo: MyInfoReducer,
