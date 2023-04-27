@@ -146,14 +146,8 @@ const RoomEditor = (props: HandleRoomDetail) => {
   }, []);
 
   return (
-    <>
-      <Box
-        className="flex-container"
-        sx={{ height: "10%" }}
-        onKeyDown={pressESC}
-        tabIndex={0}
-        ref={divRef}
-      >
+    <Box ref={divRef} onKeyDown={pressESC} tabIndex={0} sx={{ height: "100%" }}>
+      <Box className="flex-container" sx={{ height: "10%" }}>
         <Typography sx={{ fontSize: "20px" }}>
           <b>채팅방 정보 수정</b>
         </Typography>
@@ -183,7 +177,7 @@ const RoomEditor = (props: HandleRoomDetail) => {
       <Box className="flex-container" sx={{ height: "10%" }}>
         <Button sx={{ width: "80%" }}>생성</Button>
       </Box>
-    </>
+    </Box>
   );
 };
 

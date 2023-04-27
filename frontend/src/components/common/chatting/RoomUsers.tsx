@@ -1,18 +1,22 @@
 import { useState, useRef, useEffect } from "react";
+import UserList from "./UserList";
+import BanList from "./BanList";
+import "styles/global.scss";
+import "styles/Chatting.scss";
 
 import { Box } from "@mui/material";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
-import "styles/global.scss";
-import "styles/Chatting.scss";
 import IconButton from "@mui/joy/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
+import { MyDetail } from "./ChattingRoom";
 
-type HandleRoomDetail = {
+type RoomUsersProps = {
+  myDetail: MyDetail;
   setRoomStatus: Function;
 };
 
-const RoomUsers = (props: HandleRoomDetail) => {
+const RoomUsers = (props: RoomUsersProps) => {
   const [selected, setSelected] = useState<string>("users");
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -27,14 +31,8 @@ const RoomUsers = (props: HandleRoomDetail) => {
   }, []);
 
   return (
-    <>
-      <Box
-        className="flex-container"
-        sx={{ height: "10%" }}
-        onKeyDown={pressESC}
-        tabIndex={0}
-        ref={divRef}
-      >
+    <Box ref={divRef} onKeyDown={pressESC} tabIndex={0} sx={{ height: "100%" }}>
+      <Box className="flex-container" sx={{ height: "10%" }}>
         <Select
           defaultValue={selected}
           // onChange={(e) => {
@@ -91,17 +89,13 @@ const RoomUsers = (props: HandleRoomDetail) => {
           className="users-box"
         >
           {selected === "users" ? (
-            <Box sx={{ p: 3, height: "100%", overflow: "auto" }}>
-              유저 목록입니다.
-            </Box>
+            <UserList myDetail={props.myDetail} />
           ) : (
-            <Box sx={{ p: 3, height: "100%", overflow: "auto" }}>
-              차단 목록입니다.
-            </Box>
+            <BanList myDetail={props.myDetail} />
           )}
         </Box>
       </Box>
-    </>
+    </Box>
   );
 };
 
