@@ -1,8 +1,11 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { ChattingDrawerWidth } from "constant";
+import { IRootState } from "./store";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
-import { ChattingDrawerWidth } from "constant";
 
+import { Box } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
@@ -36,28 +39,33 @@ const TopBar = styled(MuiAppBar, {
 }));
 
 const AppBar = (props: HandleOpen) => {
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
+
   const handleDrawerOpen = () => {
     props.setOpen(true);
   };
   return (
     <TopBar position="fixed" open={props.open}>
       <Toolbar>
-        <Link to="/game" className=" app-bar-container app-bar-link">
+        <Link
+          to="/game"
+          className="app-bar-container app-bar-link fixed-center"
+        >
           <Typography variant="h6" component="h1" align="center">
             WebPongServ
           </Typography>
         </Link>
-        <div className="app-bar-container">
+        <Box className="app-bar-container">
           <Link
-            to={`/profile/0`}
+            to={`/profile/${myInfo.nickname}`}
             className="app-bar-image flex-container app-bar-link"
           >
-            <img src="../image.png" alt="profile_image" />
+            <img src={`/profile/${myInfo.imgURL}`} alt="profile_image" />
             <Typography align="center" className="app-bar-center font">
-              susong
+              {myInfo.nickname}
             </Typography>
           </Link>
-        </div>
+        </Box>
         <IconButton
           color="inherit"
           aria-label="open drawer"
