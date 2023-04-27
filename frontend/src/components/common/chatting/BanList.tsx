@@ -1,8 +1,7 @@
 import { useState } from "react";
+import { MyDetail } from "./ChattingRoom";
 import "styles/global.scss";
 import "styles/Chatting.scss";
-import { UserDetail } from "./UserList";
-import { MyDetail } from "./ChattingRoom";
 
 import { Box } from "@mui/material";
 import List from "@mui/material/List";
@@ -14,7 +13,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-interface BanDetail {
+interface ChatBanDetail {
   nickname: string;
   role: string;
   imgUrl: string;
@@ -25,7 +24,7 @@ interface BanListProps {
 }
 
 const BanList = (props: BanListProps) => {
-  const [bans, setBans] = useState<BanDetail[]>([
+  const [bans, setBans] = useState<ChatBanDetail[]>([
     { nickname: "noname_12", role: "normal", imgUrl: "../image.png" },
     { nickname: "seongtki", role: "admin", imgUrl: "../image.png" },
   ]);

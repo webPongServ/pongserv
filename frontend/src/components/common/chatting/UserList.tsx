@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { MyDetail } from "./ChattingRoom";
+import "styles/global.scss";
+import "styles/Chatting.scss";
 
 import { Box } from "@mui/material";
 import List from "@mui/material/List";
@@ -11,7 +13,7 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-export interface UserDetail {
+export interface ChatUserDetail {
   nickname: string;
   role: string;
   imgUrl: string;
@@ -22,7 +24,7 @@ interface UserListProps {
 }
 
 const UserList = (props: UserListProps) => {
-  const [users, setUsers] = useState<UserDetail[]>([
+  const [users, setUsers] = useState<ChatUserDetail[]>([
     { nickname: "chanhyle", role: "owner", imgUrl: "../image.png" },
     { nickname: "susong", role: "admin", imgUrl: "../image.png" },
     { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
