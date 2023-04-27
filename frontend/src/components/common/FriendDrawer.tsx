@@ -1,6 +1,8 @@
-import { useState } from "react";
 import { FriendDrawerWidth } from "constant";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { IRootState } from "./store";
+import "styles/AppHeader.scss";
 
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
@@ -9,7 +11,6 @@ import ListItemText from "@mui/material/ListItemText";
 import { styled } from "@mui/material/styles";
 import MuiDrawer from "@mui/material/Drawer";
 import List from "@mui/material/List";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { Theme, CSSObject } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
 import { Box, IconButton } from "@mui/material";
@@ -48,15 +49,8 @@ const openedMixin = (theme: Theme): CSSObject => ({
 
 const FriendDrawer = () => {
   const navigate = useNavigate();
-  const [loginFriends, setLoginFriends] = useState<string[]>([
-    "mgo",
-    "seongtki",
-    "chanhyle",
-    "seongyle",
-  ]);
-  const [logoutFriends, setLogoutFriends] = useState<string[]>(["noname_12"]);
-  
-  console.log(setLoginFriends, setLogoutFriends);
+  // 받아 오기
+  const friends = useSelector((state: IRootState) => state.friends.friends);
 
   return (
     <Drawer variant="permanent" open={true}>
@@ -73,67 +67,70 @@ const FriendDrawer = () => {
         </IconButton>
       </Box>
       <List sx={{ height: "80%", overflow: "auto" }}>
-        {loginFriends.map((value, index) => (
-          <ListItem
-            key={value + index}
-            disablePadding
-            sx={{ display: "block" }}
-          >
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: true ? "initial" : "center",
-                px: 2.5,
-              }}
-              onClick={() => {
-                navigate(`/profile/${index}`);
-              }}
+        {friends
+          .filter((friend) => friend.status === "login")
+          .map((value, index) => (
+            <ListItem
+              key={value.nickname + index}
+              disablePadding
+              sx={{ display: "block" }}
             >
-              <ListItemIcon
+              <ListItemButton
                 sx={{
-                  minWidth: 0,
-                  mr: true ? 3 : "auto",
-                  justifyContent: "center",
+                  minHeight: 48,
+                  justifyContent: "initial",
+                  px: 2.5,
+                }}
+                onClick={() => {
+                  navigate(`/profile/${value.nickname}`);
                 }}
               >
-                <AccountCircleIcon fontSize="large" />
-              </ListItemIcon>
-              <ListItemText primary={value} sx={{ opacity: true ? 1 : 0 }} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-        {logoutFriends.map((value, index) => (
-          <ListItem
-            key={value + index}
-            disablePadding
-            sx={{ display: "block" }}
-          >
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: true ? "initial" : "center",
-                px: 2.5,
-              }}
-              onClick={() => {
-                navigate(`/profile/${index}`);
-              }}
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: 2,
+                    justifyContent: "center",
+                  }}
+                  className="friend-drawer-image"
+                >
+                  <img src={`${value.imgURL}`} alt="friend-drawer-img" />
+                </ListItemIcon>
+                <ListItemText primary={value.nickname} />
+              </ListItemButton>
+            </ListItem>
+          ))}
+        {friends
+          .filter((friend) => friend.status === "logout")
+          .map((value, index) => (
+            <ListItem
+              key={value.nickname + index}
+              disablePadding
+              sx={{ display: "block" }}
             >
-              <ListItemIcon
+              <ListItemButton
                 sx={{
-                  minWidth: 0,
-                  mr: true ? 3 : "auto",
-                  justifyContent: "center",
+                  minHeight: 48,
+                  justifyContent: "initial",
+                  px: 2.5,
+                }}
+                onClick={() => {
+                  navigate(`/profile/${value.nickname}`);
                 }}
               >
-                <AccountCircleIcon fontSize="large" sx={{ color: "#cccccc" }} />
-              </ListItemIcon>
-              <ListItemText
-                primary={value}
-                sx={{ opacity: true ? 1 : 0, color: "#cccccc" }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: 2,
+                    justifyContent: "center",
+                  }}
+                  className="friend-drawer-image logoff"
+                >
+                  <img src={`${value.imgURL}`} alt="friend-drawer-img" />
+                </ListItemIcon>
+                <ListItemText primary={value.nickname} className="logoff" />
+              </ListItemButton>
+            </ListItem>
+          ))}
       </List>
     </Drawer>
   );
