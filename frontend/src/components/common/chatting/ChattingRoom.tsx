@@ -7,6 +7,7 @@ import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
 
 type HandleRoomID = { roomID: string; setRoomID: Function };
+export type MyDetail = { nickname: string; role: string; imgUrl: string };
 
 const ChattingRoom = (props: HandleRoomID) => {
   // API 요청
@@ -20,6 +21,11 @@ const ChattingRoom = (props: HandleRoomID) => {
     createdAt: new Date(),
   });
   const [roomStatus, setRoomStatus] = useState<string>("chat");
+  const [myDetail, setMyDetail] = useState({
+    nickname: "chanhyle",
+    role: "owner",
+    imgUrl: "../image.png",
+  });
 
   console.log(setRoomDetail);
 
@@ -112,7 +118,9 @@ const ChattingRoom = (props: HandleRoomID) => {
           setRoomStatus={setRoomStatus}
         />
       )}
-      {roomStatus === "users" && <RoomUsers setRoomStatus={setRoomStatus} />}
+      {roomStatus === "users" && (
+        <RoomUsers myDetail={myDetail} setRoomStatus={setRoomStatus} />
+      )}
     </Box>
   );
 };
