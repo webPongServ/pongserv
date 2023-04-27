@@ -1,7 +1,8 @@
-.app-bar-container {
+.my-profile {
+  margin-right: 10px;
 }
 
-.app-bar-image img {
+.my-profile img {
   width: 40px;
   height: 40px;
   margin-right: 10px;
@@ -14,10 +15,23 @@
 
 .app-bar-link {
   text-decoration: none;
-  flex-grow: 1;
   color: #ffffff;
 }
 
-.app-bar-link .font {
+.app-bar-link .mid-size {
   font-size: 20px;
+}
+
+.friend-drawer-image img {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  border: 0px solid #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.logoff {
+  opacity: 0.3;
 }

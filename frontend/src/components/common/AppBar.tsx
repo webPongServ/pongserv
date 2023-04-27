@@ -47,25 +47,20 @@ const AppBar = (props: HandleOpen) => {
   return (
     <TopBar position="fixed" open={props.open}>
       <Toolbar>
-        <Link
-          to="/game"
-          className="app-bar-container app-bar-link fixed-center"
-        >
+        <Link to="/game" className="app-bar-link fixed-center">
           <Typography variant="h6" component="h1" align="center">
             WebPongServ
           </Typography>
         </Link>
-        <Box className="app-bar-container">
-          <Link
-            to={`/profile/${myInfo.nickname}`}
-            className="app-bar-image flex-container app-bar-link"
-          >
-            <img src={`/profile/${myInfo.imgURL}`} alt="profile_image" />
-            <Typography align="center" className="app-bar-center font">
-              {myInfo.nickname}
-            </Typography>
-          </Link>
-        </Box>
+        <Link
+          to={`/profile/${myInfo.nickname}`}
+          className="my-profile flex-container app-bar-link"
+        >
+          <img src={`/profile/${myInfo.imgURL}`} alt="profile_image" />
+          <Typography align="center" className="mid-size">
+            {myInfo.nickname}
+          </Typography>
+        </Link>
         <IconButton
           color="inherit"
           aria-label="open drawer"
