@@ -1,13 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingTypes } from "types/CurrentChatting";
+import { ChatRoomForm } from "types/Form";
+import { IRootState } from "components/common/store";
+import "styles/global.scss";
+import "styles/Chatting.scss";
 
 import { Typography } from "@mui/material";
 import { Button } from "@mui/joy";
 import { Box } from "@mui/material";
 import { Input } from "@mui/joy";
-import "styles/global.scss";
-import "styles/Chatting.scss";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import Slider from "@mui/joy/Slider";
@@ -16,8 +18,24 @@ import CloseIcon from "@mui/icons-material/Close";
 
 const RoomCreator = () => {
   const [isPublic, setIsPublic] = useState<boolean>(true);
+  const [chatRoomForm, setChatRoomForm] = useState<ChatRoomForm>({
+    title: "",
+    max: 2,
+    type: "public",
+    password: "",
+  });
   const divRef = useRef<HTMLDivElement>(null);
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const dispatch = useDispatch();
+
+  const HandleTitle: React.ChangeEventHandler<HTMLInputElement> = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (e) {
+      const target: HTMLInputElement = e.target;
+      setChatRoomForm({ ...chatRoomForm, title: target.value });
+    }
+  };
 
   const CreatorInput = (type: string) => {
     let name, input;
@@ -32,13 +50,7 @@ const RoomCreator = () => {
             placeholder="최대 20자"
             required
             slotProps={{ input: { maxLength: 20 } }}
-            // props={{ maxLength: 20 }}
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target = e.target as HTMLInputElement;
-            //     setPartyForm({ ...partyForm, title: target.value });
-            //   }
-            // }}
+            onChange={HandleTitle}
           />
         );
         break;
@@ -54,15 +66,15 @@ const RoomCreator = () => {
             min={2}
             max={10}
             valueLabelDisplay="auto"
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target: HTMLInputElement = e.target as HTMLInputElement;
-            //     props.setPartyForm({
-            //       ...props.partyForm,
-            //       max: target.value,
-            //     });
-            //   }
-            // }}
+            onChange={(e) => {
+              if (e) {
+                const target: HTMLInputElement = e.target as HTMLInputElement;
+                setChatRoomForm({
+                  ...chatRoomForm,
+                  max: parseInt(target.value),
+                });
+              }
+            }}
           />
         );
         break;
@@ -72,15 +84,17 @@ const RoomCreator = () => {
         input = (
           <Select
             defaultValue="public"
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target: HTMLInputElement = e.target as HTMLInputElement;
-            //     props.setPartyForm({
-            //       ...props.partyForm,
-            //       category: target.outerText,
-            //     });
-            //   }
-            // }}
+            onChange={(e) => {
+              if (e) {
+                const target: HTMLInputElement = e.target as HTMLInputElement;
+                setChatRoomForm({
+                  ...chatRoomForm,
+                  type: `${
+                    target.innerText === "공개" ? "public" : "protected"
+                  }`,
+                });
+              }
+            }}
           >
             <Option value="public" onClick={() => setIsPublic(true)}>
               공개
@@ -99,12 +113,12 @@ const RoomCreator = () => {
             placeholder="최대 20자"
             type="password"
             slotProps={{ input: { maxLength: 20 } }}
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target = e.target as HTMLInputElement;
-            //     setPartyForm({ ...partyForm, title: target.value });
-            //   }
-            // }}
+            onChange={(e) => {
+              if (e) {
+                const target = e.target as HTMLInputElement;
+                setChatRoomForm({ ...chatRoomForm, password: target.value });
+              }
+            }}
           />
         );
         break;
@@ -181,7 +195,33 @@ const RoomCreator = () => {
         {isPublic ? "" : CreatorInput("password")}
       </Box>
       <Box className="flex-container" sx={{ height: "10%" }}>
-        <Button sx={{ width: "80%" }}>생성</Button>
+        <Button
+          sx={{ width: "80%" }}
+          onClick={() => {
+            if (chatRoomForm.title.length === 0)
+              return alert("제목을 입력해주세요!");
+            else if (
+              chatRoomForm.type === "protected" &&
+              chatRoomForm.password.length === 0
+            )
+              return alert("비밀번호를 입력해주세요!");
+            // API call
+            dispatch({
+              type: CurrentChattingTypes.UPDATE_STATUS_CHATTING,
+              payload: {
+                id: "202304280001",
+                title: `${chatRoomForm.title}`,
+                owner: `${myInfo.nickname}`,
+                type: `${chatRoomForm.type}`,
+                max: `${chatRoomForm.max}`,
+                current: 1,
+                createdAt: new Date(),
+              },
+            });
+          }}
+        >
+          생성
+        </Button>
       </Box>
     </Box>
   );
