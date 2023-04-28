@@ -12,9 +12,15 @@ export interface CustomSliderProps {
   handleFunction: any;
 }
 
-export interface CustomSelectProps {
+export interface ChattingTypeSelectProps {
   name: string;
   defaultValue: string;
   setIsPublic: Function;
+  handleFunction: any;
+}
+
+export interface GameDifficultyRadioGroupProps {
+  name: string;
+  defaultValue: string;
   handleFunction: any;
 }

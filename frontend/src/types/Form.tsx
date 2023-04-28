@@ -10,3 +10,9 @@ export interface ChatRoomEditForm {
   max: number;
   type: string;
 }
+
+export interface GameRoomForm {
+  title: string;
+  maxScore: number;
+  difficulty: string;
+}

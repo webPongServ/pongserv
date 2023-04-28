@@ -5,7 +5,7 @@ import { Slider } from "@mui/joy";
 const CustomSlider = (props: CustomSliderProps) => {
   const marks = []; // type : Mark[]
 
-  for (let i = 2; i <= 10; i++) marks.push({ value: i, label: `${i}` });
+  for (let i = 1; i <= 10; i++) marks.push({ value: i, label: `${i}` });
 
   return (
     <Box
@@ -23,8 +23,8 @@ const CustomSlider = (props: CustomSliderProps) => {
           defaultValue={props.defaultValue}
           marks={marks}
           step={1}
-          min={2}
-          max={10}
+          min={props.min}
+          max={props.max}
           valueLabelDisplay="auto"
           onChange={props.handleFunction}
         />

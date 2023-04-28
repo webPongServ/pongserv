@@ -1,8 +1,8 @@
-import { CustomSelectProps } from "types/Utils";
+import { ChattingTypeSelectProps } from "types/Utils";
 import { Box, Typography } from "@mui/material";
 import { Select, Option } from "@mui/joy";
 
-const CustomSelect = (props: CustomSelectProps) => {
+const ChattingTypeSelect = (props: ChattingTypeSelectProps) => {
   return (
     <Box
       sx={{
@@ -30,4 +30,4 @@ const CustomSelect = (props: CustomSelectProps) => {
   );
 };
 
-export default CustomSelect;
+export default ChattingTypeSelect;
