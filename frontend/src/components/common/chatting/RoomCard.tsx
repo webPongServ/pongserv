@@ -36,7 +36,7 @@ const RoomCard = (props: ChatRoomDetail) => {
     >
       <Card
         variant="outlined"
-        className="chat-container chat-gap"
+        className="chat-gap"
         sx={{
           "&:hover": { border: "3px solid skyblue" },
         }}
