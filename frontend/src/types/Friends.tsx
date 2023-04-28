@@ -1,4 +1,4 @@
-import { UserDetail } from "./UserDetail";
+import { UserDetail } from "./Detail";
 
 export interface Friends {
   friends: UserDetail[];
@@ -13,22 +13,22 @@ const INITIAL_FRIENDS: Friends = {
   ],
 };
 
-enum FriendsActionTypes {
-  GET = "FRIENDS_GET",
-  ADD = "FRIENDS_ADD",
-  DELETE = "FRIENDS_DELETE",
+export enum FriendsActionTypes {
+  GET = "GET",
+  ADD = "ADD",
+  DELETE = "DELETE",
 }
 
-interface FriendsGetAction {
+export interface FriendsGetAction {
   type: FriendsActionTypes.GET;
   payload: Friends;
 }
-interface FriendsAddAction {
+export interface FriendsAddAction {
   type: FriendsActionTypes.ADD;
   payload: UserDetail;
 }
 
-interface FriendsDeleteAction {
+export interface FriendsDeleteAction {
   type: FriendsActionTypes.DELETE;
   payload: string;
 }

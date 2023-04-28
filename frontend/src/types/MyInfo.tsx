@@ -1,22 +1,22 @@
-import { UserDetail } from "./UserDetail";
+import { UserDetail } from "./Detail";
 
-export const INITIAL_MYINFO: UserDetail = {
+const INITIAL_MYINFO: UserDetail = {
   nickname: "susong",
   imgURL: "../image.png",
   status: "login",
 };
 
-enum MyInfoActionTypes {
-  UPDATE = "MYINFO_UPDATE",
-  REMOVE = "MYINFO_REMOVE",
+export enum MyInfoActionTypes {
+  UPDATE = "UPDATE",
+  REMOVE = "REMOVE",
 }
 
-interface MyInfoUpdateAction {
+export interface MyInfoUpdateAction {
   type: MyInfoActionTypes.UPDATE;
   payload: UserDetail;
 }
 
-interface MyInfoRemoveAction {
+export interface MyInfoRemoveAction {
   type: MyInfoActionTypes.REMOVE;
   payload: UserDetail;
 }
