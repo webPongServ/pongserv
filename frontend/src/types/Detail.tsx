@@ -31,4 +31,5 @@ export interface ProfileDetail {
   lose: number;
   ELO: number;
   winRate: number;
+  status: string;
 }

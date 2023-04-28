@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import UserInfo from "components/profile/UserInfo";
 import ProfileButton from "components/profile/ProfileButton";
 import { CurrentChattingTypes } from "types/CurrentChatting";
+import { FriendsActionTypes } from "types/Friends";
 import { IRootState } from "components/common/store";
 import { ProfileDetail } from "types/Detail";
 import "styles/Profile.scss";
@@ -18,17 +19,20 @@ import { Box } from "@mui/material";
 const Profile = () => {
   // 다른 사람 정보도 요청해야 하니까 여기서 요청하기
   const [profileDetail, setProfileDetail] = useState<ProfileDetail>({
-    nickname: "chanhyle",
+    nickname: "skittles",
     imgURL: "../image.png",
     total: 5,
     win: 5,
     lose: 0,
     ELO: 150,
     winRate: 0.8,
+    status: "login",
   });
 
   const myInfo = useSelector((state: IRootState) => state.myInfo);
+  const friends = useSelector((state: IRootState) => state.friends.friends);
   const dispatch = useDispatch();
+  const [isFriend, setIsFriend] = useState<boolean>(false);
 
   console.log(setProfileDetail);
 
@@ -48,8 +52,35 @@ const Profile = () => {
     });
   };
 
-  const handleFriendAddButton = () => {};
+  const handleFriendAddButton = () => {
+    dispatch({
+      type: FriendsActionTypes.ADD,
+      payload: {
+        nickname: profileDetail.nickname,
+        imgURL: profileDetail.imgURL,
+        status: profileDetail.status,
+      },
+    });
+    setIsFriend(!isFriend);
+  };
+
+  const handleFriendDeleteButton = () => {
+    dispatch({
+      type: FriendsActionTypes.DELETE,
+      payload: profileDetail.nickname,
+    });
+    setIsFriend(!isFriend);
+  };
+
   const handleBlockButton = () => {};
+
+  useEffect(() => {
+    friends.forEach((element) => {
+      if (element.nickname === profileDetail.nickname) {
+        setIsFriend(true);
+      }
+    });
+  }, []);
 
   return (
     <>
@@ -63,15 +94,33 @@ const Profile = () => {
             lose={profileDetail.lose}
             ELO={profileDetail.ELO}
             winRate={profileDetail.winRate}
+            status={profileDetail.status}
           />
         </Box>
         <Box className="profile-container flex-container direction-column">
-          <ProfileButton name="DM" handleOnClick={handleDMButton} />
           <ProfileButton
-            name="친구 추가"
-            handleOnClick={handleFriendAddButton}
+            type="positive"
+            name="DM"
+            handleOnClick={handleDMButton}
           />
-          <ProfileButton name="차단" handleOnClick={handleBlockButton} />
+          {isFriend ? (
+            <ProfileButton
+              name="친구 삭제"
+              type="negative"
+              handleOnClick={handleFriendDeleteButton}
+            />
+          ) : (
+            <ProfileButton
+              name="친구 추가"
+              type="positive"
+              handleOnClick={handleFriendAddButton}
+            />
+          )}
+          <ProfileButton
+            name="차단"
+            type="negative"
+            handleOnClick={handleBlockButton}
+          />
         </Box>
       </Box>
       <Box className="profile-fullcontainer" style={{ height: "70%" }}>
