@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useSelector } from "react-redux";
 import { ChattingDrawerWidth } from "constant";
+import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
@@ -10,8 +12,8 @@ import { styled, useTheme } from "@mui/material/styles";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 
-import WaitingRoom from "./chatting/WaitingRoom";
-import ChattingRoom from "./chatting/ChattingRoom";
+import WaitingRoom from "components/common/chatting/WaitingRoom";
+import ChattingRoom from "components/common/chatting/ChattingRoom";
 import RoomCreator from "components/common/chatting/RoomCreator";
 
 type HandleOpen = { open: boolean; setOpen: Function };
@@ -26,7 +28,9 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 }));
 
 const ChattingDrawer = (props: HandleOpen) => {
-  const [roomID, setRoomID] = useState<string>("waiting");
+  const currentChatting = useSelector(
+    (state: IRootState) => state.currentChatting
+  );
 
   const theme = useTheme();
 
@@ -63,15 +67,9 @@ const ChattingDrawer = (props: HandleOpen) => {
         </div>
       </DrawerHeader>
       <Divider />
-      {roomID === "waiting" && (
-        <WaitingRoom roomID={roomID} setRoomID={setRoomID} />
-      )}
-      {roomID === "creator" && (
-        <RoomCreator roomID={roomID} setRoomID={setRoomID} />
-      )}
-      {!(roomID === "waiting" || roomID === "creator") && (
-        <ChattingRoom roomID={roomID} setRoomID={setRoomID} />
-      )}
+      {currentChatting.status === "waiting" && <WaitingRoom />}
+      {currentChatting.status === "creating" && <RoomCreator />}
+      {currentChatting.status === "chatting" && <ChattingRoom />}
     </Drawer>
   );
 };

@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { CurrentChattingTypes } from "types/CurrentChatting";
 
 import { Typography } from "@mui/material";
 import { Button } from "@mui/joy";
@@ -12,11 +14,10 @@ import Slider from "@mui/joy/Slider";
 import IconButton from "@mui/joy/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 
-type HandleRoomID = { roomID: string; setRoomID: Function };
-
-const RoomCreator = (props: HandleRoomID) => {
+const RoomCreator = () => {
   const [isPublic, setIsPublic] = useState<boolean>(true);
   const divRef = useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
 
   const CreatorInput = (type: string) => {
     let name, input;
@@ -131,7 +132,10 @@ const RoomCreator = (props: HandleRoomID) => {
 
   const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape" || event.key === "Esc") {
-      props.setRoomID("waiting");
+      dispatch({
+        type: CurrentChattingTypes.UPDATE_STATUS_WAITING,
+        payload: "",
+      });
     }
   };
 
@@ -152,7 +156,12 @@ const RoomCreator = (props: HandleRoomID) => {
         </Typography>
         <IconButton
           sx={{ marginLeft: "auto" }}
-          onClick={() => props.setRoomID("waiting")}
+          onClick={() =>
+            dispatch({
+              type: CurrentChattingTypes.UPDATE_STATUS_WAITING,
+              payload: "",
+            })
+          }
         >
           <CloseIcon />
         </IconButton>

@@ -1,25 +1,22 @@
 import { useState } from "react";
-import { ChatRoomInfo } from "./WaitingRoom";
-import RoomEditor from "./RoomEditor";
-import RoomUsers from "./RoomUsers";
+import { ChatRoomDetail } from "types/Detail";
+import RoomEditor from "components/common/chatting/RoomEditor";
+import RoomUsers from "components/common/chatting/RoomUsers";
+import { useSelector, useDispatch } from "react-redux";
+import { CurrentChattingTypes } from "types/CurrentChatting";
+import { IRootState } from "components/common/store";
 
 import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
 
-type HandleRoomID = { roomID: string; setRoomID: Function };
 export type MyDetail = { nickname: string; role: string; imgUrl: string };
 
-const ChattingRoom = (props: HandleRoomID) => {
+const ChattingRoom = () => {
+  const currentChatting = useSelector(
+    (state: IRootState) => state.currentChatting.chatRoom
+  );
+  const dispatch = useDispatch();
   // API 요청
-  const [roomDetail, setRoomDetail] = useState<ChatRoomInfo>({
-    id: "202304230002",
-    title: "옥상으로 따라와",
-    type: "protected",
-    current: 4,
-    max: 9,
-    owner: "mgo",
-    createdAt: new Date(),
-  });
   const [roomStatus, setRoomStatus] = useState<string>("chat");
   const [myDetail, setMyDetail] = useState({
     nickname: "chanhyle",
@@ -27,7 +24,7 @@ const ChattingRoom = (props: HandleRoomID) => {
     imgUrl: "../image.png",
   });
 
-  console.log(setRoomDetail);
+  console.log(setMyDetail);
 
   return (
     <Box sx={{ p: 5, height: "90%" }}>
@@ -35,7 +32,7 @@ const ChattingRoom = (props: HandleRoomID) => {
         <>
           <Box className="flex-container header" sx={{ height: "10%" }}>
             <div style={{ fontSize: "25px", flexGrow: 1 }}>
-              {roomDetail.title}
+              {currentChatting.title}
             </div>
           </Box>
           <Box
@@ -102,7 +99,10 @@ const ChattingRoom = (props: HandleRoomID) => {
               sx={{ width: "33%" }}
               variant="outlined"
               onClick={() => {
-                props.setRoomID("waiting");
+                dispatch({
+                  type: CurrentChattingTypes.UPDATE_STATUS_WAITING,
+                  payload: "",
+                });
               }}
             >
               채팅방 나가기
@@ -112,9 +112,9 @@ const ChattingRoom = (props: HandleRoomID) => {
       )}
       {roomStatus === "edit" && (
         <RoomEditor
-          title={roomDetail.title}
-          type={roomDetail.type}
-          max={roomDetail.max}
+          title={currentChatting.title}
+          type={currentChatting.type}
+          max={currentChatting.max}
           setRoomStatus={setRoomStatus}
         />
       )}

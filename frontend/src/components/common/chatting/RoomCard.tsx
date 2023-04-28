@@ -1,29 +1,36 @@
+import { IRootState } from "components/common/store";
+import { useSelector, useDispatch } from "react-redux";
+import { CurrentChattingTypes } from "types/CurrentChatting";
+import { ChatRoomDetail } from "types/Detail";
+
 import Card from "@mui/joy/Card";
 import CardOverflow from "@mui/joy/CardOverflow";
 import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
 import Typography from "@mui/joy/Typography";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Person from "@mui/icons-material/Person";
 
-type ChatRoomInfoProps = {
-  id: string;
-  title: string;
-  owner: string;
-  type: string;
-  current: number;
-  max: number;
-  createdAt: Date;
-  roomID: string;
-  setRoomID: Function;
-};
+const RoomCard = (props: ChatRoomDetail) => {
+  const currentChatting = useSelector(
+    (state: IRootState) => state.currentChatting
+  );
+  const dispatch = useDispatch();
 
-// 몇 시간 전에 생성되었는지 추가?
-const RoomCard = (props: ChatRoomInfoProps) => {
   return (
     <Box
       onClick={() => {
-        props.setRoomID(props.id);
+        dispatch({
+          type: CurrentChattingTypes.UPDATE_STATUS_CHATTING,
+          payload: {
+            id: props.id,
+            title: props.title,
+            owner: props.owner,
+            type: props.type,
+            current: props.current,
+            max: props.max,
+            createdAt: props.createdAt,
+          },
+        });
       }}
       sx={{ cursor: "pointer" }}
     >

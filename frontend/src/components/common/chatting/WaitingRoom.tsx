@@ -1,23 +1,18 @@
 import { useState } from "react";
 import RoomCard from "components/common/chatting/RoomCard";
+import { ChatRoomDetail } from "types/Detail";
+import { useSelector, useDispatch } from "react-redux";
+import { CurrentChattingTypes } from "types/CurrentChatting";
 
 import { Box } from "@mui/material";
 import { Button } from "@mui/joy";
 
-export type ChatRoomInfo = {
-  id: string;
-  title: string;
-  owner: string;
-  type: string;
-  current: number;
-  max: number;
-  createdAt: Date;
-};
+const WaitingRoom = () => {
+  const dispatch = useDispatch();
 
-type HandleRoomID = { roomID: string; setRoomID: Function };
-
-const WaitingRoom = (props: HandleRoomID) => {
-  const [chatRoomList, setChatRoomList] = useState<ChatRoomInfo[]>([
+  // chatroom은 전역에서 관리하지 않음 => 로컬에서도 처음에 받아오는 것만(없어진 것 예외처리 필요)
+  // 보이지 않을 수도 있는데, 상태로 관리하는 것은 불필요한 낭비일 수 있음 => 새로고침 버튼을 두자
+  const [chatRoomList, setChatRoomList] = useState<ChatRoomDetail[]>([
     {
       id: "202304230001",
       title: "이기면 100만원~",
@@ -45,42 +40,6 @@ const WaitingRoom = (props: HandleRoomID) => {
       max: 2,
       createdAt: new Date(),
     },
-    {
-      id: "202304230003",
-      title: "[DM] mgo님과의 채팅방",
-      owner: "mgo",
-      type: "private",
-      current: 1,
-      max: 2,
-      createdAt: new Date(),
-    },
-    {
-      id: "202304230003",
-      title: "[DM] mgo님과의 채팅방",
-      owner: "mgo",
-      type: "private",
-      current: 1,
-      max: 2,
-      createdAt: new Date(),
-    },
-    {
-      id: "202304230003",
-      title: "[DM] mgo님과의 채팅방",
-      owner: "mgo",
-      type: "private",
-      current: 1,
-      max: 2,
-      createdAt: new Date(),
-    },
-    {
-      id: "202304230003",
-      title: "[DM] mgo님과의 채팅방",
-      owner: "mgo",
-      type: "private",
-      current: 1,
-      max: 2,
-      createdAt: new Date(),
-    },
   ]);
 
   console.log(setChatRoomList);
@@ -97,15 +56,18 @@ const WaitingRoom = (props: HandleRoomID) => {
             current={value.current}
             max={value.max}
             createdAt={value.createdAt}
-            roomID={props.roomID}
-            setRoomID={props.setRoomID}
           />
         ))}
       </Box>
       <Box className="flex-container" sx={{ height: "10%" }}>
         <Button
           className="chat-container"
-          onClick={() => props.setRoomID("creator")}
+          onClick={() =>
+            dispatch({
+              type: CurrentChattingTypes.UPDATE_STATUS_CREATING,
+              payload: "",
+            })
+          }
         >
           채팅방 생성
         </Button>
