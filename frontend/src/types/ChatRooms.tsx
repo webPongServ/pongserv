@@ -36,22 +36,22 @@ const INITIAL_CHATROOMS: ChatRooms = {
   ],
 };
 
-enum ChatRoomsActionTypes {
-  GET = "CHATROOMS_GET",
-  ADD = "CHATROOMS_ADD",
-  DELETE = "CHATROOMS_DELETE",
+export enum ChatRoomsActionTypes {
+  GET = "GET",
+  ADD = "ADD",
+  DELETE = "DELETE",
 }
 
-interface ChatRoomsGetAction {
+export interface ChatRoomsGetAction {
   type: ChatRoomsActionTypes.GET;
   payload: ChatRooms;
 }
-interface ChatRoomsAddAction {
+export interface ChatRoomsAddAction {
   type: ChatRoomsActionTypes.ADD;
   payload: ChatRoomDetail;
 }
 
-interface ChatRoomsDeleteAction {
+export interface ChatRoomsDeleteAction {
   type: ChatRoomsActionTypes.DELETE;
   payload: string;
 }

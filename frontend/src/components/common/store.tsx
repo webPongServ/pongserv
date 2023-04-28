@@ -1,14 +1,14 @@
 import { combineReducers, createStore } from "redux";
 import { MyInfoReducer } from "types/MyInfo";
 import { FriendsReducer } from "types/Friends";
-// import { ChatRoomsReducer } from "types/ChatRooms";
 import { CurrentChattingReducer } from "types/CurrentChatting";
+import { GameRoomsReducer } from "types/GameRooms";
 
 const rootReducer = combineReducers({
   myInfo: MyInfoReducer,
   friends: FriendsReducer,
-  // chatRoom: ChatRoomsReducer,
   currentChatting: CurrentChattingReducer,
+  gameRooms: GameRoomsReducer,
 });
 
 export type IRootState = ReturnType<typeof rootReducer>;

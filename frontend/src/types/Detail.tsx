@@ -13,3 +13,22 @@ export interface ChatRoomDetail {
   max: number;
   createdAt: Date;
 }
+
+export interface GameRoomDetail {
+  id: string;
+  title: string;
+  owner: string;
+  maxScore: number;
+  difficulty: string;
+  createdAt: Date;
+}
+
+export interface ProfileDetail {
+  nickname: string;
+  imgURL: string;
+  total: number;
+  win: number;
+  lose: number;
+  ELO: number;
+  winRate: number;
+}
