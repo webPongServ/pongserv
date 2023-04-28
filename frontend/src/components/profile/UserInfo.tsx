@@ -1,21 +1,13 @@
 import { useState } from "react";
 import "styles/Profile.scss";
 import "styles/global.scss";
+import { ProfileDetail } from "types/Detail";
 
 import { Box } from "@mui/material";
 
-export type UserData = {
-  nickname: string;
-  imgURL: string;
-  total: number;
-  win: number;
-  lose: number;
-  ELO: number;
-  winRate: number;
-};
-
 const UserInfo = () => {
-  const [userInfo, setUserInfo] = useState<UserData>({
+  // 다른 사람 정보도 요청해야 하니까 여기서 요청하기
+  const [userInfo, setUserInfo] = useState<ProfileDetail>({
     nickname: "susong",
     imgURL: "../image.png",
     total: 10,

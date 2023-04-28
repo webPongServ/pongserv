@@ -3,68 +3,20 @@ import GameCard from "components/game/GameCard";
 import NormalGameModal from "components/game/NormalGameModal";
 import LadderGameModal from "components/game/LadderGameModal";
 import CreateGameModal from "components/game/CreateGameModal";
+import { useSelector } from "react-redux";
+import { IRootState } from "components/common/store";
 
 import { Box } from "@mui/system";
 import { Button } from "@mui/joy";
 import "styles/global.scss";
 import "styles/Game.scss";
 
-export type GameInfo = {
-  id: string;
-  title: string;
-  owner: string;
-  maxScore: number;
-  difficulty: string;
-  createdAt: Date;
-};
-
 const Game = () => {
   const [roomStatus, setRoomStatus] = useState<string>("game");
   const [selectedID, setSelectedID] = useState<string>("");
-  const [gameList, setGameList] = useState<GameInfo[]>([
-    {
-      id: "202304250001",
-      title: "chanhyle님의 게임방",
-      owner: "chanhyle",
-      maxScore: 10,
-      difficulty: "easy",
-      createdAt: new Date(),
-    },
-    {
-      id: "202304250002",
-      title: "옥상으로 따라와",
-      owner: "seongtki",
-      maxScore: 5,
-      difficulty: "hard",
-      createdAt: new Date(),
-    },
-    {
-      id: "202304250002",
-      title: "옥상으로 따라와",
-      owner: "seongtki",
-      maxScore: 5,
-      difficulty: "hard",
-      createdAt: new Date(),
-    },
-    {
-      id: "202304250002",
-      title: "옥상으로 따라와",
-      owner: "seongtki",
-      maxScore: 5,
-      difficulty: "hard",
-      createdAt: new Date(),
-    },
-    {
-      id: "202304250002",
-      title: "옥상으로 따라와",
-      owner: "seongtki",
-      maxScore: 5,
-      difficulty: "hard",
-      createdAt: new Date(),
-    },
-  ]);
-
-  console.log(setGameList);
+  const gameRooms = useSelector(
+    (state: IRootState) => state.gameRooms.gameRooms
+  );
 
   return (
     <>
@@ -72,7 +24,7 @@ const Game = () => {
         className="flex-wrap-container overflow"
         sx={{ height: "80%", p: 3, gap: 3 }}
       >
-        {gameList.map((value, index) => {
+        {gameRooms.map((value, index) => {
           return (
             <GameCard
               key={value.id + index}
