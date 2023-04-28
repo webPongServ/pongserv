@@ -1,12 +1,17 @@
 import { Button } from "@mui/joy";
 import "styles/Profile.scss";
 
-type ButtonName = { name: string };
+interface ProfileButtonProps {
+  name: string;
+  handleOnClick: React.MouseEventHandler<HTMLAnchorElement>;
+}
 
-const ProfileButton = (props: ButtonName) => {
+const ProfileButton = (props: ProfileButtonProps) => {
   return (
     <div className="gap">
-      <Button className="medium-size">{props.name}</Button>
+      <Button onClick={props.handleOnClick} className="medium-size">
+        {props.name}
+      </Button>
     </div>
   );
 };
