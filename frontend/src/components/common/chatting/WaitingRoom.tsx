@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import RoomCard from "components/common/chatting/RoomCard";
 import { ChatRoomDetail } from "types/Detail";
 import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingTypes } from "types/CurrentChatting";
+import { CurrentChattingActionTypes } from "types/CurrentChatting";
 
 import { Box, IconButton } from "@mui/material";
 import { Button } from "@mui/joy";
@@ -72,7 +72,7 @@ const WaitingRoom = () => {
           id="chatting-create"
           onClick={() =>
             dispatch({
-              type: CurrentChattingTypes.UPDATE_STATUS_CREATING,
+              type: CurrentChattingActionTypes.UPDATE_STATUS_CREATING,
               payload: "",
             })
           }

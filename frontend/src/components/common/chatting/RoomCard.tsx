@@ -1,6 +1,6 @@
 import { IRootState } from "components/common/store";
 import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingTypes } from "types/CurrentChatting";
+import { CurrentChattingActionTypes } from "types/CurrentChatting";
 import { ChatRoomDetail } from "types/Detail";
 
 import Card from "@mui/joy/Card";
@@ -20,7 +20,7 @@ const RoomCard = (props: ChatRoomDetail) => {
     <Box
       onClick={() => {
         dispatch({
-          type: CurrentChattingTypes.UPDATE_STATUS_CHATTING,
+          type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
           payload: {
             id: props.id,
             title: props.title,

@@ -3,7 +3,7 @@ import { ChatRoomDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
 import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingTypes } from "types/CurrentChatting";
+import { CurrentChattingActionTypes } from "types/CurrentChatting";
 import { IRootState } from "components/common/store";
 
 import { Box } from "@mui/material";
@@ -100,7 +100,7 @@ const ChattingRoom = () => {
               variant="outlined"
               onClick={() => {
                 dispatch({
-                  type: CurrentChattingTypes.UPDATE_STATUS_WAITING,
+                  type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
                   payload: "",
                 });
               }}

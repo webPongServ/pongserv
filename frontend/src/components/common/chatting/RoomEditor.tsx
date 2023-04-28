@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingTypes } from "types/CurrentChatting";
+import { CurrentChattingActionTypes } from "types/CurrentChatting";
 import { ChatRoomForm } from "types/Form";
 import { IRootState } from "components/common/store";
 
@@ -203,7 +203,7 @@ const RoomEditor = (props: HandleRoomDetail) => {
               return alert("비밀번호를 입력해주세요!");
             // API call
             dispatch({
-              type: CurrentChattingTypes.EDIT_CHATTINGROOM,
+              type: CurrentChattingActionTypes.EDIT_CHATTINGROOM,
               payload: {
                 title: `${chatRoomForm.title}`,
                 type: `${chatRoomForm.type}`,

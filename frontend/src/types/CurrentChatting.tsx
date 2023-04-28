@@ -23,7 +23,7 @@ const INITIAL_CURRENTCHATTING: CurrentChatting = {
   banList: [],
 };
 
-export enum CurrentChattingTypes {
+export enum CurrentChattingActionTypes {
   UPDATE_STATUS_WAITING = "UPDATE_STATUS_WAITING",
   UPDATE_STATUS_CREATING = "UPDATE_STATUS_CREATING",
   UPDATE_STATUS_CHATTING = "UPDATE_STATUS_CHATTING",
@@ -34,24 +34,25 @@ export enum CurrentChattingTypes {
   GET_BANLIST = "GET_BANLIST",
   ADD_BANLIST = "ADD_BANLIST",
   DELETE_BANLIST = "DELETE_BANLIST",
+  EDIT_CHATTING = "EDIT_CHATTING",
 }
 
 export interface CurrentChatting_UpdateStatusWaitingAction {
-  type: CurrentChattingTypes.UPDATE_STATUS_WAITING;
+  type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING;
   payload: string;
 }
 export interface CurrentChatting_UpdateStatusCreatingAction {
-  type: CurrentChattingTypes.UPDATE_STATUS_CREATING;
+  type: CurrentChattingActionTypes.UPDATE_STATUS_CREATING;
   payload: string;
 }
 
 export interface CurrentChatting_UpdateStatusChattingAction {
-  type: CurrentChattingTypes.UPDATE_STATUS_CHATTING;
+  type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING;
   payload: ChatRoomDetail;
 }
 
 export interface CurrentChatting_EditChattingRoomAction {
-  type: CurrentChattingTypes.EDIT_CHATTINGROOM;
+  type: CurrentChattingActionTypes.EDIT_CHATTINGROOM;
   payload: ChatRoomEditForm;
 }
 
@@ -66,20 +67,20 @@ export const CurrentChattingReducer = (
   action: CurrentChattingAction
 ): CurrentChatting => {
   switch (action.type) {
-    case CurrentChattingTypes.UPDATE_STATUS_WAITING:
+    case CurrentChattingActionTypes.UPDATE_STATUS_WAITING:
       return INITIAL_CURRENTCHATTING;
-    case CurrentChattingTypes.UPDATE_STATUS_CREATING:
+    case CurrentChattingActionTypes.UPDATE_STATUS_CREATING:
       return {
         ...state,
         status: "creating",
       };
-    case CurrentChattingTypes.UPDATE_STATUS_CHATTING:
+    case CurrentChattingActionTypes.UPDATE_STATUS_CHATTING:
       return {
         ...state,
         status: "chatting",
         chatRoom: action.payload,
       };
-    case CurrentChattingTypes.EDIT_CHATTINGROOM:
+    case CurrentChattingActionTypes.EDIT_CHATTINGROOM:
       return {
         ...state,
         chatRoom: {

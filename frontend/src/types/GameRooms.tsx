@@ -26,22 +26,22 @@ const INITIAL_GAMEROOMS: GameRooms = {
 };
 
 export enum GameRoomsActionTypes {
-  GET = "GET",
-  ADD = "ADD",
-  DELETE = "DELETE",
+  GAMEROOMS_GET = "GAMEROOMS_GET",
+  GAMEROOMS_ADD = "GAMEROOMS_ADD",
+  GAMEROOMS_DELETE = "GAMEROOMS_DELETE",
 }
 
 export interface GameRoomsGetAction {
-  type: GameRoomsActionTypes.GET;
+  type: GameRoomsActionTypes.GAMEROOMS_GET;
   payload: GameRooms;
 }
 export interface GameRoomsAddAction {
-  type: GameRoomsActionTypes.ADD;
+  type: GameRoomsActionTypes.GAMEROOMS_ADD;
   payload: GameRoomDetail;
 }
 
 export interface GameRoomsDeleteAction {
-  type: GameRoomsActionTypes.DELETE;
+  type: GameRoomsActionTypes.GAMEROOMS_DELETE;
   payload: string;
 }
 
@@ -55,14 +55,14 @@ export const GameRoomsReducer = (
   action: GameRoomsAction
 ): GameRooms => {
   switch (action.type) {
-    case GameRoomsActionTypes.GET:
+    case GameRoomsActionTypes.GAMEROOMS_GET:
       return action.payload;
-    case GameRoomsActionTypes.ADD:
+    case GameRoomsActionTypes.GAMEROOMS_ADD:
       return {
         ...state,
         gameRooms: [...state.gameRooms, action.payload],
       };
-    case GameRoomsActionTypes.DELETE:
+    case GameRoomsActionTypes.GAMEROOMS_DELETE:
       return {
         ...state,
         gameRooms: state.gameRooms.filter(

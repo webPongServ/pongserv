@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingTypes } from "types/CurrentChatting";
 import { ChatRoomForm } from "types/Form";
+import { CurrentChattingActionTypes } from "types/CurrentChatting";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/Chatting.scss";
@@ -147,7 +147,7 @@ const RoomCreator = () => {
   const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape" || event.key === "Esc") {
       dispatch({
-        type: CurrentChattingTypes.UPDATE_STATUS_WAITING,
+        type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
         payload: "",
       });
     }
@@ -172,7 +172,7 @@ const RoomCreator = () => {
           sx={{ marginLeft: "auto" }}
           onClick={() =>
             dispatch({
-              type: CurrentChattingTypes.UPDATE_STATUS_WAITING,
+              type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
               payload: "",
             })
           }
@@ -207,7 +207,7 @@ const RoomCreator = () => {
               return alert("비밀번호를 입력해주세요!");
             // API call
             dispatch({
-              type: CurrentChattingTypes.UPDATE_STATUS_CHATTING,
+              type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
               payload: {
                 id: "202304280001",
                 title: `${chatRoomForm.title}`,

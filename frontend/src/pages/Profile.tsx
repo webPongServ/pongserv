@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import UserInfo from "components/profile/UserInfo";
 import ProfileButton from "components/profile/ProfileButton";
-import { CurrentChattingTypes } from "types/CurrentChatting";
+import { CurrentChattingActionTypes } from "types/CurrentChatting";
 import { FriendsActionTypes } from "types/Friends";
 import { IRootState } from "components/common/store";
 import { ProfileDetail } from "types/Detail";
@@ -39,7 +39,7 @@ const Profile = () => {
   const handleDMButton = () => {
     // const data = ... // 채팅방 생성 API 요청
     dispatch({
-      type: CurrentChattingTypes.UPDATE_STATUS_CHATTING,
+      type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
       payload: {
         id: "202304280001", // API를 통해 받아온 데이터
         title: `[DM] ${profileDetail.nickname}, ${myInfo.nickname}`,
@@ -54,7 +54,7 @@ const Profile = () => {
 
   const handleFriendAddButton = () => {
     dispatch({
-      type: FriendsActionTypes.ADD,
+      type: FriendsActionTypes.FRIENDS_ADD,
       payload: {
         nickname: profileDetail.nickname,
         imgURL: profileDetail.imgURL,
@@ -66,7 +66,7 @@ const Profile = () => {
 
   const handleFriendDeleteButton = () => {
     dispatch({
-      type: FriendsActionTypes.DELETE,
+      type: FriendsActionTypes.FRIENDS_DELETE,
       payload: profileDetail.nickname,
     });
     setIsFriend(!isFriend);

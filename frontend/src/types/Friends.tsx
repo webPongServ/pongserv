@@ -14,22 +14,22 @@ const INITIAL_FRIENDS: Friends = {
 };
 
 export enum FriendsActionTypes {
-  GET = "GET",
-  ADD = "ADD",
-  DELETE = "DELETE",
+  FRIENDS_GET = "FRIENDS_GET",
+  FRIENDS_ADD = "FRIENDS_ADD",
+  FRIENDS_DELETE = "FRIENDS_DELETE",
 }
 
 export interface FriendsGetAction {
-  type: FriendsActionTypes.GET;
+  type: FriendsActionTypes.FRIENDS_GET;
   payload: Friends;
 }
 export interface FriendsAddAction {
-  type: FriendsActionTypes.ADD;
+  type: FriendsActionTypes.FRIENDS_ADD;
   payload: UserDetail;
 }
 
 export interface FriendsDeleteAction {
-  type: FriendsActionTypes.DELETE;
+  type: FriendsActionTypes.FRIENDS_DELETE;
   payload: string;
 }
 
@@ -40,21 +40,20 @@ export const FriendsReducer = (
   action: FriendsAction
 ): Friends => {
   switch (action.type) {
-    case FriendsActionTypes.GET:
+    case FriendsActionTypes.FRIENDS_GET:
       return action.payload;
-    case FriendsActionTypes.ADD:
+    case FriendsActionTypes.FRIENDS_ADD:
       return {
         ...state,
         friends: [...state.friends, action.payload],
       };
-    case FriendsActionTypes.DELETE:
+    case FriendsActionTypes.FRIENDS_DELETE:
       return {
         ...state,
         friends: state.friends.filter(
           (friend) => friend.nickname !== action.payload
         ),
       };
-
     default:
       return state;
   }

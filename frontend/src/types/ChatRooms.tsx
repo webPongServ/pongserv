@@ -37,22 +37,22 @@ const INITIAL_CHATROOMS: ChatRooms = {
 };
 
 export enum ChatRoomsActionTypes {
-  GET = "GET",
-  ADD = "ADD",
-  DELETE = "DELETE",
+  CHATROOMS_GET = "CHATROOMS_GET",
+  CHATROOMS_ADD = "CHATROOMS_ADD",
+  CHATROOMS_DELETE = "CHATROOMS_DELETE",
 }
 
 export interface ChatRoomsGetAction {
-  type: ChatRoomsActionTypes.GET;
+  type: ChatRoomsActionTypes.CHATROOMS_GET;
   payload: ChatRooms;
 }
 export interface ChatRoomsAddAction {
-  type: ChatRoomsActionTypes.ADD;
+  type: ChatRoomsActionTypes.CHATROOMS_ADD;
   payload: ChatRoomDetail;
 }
 
 export interface ChatRoomsDeleteAction {
-  type: ChatRoomsActionTypes.DELETE;
+  type: ChatRoomsActionTypes.CHATROOMS_DELETE;
   payload: string;
 }
 
@@ -66,21 +66,20 @@ export const ChatRoomsReducer = (
   action: ChatRoomsAction
 ): ChatRooms => {
   switch (action.type) {
-    case ChatRoomsActionTypes.GET:
+    case ChatRoomsActionTypes.CHATROOMS_GET:
       return action.payload;
-    case ChatRoomsActionTypes.ADD:
+    case ChatRoomsActionTypes.CHATROOMS_ADD:
       return {
         ...state,
         chatRooms: [...state.chatRooms, action.payload],
       };
-    case ChatRoomsActionTypes.DELETE:
+    case ChatRoomsActionTypes.CHATROOMS_DELETE:
       return {
         ...state,
         chatRooms: state.chatRooms.filter(
           (chatRoom) => chatRoom.id !== action.payload
         ),
       };
-
     default:
       return state;
   }
