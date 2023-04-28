@@ -1,4 +1,8 @@
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { CurrentChattingTypes } from "types/CurrentChatting";
+import { ChatRoomForm } from "types/Form";
+import { IRootState } from "components/common/store";
 
 import { Typography } from "@mui/material";
 import { Button } from "@mui/joy";
@@ -21,7 +25,24 @@ type HandleRoomDetail = {
 
 const RoomEditor = (props: HandleRoomDetail) => {
   const [isPublic, setIsPublic] = useState<boolean>(props.type === "public");
+  const [chatRoomForm, setChatRoomForm] = useState<ChatRoomForm>({
+    title: props.title,
+    max: props.max,
+    type: props.type,
+    password: "",
+  });
   const divRef = useRef<HTMLDivElement>(null);
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
+  const dispatch = useDispatch();
+
+  const HandleTitle: React.ChangeEventHandler<HTMLInputElement> = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    if (e) {
+      const target: HTMLInputElement = e.target;
+      setChatRoomForm({ ...chatRoomForm, title: target.value });
+    }
+  };
 
   const CreatorInput = (type: string) => {
     let name, input;
@@ -33,17 +54,11 @@ const RoomEditor = (props: HandleRoomDetail) => {
         name = "제목";
         input = (
           <Input
-            defaultValue={props.title}
             placeholder="최대 20자"
+            defaultValue={chatRoomForm.title}
             required
             slotProps={{ input: { maxLength: 20 } }}
-            // props={{ maxLength: 20 }}
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target = e.target as HTMLInputElement;
-            //     setPartyForm({ ...partyForm, title: target.value });
-            //   }
-            // }}
+            onChange={HandleTitle}
           />
         );
         break;
@@ -53,21 +68,21 @@ const RoomEditor = (props: HandleRoomDetail) => {
         input = (
           <Slider
             aria-label="Small steps"
-            defaultValue={props.max}
+            defaultValue={chatRoomForm.max}
             marks={marks}
             step={1}
             min={2}
             max={10}
             valueLabelDisplay="auto"
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target: HTMLInputElement = e.target as HTMLInputElement;
-            //     props.setPartyForm({
-            //       ...props.partyForm,
-            //       max: target.value,
-            //     });
-            //   }
-            // }}
+            onChange={(e) => {
+              if (e) {
+                const target: HTMLInputElement = e.target as HTMLInputElement;
+                setChatRoomForm({
+                  ...chatRoomForm,
+                  max: parseInt(target.value),
+                });
+              }
+            }}
           />
         );
         break;
@@ -76,16 +91,18 @@ const RoomEditor = (props: HandleRoomDetail) => {
         name = "채팅방 유형";
         input = (
           <Select
-            defaultValue={props.type}
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target: HTMLInputElement = e.target as HTMLInputElement;
-            //     props.setPartyForm({
-            //       ...props.partyForm,
-            //       category: target.outerText,
-            //     });
-            //   }
-            // }}
+            defaultValue={chatRoomForm.type}
+            onChange={(e) => {
+              if (e) {
+                const target: HTMLInputElement = e.target as HTMLInputElement;
+                setChatRoomForm({
+                  ...chatRoomForm,
+                  type: `${
+                    target.innerText === "공개" ? "public" : "protected"
+                  }`,
+                });
+              }
+            }}
           >
             <Option value="public" onClick={() => setIsPublic(true)}>
               공개
@@ -104,12 +121,12 @@ const RoomEditor = (props: HandleRoomDetail) => {
             placeholder="최대 20자"
             type="password"
             slotProps={{ input: { maxLength: 20 } }}
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target = e.target as HTMLInputElement;
-            //     setPartyForm({ ...partyForm, title: target.value });
-            //   }
-            // }}
+            onChange={(e) => {
+              if (e) {
+                const target = e.target as HTMLInputElement;
+                setChatRoomForm({ ...chatRoomForm, password: target.value });
+              }
+            }}
           />
         );
         break;
@@ -117,7 +134,6 @@ const RoomEditor = (props: HandleRoomDetail) => {
       default:
         break;
     }
-
     return (
       <Box
         sx={{
@@ -175,7 +191,30 @@ const RoomEditor = (props: HandleRoomDetail) => {
         {isPublic ? "" : CreatorInput("password")}
       </Box>
       <Box className="flex-container" sx={{ height: "10%" }}>
-        <Button sx={{ width: "80%" }}>생성</Button>
+        <Button
+          sx={{ width: "80%" }}
+          onClick={() => {
+            if (chatRoomForm.title.length === 0)
+              return alert("제목을 입력해주세요!");
+            else if (
+              chatRoomForm.type === "protected" &&
+              chatRoomForm.password.length === 0
+            )
+              return alert("비밀번호를 입력해주세요!");
+            // API call
+            dispatch({
+              type: CurrentChattingTypes.EDIT_CHATTINGROOM,
+              payload: {
+                title: `${chatRoomForm.title}`,
+                type: `${chatRoomForm.type}`,
+                max: `${chatRoomForm.max}`,
+              },
+            });
+            props.setRoomStatus("chat");
+          }}
+        >
+          수정
+        </Button>
       </Box>
     </Box>
   );
