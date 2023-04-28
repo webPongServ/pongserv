@@ -1,4 +1,5 @@
 import { UserDetail, ChatRoomDetail } from "./Detail";
+import { ChatRoomEditForm } from "./Form";
 
 export interface CurrentChatting {
   status: string;
@@ -26,6 +27,7 @@ export enum CurrentChattingTypes {
   UPDATE_STATUS_WAITING = "UPDATE_STATUS_WAITING",
   UPDATE_STATUS_CREATING = "UPDATE_STATUS_CREATING",
   UPDATE_STATUS_CHATTING = "UPDATE_STATUS_CHATTING",
+  EDIT_CHATTINGROOM = "EDIT_CHATTINGROOM",
   GET_USERLIST = "GET_USERLIST",
   ADD_USERLIST = "ADD_USERLIST",
   DELETE_USERLIST = "DELETE_USERLIST",
@@ -48,10 +50,16 @@ export interface CurrentChatting_UpdateStatusChattingAction {
   payload: ChatRoomDetail;
 }
 
+export interface CurrentChatting_EditChattingRoomAction {
+  type: CurrentChattingTypes.EDIT_CHATTINGROOM;
+  payload: ChatRoomEditForm;
+}
+
 type CurrentChattingAction =
   | CurrentChatting_UpdateStatusWaitingAction
   | CurrentChatting_UpdateStatusChattingAction
-  | CurrentChatting_UpdateStatusCreatingAction;
+  | CurrentChatting_UpdateStatusCreatingAction
+  | CurrentChatting_EditChattingRoomAction;
 
 export const CurrentChattingReducer = (
   state = INITIAL_CURRENTCHATTING,
@@ -70,6 +78,16 @@ export const CurrentChattingReducer = (
         ...state,
         status: "chatting",
         chatRoom: action.payload,
+      };
+    case CurrentChattingTypes.EDIT_CHATTINGROOM:
+      return {
+        ...state,
+        chatRoom: {
+          ...state.chatRoom,
+          title: action.payload.title,
+          type: action.payload.type,
+          max: action.payload.max,
+        },
       };
     default:
       return state;
