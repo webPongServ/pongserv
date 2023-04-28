@@ -11,10 +11,10 @@ const MainRoute = (): JSX.Element => {
     <>
       <Routes>
         <Route path="/main" element={<Main />} />
-        <Route path="/profile/:no" element={<Profile />} />
+        <Route path="/profile/:nickname" element={<Profile />} />
         <Route path="/search" element={<Search />} />
         <Route path="/game" element={<Game />} />
-        <Route path="/game/:no" element={<GameRoom />} />
+        <Route path="/game/:id" element={<GameRoom />} />
         <Route
           path="/game/ladder"
           element={
@@ -25,8 +25,6 @@ const MainRoute = (): JSX.Element => {
             />
           }
         />
-        {/* <Route path="/party" element={<Party />} />
-        <Route path="/logout" element={<Logout />} /> */}
       </Routes>
     </>
   );
