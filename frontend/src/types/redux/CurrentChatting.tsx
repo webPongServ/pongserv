@@ -1,5 +1,5 @@
-import { UserDetail, ChatRoomDetail } from "./Detail";
-import { ChatRoomEditForm } from "./Form";
+import { UserDetail, ChatRoomDetail } from "types/Detail";
+import { ChatRoomEditForm } from "types/Form";
 
 export interface CurrentChatting {
   status: string;

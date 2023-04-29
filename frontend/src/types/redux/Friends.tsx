@@ -1,4 +1,4 @@
-import { UserDetail } from "./Detail";
+import { UserDetail } from "types/Detail";
 
 export interface Friends {
   friends: UserDetail[];

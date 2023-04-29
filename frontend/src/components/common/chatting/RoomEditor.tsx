@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { CurrentChattingActionTypes } from "types/CurrentChatting";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChatRoomForm } from "types/Form";
 import CustomInput from "../utils/CustomInput";
 import CustomSlider from "../utils/CustomSlider";

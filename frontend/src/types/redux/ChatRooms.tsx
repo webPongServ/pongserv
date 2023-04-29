@@ -1,4 +1,4 @@
-import { ChatRoomDetail } from "./Detail";
+import { ChatRoomDetail } from "types/Detail";
 
 export interface ChatRooms {
   chatRooms: ChatRoomDetail[];

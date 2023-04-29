@@ -1,4 +1,4 @@
-import { GameRoomDetail } from "./Detail";
+import { GameRoomDetail } from "types/Detail";
 
 export interface GameRooms {
   gameRooms: GameRoomDetail[];

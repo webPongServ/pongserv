@@ -1,8 +1,8 @@
 import { combineReducers, createStore } from "redux";
-import { MyInfoReducer } from "types/MyInfo";
-import { FriendsReducer } from "types/Friends";
-import { CurrentChattingReducer } from "types/CurrentChatting";
-import { GameRoomsReducer } from "types/GameRooms";
+import { MyInfoReducer } from "types/redux/MyInfo";
+import { FriendsReducer } from "types/redux/Friends";
+import { CurrentChattingReducer } from "types/redux/CurrentChatting";
+import { GameRoomsReducer } from "types/redux/GameRooms";
 
 const rootReducer = combineReducers({
   myInfo: MyInfoReducer,

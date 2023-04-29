@@ -1,4 +1,4 @@
-import { UserDetail } from "./Detail";
+import { UserDetail } from "types/Detail";
 
 const INITIAL_MYINFO: UserDetail = {
   nickname: "susong",

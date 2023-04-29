@@ -1,6 +1,6 @@
 import { IRootState } from "components/common/store";
 import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingActionTypes } from "types/CurrentChatting";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChatRoomDetail } from "types/Detail";
 import "styles/global.scss";
 import "styles/Chatting.scss";

@@ -3,7 +3,7 @@ import { ChatRoomDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
 import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingActionTypes } from "types/CurrentChatting";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/Chatting.scss";
