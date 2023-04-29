@@ -24,3 +24,17 @@ export interface GameDifficultyRadioGroupProps {
   defaultValue: string;
   handleFunction: any;
 }
+
+export interface CustomIconButtonProps {
+  class: string;
+  icon: JSX.Element;
+  handleFunction: any;
+}
+
+export interface CustomProfileButtonProps {
+  class: string;
+  nickname: string;
+  imgURL: string;
+  position: string;
+  handleFunction: any;
+}
