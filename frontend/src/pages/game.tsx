@@ -19,11 +19,8 @@ const Game = () => {
   );
 
   return (
-    <>
-      <Box
-        className="flex-wrap-container overflow"
-        sx={{ height: "80%", p: 3, gap: 3 }}
-      >
+    <Box id="Game" className="flex-container">
+      <Box id="game-box" className="flex-wrap-container overflow">
         {gameRooms.map((value, index) => {
           return (
             <GameCard
@@ -40,20 +37,11 @@ const Game = () => {
           );
         })}
       </Box>
-      <Box
-        className="flex-container direction-column game-button-group"
-        sx={{ height: "20%" }}
-      >
-        <Button
-          className="large-size"
-          onClick={() => setRoomStatus("create-game")}
-        >
+      <Box id="button-box" className="flex-container">
+        <Button onClick={() => setRoomStatus("create-game")}>
           일반 게임 생성
         </Button>
-        <Button
-          className="large-size"
-          onClick={() => setRoomStatus("ladder-game")}
-        >
+        <Button onClick={() => setRoomStatus("ladder-game")}>
           래더 게임 시작
         </Button>
       </Box>
@@ -64,7 +52,7 @@ const Game = () => {
       />
       <LadderGameModal roomStatus={roomStatus} setRoomStatus={setRoomStatus} />
       <CreateGameModal roomStatus={roomStatus} setRoomStatus={setRoomStatus} />
-    </>
+    </Box>
   );
 };
 

@@ -8,7 +8,6 @@ import "styles/Chatting.scss";
 import Card from "@mui/joy/Card";
 import CardOverflow from "@mui/joy/CardOverflow";
 import Box from "@mui/joy/Box";
-import Typography from "@mui/joy/Typography";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Person from "@mui/icons-material/Person";
 
@@ -45,20 +44,20 @@ const RoomCard = (props: ChatRoomDetail) => {
           <StarBorderIcon />
           {props.owner}
         </Box>
-        <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
+        <Box>|</Box>
         <Box className="flex-container">
           <Person />
           {props.current} / {props.max}
         </Box>
       </Box>
       <CardOverflow className="card-overflow" variant="soft">
-        <Typography sx={{ color: "#aaaaaa" }}>
+        <Box>
           {props.type === "public" && "공개"}
           {props.type === "protected" && "비공개"}
           {props.type === "private" && "DM"}
-        </Typography>
-        <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
-        <Typography sx={{ color: "#aaaaaa" }}>9 hours ago</Typography>
+        </Box>
+        <Box>|</Box>
+        <Box>9 hours ago</Box>
       </CardOverflow>
     </Card>
   );

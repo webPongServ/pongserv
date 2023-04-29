@@ -1,29 +1,74 @@
-.game-button-group {
+#Game {
   width: 100%;
-}
+  height: 105%;
+  flex-direction: column;
+  row-gap: 5%;
 
-.game-button-group .large-size {
-  width: 50%;
-  margin-bottom: 5px;
-}
+  #game-box {
+    height: 80%;
+    padding: 3%;
 
-.game-image img {
-  width: 75px;
-  height: 75px;
-  display: flex;
-  align-items: center;
-  border-radius: 50%;
-  border: 0px solid #fff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
-}
+    .game-card {
+      width: 250px;
+      height: 250px;
+      cursor: pointer;
+      margin: 1%;
+      &:hover {
+        border: 3px solid skyblue;
+      }
 
-.sword img {
-  width: 30px;
-  height: 30px;
-}
+      .preview {
+        height: 130px;
+        justify-content: space-between;
 
-.game-link {
-  text-decoration: none;
+        .user {
+          flex-direction: column;
+
+          img {
+            width: 75px;
+            height: 75px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            border-radius: 50%;
+            border: 0px solid #fff;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+              0 3px 6px rgba(0, 0, 0, 0.23);
+          }
+        }
+
+        .vs {
+          width: 30px;
+          height: 30px;
+        }
+      }
+
+      .title {
+        height: 80px;
+        font-size: 15px;
+        font-weight: bold;
+      }
+
+      .card-overflow {
+        font-size: 13px;
+        height: 40px;
+        color: #aaaaaa;
+        column-gap: 2%;
+        padding: 0.5% var(--Card-padding) 0.5% var(--Card-padding);
+      }
+    }
+  }
+
+  #button-box {
+    flex-direction: column;
+    width: 100%;
+    height: 10%;
+
+    button {
+      width: 50%;
+      margin-bottom: 5px;
+    }
+  }
 }
 
 .game-modal {
