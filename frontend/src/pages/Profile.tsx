@@ -1,20 +1,18 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import UserInfo from "components/profile/UserInfo";
-import ProfileButton from "components/profile/ProfileButton";
-import { CurrentChattingActionTypes } from "types/CurrentChatting";
-import { FriendsActionTypes } from "types/Friends";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
+import { FriendsActionTypes } from "types/redux/Friends";
 import { IRootState } from "components/common/store";
 import { ProfileDetail } from "types/Detail";
+import UserInfo from "components/profile/UserInfo";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
-import Tabs from "@mui/joy/Tabs";
-import TabList from "@mui/joy/TabList";
+import { Box } from "@mui/material";
+import { Button, Tabs, TabList } from "@mui/joy";
 import Tab, { tabClasses } from "@mui/joy/Tab";
 import GameHistoryList from "components/profile/GameHistoryList";
 import AchievementList from "components/profile/AchievementList";
-import { Box } from "@mui/material";
 
 const Profile = () => {
   // 다른 사람 정보도 요청해야 하니까 여기서 요청하기
@@ -83,9 +81,9 @@ const Profile = () => {
   }, []);
 
   return (
-    <>
-      <Box className="flex-container profile-fullcontainer">
-        <Box className="profile-container flex-container">
+    <Box id="Profile" className="flex-container">
+      <Box id="user-info-box" className="flex-container">
+        <Box className="user-info flex-container">
           <UserInfo
             nickname={profileDetail.nickname}
             imgURL={profileDetail.imgURL}
@@ -97,67 +95,56 @@ const Profile = () => {
             status={profileDetail.status}
           />
         </Box>
-        <Box className="profile-container flex-container direction-column">
-          <ProfileButton
-            type="positive"
-            name="DM"
-            handleOnClick={handleDMButton}
-          />
-          {isFriend ? (
-            <ProfileButton
-              name="친구 삭제"
-              type="negative"
-              handleOnClick={handleFriendDeleteButton}
-            />
-          ) : (
-            <ProfileButton
-              name="친구 추가"
-              type="positive"
-              handleOnClick={handleFriendAddButton}
-            />
-          )}
-          <ProfileButton
-            name="차단"
-            type="negative"
-            handleOnClick={handleBlockButton}
-          />
+        <Box className="button-group flex-container">
+          <Button variant="solid" onClick={handleDMButton}>
+            DM
+          </Button>
+          <Button
+            variant={isFriend ? "outlined" : "solid"}
+            onClick={
+              isFriend ? handleFriendDeleteButton : handleFriendAddButton
+            }
+          >
+            {isFriend ? "친구 삭제" : "친구 추가"}
+          </Button>
+          <Button variant="outlined" onClick={handleBlockButton}>
+            차단
+          </Button>
         </Box>
       </Box>
-      <Box className="profile-fullcontainer" style={{ height: "70%" }}>
-        <Tabs aria-label="tabs" defaultValue={0} sx={{ height: "100%" }}>
-          <TabList
-            variant="plain"
-            sx={{
-              width: "250px",
-              "--List-padding": "0px",
-              "--List-radius": "0px",
-              "--ListItem-minHeight": "48px",
-              [`& .${tabClasses.root}`]: {
-                boxShadow: "none",
-                fontWeight: "md",
-                [`&.${tabClasses.selected}::before`]: {
-                  content: '""',
-                  display: "block",
-                  position: "absolute",
-                  left: "var(--ListItem-paddingLeft)", // change to `0` to stretch to the edge.
-                  right: "var(--ListItem-paddingRight)", // change to `0` to stretch to the edge.
-                  bottom: 0,
-                  height: 3,
-                  bgcolor: "primary.400",
-                },
+      <Tabs id="history-box" aria-label="tabs" defaultValue={0}>
+        <TabList
+          variant="plain"
+          sx={{
+            width: "250px",
+            "--List-padding": "0px",
+            "--List-radius": "0px",
+            "--ListItem-minHeight": "48px",
+            [`& .${tabClasses.root}`]: {
+              boxShadow: "none",
+              fontWeight: "md",
+              [`&.${tabClasses.selected}::before`]: {
+                content: '""',
+                display: "block",
+                position: "absolute",
+                left: "var(--ListItem-paddingLeft)", // change to `0` to stretch to the edge.
+                right: "var(--ListItem-paddingRight)", // change to `0` to stretch to the edge.
+                bottom: 0,
+                height: 3,
+                bgcolor: "primary.400",
               },
-            }}
-          >
-            <Tab>전적</Tab>
-            <Tab>업적</Tab>
-          </TabList>
-          <Box className="profile-fullcontainer overflow">
-            <GameHistoryList />
-            <AchievementList />
-          </Box>
-        </Tabs>
-      </Box>
-    </>
+            },
+          }}
+        >
+          <Tab>전적</Tab>
+          <Tab>업적</Tab>
+        </TabList>
+        <Box className="history overflow">
+          <GameHistoryList />
+          <AchievementList />
+        </Box>
+      </Tabs>
+    </Box>
   );
 };
 

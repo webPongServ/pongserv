@@ -1,15 +1,10 @@
 import { useState } from "react";
-
-import TabPanel from "@mui/joy/TabPanel";
-import Card from "@mui/joy/Card";
-import Typography from "@mui/joy/Typography";
+import { Achievement } from "types/Profile";
 import "styles/global.scss";
+import "styles/Profile.scss";
 
-export type Achievement = {
-  achvTitle: string;
-  achvContent: string;
-  achvImg: string;
-};
+import { Box } from "@mui/material";
+import { TabPanel, Card, Typography } from "@mui/joy";
 
 const Achievements = () => {
   const [achievementList, setAchievementList] = useState<Achievement[]>([
@@ -58,30 +53,26 @@ const Achievements = () => {
   console.log(setAchievementList);
 
   return (
-    <TabPanel
-      value={1}
-      sx={{ p: 3, display: "flex" }}
-      className="flex-container profile-fullcontainer"
-    >
-      <div className="flex-wrap-container">
+    <TabPanel value={1}>
+      <Box className="flex-wrap-container flex-container">
         {achievementList.map((value, index) => {
           return (
             <Card
-              key={value.achvTitle + index}
+              className="achievement-card flex-container"
               variant="outlined"
-              className="achievement-container flex-container gap"
+              key={value.achvTitle + index}
             >
-              <div className="flex-container column">
-                <img src={value.achvImg} alt="achievement_image" />
-                <div>
-                  <Typography>{value.achvTitle}</Typography>
+              <Box className="flex-container">
+                <img src={value.achvImg} alt="achievement_img" />
+                <Box>
+                  <Typography className="title">{value.achvTitle}</Typography>
                   <Typography>{value.achvContent}</Typography>
-                </div>
-              </div>
+                </Box>
+              </Box>
             </Card>
           );
         })}
-      </div>
+      </Box>
     </TabPanel>
   );
 };

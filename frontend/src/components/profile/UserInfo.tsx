@@ -7,18 +7,16 @@ import { Box } from "@mui/material";
 const UserInfo = (props: ProfileDetail) => {
   return (
     <Box className="flex-container">
-      <div className="profile-image">
-        <img src={props.imgURL} alt="profile_image" />
-      </div>
-      <div>
-        <div className="title">{props.nickname}</div>
-        <div>
+      <img src={props.imgURL} alt="profile_image" />
+      <Box>
+        <Box className="title">{props.nickname}</Box>
+        <Box>
           전적 : {props.total}G {props.win}W {props.lose}L
-        </div>
-        <div>
+        </Box>
+        <Box>
           래더 점수 : {props.ELO} ({props.winRate * 100}%)
-        </div>
-      </div>
+        </Box>
+      </Box>
     </Box>
   );
 };

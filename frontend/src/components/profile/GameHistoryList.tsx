@@ -1,22 +1,11 @@
 import { useState } from "react";
-
-import TabPanel from "@mui/joy/TabPanel";
-import Card from "@mui/joy/Card";
-import Typography from "@mui/joy/Typography";
 import { Link } from "react-router-dom";
+import { History } from "types/Profile";
 import "styles/global.scss";
+import "styles/Profile.scss";
 
-export type History = {
-  isWin: boolean;
-  myId: number;
-  myNick: string;
-  myImg: string;
-  myScore: number;
-  opId: number;
-  opNick: string;
-  opImg: string;
-  opScore: number;
-};
+import { Box, Typography } from "@mui/material";
+import { TabPanel, Card } from "@mui/joy";
 
 const GameHistoryList = () => {
   const [historyList, setHistoryList] = useState<History[]>([
@@ -27,7 +16,7 @@ const GameHistoryList = () => {
       myImg: "../image.png",
       myScore: 3,
       opId: 5,
-      opNick: "noname_12",
+      opNick: "seongtki",
       opImg: "../favicon.ico",
       opScore: 1,
     },
@@ -49,7 +38,7 @@ const GameHistoryList = () => {
       myImg: "../image.png",
       myScore: 2,
       opId: 5,
-      opNick: "noname_12",
+      opNick: "chanhyle",
       opImg: "../favicon.ico",
       opScore: 3,
     },
@@ -60,7 +49,7 @@ const GameHistoryList = () => {
       myImg: "../image.png",
       myScore: 2,
       opId: 5,
-      opNick: "noname_12",
+      opNick: "mgo",
       opImg: "../favicon.ico",
       opScore: 3,
     },
@@ -90,34 +79,41 @@ const GameHistoryList = () => {
 
   console.log(setHistoryList);
 
+  const userProfile = (nickname: string, imgURL: string): JSX.Element => {
+    return (
+      <Link className="user flex-container" to={`/profile/${nickname}`}>
+        <Box className="flex-container direction-column">
+          <img src={imgURL} alt="history_myimg" />
+          <Box>{nickname}</Box>
+        </Box>
+      </Link>
+    );
+  };
+
   return (
-    <TabPanel
-      value={0}
-      sx={{ p: 3, autoflow: "auto" }}
-      className="flex-container profile-fullcontainer"
-    >
+    <TabPanel value={0}>
       {historyList.map((value, index) => {
         return (
-          <div className="flex-container" key={value.myId + index}>
+          <Box className="flex-container">
             <Card
+              className="history-card flex-container"
               variant="outlined"
-              className="history-container flex-container gap"
-              sx={{ flexDirection: "row" }} // why?
+              key={value.myId + index}
             >
-              <Typography>{value.isWin ? "승리" : "패배"}</Typography>
-              <Link to={`/profile/${value.myId}`} className="history-image">
-                <img src={value.myImg} alt="history_myimage" />
-                <Typography>{value.myNick}</Typography>
-              </Link>
-              <div>{value.myScore}</div>
-              <div>vs.</div>
-              <div>{value.opScore}</div>
-              <Link to={`/profile/${value.opId}`} className="history-image">
-                <img src={value.opImg} alt="history_opimage" />
-                <Typography>{value.opNick}</Typography>
-              </Link>
+              <Box className="result">
+                <Typography className={value.isWin ? "win" : "lose"}>
+                  {value.isWin ? "승리" : "패배"}
+                </Typography>
+              </Box>
+              {userProfile(value.myNick, value.myImg)}
+              <Box className="score flex-container">
+                <Box>{value.myScore}</Box>
+                <Box>vs</Box>
+                <Box>{value.opScore}</Box>
+              </Box>
+              {userProfile(value.opNick, value.opImg)}
             </Card>
-          </div>
+          </Box>
         );
       })}
     </TabPanel>

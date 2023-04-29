@@ -45,7 +45,7 @@ const BanList = (props: BanListProps) => {
 
   return (
     <>
-      <List sx={{ height: "100%", overflow: "auto" }}>
+      <List>
         {bans.map((value, index) => (
           <ListItem
             key={value.nickname + index}
