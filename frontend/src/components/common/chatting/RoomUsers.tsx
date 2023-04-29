@@ -1,13 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import UserList from "./UserList";
 import BanList from "./BanList";
+import CustomIconButton from "../utils/CustomIconButton";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
 import { Box } from "@mui/material";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
-import IconButton from "@mui/joy/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { MyDetail } from "./ChattingRoom";
 
@@ -31,8 +31,8 @@ const RoomUsers = (props: RoomUsersProps) => {
   }, []);
 
   return (
-    <Box ref={divRef} onKeyDown={pressESC} tabIndex={0} sx={{ height: "100%" }}>
-      <Box className="flex-container" sx={{ height: "10%" }}>
+    <Box id="modal" ref={divRef} onKeyDown={pressESC} tabIndex={0}>
+      <Box className="modal-header flex-container">
         <Select
           defaultValue={selected}
           // onChange={(e) => {
@@ -62,38 +62,20 @@ const RoomUsers = (props: RoomUsersProps) => {
             차단 목록
           </Option>
         </Select>
-        <IconButton
-          sx={{ marginLeft: "auto" }}
-          onClick={() => {
+        <CustomIconButton
+          class="red"
+          icon={<CloseIcon />}
+          handleFunction={() => {
             props.setRoomStatus("chat");
           }}
-        >
-          <CloseIcon />
-        </IconButton>
+        />
       </Box>
-      <Box
-        className="flex-container align-normal justify-normal"
-        sx={{
-          flexDirection: "column",
-          height: "90%",
-          gap: 3,
-          marginTop: "5%",
-        }}
-      >
-        <Box
-          sx={{
-            height: "100%",
-            p: 1,
-            overflow: "auto",
-          }}
-          className="users-box"
-        >
-          {selected === "users" ? (
-            <UserList myDetail={props.myDetail} />
-          ) : (
-            <BanList myDetail={props.myDetail} />
-          )}
-        </Box>
+      <Box className="modal-body flex-container users-box overflow">
+        {selected === "users" ? (
+          <UserList myDetail={props.myDetail} />
+        ) : (
+          <BanList myDetail={props.myDetail} />
+        )}
       </Box>
     </Box>
   );

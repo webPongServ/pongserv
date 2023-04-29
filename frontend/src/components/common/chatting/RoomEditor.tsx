@@ -5,11 +5,12 @@ import { ChatRoomForm } from "types/Form";
 import CustomInput from "../utils/CustomInput";
 import CustomSlider from "../utils/CustomSlider";
 import ChattingTypeSelect from "../utils/ChattingTypeSelect";
+import CustomIconButton from "../utils/CustomIconButton";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
-import { Box, Typography } from "@mui/material";
-import { Button, IconButton } from "@mui/joy";
+import { Box } from "@mui/material";
+import { Button } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
 
 type HandleRoomDetail = {
@@ -94,29 +95,18 @@ const RoomEditor = (props: HandleRoomDetail) => {
   }, []);
 
   return (
-    <Box ref={divRef} onKeyDown={pressESC} tabIndex={0} sx={{ height: "100%" }}>
-      <Box className="flex-container" sx={{ height: "10%" }}>
-        <Typography sx={{ fontSize: "20px" }}>
-          <b>채팅방 정보 수정</b>
-        </Typography>
-        <IconButton
-          sx={{ marginLeft: "auto" }}
-          onClick={() => {
+    <Box id="modal" ref={divRef} onKeyDown={pressESC} tabIndex={0}>
+      <Box className="modal-header flex-container">
+        <b>채팅방 정보 수정</b>
+        <CustomIconButton
+          class="red"
+          icon={<CloseIcon />}
+          handleFunction={() => {
             props.setRoomStatus("chat");
           }}
-        >
-          <CloseIcon />
-        </IconButton>
+        />
       </Box>
-      <Box
-        className="flex-container align-normal justify-normal"
-        sx={{
-          flexDirection: "column",
-          height: "80%",
-          gap: 3,
-          marginTop: "5%",
-        }}
-      >
+      <Box className="modal-body flex-container">
         <CustomInput
           name="제목"
           defaultValue={props.title}
@@ -145,10 +135,8 @@ const RoomEditor = (props: HandleRoomDetail) => {
           />
         )}
       </Box>
-      <Box className="flex-container" sx={{ height: "10%" }}>
-        <Button sx={{ width: "80%" }} onClick={editChattingRoom}>
-          수정
-        </Button>
+      <Box className="modal-footer flex-container">
+        <Button onClick={editChattingRoom}>수정</Button>
       </Box>
     </Box>
   );

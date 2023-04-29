@@ -2,6 +2,8 @@ import { IRootState } from "components/common/store";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/CurrentChatting";
 import { ChatRoomDetail } from "types/Detail";
+import "styles/global.scss";
+import "styles/Chatting.scss";
 
 import Card from "@mui/joy/Card";
 import CardOverflow from "@mui/joy/CardOverflow";
@@ -17,7 +19,9 @@ const RoomCard = (props: ChatRoomDetail) => {
   const dispatch = useDispatch();
 
   return (
-    <Box
+    <Card
+      id="card"
+      variant="outlined"
       onClick={() => {
         dispatch({
           type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
@@ -32,60 +36,31 @@ const RoomCard = (props: ChatRoomDetail) => {
           },
         });
       }}
-      sx={{ cursor: "pointer" }}
     >
-      <Card
-        variant="outlined"
-        className="chat-gap"
-        sx={{
-          "&:hover": { border: "3px solid skyblue" },
-        }}
-      >
-        <Box sx={{ display: "flex", flexDirection: "row" }}>
-          <Typography level="h1" fontSize="md" sx={{ mb: 0.5 }}>
-            {props.title}
-          </Typography>
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-            py: 1,
-            alignItems: "center",
-            height: "32px",
-          }}
-        >
+      <Box className="title">
+        <b>{props.title}</b>
+      </Box>
+      <Box className="content">
+        <Box className="flex-container">
           <StarBorderIcon />
-          <Typography level="body1">{props.owner}</Typography>
-          <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
-          <Person />
-          <Typography
-            level="body1"
-            sx={{ fontWeight: "md", color: "text.secondary" }}
-          >
-            {props.current} / {props.max}
-          </Typography>
+          {props.owner}
         </Box>
-        <CardOverflow
-          variant="soft"
-          sx={{
-            display: "flex",
-            gap: 1.5,
-            py: 1,
-            px: "var(--Card-padding)",
-            bgcolor: "background.level1",
-          }}
-        >
-          <Typography sx={{ color: "#aaaaaa" }}>
-            {props.type === "public" && "공개"}
-            {props.type === "protected" && "비공개"}
-            {props.type === "private" && "DM"}
-          </Typography>
-          <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
-          <Typography sx={{ color: "#aaaaaa" }}>9 hours ago</Typography>
-        </CardOverflow>
-      </Card>
-    </Box>
+        <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
+        <Box className="flex-container">
+          <Person />
+          {props.current} / {props.max}
+        </Box>
+      </Box>
+      <CardOverflow className="card-overflow" variant="soft">
+        <Typography sx={{ color: "#aaaaaa" }}>
+          {props.type === "public" && "공개"}
+          {props.type === "protected" && "비공개"}
+          {props.type === "private" && "DM"}
+        </Typography>
+        <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
+        <Typography sx={{ color: "#aaaaaa" }}>9 hours ago</Typography>
+      </CardOverflow>
+    </Card>
   );
 };
 

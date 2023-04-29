@@ -1,20 +1,147 @@
-#chatting-create {
-  width: 70%;
-}
+$ChattingDrawerWidth: 500px;
 
-.chat-gap {
-  margin-bottom: 20px;
-}
+#ChattingDrawer {
+  width: $ChattingDrawerWidth;
+  height: 100%;
+  flex-shrink: 0;
 
-.chatting-box {
-  margin-bottom: 20px;
-  border: 1px solid transparent;
-  border-radius: 10px;
-  background-color: #c8d9f0;
-}
+  & .MuiDrawer-paper {
+    width: $ChattingDrawerWidth;
+  }
 
-.users-box {
-  margin-bottom: 20px;
-  border: 1px solid #c8d9f0;
-  border-radius: 10px;
+  #header {
+    height: 5%;
+    font-size: 20px;
+
+    #title {
+      flex-grow: 1;
+    }
+  }
+
+  #body {
+    height: 90%;
+    padding: 3%;
+
+    #modal {
+      height: 100%;
+      padding: 3%;
+
+      .modal-header {
+        height: 10%;
+        justify-content: space-between;
+        font-size: 20px;
+      }
+
+      .modal-body {
+        height: 80%;
+        row-gap: 3%;
+        margin-top: 5%;
+        flex-direction: column;
+        align-items: normal;
+        justify-content: normal;
+      }
+
+      .modal-footer {
+        height: 10%;
+
+        button {
+          width: 80%;
+        }
+      }
+
+      .red {
+        color: red;
+      }
+    }
+
+    #page {
+      height: 100%;
+      padding: 3%;
+
+      .page-header {
+        height: 5%;
+        font-size: 20px;
+      }
+
+      .page-body {
+        height: 85%;
+      }
+
+      .page-footer {
+        height: 10%;
+        column-gap: 2%;
+
+        .big {
+          width: 70%;
+        }
+
+        .small {
+          width: 33%;
+        }
+      }
+
+      .users-box {
+        margin-bottom: 20px;
+        border: 1px solid #c8d9f0;
+        border-radius: 10px;
+      }
+
+      .chatting-box {
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        background-color: #c8d9f0;
+
+        .chatting-display {
+          height: 90%;
+          padding: 5%;
+        }
+
+        .chatting-input {
+          height: 10%;
+          justify-content: space-around;
+        }
+
+        .input {
+          width: 80%;
+        }
+      }
+    }
+
+    #card {
+      cursor: pointer;
+      margin-bottom: 15px;
+      &:hover {
+        border: 3px solid skyblue;
+      }
+
+      .title {
+        font-size: 20px;
+        margin-bottom: 0.5px;
+      }
+
+      .content {
+        display: flex;
+        align-items: center;
+        font-size: 15px;
+        // height: 32px;
+        column-gap: 2%;
+        padding-bottom: 1%;
+
+        svg {
+          width: 20px;
+          height: 20px;
+          margin-right: 5px;
+        }
+      }
+
+      .card-overflow {
+        display: flex;
+        color: #aaaaaa;
+        column-gap: 2%;
+        height: 32px;
+        padding: 0.5% var(--Card-padding) 0.5% var(--Card-padding);
+      }
+    }
+  }
 }

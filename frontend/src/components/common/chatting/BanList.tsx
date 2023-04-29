@@ -1,15 +1,11 @@
 import { useState } from "react";
 import { MyDetail } from "./ChattingRoom";
+import CustomProfileButton from "../utils/CustomProfileButton";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
-import { Box } from "@mui/material";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
@@ -48,40 +44,24 @@ const BanList = (props: BanListProps) => {
   };
 
   return (
-    <Box sx={{ p: 1, height: "100%", overflow: "auto" }}>
-      <List sx={{ height: "80%", overflow: "auto" }}>
+    <>
+      <List sx={{ height: "100%", overflow: "auto" }}>
         {bans.map((value, index) => (
           <ListItem
             key={value.nickname + index}
             disablePadding
             sx={{ display: "block" }}
           >
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: true ? "initial" : "center",
-                px: 2.5,
-              }}
-              // what?
-              onClick={(e: any) => {
+            <CustomProfileButton
+              class="login"
+              nickname={value.nickname}
+              imgURL={value.imgUrl}
+              position="UserList"
+              handleFunction={(e: any) => {
                 setAnchorEl(e.currentTarget);
                 handleContextMenu(e);
               }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: true ? 3 : "auto",
-                  justifyContent: "center",
-                }}
-              >
-                <AccountCircleIcon fontSize="large" />
-              </ListItemIcon>
-              <ListItemText
-                primary={value.nickname}
-                sx={{ opacity: true ? 1 : 0 }}
-              />
-            </ListItemButton>
+            />
           </ListItem>
         ))}
       </List>
@@ -101,7 +81,7 @@ const BanList = (props: BanListProps) => {
       >
         <MenuItem>채팅방 차단 해제</MenuItem>
       </Menu>
-    </Box>
+    </>
   );
 };
 

@@ -3,8 +3,11 @@ import RoomCard from "components/common/chatting/RoomCard";
 import { ChatRoomDetail } from "types/Detail";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/CurrentChatting";
+import CustomIconButton from "../utils/CustomIconButton";
+import "styles/Chatting.scss";
+import "styles/global.scss";
 
-import { Box, IconButton } from "@mui/material";
+import { Box } from "@mui/material";
 import { Button } from "@mui/joy";
 import SyncIcon from "@mui/icons-material/Sync";
 
@@ -45,6 +48,42 @@ const WaitingRoom = () => {
         max: 2,
         createdAt: new Date(),
       },
+      {
+        id: "202304230003",
+        title: "[DM] susong, mgo",
+        owner: "mgo",
+        type: "private",
+        current: 1,
+        max: 2,
+        createdAt: new Date(),
+      },
+      {
+        id: "202304230003",
+        title: "[DM] susong, mgo",
+        owner: "mgo",
+        type: "private",
+        current: 1,
+        max: 2,
+        createdAt: new Date(),
+      },
+      {
+        id: "202304230003",
+        title: "[DM] susong, mgo",
+        owner: "mgo",
+        type: "private",
+        current: 1,
+        max: 2,
+        createdAt: new Date(),
+      },
+      {
+        id: "202304230003",
+        title: "[DM] susong, mgo",
+        owner: "mgo",
+        type: "private",
+        current: 1,
+        max: 2,
+        createdAt: new Date(),
+      },
     ]);
   };
 
@@ -53,8 +92,9 @@ const WaitingRoom = () => {
   }, []);
 
   return (
-    <Box sx={{ p: 2, height: "90%" }}>
-      <Box className="width-center overflow" sx={{ p: 2, height: "90%" }}>
+    <Box id="page">
+      <Box className="page-header">채팅 대기실</Box>
+      <Box className="page-body overflow">
         {chatRoomList.map((value) => (
           <RoomCard
             id={value.id}
@@ -67,9 +107,9 @@ const WaitingRoom = () => {
           />
         ))}
       </Box>
-      <Box className="flex-container" sx={{ height: "10%", gap: 1 }}>
+      <Box className="page-footer flex-container">
         <Button
-          id="chatting-create"
+          className="big"
           onClick={() =>
             dispatch({
               type: CurrentChattingActionTypes.UPDATE_STATUS_CREATING,
@@ -79,9 +119,11 @@ const WaitingRoom = () => {
         >
           채팅방 생성
         </Button>
-        <IconButton onClick={getChatRoomList}>
-          <SyncIcon />
-        </IconButton>
+        <CustomIconButton
+          class=""
+          icon={<SyncIcon />}
+          handleFunction={getChatRoomList}
+        />
       </Box>
     </Box>
   );

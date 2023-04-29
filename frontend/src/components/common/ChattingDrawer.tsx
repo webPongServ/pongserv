@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSelector } from "react-redux";
-import { ChattingDrawerWidth } from "constant";
 import { IRootState } from "components/common/store";
+import CustomIconButton from "./utils/CustomIconButton";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
@@ -9,8 +9,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Drawer from "@mui/material/Drawer";
 import { styled, useTheme } from "@mui/material/styles";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
+import { Box, Divider } from "@mui/material";
 
 import WaitingRoom from "components/common/chatting/WaitingRoom";
 import ChattingRoom from "components/common/chatting/ChattingRoom";
@@ -40,36 +39,33 @@ const ChattingDrawer = (props: HandleOpen) => {
 
   return (
     <Drawer
-      sx={{
-        width: ChattingDrawerWidth,
-        height: "100%",
-        flexShrink: 0,
-        "& .MuiDrawer-paper": {
-          width: ChattingDrawerWidth,
-        },
-      }}
+      id="ChattingDrawer"
       variant="persistent"
       anchor="right"
       open={props.open}
     >
-      <DrawerHeader sx={{ height: "8%" }}>
-        <IconButton onClick={handleDrawerClose}>
-          {theme.direction === "rtl" ? (
-            <ChevronLeftIcon />
-          ) : (
-            <ChevronRightIcon />
-          )}
-        </IconButton>
-        <div style={{ flexGrow: 1, justifyContent: "center" }}>
-          <div className="flex-container">
-            <div style={{ fontSize: "20px" }}>채팅</div>
-          </div>
-        </div>
+      <DrawerHeader id="header">
+        <CustomIconButton
+          class=""
+          icon={
+            theme.direction === "rtl" ? (
+              <ChevronLeftIcon />
+            ) : (
+              <ChevronRightIcon />
+            )
+          }
+          handleFunction={handleDrawerClose}
+        />
+        <Box id="title" className="flex-container">
+          채팅
+        </Box>
       </DrawerHeader>
       <Divider />
-      {currentChatting.status === "waiting" && <WaitingRoom />}
-      {currentChatting.status === "creating" && <RoomCreator />}
-      {currentChatting.status === "chatting" && <ChattingRoom />}
+      <Box id="body">
+        {currentChatting.status === "waiting" && <WaitingRoom />}
+        {currentChatting.status === "creating" && <RoomCreator />}
+        {currentChatting.status === "chatting" && <ChattingRoom />}
+      </Box>
     </Drawer>
   );
 };

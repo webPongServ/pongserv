@@ -6,11 +6,12 @@ import { IRootState } from "components/common/store";
 import CustomInput from "../utils/CustomInput";
 import CustomSlider from "../utils/CustomSlider";
 import ChattingTypeSelect from "../utils/ChattingTypeSelect";
+import CustomIconButton from "../utils/CustomIconButton";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
-import { Box, Typography } from "@mui/material";
-import { Button, IconButton } from "@mui/joy";
+import { Box } from "@mui/material";
+import { Button } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
 
 const RoomCreator = () => {
@@ -95,37 +96,21 @@ const RoomCreator = () => {
   }, []);
 
   return (
-    <Box
-      sx={{ p: 5, height: "90%" }}
-      onKeyDown={pressESC}
-      tabIndex={0}
-      ref={divRef}
-    >
-      <Box className="flex-container" sx={{ height: "10%" }}>
-        <Typography sx={{ fontSize: "20px" }}>
-          <b>채팅방 생성</b>
-        </Typography>
-        <IconButton
-          sx={{ marginLeft: "auto" }}
-          onClick={() =>
+    <Box id="modal" onKeyDown={pressESC} tabIndex={0} ref={divRef}>
+      <Box className="modal-header flex-container">
+        <b>채팅방 생성</b>
+        <CustomIconButton
+          class="red"
+          icon={<CloseIcon />}
+          handleFunction={() =>
             dispatch({
               type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
               payload: "",
             })
           }
-        >
-          <CloseIcon />
-        </IconButton>
+        />
       </Box>
-      <Box
-        className="flex-container align-normal justify-normal"
-        sx={{
-          flexDirection: "column",
-          height: "80%",
-          gap: 3,
-          marginTop: "5%",
-        }}
-      >
+      <Box className="modal-body flex-container">
         <CustomInput name="제목" defaultValue="" handleFunction={handleTitle} />
         <CustomSlider
           name="최대 인원"
@@ -150,10 +135,8 @@ const RoomCreator = () => {
           />
         )}
       </Box>
-      <Box className="flex-container" sx={{ height: "10%" }}>
-        <Button sx={{ width: "80%" }} onClick={createChattingRoom}>
-          생성
-        </Button>
+      <Box className="modal-footer flex-container">
+        <Button onClick={createChattingRoom}>생성</Button>
       </Box>
     </Box>
   );

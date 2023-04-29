@@ -5,6 +5,8 @@ import RoomUsers from "components/common/chatting/RoomUsers";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/CurrentChatting";
 import { IRootState } from "components/common/store";
+import "styles/global.scss";
+import "styles/Chatting.scss";
 
 import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
@@ -27,22 +29,12 @@ const ChattingRoom = () => {
   console.log(setMyDetail);
 
   return (
-    <Box sx={{ p: 5, height: "90%" }}>
+    <Box id="page">
       {roomStatus === "chat" && (
         <>
-          <Box className="flex-container header" sx={{ height: "10%" }}>
-            <div style={{ fontSize: "25px", flexGrow: 1 }}>
-              {currentChatting.title}
-            </div>
-          </Box>
-          <Box
-            sx={{
-              height: "80%",
-              p: 1,
-            }}
-            className="chatting-box"
-          >
-            <Box sx={{ p: 3, height: "90%", overflow: "auto" }}>
+          <Box className="page-header">{currentChatting.title}</Box>
+          <Box className="page-body chatting-box">
+            <Box className="chatting-display overflow">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
               Rhoncus dolor purus non enim praesent elementum facilisis leo vel.
@@ -70,17 +62,14 @@ const ChattingRoom = () => {
               maecenas accumsan lacus vel facilisis. Nulla posuere sollicitudin
               aliquam ultrices sagittis orci a.
             </Box>
-            <Box className="flex-container" sx={{ height: "10%", gap: 1 }}>
-              <Input
-                placeholder="채팅을 입력하세요."
-                sx={{ width: "80%" }}
-              ></Input>
+            <Box className="chatting-input flex-container">
+              <Input className="input" placeholder="채팅을 입력하세요."></Input>
               <Button>전송</Button>
             </Box>
           </Box>
-          <Box className="flex-container header" sx={{ height: "10%", gap: 1 }}>
+          <Box className="page-footer flex-container">
             <Button
-              sx={{ width: "33%" }}
+              className="small"
               onClick={() => {
                 setRoomStatus("users");
               }}
@@ -88,7 +77,7 @@ const ChattingRoom = () => {
               유저 목록
             </Button>
             <Button
-              sx={{ width: "33%" }}
+              className="small"
               onClick={() => {
                 setRoomStatus("edit");
               }}
@@ -96,7 +85,7 @@ const ChattingRoom = () => {
               채팅방 정보 수정
             </Button>
             <Button
-              sx={{ width: "33%" }}
+              className="small"
               variant="outlined"
               onClick={() => {
                 dispatch({
