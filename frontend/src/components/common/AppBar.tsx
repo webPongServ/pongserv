@@ -1,16 +1,13 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ChattingDrawerWidth } from "constant";
-import { IRootState } from "./store";
+import { IRootState } from "components/common/store";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 
-import { Box } from "@mui/material";
-import Toolbar from "@mui/material/Toolbar";
+import { Toolbar, IconButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 type HandleOpen = { open: boolean; setOpen: Function };
@@ -45,28 +42,24 @@ const AppBar = (props: HandleOpen) => {
     props.setOpen(true);
   };
   return (
-    <TopBar position="fixed" open={props.open}>
+    <TopBar id="AppBar" position="fixed" open={props.open}>
       <Toolbar>
-        <Link to="/game" className="app-bar-link fixed-center">
-          <Typography variant="h6" component="h1" align="center">
-            WebPongServ
-          </Typography>
+        <Link id="logo" to="/game" className="fixed-center">
+          WebPongServ
         </Link>
         <Link
+          id="my-profile"
           to={`/profile/${myInfo.nickname}`}
-          className="my-profile flex-container app-bar-link"
+          className="flex-container"
         >
-          <img src={`/profile/${myInfo.imgURL}`} alt="profile_image" />
-          <Typography align="center" className="mid-size">
-            {myInfo.nickname}
-          </Typography>
+          <img src={`/profile/${myInfo.imgURL}`} alt="AppBar-profile" />
+          {myInfo.nickname}
         </Link>
         <IconButton
-          color="inherit"
-          aria-label="open drawer"
+          id="chat-button"
           edge="end"
           onClick={handleDrawerOpen}
-          sx={{ ...(props.open && { display: "none" }) }}
+          // sx={{ ...(props.open && { display: "none" }) }}
         >
           <MenuIcon />
         </IconButton>
