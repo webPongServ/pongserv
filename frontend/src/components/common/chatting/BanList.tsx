@@ -47,11 +47,7 @@ const BanList = (props: BanListProps) => {
     <>
       <List>
         {bans.map((value, index) => (
-          <ListItem
-            key={value.nickname + index}
-            disablePadding
-            sx={{ display: "block" }}
-          >
+          <ListItem key={value.nickname + index} disablePadding>
             <CustomProfileButton
               class="login"
               nickname={value.nickname}

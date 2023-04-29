@@ -54,7 +54,7 @@ const Search = () => {
 
   return (
     <Box id="Search" className="flex-container">
-      <Box className="input-box flex-container">
+      <Box id="input-box" className="flex-container">
         <SearchIcon />
         <Input
           placeholder="유저 이름을 입력하세요."
@@ -62,7 +62,7 @@ const Search = () => {
           onKeyDown={HandleKeyDown}
         />
       </Box>
-      <List className="result-box overflow">
+      <List id="result-box" className="overflow">
         {searchedUser.map((value, index) => (
           <ListItem key={value + index} disablePadding>
             <CustomProfileButton
