@@ -65,6 +65,12 @@ $ChattingDrawerWidth: 500px;
 
       .page-body {
         height: 85%;
+        display: flex;
+        justify-content: center;
+
+        .chatting-card {
+          width: 85%;
+        }
       }
 
       .page-footer {

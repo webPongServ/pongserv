@@ -95,17 +95,19 @@ const WaitingRoom = () => {
     <Box id="page">
       <Box className="page-header">채팅 대기실</Box>
       <Box className="page-body overflow">
-        {chatRoomList.map((value) => (
-          <RoomCard
-            id={value.id}
-            title={value.title}
-            owner={value.owner}
-            type={value.type}
-            current={value.current}
-            max={value.max}
-            createdAt={value.createdAt}
-          />
-        ))}
+        <Box className="chatting-card">
+          {chatRoomList.map((value) => (
+            <RoomCard
+              id={value.id}
+              title={value.title}
+              owner={value.owner}
+              type={value.type}
+              current={value.current}
+              max={value.max}
+              createdAt={value.createdAt}
+            />
+          ))}
+        </Box>
       </Box>
       <Box className="page-footer flex-container">
         <Button
