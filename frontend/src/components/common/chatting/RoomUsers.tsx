@@ -33,35 +33,7 @@ const RoomUsers = (props: RoomUsersProps) => {
   return (
     <Box id="modal" ref={divRef} onKeyDown={pressESC} tabIndex={0}>
       <Box className="modal-header flex-container">
-        <Select
-          defaultValue={selected}
-          // onChange={(e) => {
-          //   if (e) {
-          //     const target: HTMLInputElement = e.target as HTMLInputElement;
-          //     props.setPartyForm({
-          //       ...props.partyForm,
-          //       category: target.outerText,
-          //     });
-          //   }
-          // }}
-        >
-          <Option
-            value="users"
-            onClick={() => {
-              setSelected("users");
-            }}
-          >
-            유저 목록
-          </Option>
-          <Option
-            value="bans"
-            onClick={() => {
-              setSelected("bans");
-            }}
-          >
-            차단 목록
-          </Option>
-        </Select>
+        <b>유저 / 차단 목록</b>
         <CustomIconButton
           class="red"
           icon={<CloseIcon />}
@@ -70,12 +42,45 @@ const RoomUsers = (props: RoomUsersProps) => {
           }}
         />
       </Box>
-      <Box className="modal-body flex-container users-box overflow">
-        {selected === "users" ? (
-          <UserList myDetail={props.myDetail} />
-        ) : (
-          <BanList myDetail={props.myDetail} />
-        )}
+      <Box className="modal-body flex-container">
+        <Box>
+          <Select
+            defaultValue={selected}
+            // onChange={(e) => {
+            //   if (e) {
+            //     const target: HTMLInputElement = e.target as HTMLInputElement;
+            //     props.setPartyForm({
+            //       ...props.partyForm,
+            //       category: target.outerText,
+            //     });
+            //   }
+            // }}
+          >
+            <Option
+              value="users"
+              onClick={() => {
+                setSelected("users");
+              }}
+            >
+              유저 목록
+            </Option>
+            <Option
+              value="bans"
+              onClick={() => {
+                setSelected("bans");
+              }}
+            >
+              차단 목록
+            </Option>
+          </Select>
+        </Box>
+        <Box className="users-box overflow">
+          {selected === "users" ? (
+            <UserList myDetail={props.myDetail} />
+          ) : (
+            <BanList myDetail={props.myDetail} />
+          )}
+        </Box>
       </Box>
     </Box>
   );
