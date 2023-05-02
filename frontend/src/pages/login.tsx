@@ -3,23 +3,24 @@ import { useState } from "react";
 // import axios from "axios";
 import NewSessionModal from "components/login/NewSessionModal";
 import TwoFactorModal from "components/login/TwoFactorModal";
+import "styles/Login.scss";
 
 import { Box } from "@mui/material";
 import Button from "@mui/joy/Button";
 
 const Login = () => {
   // const navigate = useNavigate();
-  const [modalStatus, setModalStatus] = useState<string>("Closed");
+  const [modalStatus, setModalStatus] = useState<string>("closed");
 
   return (
-    <>
+    <Box id="Login" className="flex-container">
       <Box>
         <Button
-          onClick={async () => {
+          onClick={() => {
             // navigate("/main");
             // const result = await axios.get("https://api.kf-21boramae.com/");
             // console.log(result.data);
-            setModalStatus("NewSession");
+            setModalStatus("two-factor");
           }}
         >
           Login with 42
@@ -33,7 +34,7 @@ const Login = () => {
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
       />
-    </>
+    </Box>
   );
 };
 

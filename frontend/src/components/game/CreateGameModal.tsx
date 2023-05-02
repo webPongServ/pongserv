@@ -4,17 +4,18 @@ import CustomInput from "components/common/utils/CustomInput";
 import CustomSlider from "components/common/utils/CustomSlider";
 import GameDifficultyRadioGroup from "components/common/utils/GameDifficultyRadioGroup";
 import { GameRoomForm } from "types/Form";
+import CustomIconButton from "components/common/utils/CustomIconButton";
 import "styles/global.scss";
 import "styles/Game.scss";
 
-import { Typography, Box } from "@mui/material";
-import { Button, Modal, ModalDialog, IconButton } from "@mui/joy";
+import { Box } from "@mui/material";
+import { Button, Modal, ModalDialog } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
 
-type CreateGameModalProps = {
+interface CreateGameModalProps {
   roomStatus: string;
   setRoomStatus: Function;
-};
+}
 
 const CreateGameModal = (props: CreateGameModalProps) => {
   const navigate = useNavigate();
@@ -59,28 +60,17 @@ const CreateGameModal = (props: CreateGameModalProps) => {
       open={props.roomStatus === "create-game"}
       onClose={() => props.setRoomStatus("game")}
     >
-      <ModalDialog className="game-modal-big" variant="outlined">
-        <Box sx={{ p: 3, height: "100%" }}>
-          <Box className="flex-container" sx={{ height: "10%" }}>
-            <Typography sx={{ fontSize: "20px" }}>
-              <b>일반 게임 생성</b>
-            </Typography>
-            <IconButton
-              sx={{ marginLeft: "auto" }}
-              onClick={() => props.setRoomStatus("game")}
-            >
-              <CloseIcon />
-            </IconButton>
+      <ModalDialog className="modal" variant="outlined">
+        <Box id="create" className="outframe">
+          <Box className="header flex-container">
+            <b>일반 게임 생성</b>
+            <CustomIconButton
+              class="right"
+              icon={<CloseIcon />}
+              handleFunction={() => props.setRoomStatus("game")}
+            />
           </Box>
-          <Box
-            className="flex-container align-normal justify-normal"
-            sx={{
-              flexDirection: "column",
-              height: "80%",
-              gap: 3,
-              paddingTop: "5%",
-            }}
-          >
+          <Box className="body flex-container">
             <CustomInput
               name="제목"
               defaultValue=""
@@ -99,13 +89,8 @@ const CreateGameModal = (props: CreateGameModalProps) => {
               handleFunction={handleDifficulty}
             />
           </Box>
-          <Box className="flex-container" sx={{ height: "10%" }}>
-            <Button
-              sx={{ width: "80%" }}
-              onClick={() => navigate(`/game/${roomID}`)}
-            >
-              생성
-            </Button>
+          <Box className="footer flex-container">
+            <Button onClick={() => navigate(`/game/${roomID}`)}>생성</Button>
           </Box>
         </Box>
       </ModalDialog>
