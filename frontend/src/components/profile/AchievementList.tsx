@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Achievement } from "types/Profile";
+import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import "styles/global.scss";
 import "styles/Profile.scss";
 
@@ -54,25 +55,31 @@ const Achievements = () => {
 
   return (
     <TabPanel value={1}>
-      <Box className="flex-wrap-container flex-container">
-        {achievementList.map((value, index) => {
-          return (
-            <Card
-              className="achievement-card flex-container"
-              variant="outlined"
-              key={value.achvTitle + index}
-            >
-              <Box className="flex-container">
-                <img src={value.achvImg} alt="achievement_img" />
-                <Box>
-                  <Typography className="title">{value.achvTitle}</Typography>
-                  <Typography>{value.achvContent}</Typography>
+      {achievementList.length === 0 ? (
+        <Box className="flex-container empty-achievement">
+          <EmptyListMessage message="업적이 존재하지 않습니다!" />
+        </Box>
+      ) : (
+        <Box className="flex-wrap-container">
+          {achievementList.map((value, index) => {
+            return (
+              <Card
+                className="achievement-card flex-container"
+                variant="outlined"
+                key={value.achvTitle + index}
+              >
+                <Box className="flex-container">
+                  <img src={value.achvImg} alt="achievement_img" />
+                  <Box>
+                    <Typography className="title">{value.achvTitle}</Typography>
+                    <Typography>{value.achvContent}</Typography>
+                  </Box>
                 </Box>
-              </Box>
-            </Card>
-          );
-        })}
-      </Box>
+              </Card>
+            );
+          })}
+        </Box>
+      )}
     </TabPanel>
   );
 };

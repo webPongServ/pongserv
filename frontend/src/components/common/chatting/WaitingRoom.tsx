@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import PasswordFormCard from "./PasswordFormCard";
 import RoomCard from "components/common/chatting/RoomCard";
+import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import { ChatRoomDetail } from "types/Detail";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
@@ -59,6 +60,42 @@ const WaitingRoom = () => {
         max: 2,
         createdAt: new Date(),
       },
+      {
+        id: "202304230002",
+        title: "비밀번호 486",
+        owner: "seongtki",
+        type: "protected",
+        current: 1,
+        max: 2,
+        createdAt: new Date(),
+      },
+      {
+        id: "202304230002",
+        title: "비밀번호 486",
+        owner: "seongtki",
+        type: "protected",
+        current: 1,
+        max: 2,
+        createdAt: new Date(),
+      },
+      {
+        id: "202304230002",
+        title: "비밀번호 486",
+        owner: "seongtki",
+        type: "protected",
+        current: 1,
+        max: 2,
+        createdAt: new Date(),
+      },
+      {
+        id: "202304230002",
+        title: "비밀번호 486",
+        owner: "seongtki",
+        type: "protected",
+        current: 1,
+        max: 2,
+        createdAt: new Date(),
+      },
     ]);
   };
 
@@ -70,11 +107,15 @@ const WaitingRoom = () => {
     <Box id="page">
       <Box className="page-header">채팅 대기실</Box>
       <Box className="page-body overflow">
-        {chatRoomList.map((value, index) =>
-          index === pwIndex ? (
-            <PasswordFormCard room={value} setPwIndex={setPwIndex} />
-          ) : (
-            <RoomCard room={value} index={index} setPwIndex={setPwIndex} />
+        {chatRoomList.length === 0 ? (
+          <EmptyListMessage message="채팅방이 존재하지 않습니다!" />
+        ) : (
+          chatRoomList.map((value, index) =>
+            index === pwIndex ? (
+              <PasswordFormCard room={value} setPwIndex={setPwIndex} />
+            ) : (
+              <RoomCard room={value} index={index} setPwIndex={setPwIndex} />
+            )
           )
         )}
       </Box>

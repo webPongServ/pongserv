@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { History } from "types/Profile";
+import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import "styles/global.scss";
 import "styles/Profile.scss";
 
@@ -92,30 +93,34 @@ const GameHistoryList = () => {
 
   return (
     <TabPanel value={0}>
-      {historyList.map((value, index) => {
-        return (
-          <Box className="flex-container">
-            <Card
-              className="history-card flex-container"
-              variant="outlined"
-              key={value.myId + index}
-            >
-              <Box className="result">
-                <Typography className={value.isWin ? "win" : "lose"}>
-                  {value.isWin ? "승리" : "패배"}
-                </Typography>
-              </Box>
-              {userProfile(value.myNick, value.myImg)}
-              <Box className="score flex-container">
-                <Box>{value.myScore}</Box>
-                <Box>vs</Box>
-                <Box>{value.opScore}</Box>
-              </Box>
-              {userProfile(value.opNick, value.opImg)}
-            </Card>
-          </Box>
-        );
-      })}
+      {historyList.length === 0 ? (
+        <EmptyListMessage message="전적이 존재하지 않습니다!" />
+      ) : (
+        historyList.map((value, index) => {
+          return (
+            <Box className="flex-container">
+              <Card
+                className="history-card flex-container"
+                variant="outlined"
+                key={value.myId + index}
+              >
+                <Box className="result">
+                  <Typography className={value.isWin ? "win" : "lose"}>
+                    {value.isWin ? "승리" : "패배"}
+                  </Typography>
+                </Box>
+                {userProfile(value.myNick, value.myImg)}
+                <Box className="score flex-container">
+                  <Box>{value.myScore}</Box>
+                  <Box>vs</Box>
+                  <Box>{value.opScore}</Box>
+                </Box>
+                {userProfile(value.opNick, value.opImg)}
+              </Card>
+            </Box>
+          );
+        })
+      )}
     </TabPanel>
   );
 };

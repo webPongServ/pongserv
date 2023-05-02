@@ -1,6 +1,7 @@
 import { useState } from "react";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import { ChatUserDetail } from "types/Detail";
+import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
@@ -43,7 +44,9 @@ const UserList = (props: UserListProps) => {
     setAnchorEl(null);
   };
 
-  return (
+  return props.users.length === 0 ? (
+    <EmptyListMessage message="채팅 중인 사용자가 없습니다!" />
+  ) : (
     <>
       <List>
         {props.users.map((value, index) => (

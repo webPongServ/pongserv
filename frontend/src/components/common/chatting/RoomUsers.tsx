@@ -21,11 +21,10 @@ const RoomUsers = (props: RoomUsersProps) => {
     { nickname: "chanhyle", role: "owner", imgURL: "../image.png" },
     { nickname: "susong", role: "admin", imgURL: "../image.png" },
     { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-  ]);
-  const [bans, setBans] = useState<ChatUserDetail[]>([
     { nickname: "noname_12", role: "normal", imgURL: "../image.png" },
     { nickname: "seongtki", role: "admin", imgURL: "../image.png" },
   ]);
+  const [bans, setBans] = useState<ChatUserDetail[]>([]);
   const [selected, setSelected] = useState<string>("users");
   const divRef = useRef<HTMLDivElement>(null);
 

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChatUserDetail } from "types/Detail";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
+import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
@@ -43,7 +44,9 @@ const BanList = (props: BanListProps) => {
     role: "normal",
   });
 
-  return (
+  return props.bans.length === 0 ? (
+    <EmptyListMessage message="차단한 사용자가 없습니다!" />
+  ) : (
     <>
       <List>
         {props.bans.map((value, index) => (
