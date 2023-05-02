@@ -72,7 +72,7 @@ const ChattingRoom = () => {
                 setRoomStatus("users");
               }}
             >
-              유저 목록
+              유저/차단 목록
             </Button>
             <Button
               className="small"
