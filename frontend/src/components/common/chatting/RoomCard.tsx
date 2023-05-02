@@ -6,12 +6,17 @@ import "styles/global.scss";
 import "styles/Chatting.scss";
 
 import Card from "@mui/joy/Card";
-import CardOverflow from "@mui/joy/CardOverflow";
 import Box from "@mui/joy/Box";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Person from "@mui/icons-material/Person";
 
-const RoomCard = (props: ChatRoomDetail) => {
+interface RoomCardProps {
+  room: ChatRoomDetail;
+  index: number;
+  setPwIndex: Function;
+}
+
+const RoomCard = (props: RoomCardProps) => {
   const currentChatting = useSelector(
     (state: IRootState) => state.currentChatting
   );
@@ -22,43 +27,42 @@ const RoomCard = (props: ChatRoomDetail) => {
       id="card"
       variant="outlined"
       onClick={() => {
-        dispatch({
-          type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-          payload: {
-            id: props.id,
-            title: props.title,
-            owner: props.owner,
-            type: props.type,
-            current: props.current,
-            max: props.max,
-            createdAt: props.createdAt,
-          },
-        });
+        props.room.type === "protected"
+          ? props.setPwIndex(props.index)
+          : dispatch({
+              type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
+              payload: {
+                id: props.room.id,
+                title: props.room.title,
+                owner: props.room.owner,
+                type: props.room.type,
+                current: props.room.current,
+                max: props.room.max,
+                createdAt: props.room.createdAt,
+              },
+            });
       }}
     >
       <Box className="title">
-        <b>{props.title}</b>
+        <b>{props.room.title}</b>
       </Box>
       <Box className="content">
         <Box className="flex-container">
           <StarBorderIcon />
-          {props.owner}
+          {props.room.owner}
         </Box>
         <Box>|</Box>
         <Box className="flex-container">
           <Person />
-          {props.current} / {props.max}
-        </Box>
-      </Box>
-      <CardOverflow className="card-overflow" variant="soft">
-        <Box>
-          {props.type === "public" && "공개"}
-          {props.type === "protected" && "비공개"}
-          {props.type === "private" && "DM"}
+          {props.room.current} / {props.room.max}
         </Box>
         <Box>|</Box>
-        <Box>9 hours ago</Box>
-      </CardOverflow>
+        <Box>
+          {props.room.type === "public" && "공개"}
+          {props.room.type === "protected" && "비공개"}
+          {props.room.type === "private" && "DM"}
+        </Box>
+      </Box>
     </Card>
   );
 };

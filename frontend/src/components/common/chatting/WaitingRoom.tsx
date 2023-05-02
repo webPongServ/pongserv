@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import PasswordFormCard from "./PasswordFormCard";
 import RoomCard from "components/common/chatting/RoomCard";
 import { ChatRoomDetail } from "types/Detail";
 import { useSelector, useDispatch } from "react-redux";
@@ -17,6 +18,7 @@ const WaitingRoom = () => {
   // chatroom은 전역에서 관리하지 않음 => 로컬에서도 처음에 받아오는 것만(없어진 것 예외처리 필요)
   // 보이지 않을 수도 있는데, 상태로 관리하는 것은 불필요한 낭비일 수 있음 => 새로고침 버튼을 두자
   const [chatRoomList, setChatRoomList] = useState<ChatRoomDetail[]>([]);
+  const [pwIndex, setPwIndex] = useState<number>(-1);
 
   const getChatRoomList = () => {
     // fetch data
@@ -49,37 +51,10 @@ const WaitingRoom = () => {
         createdAt: new Date(),
       },
       {
-        id: "202304230003",
-        title: "[DM] susong, mgo",
-        owner: "mgo",
-        type: "private",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230003",
-        title: "[DM] susong, mgo",
-        owner: "mgo",
-        type: "private",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230003",
-        title: "[DM] susong, mgo",
-        owner: "mgo",
-        type: "private",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230003",
-        title: "[DM] susong, mgo",
-        owner: "mgo",
-        type: "private",
+        id: "202304230002",
+        title: "비밀번호 486",
+        owner: "seongtki",
+        type: "protected",
         current: 1,
         max: 2,
         createdAt: new Date(),
@@ -95,19 +70,13 @@ const WaitingRoom = () => {
     <Box id="page">
       <Box className="page-header">채팅 대기실</Box>
       <Box className="page-body overflow">
-        <Box className="chatting-card">
-          {chatRoomList.map((value) => (
-            <RoomCard
-              id={value.id}
-              title={value.title}
-              owner={value.owner}
-              type={value.type}
-              current={value.current}
-              max={value.max}
-              createdAt={value.createdAt}
-            />
-          ))}
-        </Box>
+        {chatRoomList.map((value, index) =>
+          index === pwIndex ? (
+            <PasswordFormCard room={value} setPwIndex={setPwIndex} />
+          ) : (
+            <RoomCard room={value} index={index} setPwIndex={setPwIndex} />
+          )
+        )}
       </Box>
       <Box className="page-footer flex-container">
         <Button
