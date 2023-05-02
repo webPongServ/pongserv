@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import UserList from "./UserList";
-import BanList from "./BanList";
-import CustomIconButton from "../utils/CustomIconButton";
+import UserList from "components/common/chatting/UserList";
+import BanList from "components/common/chatting/BanList";
+import CustomIconButton from "components/common/utils/CustomIconButton";
+import { ChatUserDetail } from "types/Detail";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
@@ -9,10 +10,9 @@ import { Box } from "@mui/material";
 import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import CloseIcon from "@mui/icons-material/Close";
-import { MyDetail } from "./ChattingRoom";
 
 type RoomUsersProps = {
-  myDetail: MyDetail;
+  myDetail: ChatUserDetail;
   setRoomStatus: Function;
 };
 

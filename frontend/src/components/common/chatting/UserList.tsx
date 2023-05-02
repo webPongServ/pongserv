@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { MyDetail } from "./ChattingRoom";
-import CustomProfileButton from "../utils/CustomProfileButton";
+import CustomProfileButton from "components/common/utils/CustomProfileButton";
+import { ChatUserDetail } from "types/Detail";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
@@ -10,29 +10,23 @@ import ListItem from "@mui/material/ListItem";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-export interface ChatUserDetail {
-  nickname: string;
-  role: string;
-  imgUrl: string;
-}
-
 interface UserListProps {
-  myDetail: MyDetail;
+  myDetail: ChatUserDetail;
 }
 
 const UserList = (props: UserListProps) => {
   const [users, setUsers] = useState<ChatUserDetail[]>([
-    { nickname: "chanhyle", role: "owner", imgUrl: "../image.png" },
-    { nickname: "susong", role: "admin", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
-    { nickname: "mgo", role: "normal", imgUrl: "../image.png" },
+    { nickname: "chanhyle", role: "owner", imgURL: "../image.png" },
+    { nickname: "susong", role: "admin", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
   ]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contextMenu, setContextMenu] = useState<{
@@ -62,7 +56,7 @@ const UserList = (props: UserListProps) => {
             <CustomProfileButton
               class="login"
               nickname={value.nickname}
-              imgURL={value.imgUrl}
+              imgURL={value.imgURL}
               position="UserList"
               handleFunction={(e: any) => {
                 setAnchorEl(e.currentTarget);

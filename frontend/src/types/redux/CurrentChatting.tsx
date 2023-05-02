@@ -1,11 +1,11 @@
-import { UserDetail, ChatRoomDetail } from "types/Detail";
+import { ChatUserDetail, ChatRoomDetail } from "types/Detail";
 import { ChatRoomEditForm } from "types/Form";
 
 export interface CurrentChatting {
   status: string;
   chatRoom: ChatRoomDetail;
-  userList: UserDetail[];
-  banList: UserDetail[];
+  userList: ChatUserDetail[];
+  banList: ChatUserDetail[];
 }
 
 const INITIAL_CURRENTCHATTING: CurrentChatting = {

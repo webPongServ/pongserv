@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { MyDetail } from "./ChattingRoom";
-import CustomProfileButton from "../utils/CustomProfileButton";
+import { ChatUserDetail } from "types/Detail";
+import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 
@@ -9,20 +9,14 @@ import ListItem from "@mui/material/ListItem";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
-interface ChatBanDetail {
-  nickname: string;
-  role: string;
-  imgUrl: string;
-}
-
 interface BanListProps {
-  myDetail: MyDetail;
+  myDetail: ChatUserDetail;
 }
 
 const BanList = (props: BanListProps) => {
-  const [bans, setBans] = useState<ChatBanDetail[]>([
-    { nickname: "noname_12", role: "normal", imgUrl: "../image.png" },
-    { nickname: "seongtki", role: "admin", imgUrl: "../image.png" },
+  const [bans, setBans] = useState<ChatUserDetail[]>([
+    { nickname: "noname_12", role: "normal", imgURL: "../image.png" },
+    { nickname: "seongtki", role: "admin", imgURL: "../image.png" },
   ]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contextMenu, setContextMenu] = useState<{
@@ -51,7 +45,7 @@ const BanList = (props: BanListProps) => {
             <CustomProfileButton
               class="login"
               nickname={value.nickname}
-              imgURL={value.imgUrl}
+              imgURL={value.imgURL}
               position="UserList"
               handleFunction={(e: any) => {
                 setAnchorEl(e.currentTarget);

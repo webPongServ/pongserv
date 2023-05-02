@@ -14,6 +14,12 @@ export interface ChatRoomDetail {
   createdAt: Date;
 }
 
+export interface ChatUserDetail {
+  nickname: string;
+  imgURL: string;
+  role: string;
+}
+
 export interface GameRoomDetail {
   id: string;
   title: string;

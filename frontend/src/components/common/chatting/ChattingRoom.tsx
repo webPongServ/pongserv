@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChatRoomDetail } from "types/Detail";
+import { ChatUserDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
 import { useSelector, useDispatch } from "react-redux";
@@ -11,8 +11,6 @@ import "styles/Chatting.scss";
 import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
 
-export type MyDetail = { nickname: string; role: string; imgUrl: string };
-
 const ChattingRoom = () => {
   const currentChatting = useSelector(
     (state: IRootState) => state.currentChatting.chatRoom
@@ -20,10 +18,10 @@ const ChattingRoom = () => {
   const dispatch = useDispatch();
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
-  const [myDetail, setMyDetail] = useState({
+  const [myDetail, setMyDetail] = useState<ChatUserDetail>({
     nickname: "chanhyle",
+    imgURL: "../image.png",
     role: "owner",
-    imgUrl: "../image.png",
   });
 
   console.log(setMyDetail);
