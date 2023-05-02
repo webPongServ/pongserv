@@ -2,10 +2,10 @@ import React, { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChatRoomForm } from "types/Form";
-import CustomInput from "../utils/CustomInput";
-import CustomSlider from "../utils/CustomSlider";
-import ChattingTypeSelect from "../utils/ChattingTypeSelect";
-import CustomIconButton from "../utils/CustomIconButton";
+import CustomInput from "components/common/utils/CustomInput";
+import CustomSlider from "components/common/utils/CustomSlider";
+import ChattingTypeSelect from "components/common/utils/ChattingTypeSelect";
+import CustomIconButton from "components/common/utils/CustomIconButton";
 import "styles/global.scss";
 import "styles/Chatting.scss";
 

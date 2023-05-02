@@ -5,14 +5,14 @@ import { FriendsActionTypes } from "types/redux/Friends";
 import { IRootState } from "components/common/store";
 import { ProfileDetail } from "types/Detail";
 import UserInfo from "components/profile/UserInfo";
+import GameHistoryList from "components/profile/GameHistoryList";
+import AchievementList from "components/profile/AchievementList";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
 import { Box } from "@mui/material";
 import { Button, Tabs, TabList } from "@mui/joy";
 import Tab, { tabClasses } from "@mui/joy/Tab";
-import GameHistoryList from "components/profile/GameHistoryList";
-import AchievementList from "components/profile/AchievementList";
 
 const Profile = () => {
   // 다른 사람 정보도 요청해야 하니까 여기서 요청하기

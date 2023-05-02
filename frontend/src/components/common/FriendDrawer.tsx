@@ -2,8 +2,8 @@ import { FriendDrawerWidth } from "constant";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
-import CustomIconButton from "./utils/CustomIconButton";
-import CustomProfileButton from "./utils/CustomProfileButton";
+import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 

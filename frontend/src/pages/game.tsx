@@ -5,11 +5,11 @@ import LadderGameModal from "components/game/LadderGameModal";
 import CreateGameModal from "components/game/CreateGameModal";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
+import "styles/global.scss";
+import "styles/Game.scss";
 
 import { Box } from "@mui/system";
 import { Button } from "@mui/joy";
-import "styles/global.scss";
-import "styles/Game.scss";
 
 const Game = () => {
   const [roomStatus, setRoomStatus] = useState<string>("game");

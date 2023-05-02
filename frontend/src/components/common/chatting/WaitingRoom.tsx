@@ -3,7 +3,7 @@ import RoomCard from "components/common/chatting/RoomCard";
 import { ChatRoomDetail } from "types/Detail";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
-import CustomIconButton from "../utils/CustomIconButton";
+import CustomIconButton from "components/common/utils/CustomIconButton";
 import "styles/Chatting.scss";
 import "styles/global.scss";
 

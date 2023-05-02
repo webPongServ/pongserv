@@ -1,5 +1,5 @@
 import { useState } from "react";
-import GameWaiting from "./GameWaiting";
+import GameWaiting from "components/game/GameWaiting";
 
 const GameRoom = () => {
   const [isWaiting, setIsWaiting] = useState<boolean>(true);
