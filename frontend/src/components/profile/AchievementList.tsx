@@ -60,7 +60,7 @@ const Achievements = () => {
           <EmptyListMessage message="업적이 존재하지 않습니다!" />
         </Box>
       ) : (
-        <Box className="flex-wrap-container">
+        <Box className="flex-wrap-container flex-container">
           {achievementList.map((value, index) => {
             return (
               <Card
