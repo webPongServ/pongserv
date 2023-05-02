@@ -2,8 +2,8 @@ import { useState } from "react";
 import { ChatUserDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
-import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
+import RoomLeave from "components/common/chatting/RoomLeave";
+import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/Chatting.scss";
@@ -15,7 +15,6 @@ const ChattingRoom = () => {
   const currentChatting = useSelector(
     (state: IRootState) => state.currentChatting.chatRoom
   );
-  const dispatch = useDispatch();
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
   const [myDetail, setMyDetail] = useState<ChatUserDetail>({
@@ -86,10 +85,7 @@ const ChattingRoom = () => {
               className="small"
               variant="outlined"
               onClick={() => {
-                dispatch({
-                  type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
-                  payload: "",
-                });
+                setRoomStatus("leave");
               }}
             >
               채팅방 나가기
@@ -108,6 +104,7 @@ const ChattingRoom = () => {
       {roomStatus === "users" && (
         <RoomUsers myDetail={myDetail} setRoomStatus={setRoomStatus} />
       )}
+      {roomStatus === "leave" && <RoomLeave setRoomStatus={setRoomStatus} />}
     </Box>
   );
 };
