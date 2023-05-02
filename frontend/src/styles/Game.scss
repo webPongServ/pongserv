@@ -1,4 +1,4 @@
-#Game {
+#GameWaiting {
   width: 100%;
   height: 105%;
   flex-direction: column;
@@ -69,4 +69,11 @@
       margin-bottom: 5px;
     }
   }
+}
+
+#GameReady {
+  width: 100%;
+  height: 105%;
+  row-gap: 5%;
+  flex-direction: column;
 }
