@@ -13,12 +13,12 @@ import { Box } from "@mui/material";
 import { Button } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
 
-type HandleRoomDetail = {
+interface HandleRoomDetail {
   title: string;
   type: string;
   max: number;
   setRoomStatus: Function;
-};
+}
 
 const RoomEditor = (props: HandleRoomDetail) => {
   const [isPublic, setIsPublic] = useState<boolean>(props.type === "public");
