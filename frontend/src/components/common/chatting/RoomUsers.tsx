@@ -17,6 +17,15 @@ type RoomUsersProps = {
 };
 
 const RoomUsers = (props: RoomUsersProps) => {
+  const [users, setUsers] = useState<ChatUserDetail[]>([
+    { nickname: "chanhyle", role: "owner", imgURL: "../image.png" },
+    { nickname: "susong", role: "admin", imgURL: "../image.png" },
+    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
+  ]);
+  const [bans, setBans] = useState<ChatUserDetail[]>([
+    { nickname: "noname_12", role: "normal", imgURL: "../image.png" },
+    { nickname: "seongtki", role: "admin", imgURL: "../image.png" },
+  ]);
   const [selected, setSelected] = useState<string>("users");
   const divRef = useRef<HTMLDivElement>(null);
 
@@ -76,9 +85,21 @@ const RoomUsers = (props: RoomUsersProps) => {
         </Box>
         <Box className="users-box overflow">
           {selected === "users" ? (
-            <UserList myDetail={props.myDetail} />
+            <UserList
+              users={users}
+              bans={bans}
+              setUsers={setUsers}
+              setBans={setBans}
+              myDetail={props.myDetail}
+            />
           ) : (
-            <BanList myDetail={props.myDetail} />
+            <BanList
+              bans={bans}
+              users={users}
+              setUsers={setUsers}
+              setBans={setBans}
+              myDetail={props.myDetail}
+            />
           )}
         </Box>
       </Box>

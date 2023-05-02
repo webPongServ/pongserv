@@ -12,29 +12,24 @@ import MenuItem from "@mui/material/MenuItem";
 
 interface UserListProps {
   myDetail: ChatUserDetail;
+  users: ChatUserDetail[];
+  bans: ChatUserDetail[];
+  setUsers: Function;
+  setBans: Function;
 }
 
 const UserList = (props: UserListProps) => {
-  const [users, setUsers] = useState<ChatUserDetail[]>([
-    { nickname: "chanhyle", role: "owner", imgURL: "../image.png" },
-    { nickname: "susong", role: "admin", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-  ]);
+  const [selectedUser, setSelectedUser] = useState<ChatUserDetail>({
+    nickname: "",
+    imgURL: "",
+    role: "normal",
+  });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
   } | null>(null);
   const open = Boolean(anchorEl);
-  const [amI, setAmI] = useState<boolean>(false);
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -51,7 +46,7 @@ const UserList = (props: UserListProps) => {
   return (
     <>
       <List>
-        {users.map((value, index) => (
+        {props.users.map((value, index) => (
           <ListItem key={value.nickname + index} disablePadding>
             <CustomProfileButton
               class="login"
@@ -61,7 +56,7 @@ const UserList = (props: UserListProps) => {
               handleFunction={(e: any) => {
                 setAnchorEl(e.currentTarget);
                 handleContextMenu(e);
-                setAmI(e.target.textContent === props.myDetail.nickname);
+                setSelectedUser(value);
               }}
             />
           </ListItem>
@@ -81,19 +76,32 @@ const UserList = (props: UserListProps) => {
             : undefined
         }
       >
-        {amI && <MenuItem>내 계정</MenuItem>}
-        {!amI && props.myDetail.role === "normal" && (
-          <MenuItem>대결 신청</MenuItem>
+        {selectedUser.nickname === props.myDetail.nickname && (
+          <MenuItem>내 계정</MenuItem>
         )}
-        {!amI && props.myDetail.role !== "normal" && (
-          <Box>
-            <MenuItem>채팅방 내보내기</MenuItem>
-            <MenuItem>채팅방 차단</MenuItem>
-            <MenuItem>벙어리</MenuItem>
-            <MenuItem>관리자 권한 부여</MenuItem>
-            <MenuItem>대결 신청</MenuItem>
-          </Box>
-        )}
+        {!(selectedUser.nickname === props.myDetail.nickname) &&
+          props.myDetail.role === "normal" && <MenuItem>대결 신청</MenuItem>}
+        {!(selectedUser.nickname === props.myDetail.nickname) &&
+          props.myDetail.role !== "normal" && (
+            <Box>
+              <MenuItem>채팅방 내보내기</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  props.setUsers(
+                    props.users.filter(
+                      (value) => value.nickname !== selectedUser.nickname
+                    )
+                  );
+                  props.setBans([...props.bans, selectedUser]);
+                }}
+              >
+                채팅방 차단
+              </MenuItem>
+              <MenuItem>벙어리</MenuItem>
+              <MenuItem>관리자 권한 부여</MenuItem>
+              <MenuItem>대결 신청</MenuItem>
+            </Box>
+          )}
       </Menu>
     </>
   );

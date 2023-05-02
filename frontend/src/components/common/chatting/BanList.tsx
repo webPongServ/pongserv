@@ -10,14 +10,14 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 interface BanListProps {
+  bans: ChatUserDetail[];
+  users: ChatUserDetail[];
+  setUsers: Function;
+  setBans: Function;
   myDetail: ChatUserDetail;
 }
 
 const BanList = (props: BanListProps) => {
-  const [bans, setBans] = useState<ChatUserDetail[]>([
-    { nickname: "noname_12", role: "normal", imgURL: "../image.png" },
-    { nickname: "seongtki", role: "admin", imgURL: "../image.png" },
-  ]);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
@@ -37,10 +37,16 @@ const BanList = (props: BanListProps) => {
     setAnchorEl(null);
   };
 
+  const [selectedUser, setSelectedUser] = useState<ChatUserDetail>({
+    nickname: "",
+    imgURL: "",
+    role: "normal",
+  });
+
   return (
     <>
       <List>
-        {bans.map((value, index) => (
+        {props.bans.map((value, index) => (
           <ListItem key={value.nickname + index} disablePadding>
             <CustomProfileButton
               class="login"
@@ -50,6 +56,7 @@ const BanList = (props: BanListProps) => {
               handleFunction={(e: any) => {
                 setAnchorEl(e.currentTarget);
                 handleContextMenu(e);
+                setSelectedUser(value);
               }}
             />
           </ListItem>
@@ -69,7 +76,18 @@ const BanList = (props: BanListProps) => {
             : undefined
         }
       >
-        <MenuItem>채팅방 차단 해제</MenuItem>
+        <MenuItem
+          onClick={() => {
+            props.setUsers([...props.users, selectedUser]);
+            props.setBans(
+              props.bans.filter(
+                (value) => value.nickname !== selectedUser.nickname
+              )
+            );
+          }}
+        >
+          채팅방 차단 해제
+        </MenuItem>
       </Menu>
     </>
   );
