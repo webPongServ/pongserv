@@ -7,15 +7,15 @@ import { TbCh03LEntity } from './entities/tb-ch-03-l.entity';
 import { TbCh04LEntity } from './entities/tb-ch-04-l.entity';
 
 @Module({
-	imports: [
-	  TypeOrmModule.forFeature([
-		TbCh01LEntity,
-		TbCh02LEntity,
-		TbCh02DEntity,
-		TbCh03LEntity,
-		TbCh04LEntity
-	  ]),
-	],
-	providers: []
+  imports: [
+    TypeOrmModule.forFeature([
+      TbCh01LEntity,
+      TbCh02LEntity,
+      TbCh02DEntity,
+      TbCh03LEntity,
+      TbCh04LEntity,
+    ]),
+  ],
+  providers: [],
 })
 export class DbChatsManagerModule {}
