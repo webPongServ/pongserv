@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChatRoomDetail } from "types/Detail";
 import "styles/global.scss";
-import "styles/Chatting.scss";
+import "styles/ChattingDrawer.scss";
 
 import Card from "@mui/joy/Card";
 import Box from "@mui/joy/Box";

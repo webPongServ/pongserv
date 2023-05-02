@@ -4,7 +4,7 @@ import BanList from "components/common/chatting/BanList";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import { ChatUserDetail } from "types/Detail";
 import "styles/global.scss";
-import "styles/Chatting.scss";
+import "styles/ChattingDrawer.scss";
 
 import { Box } from "@mui/material";
 import Select from "@mui/joy/Select";

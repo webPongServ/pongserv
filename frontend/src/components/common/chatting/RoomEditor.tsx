@@ -7,7 +7,7 @@ import CustomSlider from "components/common/utils/CustomSlider";
 import ChattingTypeSelect from "components/common/utils/ChattingTypeSelect";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import "styles/global.scss";
-import "styles/Chatting.scss";
+import "styles/ChattingDrawer.scss";
 
 import { Box } from "@mui/material";
 import { Button } from "@mui/joy";

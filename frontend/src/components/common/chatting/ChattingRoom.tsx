@@ -6,7 +6,7 @@ import RoomLeave from "components/common/chatting/RoomLeave";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
-import "styles/Chatting.scss";
+import "styles/ChattingDrawer.scss";
 
 import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";

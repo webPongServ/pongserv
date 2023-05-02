@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import "styles/global.scss";
-import "styles/Chatting.scss";
+import "styles/ChattingDrawer.scss";
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";

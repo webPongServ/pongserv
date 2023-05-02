@@ -6,7 +6,7 @@ import { ChatRoomDetail } from "types/Detail";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import CustomIconButton from "components/common/utils/CustomIconButton";
-import "styles/Chatting.scss";
+import "styles/ChattingDrawer.scss";
 import "styles/global.scss";
 
 import { Box } from "@mui/material";

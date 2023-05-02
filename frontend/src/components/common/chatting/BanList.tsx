@@ -3,7 +3,7 @@ import { ChatUserDetail } from "types/Detail";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import "styles/global.scss";
-import "styles/Chatting.scss";
+import "styles/ChattingDrawer.scss";
 
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
