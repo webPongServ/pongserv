@@ -4,7 +4,7 @@ import Profile from "pages/Profile";
 import Search from "pages/Search";
 import Game from "pages/game";
 import GameRoom from "components/game/GameRoom";
-import GameWaiting from "components/game/GameWaiting";
+import GameReady from "components/game/GameReady";
 
 const MainRoute = (): JSX.Element => {
   return (
@@ -18,7 +18,7 @@ const MainRoute = (): JSX.Element => {
         <Route
           path="/game/ladder"
           element={
-            <GameWaiting
+            <GameReady
               type="래더 게임"
               content="적절한 상대를 찾는 중"
               funnyImg="funny4.gif"

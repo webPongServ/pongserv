@@ -19,7 +19,7 @@ const Game = () => {
   );
 
   return (
-    <Box id="Game" className="flex-container">
+    <Box id="GameWaiting" className="flex-container">
       <Box id="game-box" className="flex-wrap-container overflow">
         {gameRooms.map((value, index) => {
           return (
