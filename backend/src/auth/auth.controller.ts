@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ConfigService } from '@nestjs/config';
 import {
   Body,
@@ -16,6 +17,8 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { Code42OAuthData } from './dto/code.dto';
+import { Token42OAuthData } from './dto/token.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -31,7 +34,7 @@ export class AuthController {
       '42 인트라 로그인 창으로 리다이렉션<br>로그인 성공 시 발급된 code를 가지고 /42oauth/token uri의 API로 리다이렉션',
   })
   @ApiResponse({ status: 302, description: '리다이렉션 성공' })
-  @ApiInternalServerErrorResponse({ description: 'code 발급 실패' })
+  @ApiInternalServerErrorResponse({ description: 'Token 발급 실패' })
   @Get('authorize')
   async issue42code(@Res({ passthrough: true }) res: Response) {
     try {
@@ -45,12 +48,28 @@ export class AuthController {
     }
   }
 
-  @Post('token')
-  async issueToken(@Body() codeBody: { code: string }) {
+  @ApiOperation({
+    summary: '42 Token 발급',
+    description:
+      '42 Code를 벡엔드에 제공하고, 42API를 이용해서 Access Token과 Refresh Token을 발급받는다.',
+  })
+  @ApiResponse({ status: 200, description: '42Token 발급 성공' })
+  @ApiInternalServerErrorResponse({ description: '토큰 발급 실패' })
+  @Post('code')
+  async issueToken(@Body() codeBody: Code42OAuthData) {
+    console.log(`codeBody.code: ${codeBody.code}`);
     try {
-      // const result = await this.authService.issueToken(codeBody.code);
+      const result: Token42OAuthData = await this.authService.issueToken(
+        codeBody.code,
+      );
+      console.log(result);
+
+      // todo: get intraId using tokens of reslut
+      const intraId: string = await this.authService.getIntraId(result);
+      console.log(`intraId: ${intraId}`);
+      return intraId;
     } catch (err) {
-      throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
   }
 }
