@@ -109,7 +109,7 @@ const WaitingRoom = () => {
   return (
     <Box id="page">
       <Box className="page-header">채팅 대기실</Box>
-      <Box className="page-body overflow">
+      <Box className="page-body">
         <Box className="list">
           {chatRoomList.length === 0 ? (
             <EmptyListMessage message="채팅방이 존재하지 않습니다!" />
