@@ -1,13 +1,13 @@
+import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { ChattingDrawerWidth } from "constant";
+import { IRootState } from "components/common/store";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
-import { ChattingDrawerWidth } from "constant";
 
-import Toolbar from "@mui/material/Toolbar";
+import { Toolbar, IconButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 
 type HandleOpen = { open: boolean; setOpen: Function };
@@ -36,35 +36,26 @@ const TopBar = styled(MuiAppBar, {
 }));
 
 const AppBar = (props: HandleOpen) => {
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
+
   const handleDrawerOpen = () => {
     props.setOpen(true);
   };
   return (
-    <TopBar position="fixed" open={props.open}>
+    <TopBar id="AppBar" position="fixed" open={props.open}>
       <Toolbar>
-        <Link to="/game" className=" app-bar-container app-bar-link">
-          <Typography variant="h6" component="h1" align="center">
-            WebPongServ
-          </Typography>
+        <Link id="logo" to="/game" className="fixed-center">
+          WebPongServ
         </Link>
-        <div className="app-bar-container">
-          <Link
-            to={`/profile/0`}
-            className="app-bar-image flex-container app-bar-link"
-          >
-            <img src="../image.png" alt="profile_image" />
-            <Typography align="center" className="app-bar-center font">
-              susong
-            </Typography>
-          </Link>
-        </div>
-        <IconButton
-          color="inherit"
-          aria-label="open drawer"
-          edge="end"
-          onClick={handleDrawerOpen}
-          sx={{ ...(props.open && { display: "none" }) }}
+        <Link
+          id="my-profile"
+          to={`/profile/${myInfo.nickname}`}
+          className="flex-container"
         >
+          <img src={`/profile/${myInfo.imgURL}`} alt="AppBar-profile" />
+          {myInfo.nickname}
+        </Link>
+        <IconButton id="chat-button" edge="end" onClick={handleDrawerOpen}>
           <MenuIcon />
         </IconButton>
       </Toolbar>

@@ -7,15 +7,15 @@ import { TbGm03DEntity } from './entities/tb-gm-03-d.entity';
 import { TbGm04LEntity } from './entities/tb-gm-04-l.entity';
 
 @Module({
-	imports: [
-	  TypeOrmModule.forFeature([
-		TbGm01LEntity,
-		TbGm01DEntity,
-		TbGm02SEntity,
-		TbGm03DEntity,
-		TbGm04LEntity
-	  ]),
-	],
-	providers: []
+  imports: [
+    TypeOrmModule.forFeature([
+      TbGm01LEntity,
+      TbGm01DEntity,
+      TbGm02SEntity,
+      TbGm03DEntity,
+      TbGm04LEntity,
+    ]),
+  ],
+  providers: [],
 })
 export class DbGamesManagerModule {}

@@ -1,44 +1,41 @@
-import * as React from "react";
-import { Typography } from "@mui/material";
+import "styles/global.scss";
+import "styles/Login.scss";
+
+import CustomIconButton from "components/common/utils/CustomIconButton";
+import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@mui/joy";
 import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
-import "styles/Modal.scss";
-import "styles/global.scss";
 
-type HandleModalStatus = { modalStatus: string; setModalStatus: Function };
+interface HandleModalStatus {
+  modalStatus: string;
+  setModalStatus: Function;
+}
 
 const NewSessionModal = (props: HandleModalStatus) => {
   return (
     <Modal
-      open={props.modalStatus === "NewSession"}
-      onClose={() => props.setModalStatus("Closed")}
+      open={props.modalStatus === "new-session"}
+      onClose={() => props.setModalStatus("closed")}
     >
-      <ModalDialog
-        size="lg"
-        variant="outlined"
-        aria-labelledby="variant-modal-title"
-        aria-describedby="variant-modal-description"
-      >
-        <Box
-          className="modal-message flex-container"
-          sx={{ flexDirection: "column" }}
-        >
-          <Typography>이미 로그인 중인 아이디입니다.</Typography>
-          <Typography>
+      <ModalDialog className="modal" variant="outlined">
+        <Box id="inform" className="outframe">
+          <Box className="header flex-container">
+            <b>중복 로그인 알림</b>
+            <CustomIconButton
+              class="right"
+              icon={<CloseIcon />}
+              handleFunction={() => props.setModalStatus("closed")}
+            />
+          </Box>
+          <Box className="body flex-container">
+            <span>이미 로그인 중인 아이디입니다.</span>
             <b>기존 로그인을 종료하고 새로 로그인하시겠습니까?</b>
-          </Typography>
-        </Box>
-        <Box className="modal-button-group">
-          <Button className="medium-size">확인</Button>
-          <Button
-            variant="outlined"
-            className="medium-size"
-            onClick={() => props.setModalStatus("Closed")}
-          >
-            취소
-          </Button>
+          </Box>
+          <Box className="footer flex-container">
+            <Button onClick={() => {}}>새로 로그인</Button>
+          </Box>
         </Box>
       </ModalDialog>
     </Modal>

@@ -1,45 +1,37 @@
 import { useState } from "react";
-import { ChatRoomInfo } from "./WaitingRoom";
-import RoomEditor from "./RoomEditor";
-import RoomUsers from "./RoomUsers";
+import { ChatUserDetail } from "types/Detail";
+import RoomEditor from "components/common/chatting/RoomEditor";
+import RoomUsers from "components/common/chatting/RoomUsers";
+import RoomLeave from "components/common/chatting/RoomLeave";
+import { useSelector } from "react-redux";
+import { IRootState } from "components/common/store";
+import "styles/global.scss";
+import "styles/ChattingDrawer.scss";
 
 import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
 
-type HandleRoomID = { roomID: string; setRoomID: Function };
-
-const ChattingRoom = (props: HandleRoomID) => {
+const ChattingRoom = () => {
+  const currentChatting = useSelector(
+    (state: IRootState) => state.currentChatting.chatRoom
+  );
   // API 요청
-  const [roomDetail, setRoomDetail] = useState<ChatRoomInfo>({
-    id: "202304230002",
-    title: "옥상으로 따라와",
-    type: "protected",
-    current: 4,
-    max: 9,
-    owner: "mgo",
-    createdAt: new Date(),
-  });
   const [roomStatus, setRoomStatus] = useState<string>("chat");
+  const [myDetail, setMyDetail] = useState<ChatUserDetail>({
+    nickname: "chanhyle",
+    imgURL: "../image.png",
+    role: "owner",
+  });
 
-  console.log(setRoomDetail);
+  console.log(setMyDetail);
 
   return (
-    <Box sx={{ p: 5, height: "90%" }}>
+    <Box id="page">
       {roomStatus === "chat" && (
         <>
-          <Box className="flex-container header" sx={{ height: "10%" }}>
-            <div style={{ fontSize: "25px", flexGrow: 1 }}>
-              {roomDetail.title}
-            </div>
-          </Box>
-          <Box
-            sx={{
-              height: "80%",
-              p: 1,
-            }}
-            className="chatting-box"
-          >
-            <Box sx={{ p: 3, height: "90%", overflow: "auto" }}>
+          <Box className="page-header">{currentChatting.title}</Box>
+          <Box className="page-body chatting-box">
+            <Box className="chatting-display overflow">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
               Rhoncus dolor purus non enim praesent elementum facilisis leo vel.
@@ -67,25 +59,22 @@ const ChattingRoom = (props: HandleRoomID) => {
               maecenas accumsan lacus vel facilisis. Nulla posuere sollicitudin
               aliquam ultrices sagittis orci a.
             </Box>
-            <Box className="flex-container" sx={{ height: "10%", gap: 1 }}>
-              <Input
-                placeholder="채팅을 입력하세요."
-                sx={{ width: "80%" }}
-              ></Input>
+            <Box className="chatting-input flex-container">
+              <Input className="input" placeholder="채팅을 입력하세요."></Input>
               <Button>전송</Button>
             </Box>
           </Box>
-          <Box className="flex-container header" sx={{ height: "10%", gap: 1 }}>
+          <Box className="page-footer flex-container">
             <Button
-              sx={{ width: "33%" }}
+              className="small"
               onClick={() => {
                 setRoomStatus("users");
               }}
             >
-              유저 목록
+              유저/차단 목록
             </Button>
             <Button
-              sx={{ width: "33%" }}
+              className="small"
               onClick={() => {
                 setRoomStatus("edit");
               }}
@@ -93,10 +82,10 @@ const ChattingRoom = (props: HandleRoomID) => {
               채팅방 정보 수정
             </Button>
             <Button
-              sx={{ width: "33%" }}
+              className="small"
               variant="outlined"
               onClick={() => {
-                props.setRoomID("waiting");
+                setRoomStatus("leave");
               }}
             >
               채팅방 나가기
@@ -106,13 +95,16 @@ const ChattingRoom = (props: HandleRoomID) => {
       )}
       {roomStatus === "edit" && (
         <RoomEditor
-          title={roomDetail.title}
-          type={roomDetail.type}
-          max={roomDetail.max}
+          title={currentChatting.title}
+          type={currentChatting.type}
+          max={currentChatting.max}
           setRoomStatus={setRoomStatus}
         />
       )}
-      {roomStatus === "users" && <RoomUsers setRoomStatus={setRoomStatus} />}
+      {roomStatus === "users" && (
+        <RoomUsers myDetail={myDetail} setRoomStatus={setRoomStatus} />
+      )}
+      {roomStatus === "leave" && <RoomLeave setRoomStatus={setRoomStatus} />}
     </Box>
   );
 };

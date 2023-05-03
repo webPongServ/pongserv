@@ -1,15 +1,11 @@
 import { useState } from "react";
-
-import TabPanel from "@mui/joy/TabPanel";
-import Card from "@mui/joy/Card";
-import Typography from "@mui/joy/Typography";
+import { Achievement } from "types/Profile";
+import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import "styles/global.scss";
+import "styles/Profile.scss";
 
-export type Achievement = {
-  achvTitle: string;
-  achvContent: string;
-  achvImg: string;
-};
+import { Box } from "@mui/material";
+import { TabPanel, Card, Typography } from "@mui/joy";
 
 const Achievements = () => {
   const [achievementList, setAchievementList] = useState<Achievement[]>([
@@ -58,30 +54,32 @@ const Achievements = () => {
   console.log(setAchievementList);
 
   return (
-    <TabPanel
-      value={1}
-      sx={{ p: 3, display: "flex" }}
-      className="flex-container profile-fullcontainer"
-    >
-      <div className="flex-wrap-container">
-        {achievementList.map((value, index) => {
-          return (
-            <Card
-              key={value.achvTitle + index}
-              variant="outlined"
-              className="achievement-container flex-container gap"
-            >
-              <div className="flex-container column">
-                <img src={value.achvImg} alt="achievement_image" />
-                <div>
-                  <Typography>{value.achvTitle}</Typography>
-                  <Typography>{value.achvContent}</Typography>
-                </div>
-              </div>
-            </Card>
-          );
-        })}
-      </div>
+    <TabPanel value={1}>
+      {achievementList.length === 0 ? (
+        <Box className="flex-container empty-achievement">
+          <EmptyListMessage message="업적이 존재하지 않습니다!" />
+        </Box>
+      ) : (
+        <Box className="flex-wrap-container flex-container">
+          {achievementList.map((value, index) => {
+            return (
+              <Card
+                className="achievement-card flex-container"
+                variant="outlined"
+                key={value.achvTitle + index}
+              >
+                <Box className="flex-container">
+                  <img src={value.achvImg} alt="achievement_img" />
+                  <Box>
+                    <Typography className="title">{value.achvTitle}</Typography>
+                    <Typography>{value.achvContent}</Typography>
+                  </Box>
+                </Box>
+              </Card>
+            );
+          })}
+        </Box>
+      )}
     </TabPanel>
   );
 };

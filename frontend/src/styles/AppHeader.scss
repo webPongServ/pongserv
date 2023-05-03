@@ -1,23 +1,61 @@
-.app-bar-container {
+#AppHeader-container {
+  height: 100%;
 }
 
-.app-bar-image img {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
-  display: flex;
-  align-items: center;
-  border-radius: 50%;
-  border: 0px solid #fff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+#Main-box {
+  height: 90%;
 }
 
-.app-bar-link {
-  text-decoration: none;
-  flex-grow: 1;
-  color: #ffffff;
+#AppBar {
+  #logo {
+    font-size: 25px;
+    color: #ffffff;
+    text-decoration: none;
+  }
+
+  #my-profile {
+    font-size: 20px;
+    color: #ffffff;
+    text-decoration: none;
+    margin-right: 10px;
+
+    img {
+      width: 40px;
+      height: 40px;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      border-radius: 50%;
+      border: 0px solid #fff;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+    }
+  }
+
+  #chat-button {
+    color: #ffffff;
+  }
 }
 
-.app-bar-link .font {
-  font-size: 20px;
+#FriendDrawer {
+  #padding {
+    height: 8%;
+  }
+
+  #header {
+    height: 5%;
+    row-gap: 5;
+    font-size: 20px;
+
+    button {
+      margin-right: 5%;
+    }
+  }
+
+  #body {
+    height: 80%;
+
+    .logout {
+      opacity: 0.3;
+    }
+  }
 }

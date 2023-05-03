@@ -17,8 +17,9 @@ export class DbUsersManagerService {
 		@InjectRepository(TbUa03DEntity) private ua03dRp: Repository<TbUa03DEntity>,
 	) { }
 
-	setUser() {
-		let test = this.ua01mRp.create()
-		console.log(test)
-		console.log(`in DbManagerService.serUser`)
-	}}
+  setUser() {
+    const test = this.ua01mRp.create();
+    console.log(test);
+    console.log(`in DbManagerService.serUser`);
+  }
+}

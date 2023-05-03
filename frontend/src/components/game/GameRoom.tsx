@@ -1,5 +1,5 @@
 import { useState } from "react";
-import GameWaiting from "./GameWaiting";
+import GameReady from "components/game/GameReady";
 
 const GameRoom = () => {
   const [isWaiting, setIsWaiting] = useState<boolean>(true);
@@ -7,7 +7,7 @@ const GameRoom = () => {
   console.log(setIsWaiting);
 
   return isWaiting ? (
-    <GameWaiting
+    <GameReady
       type="일반 게임"
       content="상대를 기다리는 중"
       funnyImg="funny3.gif"

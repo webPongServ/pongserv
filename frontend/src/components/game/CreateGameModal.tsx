@@ -1,21 +1,57 @@
-import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-
-import { Typography } from "@mui/material";
-import { Button } from "@mui/joy";
-import Modal from "@mui/joy/Modal";
-import ModalDialog from "@mui/joy/ModalDialog";
-import { Box } from "@mui/material";
+import { useNavigate } from "react-router-dom";
+import CustomInput from "components/common/utils/CustomInput";
+import CustomSlider from "components/common/utils/CustomSlider";
+import GameDifficultyRadioGroup from "components/common/utils/GameDifficultyRadioGroup";
+import { GameRoomForm } from "types/Form";
+import CustomIconButton from "components/common/utils/CustomIconButton";
+import "styles/global.scss";
 import "styles/Game.scss";
 
-type CreateGameModalProps = {
+import { Box } from "@mui/material";
+import { Button, Modal, ModalDialog } from "@mui/joy";
+import CloseIcon from "@mui/icons-material/Close";
+
+interface CreateGameModalProps {
   roomStatus: string;
   setRoomStatus: Function;
-};
+}
 
 const CreateGameModal = (props: CreateGameModalProps) => {
   const navigate = useNavigate();
   const [roomID, setRoomID] = useState<string>("203404250001");
+  const [gameRoomForm, setGameRoomForm] = useState<GameRoomForm>({
+    title: "",
+    maxScore: 5,
+    difficulty: "easy",
+  });
+
+  const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e) {
+      const target: HTMLInputElement = e.target;
+      setGameRoomForm({ ...gameRoomForm, title: target.value });
+    }
+  };
+
+  const handleMaxScore = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e) {
+      const target: HTMLInputElement = e.target as HTMLInputElement;
+      setGameRoomForm({
+        ...gameRoomForm,
+        maxScore: parseInt(target.value),
+      });
+    }
+  };
+
+  const handleDifficulty = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e) {
+      const target: HTMLInputElement = e.target as HTMLInputElement;
+      setGameRoomForm({
+        ...gameRoomForm,
+        difficulty: target.value,
+      });
+    }
+  };
 
   console.log(setRoomID);
 
@@ -24,37 +60,38 @@ const CreateGameModal = (props: CreateGameModalProps) => {
       open={props.roomStatus === "create-game"}
       onClose={() => props.setRoomStatus("game")}
     >
-      <ModalDialog className="game-modal" variant="outlined">
-        <Typography
-          sx={{ height: "10%", fontSize: "30px", margin: "auto auto" }}
-        >
-          일반 게임
-        </Typography>
-        <Box
-          className="flex-container direction-column"
-          sx={{ height: "70%", gap: 1 }}
-        >
-          <Typography>입장과 동시에 게임이 시작됩니다.</Typography>
-          <Typography>
-            <b>입장하시겠습니까?</b>
-          </Typography>
-        </Box>
-        <Box className="modal-button-group">
-          <Button
-            className="medium-size"
-            onClick={() => {
-              navigate(`/game/${roomID}`);
-            }}
-          >
-            생성
-          </Button>
-          <Button
-            variant="outlined"
-            className="medium-size"
-            onClick={() => props.setRoomStatus("game")}
-          >
-            취소
-          </Button>
+      <ModalDialog className="modal" variant="outlined">
+        <Box id="create" className="outframe">
+          <Box className="header flex-container">
+            <b>일반 게임 생성</b>
+            <CustomIconButton
+              class="right"
+              icon={<CloseIcon />}
+              handleFunction={() => props.setRoomStatus("game")}
+            />
+          </Box>
+          <Box className="body flex-container">
+            <CustomInput
+              name="제목"
+              defaultValue=""
+              handleFunction={handleTitle}
+            />
+            <CustomSlider
+              name="점수"
+              defaultValue={5}
+              min={1}
+              max={10}
+              handleFunction={handleMaxScore}
+            />
+            <GameDifficultyRadioGroup
+              name="난이도"
+              defaultValue="normal"
+              handleFunction={handleDifficulty}
+            />
+          </Box>
+          <Box className="footer flex-container">
+            <Button onClick={() => navigate(`/game/${roomID}`)}>생성</Button>
+          </Box>
         </Box>
       </ModalDialog>
     </Modal>

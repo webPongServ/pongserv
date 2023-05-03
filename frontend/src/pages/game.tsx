@@ -3,76 +3,25 @@ import GameCard from "components/game/GameCard";
 import NormalGameModal from "components/game/NormalGameModal";
 import LadderGameModal from "components/game/LadderGameModal";
 import CreateGameModal from "components/game/CreateGameModal";
-
-import { Box } from "@mui/system";
-import { Button } from "@mui/joy";
+import { useSelector } from "react-redux";
+import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/Game.scss";
 
-export type GameInfo = {
-  id: string;
-  title: string;
-  owner: string;
-  maxScore: number;
-  difficulty: string;
-  createdAt: Date;
-};
+import { Box } from "@mui/system";
+import { Button } from "@mui/joy";
 
 const Game = () => {
   const [roomStatus, setRoomStatus] = useState<string>("game");
   const [selectedID, setSelectedID] = useState<string>("");
-  const [gameList, setGameList] = useState<GameInfo[]>([
-    {
-      id: "202304250001",
-      title: "chanhyle님의 게임방",
-      owner: "chanhyle",
-      maxScore: 10,
-      difficulty: "easy",
-      createdAt: new Date(),
-    },
-    {
-      id: "202304250002",
-      title: "옥상으로 따라와",
-      owner: "seongtki",
-      maxScore: 5,
-      difficulty: "hard",
-      createdAt: new Date(),
-    },
-    {
-      id: "202304250002",
-      title: "옥상으로 따라와",
-      owner: "seongtki",
-      maxScore: 5,
-      difficulty: "hard",
-      createdAt: new Date(),
-    },
-    {
-      id: "202304250002",
-      title: "옥상으로 따라와",
-      owner: "seongtki",
-      maxScore: 5,
-      difficulty: "hard",
-      createdAt: new Date(),
-    },
-    {
-      id: "202304250002",
-      title: "옥상으로 따라와",
-      owner: "seongtki",
-      maxScore: 5,
-      difficulty: "hard",
-      createdAt: new Date(),
-    },
-  ]);
-
-  console.log(setGameList);
+  const gameRooms = useSelector(
+    (state: IRootState) => state.gameRooms.gameRooms
+  );
 
   return (
-    <>
-      <Box
-        className="flex-wrap-container overflow"
-        sx={{ height: "80%", p: 3, gap: 3 }}
-      >
-        {gameList.map((value, index) => {
+    <Box id="GameWaiting" className="flex-container">
+      <Box id="game-box" className="flex-wrap-container overflow">
+        {gameRooms.map((value, index) => {
           return (
             <GameCard
               key={value.id + index}
@@ -88,20 +37,11 @@ const Game = () => {
           );
         })}
       </Box>
-      <Box
-        className="flex-container direction-column game-button-group"
-        sx={{ height: "20%" }}
-      >
-        <Button
-          className="large-size"
-          onClick={() => setRoomStatus("create-game")}
-        >
+      <Box id="button-box" className="flex-container">
+        <Button onClick={() => setRoomStatus("create-game")}>
           일반 게임 생성
         </Button>
-        <Button
-          className="large-size"
-          onClick={() => setRoomStatus("ladder-game")}
-        >
+        <Button onClick={() => setRoomStatus("ladder-game")}>
           래더 게임 시작
         </Button>
       </Box>
@@ -112,7 +52,7 @@ const Game = () => {
       />
       <LadderGameModal roomStatus={roomStatus} setRoomStatus={setRoomStatus} />
       <CreateGameModal roomStatus={roomStatus} setRoomStatus={setRoomStatus} />
-    </>
+    </Box>
   );
 };
 
