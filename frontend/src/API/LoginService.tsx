@@ -4,9 +4,9 @@ export const authURL = (path: string = ""): string => {
   return `/auth/${path}`;
 };
 
-console.log(instance);
-
 const LoginService = {
+  postCode: async (body: { code: string }) =>
+    await instance.post(authURL("code"), body),
   //   login: {
   // reissueAccessToken: async () => await refresh.patch(loginUrl(`/token`)),
   //   },
