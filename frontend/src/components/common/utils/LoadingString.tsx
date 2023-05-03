@@ -11,7 +11,6 @@ const LoadingString = (props: LoadingStringProps) => {
 
   setTimeout(() => {
     setTimer(timer + 1);
-    console.log(timer);
   }, 700);
   return <Box>{props.message + String(".").repeat((timer % 3) + 1)}</Box>;
 };
