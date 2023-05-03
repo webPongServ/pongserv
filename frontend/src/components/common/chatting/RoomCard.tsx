@@ -22,6 +22,8 @@ const RoomCard = (props: RoomCardProps) => {
   );
   const dispatch = useDispatch();
 
+  console.log(currentChatting);
+
   return (
     <Card
       id="card"

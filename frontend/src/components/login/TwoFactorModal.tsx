@@ -2,12 +2,8 @@ import CustomIconButton from "components/common/utils/CustomIconButton";
 import "styles/Login.scss";
 import "styles/global.scss";
 
-import { Typography } from "@mui/material";
-import { Button } from "@mui/joy";
-import Modal from "@mui/joy/Modal";
-import ModalDialog from "@mui/joy/ModalDialog";
+import { Button, Modal, ModalDialog, Input } from "@mui/joy";
 import { Box } from "@mui/material";
-import { Input } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
 
 type HandleModalStatus = { modalStatus: string; setModalStatus: Function };

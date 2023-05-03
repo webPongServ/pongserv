@@ -1,8 +1,10 @@
 import instance from "API/api";
 
-export const authURL = (path: string = "") => {
+export const authURL = (path: string = ""): string => {
   return `/auth/${path}`;
 };
+
+console.log(instance);
 
 const LoginService = {
   //   login: {

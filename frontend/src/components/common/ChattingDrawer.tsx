@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
 import CustomIconButton from "components/common/utils/CustomIconButton";

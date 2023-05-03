@@ -99,6 +99,8 @@ const WaitingRoom = () => {
     ]);
   };
 
+  console.log(useSelector);
+
   useEffect(() => {
     getChatRoomList();
   }, []);

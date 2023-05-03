@@ -78,7 +78,8 @@ const Profile = () => {
         setIsFriend(true);
       }
     });
-  }, []);
+    // check dependency list!!
+  }, [friends, profileDetail.nickname]);
 
   return (
     <Box id="Profile" className="flex-container">

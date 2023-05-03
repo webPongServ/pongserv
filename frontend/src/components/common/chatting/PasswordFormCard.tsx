@@ -19,6 +19,8 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
   const [value, setValue] = useState<string>("");
   const dispatch = useDispatch();
 
+  console.log(useSelector);
+
   const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target;
