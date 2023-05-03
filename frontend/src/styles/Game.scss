@@ -5,59 +5,68 @@
   row-gap: 5%;
 
   #game-box {
+    width: 800px;
     height: 80%;
-    width: 650px;
     padding: 3%;
-    justify-content: space-evenly;
 
-    .game-card {
-      width: 250px;
-      height: 250px;
-      cursor: pointer;
-      margin: 1%;
-      &:hover {
-        border: 3px solid skyblue;
-      }
+    .list {
+      height: 90%;
+      justify-content: space-evenly;
 
-      .preview {
-        height: 130px;
-        justify-content: space-between;
+      .game-card {
+        width: 300px;
+        height: 250px;
+        cursor: pointer;
+        margin: 1%;
+        &:hover {
+          border: 3px solid skyblue;
+        }
 
-        .user {
-          flex-direction: column;
+        .preview {
+          width: 250px;
+          height: 130px;
+          justify-content: space-between;
 
-          img {
-            width: 75px;
-            height: 75px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            border-radius: 50%;
-            border: 0px solid #fff;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
-              0 3px 6px rgba(0, 0, 0, 0.23);
+          .user {
+            flex-direction: column;
+
+            img {
+              width: 75px;
+              height: 75px;
+              margin-bottom: 10px;
+              display: flex;
+              align-items: center;
+              border-radius: 50%;
+              border: 0px solid #fff;
+              box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                0 3px 6px rgba(0, 0, 0, 0.23);
+            }
+          }
+
+          .vs {
+            width: 30px;
+            height: 30px;
           }
         }
 
-        .vs {
-          width: 30px;
-          height: 30px;
+        .title {
+          height: 80px;
+          font-size: 20px;
+          font-weight: bold;
+        }
+
+        .card-overflow {
+          font-size: 13px;
+          height: 40px;
+          color: #aaaaaa;
+          column-gap: 2%;
+          padding: 0.5% var(--Card-padding) 0.5% var(--Card-padding);
         }
       }
+    }
 
-      .title {
-        height: 80px;
-        font-size: 15px;
-        font-weight: bold;
-      }
-
-      .card-overflow {
-        font-size: 13px;
-        height: 40px;
-        color: #aaaaaa;
-        column-gap: 2%;
-        padding: 0.5% var(--Card-padding) 0.5% var(--Card-padding);
-      }
+    .pagination {
+      height: 10%;
     }
   }
 
