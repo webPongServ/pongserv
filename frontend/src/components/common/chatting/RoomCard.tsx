@@ -1,80 +1,68 @@
+import { IRootState } from "components/common/store";
+import { useSelector, useDispatch } from "react-redux";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
+import { ChatRoomDetail } from "types/Detail";
+import "styles/global.scss";
+import "styles/ChattingDrawer.scss";
+
 import Card from "@mui/joy/Card";
-import CardOverflow from "@mui/joy/CardOverflow";
 import Box from "@mui/joy/Box";
-import Button from "@mui/joy/Button";
-import Typography from "@mui/joy/Typography";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Person from "@mui/icons-material/Person";
 
-type ChatRoomInfoProps = {
-  id: string;
-  title: string;
-  owner: string;
-  type: string;
-  current: number;
-  max: number;
-  createdAt: Date;
-  roomID: string;
-  setRoomID: Function;
-};
+interface RoomCardProps {
+  room: ChatRoomDetail;
+  index: number;
+  setPwIndex: Function;
+}
 
-// 몇 시간 전에 생성되었는지 추가?
-const RoomCard = (props: ChatRoomInfoProps) => {
+const RoomCard = (props: RoomCardProps) => {
+  const currentChatting = useSelector(
+    (state: IRootState) => state.currentChatting
+  );
+  const dispatch = useDispatch();
+
   return (
-    <Card variant="outlined" className="chat-container chat-gap">
-      <Box sx={{ display: "flex", flexDirection: "row" }}>
-        <Typography level="h1" fontSize="md" sx={{ mb: 0.5 }}>
-          {props.title}
-        </Typography>
+    <Card
+      id="card"
+      variant="outlined"
+      onClick={() => {
+        props.room.type === "protected"
+          ? props.setPwIndex(props.index)
+          : dispatch({
+              type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
+              payload: {
+                id: props.room.id,
+                title: props.room.title,
+                owner: props.room.owner,
+                type: props.room.type,
+                current: props.room.current,
+                max: props.room.max,
+                createdAt: props.room.createdAt,
+              },
+            });
+      }}
+    >
+      <Box className="title">
+        <b>{props.room.title}</b>
       </Box>
-      <Box
-        sx={{
-          display: "flex",
-          gap: 1,
-          py: 1,
-          alignItems: "center",
-          height: "32px",
-        }}
-      >
-        <StarBorderIcon />
-        <Typography level="body1">{props.owner}</Typography>
-        <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
-        <Person />
-        <Typography
-          level="body1"
-          sx={{ fontWeight: "md", color: "text.secondary" }}
-        >
-          {props.current} / {props.max}
-        </Typography>
-        <Box sx={{ marginLeft: "auto" }}>
-          <Button
-            size="sm"
-            onClick={() => {
-              props.setRoomID(props.id);
-            }}
-          >
-            입장
-          </Button>
+      <Box className="content">
+        <Box className="flex-container">
+          <StarBorderIcon />
+          {props.room.owner}
+        </Box>
+        <Box>|</Box>
+        <Box className="flex-container">
+          <Person />
+          {props.room.current} / {props.room.max}
+        </Box>
+        <Box>|</Box>
+        <Box>
+          {props.room.type === "public" && "공개"}
+          {props.room.type === "protected" && "비공개"}
+          {props.room.type === "private" && "DM"}
         </Box>
       </Box>
-      <CardOverflow
-        variant="soft"
-        sx={{
-          display: "flex",
-          gap: 1.5,
-          py: 1,
-          px: "var(--Card-padding)",
-          bgcolor: "background.level1",
-        }}
-      >
-        <Typography sx={{ color: "#aaaaaa" }}>
-          {props.type === "public" && "공개"}
-          {props.type === "protected" && "비공개"}
-          {props.type === "private" && "DM"}
-        </Typography>
-        <Typography sx={{ color: "#aaaaaa" }}>|</Typography>
-        <Typography sx={{ color: "#aaaaaa" }}>9 hours ago</Typography>
-      </CardOverflow>
     </Card>
   );
 };

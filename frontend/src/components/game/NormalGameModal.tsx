@@ -1,17 +1,18 @@
 import { useNavigate } from "react-router-dom";
+import CustomIconButton from "components/common/utils/CustomIconButton";
+import "styles/Game.scss";
 
-import { Typography } from "@mui/material";
 import { Button } from "@mui/joy";
 import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
-import "styles/Game.scss";
+import CloseIcon from "@mui/icons-material/Close";
 
-type NormalGameModalProps = {
+interface NormalGameModalProps {
   roomStatus: string;
   setRoomStatus: Function;
   selectedID: string;
-};
+}
 
 const NormalGameModal = (props: NormalGameModalProps) => {
   const navigate = useNavigate();
@@ -20,37 +21,29 @@ const NormalGameModal = (props: NormalGameModalProps) => {
       open={props.roomStatus === "normal-game"}
       onClose={() => props.setRoomStatus("game")}
     >
-      <ModalDialog className="game-modal" variant="outlined">
-        <Typography
-          sx={{ height: "10%", fontSize: "30px", margin: "auto auto" }}
-        >
-          일반 게임
-        </Typography>
-        <Box
-          className="flex-container direction-column"
-          sx={{ height: "70%", gap: 1 }}
-        >
-          <Typography>입장과 동시에 게임이 시작됩니다.</Typography>
-          <Typography>
+      <ModalDialog className="modal" variant="outlined">
+        <Box id="inform" className="outframe">
+          <Box className="header flex-container">
+            <b>일반 게임</b>
+            <CustomIconButton
+              class="right"
+              icon={<CloseIcon />}
+              handleFunction={() => props.setRoomStatus("game")}
+            />
+          </Box>
+          <Box className="body flex-container">
+            <span>입장과 동시에 게임이 시작됩니다.</span>
             <b>입장하시겠습니까?</b>
-          </Typography>
-        </Box>
-        <Box className="modal-button-group">
-          <Button
-            className="medium-size"
-            onClick={() => {
-              navigate(`/game/${props.selectedID}`);
-            }}
-          >
-            입장
-          </Button>
-          <Button
-            variant="outlined"
-            className="medium-size"
-            onClick={() => props.setRoomStatus("game")}
-          >
-            취소
-          </Button>
+          </Box>
+          <Box className="footer flex-container">
+            <Button
+              onClick={() => {
+                navigate(`/game/${props.selectedID}`);
+              }}
+            >
+              입장
+            </Button>
+          </Box>
         </Box>
       </ModalDialog>
     </Modal>

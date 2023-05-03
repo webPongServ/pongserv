@@ -1,25 +1,25 @@
 import { useState } from "react";
+import { authURL } from "API/LoginService";
+import { apiURL } from "API/api";
 // import { useNavigate } from "react-router-dom";
-// import axios from "axios";
 import NewSessionModal from "components/login/NewSessionModal";
 import TwoFactorModal from "components/login/TwoFactorModal";
+import "styles/Login.scss";
 
 import { Box } from "@mui/material";
 import Button from "@mui/joy/Button";
 
 const Login = () => {
   // const navigate = useNavigate();
-  const [modalStatus, setModalStatus] = useState<string>("Closed");
+  const [modalStatus, setModalStatus] = useState<string>("closed");
 
   return (
-    <>
+    <Box id="Login" className="flex-container">
       <Box>
         <Button
-          onClick={async () => {
-            // navigate("/main");
-            // const result = await axios.get("https://api.kf-21boramae.com/");
-            // console.log(result.data);
-            setModalStatus("NewSession");
+          onClick={() => {
+            // 왜 redirect? 그냥 호출하면 42 intra 서버로부터 CORS 에러가 발생
+            window.location.href = apiURL + authURL("authorize");
           }}
         >
           Login with 42
@@ -33,7 +33,7 @@ const Login = () => {
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
       />
-    </>
+    </Box>
   );
 };
 

@@ -1,24 +1,22 @@
-import { useState } from "react";
 import { FriendDrawerWidth } from "constant";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { IRootState } from "components/common/store";
+import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomProfileButton from "components/common/utils/CustomProfileButton";
+import "styles/AppHeader.scss";
+import "styles/global.scss";
 
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import { styled } from "@mui/material/styles";
+import { Box, List, ListItem } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
-import List from "@mui/material/List";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { Theme, CSSObject } from "@mui/material/styles";
+import { styled, Theme, CSSObject } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
-import { Box, IconButton } from "@mui/material";
 
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== "open",
 })(({ theme, open }) => ({
   width: FriendDrawerWidth,
-  height: "100%",
   flexShrink: 0,
   whiteSpace: "nowrap",
   boxSizing: "border-box",
@@ -48,93 +46,60 @@ const openedMixin = (theme: Theme): CSSObject => ({
 
 const FriendDrawer = () => {
   const navigate = useNavigate();
-  const [loginFriends, setLoginFriends] = useState<string[]>([
-    "mgo",
-    "seongtki",
-    "chanhyle",
-    "seongyle",
-  ]);
-  const [logoutFriends, setLogoutFriends] = useState<string[]>(["noname_12"]);
-  
-  console.log(setLoginFriends, setLogoutFriends);
+  // 받아 오기
+  const friends = useSelector((state: IRootState) => state.friends.friends);
 
   return (
-    <Drawer variant="permanent" open={true}>
-      <DrawerHeader sx={{ height: "10%" }} />
-      <Box className="flex-container" sx={{ height: "3%", gap: 5 }}>
-        <Box style={{ fontSize: "20px", marginLeft: "30%" }}>친구 목록</Box>
-        <IconButton
-          sx={{ backgroundColor: "skyblue", borderRadius: "10px" }}
-          onClick={() => {
+    <Drawer id="FriendDrawer" variant="permanent" open={true}>
+      <DrawerHeader id="padding" />
+      <Box id="header" className="flex-container">
+        <Box className="fixed-center">친구 목록</Box>
+        <CustomIconButton
+          class=""
+          icon={<SearchIcon />}
+          handleFunction={() => {
             navigate(`/search`);
           }}
-        >
-          <SearchIcon />
-        </IconButton>
+        />
       </Box>
-      <List sx={{ height: "80%", overflow: "auto" }}>
-        {loginFriends.map((value, index) => (
-          <ListItem
-            key={value + index}
-            disablePadding
-            sx={{ display: "block" }}
-          >
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: true ? "initial" : "center",
-                px: 2.5,
-              }}
-              onClick={() => {
-                navigate(`/profile/${index}`);
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: true ? 3 : "auto",
-                  justifyContent: "center",
-                }}
-              >
-                <AccountCircleIcon fontSize="large" />
-              </ListItemIcon>
-              <ListItemText primary={value} sx={{ opacity: true ? 1 : 0 }} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-        {logoutFriends.map((value, index) => (
-          <ListItem
-            key={value + index}
-            disablePadding
-            sx={{ display: "block" }}
-          >
-            <ListItemButton
-              sx={{
-                minHeight: 48,
-                justifyContent: true ? "initial" : "center",
-                px: 2.5,
-              }}
-              onClick={() => {
-                navigate(`/profile/${index}`);
-              }}
-            >
-              <ListItemIcon
-                sx={{
-                  minWidth: 0,
-                  mr: true ? 3 : "auto",
-                  justifyContent: "center",
-                }}
-              >
-                <AccountCircleIcon fontSize="large" sx={{ color: "#cccccc" }} />
-              </ListItemIcon>
-              <ListItemText
-                primary={value}
-                sx={{ opacity: true ? 1 : 0, color: "#cccccc" }}
-              />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <Box id="body" className="overflow">
+        {friends.length === 0 ? (
+          <EmptyListMessage message="친구인 사용자가 없습니다!" />
+        ) : (
+          <List>
+            {friends
+              .filter((friend) => friend.status === "login")
+              .map((value, index) => (
+                <ListItem key={value.nickname + index} disablePadding>
+                  <CustomProfileButton
+                    class="login"
+                    nickname={value.nickname}
+                    imgURL={value.imgURL}
+                    position="FriendDrawer"
+                    handleFunction={() => {
+                      navigate(`/profile/${value.nickname}`);
+                    }}
+                  />
+                </ListItem>
+              ))}
+            {friends
+              .filter((friend) => friend.status === "logout")
+              .map((value, index) => (
+                <ListItem key={value.nickname + index} disablePadding>
+                  <CustomProfileButton
+                    class="logout"
+                    nickname={value.nickname}
+                    imgURL={value.imgURL}
+                    position="FriendDrawer"
+                    handleFunction={() => {
+                      navigate(`/profile/${value.nickname}`);
+                    }}
+                  />
+                </ListItem>
+              ))}
+          </List>
+        )}
+      </Box>
     </Drawer>
   );
 };
