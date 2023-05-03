@@ -2,12 +2,14 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Token42OAuthData } from './dto/token.dto';
+import { DbUsersManagerService } from '../db-manager/db-users-manager/db-users-manager.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
+    private readonly dbmanagerUsersService: DbUsersManagerService,
   ) {}
   async issueToken(code: string): Promise<Token42OAuthData> {
     let result: Token42OAuthData;
@@ -65,6 +67,8 @@ export class AuthService {
       console.log('42 사용자 정보 확인 실패');
       throw new HttpException('message', HttpStatus.UNAUTHORIZED);
     }
+
+    await this.dbmanagerUsersService.getUserByIntraId(intraInfo.intraId);
 
     // try {
     //   const user: Account = await await this.accountRepository.findOne({
