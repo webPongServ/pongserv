@@ -9,45 +9,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 18
-
-    - name: Install dependencies and build backend
-      run: |
-        cd backend
-        npm ci
-        npm run build
-
-    - name: Install dependencies and build frontend
-      run: |
-        cd frontend
-        npm ci
-        npm run build
-
-    - name: copy file via ssh key
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        source: "backend/dist"
-        target: /home/ubuntu/pongserv
-    
-    - name: copy file via ssh key
-      uses: appleboy/scp-action@v0.1.4
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        source: "frontend/build"
-        target: /home/ubuntu/pongserv
-  
+    steps:  
     - name: reload pm2 with new build files
       uses: appleboy/ssh-action@v0.1.10
       with:
