@@ -57,9 +57,6 @@ export class AuthService {
         },
       );
 
-      // console.log('intraInfoResult: ');
-      // console.log(intraInfoResult);
-
       intraInfo = {
         intraId: intraInfoResult.data.login,
         imageUrl: intraInfoResult.data.image.link,
