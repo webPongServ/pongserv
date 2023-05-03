@@ -6,7 +6,9 @@
 
   #game-box {
     height: 80%;
+    width: 600px;
     padding: 3%;
+    justify-content: space-evenly;
 
     .game-card {
       width: 250px;
