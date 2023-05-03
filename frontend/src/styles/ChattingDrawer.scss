@@ -73,6 +73,14 @@ $ChattingDrawerWidth: 500px;
         height: 80%;
         display: flex;
         flex-direction: column;
+
+        .list {
+          height: 90%;
+        }
+
+        .pagination {
+          height: 10%;
+        }
       }
 
       .page-footer {
@@ -118,7 +126,8 @@ $ChattingDrawerWidth: 500px;
     }
 
     #card {
-      height: 110px;
+      // height: 110px;
+      height: 15%;
       cursor: pointer;
       margin-bottom: 15px;
       &:hover {
@@ -126,13 +135,15 @@ $ChattingDrawerWidth: 500px;
       }
 
       .title {
-        height: 70px;
+        // height: 70px;
+        height: 60%;
         font-size: 25px;
         margin-bottom: 0.5px;
       }
 
       .content {
-        height: 40px;
+        // height: 40px;
+        height: 40%;
         display: flex;
         align-items: center;
         font-size: 15px;
@@ -148,17 +159,20 @@ $ChattingDrawerWidth: 500px;
     }
 
     #password-form {
-      height: 110px;
+      // height: 110px;
+      height: 15%;
       margin-bottom: 15px;
       background-color: #aaaaaa;
 
       .title {
-        height: 20px;
+        // height: 20px;
+        height: 20%;
         margin-bottom: 10px;
       }
 
       .content {
-        height: 90px;
+        // height: 90px;
+        height: 80%;
         column-gap: 3%;
 
         .input {
