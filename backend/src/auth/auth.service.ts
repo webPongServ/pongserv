@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Token42OAuthData } from './dto/token.dto';
@@ -11,7 +16,7 @@ export class AuthService {
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
     private readonly dbmanagerUsersService: DbUsersManagerService,
-    private jwtService: JwtService
+    private jwtService: JwtService,
   ) {}
 
   async issueToken42OAuth(code: string): Promise<Token42OAuthData> {
@@ -43,9 +48,9 @@ export class AuthService {
     return result;
   }
 
-  async getIntraId(ftTokens: Token42OAuthData): Promise<string> {
-    let intraId: string;
-
+  async getIntraId(
+    ftTokens: Token42OAuthData,
+  ): Promise<{ intraId: string; intraImagePath: string }> {
     console.log(`ftTokens: `);
     console.log(ftTokens);
     const intraInfoResult = await this.httpService.axiosRef.get(
@@ -57,10 +62,10 @@ export class AuthService {
         },
       },
     );
-    if (!intraInfoResult)
-      throw new UnauthorizedException('Token42OAuth');
-    intraId = intraInfoResult.data.login;
-    return intraId;
+    if (!intraInfoResult) throw new UnauthorizedException('Token42OAuth');
+    const intraId: string = intraInfoResult.data.login;
+    const intraImagePath: string = intraInfoResult.data.image.link;
+    return { intraId, intraImagePath };
   }
 
   async checkinUser(intraId) {
@@ -71,20 +76,22 @@ export class AuthService {
     }
   }
 
-  async issueAccessToken(intraId): Promise<string> {
+  async issueAccessToken(intraId: string): Promise<string> {
     const payload = { intraId };
-    let access_token = await this.jwtService.sign(payload);
-    return ;
+    const accessToken = await this.jwtService.sign(payload);
+    return accessToken;
   }
 
   async processAuthorization(code42OAuth: string) {
-    const token42OAuth = await this.issueToken42OAuth(code42OAuth);
-    const intraId: string = await this.getIntraId(token42OAuth);
-    console.log(`intraId: ${intraId}`);
+    // const token42OAuth = await this.issueToken42OAuth(code42OAuth);
+    // const intraData: { intraId: string; intraImagePath: string } =
+    //   await this.getIntraId(token42OAuth);
+    const intraData = { intraId: 'susong', intraImagePath: '' };
+    // console.log(`intraId: ${intraId}`);
     // TODO: user checkin (DB)
-    await this.dbmanagerUsersService.checkinUser(intraId);
+    await this.dbmanagerUsersService.checkinUser(intraData);
     // TODO: issue access and refresh tokens
-    const tokenTmp = await this.issueAccessToken(intraId);
-    return intraId;
+    const accessToken = await this.issueAccessToken(intraData.intraId);
+    return accessToken;
   }
 }

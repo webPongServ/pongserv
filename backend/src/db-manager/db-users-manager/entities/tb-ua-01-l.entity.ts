@@ -1,12 +1,24 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { TbUa01MEntity } from './tb-ua-01-m.entity';
 
 // user agent state list - 유저 상태 내역
 @Entity({ name: 'TB_UA01L' })
 export class TbUa01LEntity {
   // USER_ID
+  // @PrimaryGeneratedColumn({ name: 'TMP_ID', type: 'integer' })
+  // tmpId: number;
+
   @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
-  @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.userId, {
+  @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.ua01lEntities, {
     nullable: false,
     onUpdate: 'CASCADE',
     onDelete: 'RESTRICT',
@@ -15,7 +27,7 @@ export class TbUa01LEntity {
   ua01mEntity!: TbUa01MEntity;
 
   // LOGIN_SEQ
-  @Column({ name: 'LOGIN_SEQ', type: 'integer' })
+  @PrimaryColumn({ name: 'LOGIN_SEQ', type: 'integer' })
   loginSeq: number;
 
   // LOGIN_DTTM
@@ -55,10 +67,18 @@ export class TbUa01LEntity {
   delTf: boolean;
 
   // FRST_DTTM
-  @CreateDateColumn({ name: 'FRST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @CreateDateColumn({
+    name: 'FRST_DTTM',
+    type: 'timestamp with time zone',
+    precision: 6,
+  })
   frstDttm: Date;
 
   // LAST_DTTM
-  @UpdateDateColumn({ name: 'LAST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @UpdateDateColumn({
+    name: 'LAST_DTTM',
+    type: 'timestamp with time zone',
+    precision: 6,
+  })
   lastDttm: Date;
 }

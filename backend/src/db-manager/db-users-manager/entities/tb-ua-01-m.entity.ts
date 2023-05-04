@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryColumn,
   Unique,
   UpdateDateColumn,
@@ -20,6 +21,7 @@ import { TbUa03DEntity } from './tb-ua-03-d.entity';
 @Entity({ name: 'TB_UA01M' })
 export class TbUa01MEntity {
   // USER_ID
+
   @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
   userId: string;
 
@@ -63,6 +65,7 @@ export class TbUa01MEntity {
    * OneToManys
    */
   // TB_UA
+
   @OneToMany(() => TbUa01LEntity, (ua01l) => ua01l.ua01mEntity, {
     onUpdate: 'CASCADE',
     onDelete: 'RESTRICT',

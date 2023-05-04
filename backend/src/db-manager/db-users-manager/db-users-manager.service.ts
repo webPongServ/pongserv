@@ -18,11 +18,11 @@ export class DbUsersManagerService {
   ) {}
 
   async getUserInfoByIntraId(intraId: string) {
-	const userInfo = await this.ua01mRp.findOne({
+    const userInfo = await this.ua01mRp.findOne({
       where: {
-        nickname: intraId
-      }
-    })
+        nickname: intraId,
+      },
+    });
     return userInfo;
   }
 
@@ -33,53 +33,57 @@ export class DbUsersManagerService {
   }
 
   // TODO: move to UsersModule
-  async checkinUser(nickname: string) {
+  async checkinUser(intraData: { intraId: string; intraImagePath: string }) {
     /*!SECTION
       1. 인자로 들어온 nickname을 가진 유저가 user master table(ua01mRp)에 있는지 확인한다. (회원가입 유무 확인)
         1-1. 만약 회원가입이 되어 있지 않다면, DB에 저장한다. (자동 회원가입)
       2. user login table에 유저 데이터 row를 추가한다. (로그인 세션 저장)
     */
     // 1
+    const userId = intraData.intraId;
     let userMaster = await this.ua01mRp.findOne({
       where: {
-        nickname: nickname,
-      }
+        userId: userId,
+      },
     });
     // 1-1
     if (!userMaster) {
-      userMaster = await this.ua01mRp.save(this.ua01mRp.create({
-          userId: nickname, // userID string...
-          nickname: nickname,
+      userMaster = await this.ua01mRp.save(
+        this.ua01mRp.create({
+          userId: userId, // userID string...
+          nickname: userId,
           chtRmTf: false,
           twofactorData: '',
-          imgPath: '',
+          imgPath: intraData.intraImagePath,
           delTf: false,
-        })
-      )
+        }),
+      );
     }
+    console.log(userMaster);
     // 2
-    await this.ua01lRp.save(this.ua01lRp.create({
+    const result = await this.ua01lRp.save(
+      this.ua01lRp.create({
         ua01mEntity: userMaster,
         loginSeq: 1, // TODO: set as max number in db
         loginDttm: new Date(),
-        logoutDttm: null,
+        logoutDttm: new Date(),
         chtTf: false,
         gmTf: false,
-        sessionId: null, // TODO: set as refresh token
+        sessionId: 'null', // TODO: set as refresh token
         loginTf: true,
         delTf: false,
-      })
-    )
+      }),
+    );
+    console.log(result);
   }
 
   async checkUserInDb(nickname: string) {
     const userMaster = await this.ua01mRp.findOne({
       where: {
         nickname: nickname,
-      }
+      },
     });
-    if (!userMaster)
-      return false;
+    if (!userMaster) return false;
     return true;
   }
 }

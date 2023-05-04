@@ -59,9 +59,12 @@ export class AuthController {
   async issueToken(@Body() codeBody: Code42OAuthData) {
     console.log(`codeBody.code: ${codeBody.code}`);
     try {
-      const result = await this.authService.processAuthorization(codeBody.code);
-      return result;
+      const accessToken = await this.authService.processAuthorization(
+        codeBody.code,
+      );
+      return accessToken;
     } catch (err) {
+      console.log(err);
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
   }

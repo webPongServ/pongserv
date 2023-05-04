@@ -9,16 +9,16 @@ import { DbUsersManagerService } from './db-users-manager.service';
 import { Repository } from 'typeorm';
 
 @Module({
-	imports: [
-	  TypeOrmModule.forFeature([
-		TbUa01MEntity,
-		TbUa01LEntity,
-		TbUa02LEntity,
-		TbUa03MEntity,
-		TbUa03DEntity
-	  ]),
-	],
-	providers: [DbUsersManagerService],
-	exports: [DbUsersManagerService, TypeOrmModule]
+  imports: [
+    TypeOrmModule.forFeature([
+      TbUa01MEntity,
+      TbUa01LEntity,
+      TbUa02LEntity,
+      TbUa03MEntity,
+      TbUa03DEntity,
+    ]),
+  ],
+  providers: [DbUsersManagerService],
+  exports: [DbUsersManagerService, TypeOrmModule],
 })
 export class DbUsersManagerModule {}
