@@ -14,13 +14,18 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
     HttpModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.register({
-      secret: 'ChanhyleIsHandsome',
-      signOptions: { expiresIn: 3600 },
+      secret: 'ChanhyleISHandsome',
+      signOptions: { expiresIn: '1y' },
     }),
     DbUsersManagerModule,
   ],
   controllers: [AuthController],
-  providers: [AuthService, ConfigService, AccessTokenStrategy, DbUsersManagerService],
-  exports: [AccessTokenStrategy, PassportModule]
+  providers: [
+    AuthService,
+    ConfigService,
+    AccessTokenStrategy,
+    DbUsersManagerService,
+  ],
+  exports: [AccessTokenStrategy, PassportModule],
 })
 export class AuthModule {}

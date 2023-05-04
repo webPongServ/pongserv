@@ -86,12 +86,15 @@ export class AuthService {
     // const token42OAuth = await this.issueToken42OAuth(code42OAuth);
     // const intraData: { intraId: string; intraImagePath: string } =
     //   await this.getIntraId(token42OAuth);
+    // DEBUG
     const intraData = { intraId: 'susong', intraImagePath: '' };
     // console.log(`intraId: ${intraId}`);
     // TODO: user checkin (DB)
     await this.dbmanagerUsersService.checkinUser(intraData);
     // TODO: issue access and refresh tokens
-    const accessToken = await this.issueAccessToken(intraData.intraId);
-    return accessToken;
+    // const accessToken = await this.issueAccessToken(intraData.intraId);
+    const intraId = intraData.intraId;
+    const payload = { intraId };
+    return { accessToken: await this.jwtService.signAsync(payload) };
   }
 }

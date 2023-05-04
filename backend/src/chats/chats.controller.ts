@@ -1,6 +1,7 @@
 import { ChatsService } from './chats.service';
-import { Controller, Get, Patch, Post, Put } from '@nestjs/common';
+import { Controller, Get, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 
 @ApiTags('chats')
 @Controller('chats')

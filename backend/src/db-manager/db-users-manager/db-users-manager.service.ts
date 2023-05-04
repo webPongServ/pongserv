@@ -61,29 +61,29 @@ export class DbUsersManagerService {
     }
     console.log(userMaster);
     // 2
-    const result = await this.ua01lRp.save(
-      this.ua01lRp.create({
-        ua01mEntity: userMaster,
-        loginSeq: 1, // TODO: set as max number in db
-        loginDttm: new Date(),
-        logoutDttm: new Date(),
-        chtTf: false,
-        gmTf: false,
-        sessionId: 'null', // TODO: set as refresh token
-        loginTf: true,
-        delTf: false,
-      }),
-    );
-    console.log(result);
+    // const result = await this.ua01lRp.save(
+    //   this.ua01lRp.create({
+    //     ua01mEntity: userMaster,
+    //     loginSeq: 1, // TODO: set as max number in db
+    //     loginDttm: new Date(),
+    //     logoutDttm: new Date(),
+    //     chtTf: false,
+    //     gmTf: false,
+    //     sessionId: 'null', // TODO: set as refresh token
+    //     loginTf: true,
+    //     delTf: false,
+    //   }),
+    // );
+    // console.log(result);
   }
 
-  async checkUserInDb(nickname: string) {
+  async checkUserInDb(userId: string) {
     const userMaster = await this.ua01mRp.findOne({
       where: {
-        nickname: nickname,
+        userId: userId,
       },
     });
-    if (!userMaster) return false;
-    return true;
+    if (!userMaster) return null;
+    return userId;
   }
 }
