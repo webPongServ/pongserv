@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { TbUa01MEntity } from './tb-ua-01-m.entity';
 
 // user agent state list - 유저 상태 내역
@@ -55,10 +55,10 @@ export class TbUa01LEntity {
   delTf: boolean;
 
   // FRST_DTTM
-  @Column({ name: 'FRST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @CreateDateColumn({ name: 'FRST_DTTM', type: 'timestamp with time zone', precision: 6 })
   frstDttm: Date;
 
   // LAST_DTTM
-  @Column({ name: 'LAST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @UpdateDateColumn({ name: 'LAST_DTTM', type: 'timestamp with time zone', precision: 6 })
   lastDttm: Date;
 }
