@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Token42OAuthData } from './dto/token.dto';
@@ -13,9 +13,9 @@ export class AuthService {
     private readonly dbmanagerUsersService: DbUsersManagerService,
     private jwtService: JwtService
   ) {}
+
   async issueToken42OAuth(code: string): Promise<Token42OAuthData> {
     let result: Token42OAuthData;
-
     try {
       const tokenResult = await this.httpService.axiosRef.post(
         'https://api.intra.42.fr/oauth/token',
@@ -44,35 +44,28 @@ export class AuthService {
   }
 
   async getIntraId(ftTokens: Token42OAuthData): Promise<string> {
-    let intraInfo;
-    let uid;
+    let intraId: string;
 
-    try {
-      console.log(`ftTokens: `);
-      console.log(ftTokens);
-      const intraInfoResult = await this.httpService.axiosRef.get(
-        'https://api.intra.42.fr/v2/me',
-        {
-          headers: {
-            Authorization: `Bearer ${ftTokens.accessToken}`,
-            'content-type': 'application/json',
-          },
+    console.log(`ftTokens: `);
+    console.log(ftTokens);
+    const intraInfoResult = await this.httpService.axiosRef.get(
+      'https://api.intra.42.fr/v2/me',
+      {
+        headers: {
+          Authorization: `Bearer ${ftTokens.accessToken}`,
+          'content-type': 'application/json',
         },
-      );
-
-      intraInfo = {
-        intraId: intraInfoResult.data.login,
-        imageUrl: intraInfoResult.data.image.link,
-      };
-    } catch (err) {
-      console.log('42 사용자 정보 확인 실패');
-      throw new HttpException('message', HttpStatus.UNAUTHORIZED);
-    }
+      },
+    );
+    if (!intraInfoResult)
+      throw new UnauthorizedException('Token42OAuth');
+    intraId = intraInfoResult.data.login;
+    return intraId;
   }
 
   async checkinUser(intraId) {
     // get user or set user in db
-    const user = await this.dbmanagerUsersService.getOneByIntraId(intraId);
+    const user = await this.dbmanagerUsersService.getUserInfoByIntraId(intraId);
     if (user === null) {
       // await this.dbmanagerUsersService.setOne()
     }
@@ -80,7 +73,7 @@ export class AuthService {
 
   async issueAccessToken(intraId): Promise<string> {
     const payload = { intraId };
-    let access_token = await this.jwtService.sign(payload),
+    let access_token = await this.jwtService.sign(payload);
     return ;
   }
 
@@ -88,9 +81,10 @@ export class AuthService {
     const token42OAuth = await this.issueToken42OAuth(code42OAuth);
     const intraId: string = await this.getIntraId(token42OAuth);
     console.log(`intraId: ${intraId}`);
-    // TODO: use checkin (DB)
+    // TODO: user checkin (DB)
+    await this.dbmanagerUsersService.checkinUser(intraId);
     // TODO: issue access and refresh tokens
-    const tokenTmp = this.issueAccessToken(intraId);
+    const tokenTmp = await this.issueAccessToken(intraId);
     return intraId;
   }
 }
