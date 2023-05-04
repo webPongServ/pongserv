@@ -59,15 +59,8 @@ export class AuthController {
   async issueToken(@Body() codeBody: Code42OAuthData) {
     console.log(`codeBody.code: ${codeBody.code}`);
     try {
-      const result: Token42OAuthData = await this.authService.issueToken(
-        codeBody.code,
-      );
-      console.log(result);
-
-      // todo: get intraId using tokens of reslut
-      const intraId: string = await this.authService.getIntraId(result);
-      console.log(`intraId: ${intraId}`);
-      return intraId;
+      const result = await this.authService.processAuthorization(codeBody.code);
+      return result;
     } catch (err) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }

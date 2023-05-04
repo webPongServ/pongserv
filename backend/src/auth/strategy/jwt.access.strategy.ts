@@ -1,31 +1,37 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { TbUa01MEntity } from '../db-manager/db-users-manager/entities/tb-ua-01-m.entity.ts';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity.js';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
   Strategy,
   'jwt-access',
 ) {
-  constructor(private readonly config: ConfigService) {
+  constructor(
+    @InjectRepository(TbUa01MEntity)
+    private readonly ua01mRp: Repository<TbUa01MEntity>
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      ignoreExpiration: false,
-      secretOrKey: config.get('JWT_SECRET'),
+      // ignoreExpiration: false,
+      secretOrKey: "ChanhyleISHandsome",
     });
   }
 
   async validate(payload: any): Promise<TbUa01MEntity> {
-    if (payload.uid === null || payload.intra_id === null) {
-      throw new HttpException('Invalid Account', HttpStatus.UNAUTHORIZED);
+    const { nickname } = payload;
+    const user = await this.ua01mRp.findOne({
+      where: {
+        nickname: nickname,
+      }
+    });
+    if (user === null) {
+      throw new UnauthorizedException();
     }
-
-    const account = new Account();
-    account.uid = payload.uid;
-    account.intraId = payload.intraId;
-
-    return account;
+    return user;
   }
 }

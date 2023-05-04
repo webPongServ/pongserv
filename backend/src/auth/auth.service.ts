@@ -3,6 +3,7 @@ import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Token42OAuthData } from './dto/token.dto';
 import { DbUsersManagerService } from '../db-manager/db-users-manager/db-users-manager.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -10,8 +11,9 @@ export class AuthService {
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
     private readonly dbmanagerUsersService: DbUsersManagerService,
+    private jwtService: JwtService
   ) {}
-  async issueToken(code: string): Promise<Token42OAuthData> {
+  async issueToken42OAuth(code: string): Promise<Token42OAuthData> {
     let result: Token42OAuthData;
 
     try {
@@ -38,7 +40,6 @@ export class AuthService {
       console.log('42 token 발급 실패');
       throw new HttpException(err, HttpStatus.UNAUTHORIZED);
     }
-    // console.log(result);
     return result;
   }
 
@@ -67,70 +68,29 @@ export class AuthService {
       console.log('42 사용자 정보 확인 실패');
       throw new HttpException('message', HttpStatus.UNAUTHORIZED);
     }
+  }
 
-    await this.dbmanagerUsersService.getUserByIntraId(intraInfo.intraId);
+  async checkinUser(intraId) {
+    // get user or set user in db
+    const user = await this.dbmanagerUsersService.getOneByIntraId(intraId);
+    if (user === null) {
+      // await this.dbmanagerUsersService.setOne()
+    }
+  }
 
-    // try {
-    //   const user: Account = await await this.accountRepository.findOne({
-    //     where: { intraId: intraInfo.intraId },
-    //   });
+  async issueAccessToken(intraId): Promise<string> {
+    const payload = { intraId };
+    let access_token = await this.jwtService.sign(payload),
+    return ;
+  }
 
-    //   if (user === null) {
-    //     const insertedData = await this.accountRepository.save({
-    //       intraId: intraInfo.intraId,
-    //       imageUrl: intraInfo.imageUrl,
-    //     });
-    //     uid = insertedData.uid;
-    //   } else {
-    //     uid = user.uid;
-    //   }
-    // } catch (err) {
-    //   console.log('사용자 정보 저장 실패');
-    //   throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-    // }
-
-    // const accessToken = this.jwtService.sign(
-    //   {
-    //     uid,
-    //     intraId: intraInfo.intraId,
-    //   },
-    //   {
-    //     expiresIn: this.config.get('JWT_ACCESS_EXPIRE'),
-    //   },
-    // );
-
-    // const refreshToken = this.jwtService.sign(
-    //   {
-    //     uid,
-    //   },
-    //   {
-    //     expiresIn: this.config.get('JWT_REFRESH_EXPIRE'),
-    //   },
-    // );
-
-    // try {
-    //   const updatedResult = await this.accountRepository.update(
-    //     { uid },
-    //     { refreshToken },
-    //   );
-
-    //   if (updatedResult.affected === 0) {
-    //     throw new InternalServerErrorException('토큰 저장 실패');
-    //   }
-    // } catch (err) {
-    //   console.log('refresh token 삽입 에러');
-    //   throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-    // }
-
-    // return {
-    //   accessToken,
-    //   refreshToken,
-    //   ftAccessToken,
-    //   imageUrl: intraInfo.imageUrl,
-    // };
-
-    // console.log(`ftTokens.acessToken: ${ftTokens.accessToken}`);
-    // console.log(`ftTokens.refreshToken: ${ftTokens.refreshToken}`);
-    return intraInfo.intraId;
+  async processAuthorization(code42OAuth: string) {
+    const token42OAuth = await this.issueToken42OAuth(code42OAuth);
+    const intraId: string = await this.getIntraId(token42OAuth);
+    console.log(`intraId: ${intraId}`);
+    // TODO: use checkin (DB)
+    // TODO: issue access and refresh tokens
+    const tokenTmp = this.issueAccessToken(intraId);
+    return intraId;
   }
 }
