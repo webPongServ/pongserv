@@ -15,7 +15,7 @@
 
       .game-card {
         width: 300px;
-        height: 250px;
+        height: 200px;
         cursor: pointer;
         margin: 1%;
         &:hover {
@@ -24,7 +24,7 @@
 
         .preview {
           width: 250px;
-          height: 130px;
+          height: 100px;
           justify-content: space-between;
 
           .user {
@@ -50,7 +50,7 @@
         }
 
         .title {
-          height: 80px;
+          height: 60px;
           font-size: 20px;
           font-weight: bold;
         }
@@ -58,7 +58,7 @@
         .card-overflow {
           font-size: 13px;
           height: 40px;
-          color: #aaaaaa;
+          // color: #aaaaaa;
           column-gap: 2%;
           padding: 0.5% var(--Card-padding) 0.5% var(--Card-padding);
         }
