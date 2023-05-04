@@ -1,10 +1,8 @@
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { HttpException, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity.js';
+import { DbUsersManagerService } from '../../db-manager/db-users-manager/db-users-manager.service.js';
 
 @Injectable()
 export class AccessTokenStrategy extends PassportStrategy(
@@ -12,8 +10,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   'jwt-access',
 ) {
   constructor(
-    @InjectRepository(TbUa01MEntity)
-    private readonly ua01mRp: Repository<TbUa01MEntity>
+    private readonly dbUsersManagerService: DbUsersManagerService
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -22,16 +19,16 @@ export class AccessTokenStrategy extends PassportStrategy(
     });
   }
 
-  async validate(payload: any): Promise<TbUa01MEntity> {
+  async validate(payload: any): Promise<string> {
     const { nickname } = payload;
-    const user = await this.ua01mRp.findOne({
-      where: {
-        nickname: nickname,
-      }
-    });
-    if (user === null) {
+    const checked: boolean = await this.dbUsersManagerService.checkUserInDb(nickname);
+    if (checked === false) {
       throw new UnauthorizedException();
     }
-    return user;
+    return nickname;
+  }
+
+  async checkUserInDb() {
+    
   }
 }
