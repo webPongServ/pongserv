@@ -9,6 +9,8 @@ import { ConfigService } from '@nestjs/config';
 import { Token42OAuthData } from './dto/token.dto';
 import { DbUsersManagerService } from '../db-manager/db-users-manager/db-users-manager.service';
 import { JwtService } from '@nestjs/jwt';
+import * as speakeasy from 'speakeasy';
+import * as QRCode from 'qrcode';
 
 @Injectable()
 export class AuthService {
@@ -51,7 +53,7 @@ export class AuthService {
   async getIntraId(
     ftTokens: Token42OAuthData,
   ): Promise<{ intraId: string; intraImagePath: string }> {
-    console.log(`ftTokens: `);
+    console.log(`42Tokens: `);
     console.log(ftTokens);
     const intraInfoResult = await this.httpService.axiosRef.get(
       'https://api.intra.42.fr/v2/me',
@@ -62,7 +64,8 @@ export class AuthService {
         },
       },
     );
-    if (!intraInfoResult) throw new UnauthorizedException('Token42OAuth');
+    if (!intraInfoResult)
+      throw new UnauthorizedException('Token42OAuth You are not 42 User');
     const intraId: string = intraInfoResult.data.login;
     const intraImagePath: string = intraInfoResult.data.image.link;
     return { intraId, intraImagePath };
@@ -76,25 +79,56 @@ export class AuthService {
     }
   }
 
-  async issueAccessToken(intraId: string): Promise<string> {
-    const payload = { intraId };
-    const accessToken = await this.jwtService.sign(payload);
-    return accessToken;
-  }
-
   async processAuthorization(code42OAuth: string) {
+    // Release
     // const token42OAuth = await this.issueToken42OAuth(code42OAuth);
     // const intraData: { intraId: string; intraImagePath: string } =
     //   await this.getIntraId(token42OAuth);
     // DEBUG
     const intraData = { intraId: 'susong', intraImagePath: '' };
-    // console.log(`intraId: ${intraId}`);
     // TODO: user checkin (DB)
+    if (await this.dbmanagerUsersService.checkOauth(intraData.intraId)) {
+      console.log('OAuth Needed');
+    }
     await this.dbmanagerUsersService.checkinUser(intraData);
-    // TODO: issue access and refresh tokens
-    // const accessToken = await this.issueAccessToken(intraData.intraId);
+    // Make AccessToken and return it
     const intraId = intraData.intraId;
     const payload = { intraId };
     return { accessToken: await this.jwtService.signAsync(payload) };
+  }
+
+  async makeQrCode(userId: string) {
+    const secret = speakeasy.generateSecret({
+      length: 6,
+      // name: userId,
+      algorithm: 'sha512',
+    });
+    console.log(userId);
+    const url = speakeasy.otpauthURL({
+      secret: secret.base32,
+      label: userId,
+      issuer: 'pongserv',
+      algorithm: 'sha512',
+      digits: 6,
+      period: 60,
+    });
+    await this.dbmanagerUsersService.applyTwofactor(userId, secret.base32);
+    return await QRCode.toDataURL(url);
+  }
+
+  async validateOtp(userId: string, sixDigit: string) {
+    console.log(sixDigit);
+
+    const secret = await this.dbmanagerUsersService.findSecret(userId);
+    console.log(secret);
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      algorithm: 'sha512',
+      token: sixDigit,
+      window: 2,
+    });
+    console.log(verified);
+    return verified;
   }
 }
