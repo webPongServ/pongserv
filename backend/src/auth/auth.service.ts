@@ -99,36 +99,23 @@ export class AuthService {
 
   async makeQrCode(userId: string) {
     const secret = speakeasy.generateSecret({
-      length: 6,
-      // name: userId,
-      algorithm: 'sha512',
-    });
-    console.log(userId);
-    const url = speakeasy.otpauthURL({
-      secret: secret.base32,
-      label: userId,
-      issuer: 'pongserv',
-      algorithm: 'sha512',
-      digits: 6,
-      period: 60,
+      length: 20,
+      // Algorithm can be added (now removed for process)
     });
     await this.dbmanagerUsersService.applyTwofactor(userId, secret.base32);
-    return await QRCode.toDataURL(url);
+    const QRCODE = await QRCode.toDataURL(secret.otpauth_url);
+    return QRCODE;
   }
 
   async validateOtp(userId: string, sixDigit: string) {
-    console.log(sixDigit);
-
     const secret = await this.dbmanagerUsersService.findSecret(userId);
-    console.log(secret);
     const verified = speakeasy.totp.verify({
       secret: secret,
       encoding: 'base32',
-      algorithm: 'sha512',
       token: sixDigit,
       window: 2,
+      // Algorithm can be added (now removed for process)
     });
-    console.log(verified);
     return verified;
   }
 }
