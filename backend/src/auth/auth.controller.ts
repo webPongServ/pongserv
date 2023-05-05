@@ -60,16 +60,26 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '42Token 발급 성공' })
   @ApiInternalServerErrorResponse({ description: '토큰 발급 실패' })
   @Post('code')
-  async issueToken(@Body() codeBody: Code42OAuthData) {
+  async issueToken(@Body() codeBody: Code42OAuthData, @Res() res: Response) {
     // console.log(`codeBody.code: ${codeBody.code}`);
     try {
       const accessToken = await this.authService.processAuthorization(
         codeBody.code,
       );
-      return accessToken;
+      if (accessToken == null) {
+        res.redirect('http://localhost:3001/OAuth');
+        return null;
+      }
+      res.setHeader('Set-Cookie', [
+        `accessToken=${accessToken}; HttpOnly; SameSite=None;`,
+      ]);
+      console.log('IN THE AUTH/CODE', accessToken);
+      // return { accessToken: accessToken };
+      res.json({ accessToken: accessToken });
     } catch (err) {
-      // console.log(err);
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN, {
+        cause: new Error('Something Happend in making Token'),
+      });
     }
   }
 

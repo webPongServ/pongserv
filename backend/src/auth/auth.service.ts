@@ -81,14 +81,14 @@ export class AuthService {
 
   async processAuthorization(code42OAuth: string) {
     // Release
-    // const token42OAuth = await this.issueToken42OAuth(code42OAuth);
-    // const intraData: { intraId: string; intraImagePath: string } =
-    //   await this.getIntraId(token42OAuth);
+    const token42OAuth = await this.issueToken42OAuth(code42OAuth);
+    const intraData: { intraId: string; intraImagePath: string } =
+      await this.getIntraId(token42OAuth);
     // DEBUG
-    const intraData = { intraId: 'susong', intraImagePath: '' };
+    // const intraData = { intraId: 'susong', intraImagePath: '' };
     // TODO: user checkin (DB)
     if (await this.dbmanagerUsersService.checkOauth(intraData.intraId)) {
-      console.log('OAuth Needed');
+      return null;
     }
     await this.dbmanagerUsersService.checkinUser(intraData);
     // Make AccessToken and return it
