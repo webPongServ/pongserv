@@ -41,4 +41,42 @@ export class DbChatsManagerService {
 	})
 	return (await this.ch02lRp.save(chatroomUser));
   }
+
+  async getDMChatroomsForUser(user: TbUa01MEntity) {
+	/*!SECTION
+		조건은 아래와 같다.
+		TbCh01LEntity
+			chtRmType: 03 (private)
+			chtRmTf: true
+		TbCh02LEntity
+			ch01lEntity: 해당 방
+			ua01mEntity: 해당 유저
+		
+		참고: DM일 경우에는 DM 신청을 받은 상대방은 채팅방에 참여하지 않아도
+		chatroom user list table에 등록이 된다.
+		다만 delTf가 true로 초기에 설정됨.
+	*/
+	let results: TbCh01LEntity[];
+	let prvChtrms: TbCh01LEntity[] = await this.ch01lRp.find({
+		relations: {
+			ch02lEntities: true,
+		},
+		where: {
+			chtRmType: '03',
+			chtRmTf: true
+		}
+	});
+	prvChtrms.forEach((prvChtrm) => {
+		prvChtrm.ch02lEntities.forEach((userOfChtrm) => {
+			if (userOfChtrm.ua01mEntity === user) {
+				results.push(prvChtrm);
+			}
+		})
+	})
+	return results;
+  }
+
+  getPublicAndProtectedChatrooms() {
+	
+  }
 }

@@ -43,6 +43,7 @@ export class TbCh02LEntity {
     name: 'ENTRY_DTTM',
     type: 'timestamp with time zone',
     precision: 0,
+    nullable: true,
   })
   entryDttm: Date;
 
@@ -51,11 +52,12 @@ export class TbCh02LEntity {
     name: 'AUTH_CHG_DTTM',
     type: 'timestamp with time zone',
     precision: 0,
+    nullable: true,
   })
   authChgDttm: Date;
 
-  // DEL_FT
-  @Column({ name: 'DEL_FT', type: 'boolean' })
+  // DEL_TF
+  @Column({ name: 'DEL_TF', type: 'boolean' })
   delTf: boolean;
 
   // FRST_DTTM

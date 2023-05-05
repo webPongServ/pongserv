@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { TbCh02LEntity } from './tb-ch-02-l.entity';
 
 // chatroom list
 @Entity({ name: 'TB_CH01L' })
@@ -56,4 +58,7 @@ export class TbCh01LEntity {
     precision: 6,
   })
   lastDttm: Date;
+
+  @OneToMany(() => TbCh02LEntity, (ch02l) => ch02l.ch01lEntity)
+  ch02lEntities: TbCh02LEntity[];
 }
