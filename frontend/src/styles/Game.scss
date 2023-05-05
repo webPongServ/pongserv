@@ -133,12 +133,12 @@ $paddle_height: 100px;
       background-color: white;
     }
 
-    .ball_effect {
-      height: 100%;
-      width: 100%;
-      border-radius: 100px;
-      animation: spinBall 0.1s linear infinite;
-    }
+    // .ball_effect {
+    //   height: 100%;
+    //   width: 100%;
+    //   border-radius: 100px;
+    //   animation: spinBall 0.1s linear infinite;
+    // }
 
     .paddle {
       height: $paddle_height;
