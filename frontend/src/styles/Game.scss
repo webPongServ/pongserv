@@ -1,3 +1,8 @@
+$board_width: 1000px;
+$board_height: 600px;
+$paddle_width: 18px;
+$paddle_height: 100px;
+
 #GameWaiting {
   width: 100%;
   height: 105%;
@@ -87,4 +92,103 @@
   height: 105%;
   row-gap: 5%;
   flex-direction: column;
+}
+
+#GamePlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  #app-bar {
+    /* non-flexible sizing */
+    flex: 0 0 auto;
+  }
+
+  #board {
+    /* flexible sizing */
+    flex: 1 1 auto;
+    background-color: black;
+    color: white;
+    position: relative;
+
+    .board {
+      position: fixed;
+      height: $board_height;
+      width: $board_width;
+      // background-image: linear-gradient(to right, #5c6e91, #839b97);
+      border: solid 5px white;
+      border-radius: 14px;
+      margin: auto auto;
+    }
+
+    .ball {
+      height: 30px;
+      width: 30px;
+      border-radius: 50%;
+      position: absolute;
+      top: $board_height * 0.5 - 15px;
+      left: $board_width * 0.5 - 15px;
+    }
+
+    .ball_effect {
+      height: 100%;
+      width: 100%;
+      border-radius: 100px;
+      animation: spinBall 0.1s linear infinite;
+      box-shadow: inset 0 0 18px #fff, inset 6px 0 18px white,
+        inset -6px 0 18px white, inset 6px 0 30px white, inset -6px 0 30px white,
+        0 0 18px #fff, -4px 0 18px white, 4px 0 18px white;
+    }
+
+    .paddle {
+      height: $paddle_height;
+      width: $paddle_width;
+      border-radius: 50%;
+      position: absolute;
+    }
+
+    .paddle_1 {
+      top: $board_height * 0.1;
+      left: $board_width * 0.05;
+      box-shadow: inset 0 0 18px #fff, inset -6px 0 18px white,
+        inset 6px 0 18px white, inset -6px 0 30px white, inset 6px 0 30px #0ff,
+        0 0 18px #fff, 4px 0 18px white, -4px 0 18px white;
+    }
+
+    .paddle_2 {
+      top: $board_height - $board_height * 0.3;
+      left: $board_width - $board_width * 0.05 - $paddle_width;
+      box-shadow: inset 0 0 18px #fff, inset 6px 0 18px #f3bad6,
+        inset -6px 0 18px #0ff, inset 6px 0 30px #f3bad6, inset -6px 0 30px #0ff,
+        0 0 18px #fff, -4px 0 18px #f3bad6, 4px 0 18px #0ff;
+    }
+
+    .player_1_score {
+      height: 50px;
+      width: 50px;
+      position: absolute;
+      left: $board_width * 0.3;
+      top: $board_height * 0.2;
+    }
+
+    .player_2_score {
+      height: 50px;
+      width: 50px;
+      position: absolute;
+      left: $board_width * 0.7;
+      top: $board_height * 0.2;
+    }
+
+    .message {
+      position: absolute;
+      /* color: #48426d; */
+      font-size: 20px;
+      height: 100px;
+      width: 300px;
+      color: #c9cbff;
+      left: $board_width * 0.4;
+      top: $board_height * 0.2;
+    }
+  }
 }
