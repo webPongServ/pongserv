@@ -10,7 +10,7 @@ import { DbUsersManagerService } from './db-users-manager/db-users-manager.servi
 @Module({
   imports: [
     DbUsersManagerModule,
-    // DbChatsManagerModule,
+    DbChatsManagerModule,
     // DbGamesManagerModule,
     // DbCommonManagerModule,
   ],
@@ -18,7 +18,7 @@ import { DbUsersManagerService } from './db-users-manager/db-users-manager.servi
   providers: [DbManagerService],
   exports: [
     DbUsersManagerModule,
-    // DbChatsManagerModule,
+    DbChatsManagerModule,
     // DbGamesManagerModule,
     // DbCommonManagerModule,
   ]
