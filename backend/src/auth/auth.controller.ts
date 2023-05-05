@@ -1,3 +1,4 @@
+import { otpData } from './dto/otp.dto';
 /* eslint-disable no-console */
 import { ConfigService } from '@nestjs/config';
 import {
@@ -8,6 +9,7 @@ import {
   HttpStatus,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import {
@@ -19,6 +21,8 @@ import {
 import { AuthService } from './auth.service';
 import { Code42OAuthData } from './dto/code.dto';
 import { Token42OAuthData } from './dto/token.dto';
+import { JwtAccessTokenGuard } from './guard/jwt.auth.guard';
+import { CurrentUser } from 'src/common/decorators/user.decorator';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -57,15 +61,38 @@ export class AuthController {
   @ApiInternalServerErrorResponse({ description: '토큰 발급 실패' })
   @Post('code')
   async issueToken(@Body() codeBody: Code42OAuthData) {
-    console.log(`codeBody.code: ${codeBody.code}`);
+    // console.log(`codeBody.code: ${codeBody.code}`);
     try {
       const accessToken = await this.authService.processAuthorization(
         codeBody.code,
       );
       return accessToken;
     } catch (err) {
-      console.log(err);
+      // console.log(err);
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
     }
+  }
+
+  @ApiOperation({
+    summary: '2차인증 QR 이미지 제공',
+    description: '2차 인증을 위한 QR코드를 제작한다.',
+  })
+  @ApiResponse({ status: 200, description: '2차인증 QR 이미지 발급 성공' })
+  @ApiInternalServerErrorResponse({ description: '권한 혹은 내부적 문제 발생' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('qr')
+  async makeSecret(@CurrentUser() userId: string) {
+    return this.authService.makeQrCode(userId);
+  }
+
+  @ApiOperation({
+    summary: '2차인증 검증',
+    description:
+      '2차 인증 검증을 위해 body에 6digit을 담아 보낸다. 해당 6digit기반으로 verify',
+  })
+  @ApiResponse({ status: 200, description: '2차인증 성공' })
+  @Post('otp')
+  async checkOtp(@Body() otpData: otpData) {
+    return this.authService.validateOtp(otpData.userId, otpData.sixDigit);
   }
 }

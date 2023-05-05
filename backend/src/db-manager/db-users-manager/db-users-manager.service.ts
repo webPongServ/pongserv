@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  Injectable,
+  HttpException,
+  HttpStatus,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { TbUa01MEntity } from './entities/tb-ua-01-m.entity';
@@ -52,29 +57,26 @@ export class DbUsersManagerService {
         this.ua01mRp.create({
           userId: userId, // userID string...
           nickname: userId,
-          chtRmTf: false,
+          twofactor: false,
           twofactorData: '',
           imgPath: intraData.intraImagePath,
           delTf: false,
         }),
       );
     }
-    console.log(userMaster);
+    // console.log(userMaster);
     // 2
-    // const result = await this.ua01lRp.save(
-    //   this.ua01lRp.create({
-    //     ua01mEntity: userMaster,
-    //     loginSeq: 1, // TODO: set as max number in db
-    //     loginDttm: new Date(),
-    //     logoutDttm: new Date(),
-    //     chtTf: false,
-    //     gmTf: false,
-    //     sessionId: 'null', // TODO: set as refresh token
-    //     loginTf: true,
-    //     delTf: false,
-    //   }),
-    // );
-    // console.log(result);
+    const result = await this.ua01lRp.save(
+      this.ua01lRp.create({
+        ua01mEntity: userMaster,
+        chtTf: false,
+        gmTf: false,
+        refreshTkn: 'null', // TODO: set as refresh token
+        loginTf: true,
+        delTf: false,
+      }),
+    );
+    // console.log('Second ', result);
   }
 
   async checkUserInDb(userId: string) {
@@ -85,5 +87,46 @@ export class DbUsersManagerService {
     });
     if (!userMaster) return null;
     return userId;
+  }
+  async checkOauth(intraId: string) {
+    const isOauthNeeded = await this.ua01mRp.findOne({
+      where: {
+        userId: intraId,
+        twofactor: true,
+      },
+    });
+    console.log(isOauthNeeded);
+    if (isOauthNeeded === null) return false;
+    else return true;
+  }
+
+  async applyTwofactor(userId: string, secret: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    if (user) {
+      user.twofactor = true;
+      user.twofactorData = secret;
+      await this.ua01mRp.save(user);
+      console.log('Secret is sucessfuly saved');
+      console.log(secret);
+    } else {
+      throw new BadRequestException('No User available');
+    }
+  }
+
+  async findSecret(userId: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    if (user && user.twofactor == true) {
+      return user.twofactorData;
+    } else {
+      throw new BadRequestException('No User or Twofactor not enabled');
+    }
   }
 }
