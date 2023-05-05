@@ -73,7 +73,7 @@ export class AuthService {
 
   async checkinUser(intraId) {
     // get user or set user in db
-    const user = await this.dbmanagerUsersService.getUserInfoByIntraId(intraId);
+    const user = await this.dbmanagerUsersService.getUserByUserId(intraId);
     if (user === null) {
       // await this.dbmanagerUsersService.setOne()
     }
@@ -81,11 +81,11 @@ export class AuthService {
 
   async processAuthorization(code42OAuth: string) {
     // Release
-    // const token42OAuth = await this.issueToken42OAuth(code42OAuth);
-    // const intraData: { intraId: string; intraImagePath: string } =
-    //   await this.getIntraId(token42OAuth);
+    const token42OAuth = await this.issueToken42OAuth(code42OAuth);
+    const intraData: { intraId: string; intraImagePath: string } =
+      await this.getIntraId(token42OAuth);
     // DEBUG
-    const intraData = { intraId: 'susong', intraImagePath: '' };
+    // const intraData = { intraId: 'susong', intraImagePath: '' };
     // TODO: user checkin (DB)
     if (await this.dbmanagerUsersService.checkOauth(intraData.intraId)) {
       console.log('OAuth Needed');
