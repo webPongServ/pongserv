@@ -31,6 +31,6 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
     AccessTokenStrategy,
     DbUsersManagerService,
   ],
-  exports: [AccessTokenStrategy, PassportModule],
+  exports: [AccessTokenStrategy, PassportModule, AuthService],
 })
 export class AuthModule {}
