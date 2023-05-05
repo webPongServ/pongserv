@@ -74,10 +74,10 @@ export class AuthController {
   }
 
   @ApiOperation({
-    summary: '2차인증 코드 제공',
+    summary: '2차인증 QR 이미지 제공',
     description: '2차 인증을 위한 QR코드를 제작한다.',
   })
-  @ApiResponse({ status: 200, description: '2차인증 QR코드 발급 성공' })
+  @ApiResponse({ status: 200, description: '2차인증 QR 이미지 발급 성공' })
   @ApiInternalServerErrorResponse({ description: '권한 혹은 내부적 문제 발생' })
   @UseGuards(JwtAccessTokenGuard)
   @Get('qr')
@@ -87,7 +87,8 @@ export class AuthController {
 
   @ApiOperation({
     summary: '2차인증 검증',
-    description: '2차 인증 검증을 위해 body에 6digit을 보낸다.',
+    description:
+      '2차 인증 검증을 위해 body에 6digit을 담아 보낸다. 해당 6digit기반으로 verify',
   })
   @ApiResponse({ status: 200, description: '2차인증 성공' })
   @Post('otp')
