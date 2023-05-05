@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "pages/login";
 import AppHeader from "components/common/AppHeader";
+import GamePlay from "components/game/GamePlay";
 import "styles/global.scss";
 
 function App() {
@@ -8,6 +9,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/game/:id" element={<GamePlay />} />
         <Route path="/*" element={<AppHeader />} />
       </Routes>
     </BrowserRouter>
