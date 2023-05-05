@@ -22,13 +22,13 @@ export class DbUsersManagerService {
     @InjectRepository(TbUa03DEntity) private ua03dRp: Repository<TbUa03DEntity>,
   ) {}
 
-  async getUserInfoByIntraId(intraId: string) {
-    const userInfo = await this.ua01mRp.findOne({
+  async getUserByUserId(userId: string) {
+    const user = await this.ua01mRp.findOne({
       where: {
-        nickname: intraId,
+        nickname: userId,
       },
     });
-    return userInfo;
+    return user;
   }
 
   setUser() {

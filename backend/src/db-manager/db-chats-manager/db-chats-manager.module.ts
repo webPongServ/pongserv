@@ -5,6 +5,7 @@ import { TbCh02LEntity } from './entities/tb-ch-02-l.entity';
 import { TbCh02DEntity } from './entities/tb-ch-02-d.entity';
 import { TbCh03LEntity } from './entities/tb-ch-03-l.entity';
 import { TbCh04LEntity } from './entities/tb-ch-04-l.entity';
+import { DbChatsManagerService } from './db-chats-manager.service';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TbCh04LEntity } from './entities/tb-ch-04-l.entity';
       TbCh04LEntity,
     ]),
   ],
-  providers: [],
+  providers: [DbChatsManagerService],
+  exports: [DbChatsManagerService, TypeOrmModule],
 })
 export class DbChatsManagerModule {}

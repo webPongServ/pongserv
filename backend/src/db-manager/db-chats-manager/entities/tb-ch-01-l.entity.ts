@@ -2,14 +2,9 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { TbCh02DEntity } from './tb-ch-02-d.entity';
-import { TbCh02LEntity } from './tb-ch-02-l.entity';
-import { TbCh03LEntity } from './tb-ch-03-l.entity';
 
 // chatroom list
 @Entity({ name: 'TB_CH01L' })
@@ -43,7 +38,7 @@ export class TbCh01LEntity {
   chtRmTf: boolean;
 
   // DEL_TF
-  @Column({ name: 'DEL_TF', type: 'boolean' })
+  @Column({ name: 'DEL_TF', type: 'boolean', default: false })
   delTf: boolean;
 
   // FRST_DTTM
