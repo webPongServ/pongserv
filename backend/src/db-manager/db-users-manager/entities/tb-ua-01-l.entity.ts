@@ -13,7 +13,7 @@ import { TbUa01MEntity } from './tb-ua-01-m.entity';
 
 // user agent state list - 유저 상태 내역
 @Entity({ name: 'TB_UA01L' })
-@Unique(['ua01mEntity', 'loginSeq'])
+@Unique(['ua01mEntity', 'id'])
 export class TbUa01LEntity {
   // ID
   @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
@@ -27,8 +27,8 @@ export class TbUa01LEntity {
   // LOGIN_SEQ
   // NOTE: https://orkhan.gitbook.io/typeorm/docs/decorator-reference#versioncolumn
   // OKKY에서 사용하길래 궁금함. 위에 링크 문서를 읽어보니까 incremental number를 입력해주는 것 같음.
-  @VersionColumn({ name: 'LOGIN_SEQ' })
-  loginSeq: number;
+  // @VersionColumn({ name: 'LOGIN_SEQ' })
+  // loginSeq: number;
 
   // LOGIN_DTTM
   @CreateDateColumn({

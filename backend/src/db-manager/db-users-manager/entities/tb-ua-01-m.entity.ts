@@ -26,7 +26,7 @@ export class TbUa01MEntity {
 
   // TWOFACTOR
   @Column({ name: 'TWOFACTOR', type: 'boolean' })
-  chtRmTf: boolean;
+  twofactor: boolean;
 
   // TWOFACTOR_DATA
   @Column({ name: 'TWOFACTOR_DATA', type: 'varchar', length: 50 })
