@@ -28,6 +28,15 @@ async function bootstrap() {
     .setDescription('ft_transcendence API description')
     .setVersion('0.0.1')
     .addTag('ft_transcendence')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        name: 'JWT',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
