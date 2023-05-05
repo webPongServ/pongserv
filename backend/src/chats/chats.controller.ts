@@ -1,12 +1,14 @@
 import { ChatsService } from './chats.service';
-import { Controller, Get, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
+import { CurrentUser } from 'src/common/decorators/user.decorator';
+import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 
 @ApiTags('chats')
 @Controller('chats')
 export class ChatsController {
-  constructor(private readonly ChatsService: ChatsService) {}
+  constructor(private readonly chatsService: ChatsService) {}
 
   @ApiResponse({
     status: 201,
@@ -43,15 +45,15 @@ export class ChatsController {
     return 'Hello World! it is entryChat()';
   }
 
+  @Post('create')
   @ApiResponse({
     status: 201,
     description: '채팅방 생성 성공',
     type: String, // 성공시 Chatroom_id string 반환
   })
   @ApiOperation({ summary: '채팅방 생성' })
-  @Post('create/:chatroom_name/:chatroom_type/:password')
-  createChat() {
-    return 'Hello World! it is createChat()';
+  async createChat(@CurrentUser() userId: string, @Body() chatroomCreationDto: ChatroomCreationDto) {
+    return (await this.chatsService.createChatroom(userId, chatroomCreationDto));
   }
 
   @ApiResponse({
