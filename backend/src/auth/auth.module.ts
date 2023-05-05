@@ -1,5 +1,5 @@
 import { HttpModule } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
@@ -12,10 +12,15 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
 @Module({
   imports: [
     HttpModule,
+    ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
-    JwtModule.register({
-      secret: 'ChanhyleISHandsome',
-      signOptions: { expiresIn: '1y' },
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '1y' },
+      }),
     }),
     DbUsersManagerModule,
   ],

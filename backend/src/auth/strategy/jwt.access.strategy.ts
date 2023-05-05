@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { Payload } from './jwt.payload';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
@@ -15,11 +16,16 @@ export class AccessTokenStrategy extends PassportStrategy(
   Strategy,
   'jwt-access',
 ) {
-  constructor(private readonly dbUsersManagerService: DbUsersManagerService) {
+  constructor(
+    private readonly config: ConfigService,
+    private readonly dbUsersManagerService: DbUsersManagerService,
+  ) {
+    const Secret = config.get('JWT_SECRET');
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      // ignoreExpiration: false,
-      secretOrKey: 'ChanhyleISHandsome',
+      ignoreExpiration: false,
+      secretOrKey: Secret,
+      // secretOrKey: 'ChanhyleISHandsome',
     });
   }
 
