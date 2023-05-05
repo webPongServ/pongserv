@@ -4,34 +4,34 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryColumn,
   PrimaryGeneratedColumn,
+  Unique,
   UpdateDateColumn,
+  VersionColumn,
 } from 'typeorm';
 import { TbUa01MEntity } from './tb-ua-01-m.entity';
 
 // user agent state list - 유저 상태 내역
 @Entity({ name: 'TB_UA01L' })
+@Unique(['ua01mEntity', 'loginSeq'])
 export class TbUa01LEntity {
-  // USER_ID
-  // @PrimaryGeneratedColumn({ name: 'TMP_ID', type: 'integer' })
-  // tmpId: number;
+  // ID
+  @PrimaryGeneratedColumn({name: 'ID', type: 'bigint'})
+  id: number;
 
-  @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
-  @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.ua01lEntities, {
-    nullable: false,
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
+  // @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
+  @ManyToOne(() => TbUa01MEntity)
   @JoinColumn({ name: 'USER_ID' })
   ua01mEntity!: TbUa01MEntity;
 
   // LOGIN_SEQ
-  @PrimaryColumn({ name: 'LOGIN_SEQ', type: 'integer' })
+    // NOTE: https://orkhan.gitbook.io/typeorm/docs/decorator-reference#versioncolumn
+    // OKKY에서 사용하길래 궁금함. 위에 링크 문서를 읽어보니까 incremental number를 입력해주는 것 같음.
+  @VersionColumn({ name: 'LOGIN_SEQ'})
   loginSeq: number;
 
   // LOGIN_DTTM
-  @Column({
+  @CreateDateColumn({
     name: 'LOGIN_DTTM',
     type: 'timestamp with time zone',
     precision: 0,
@@ -43,6 +43,7 @@ export class TbUa01LEntity {
     name: 'LOGOUT_DTTM',
     type: 'timestamp with time zone',
     precision: 0,
+    nullable: true 
   })
   logoutDttm: Date;
 
@@ -54,16 +55,16 @@ export class TbUa01LEntity {
   @Column({ name: 'GM_TF', type: 'boolean' })
   gmTf: boolean;
 
-  // SESSION_ID
-  @Column({ name: 'SESSION_ID', type: 'varchar', length: 200 })
-  sessionId: string;
+  // REFRESH_TKN
+  @Column({ name: 'REFRESH_TKN', type: 'varchar', length: 200 })
+  refreshTkn: string;
 
   // LOGIN_TF
   @Column({ name: 'LOGIN_TF', type: 'boolean' })
   loginTf: boolean;
 
   // DEL_TF
-  @Column({ name: 'DEL_TF', type: 'boolean' })
+  @Column({ name: 'DEL_TF', type: 'boolean'})
   delTf: boolean;
 
   // FRST_DTTM

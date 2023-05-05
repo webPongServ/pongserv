@@ -1,28 +1,23 @@
-import { TbCh02DEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-02-d.entity';
-import { TbCh02LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-02-l.entity';
-import { TbCh03LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-03-l.entity';
-import { TbCh04LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-04-l.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
-  OneToOne,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
 } from 'typeorm';
-import { TbUa01LEntity } from './tb-ua-01-l.entity';
-import { TbUa02LEntity } from './tb-ua-02-l.entity';
-import { TbUa03DEntity } from './tb-ua-03-d.entity';
 
 // user agent master - 유저 기본
-@Unique(['nickname'])
 @Entity({ name: 'TB_UA01M' })
+@Unique(['userId'])
+@Unique(['nickname'])
 export class TbUa01MEntity {
+  // ID
+  @PrimaryGeneratedColumn({name: 'ID', type: 'bigint'})
+  id: number;
+  
   // USER_ID
-
-  @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
+  @Column({ name: 'USER_ID', type: 'varchar', length: 8 })
   userId: string;
 
   // NICKNAME
@@ -60,64 +55,4 @@ export class TbUa01MEntity {
     precision: 6,
   })
   lastDttm: Date;
-
-  /**!SECTION
-   * OneToManys
-   */
-  // TB_UA
-
-  @OneToMany(() => TbUa01LEntity, (ua01l) => ua01l.ua01mEntity, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  ua01lEntities: TbUa01LEntity[];
-
-  @OneToMany(() => TbUa02LEntity, (ua02l) => ua02l.ua01mEntity, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  ua02lEntities: TbUa02LEntity[];
-
-  @OneToMany(() => TbUa02LEntity, (ua02l) => ua02l.ua01mEntityAsFr, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  ua02lEntitiesAsFr: TbUa02LEntity[];
-
-  @OneToMany(() => TbUa03DEntity, (ua03d) => ua03d.ua01mEntity, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  ua03dEntities: TbUa03DEntity[];
-
-  @OneToMany(() => TbCh02LEntity, (ch02l) => ch02l.ua01mEntity, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  // TB_CH
-  ch02lEntities: TbCh02LEntity[];
-
-  @OneToMany(() => TbCh02DEntity, (ch02d) => ch02d.ua01mEntity, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  ch02dEntities: TbCh02DEntity[];
-
-  @OneToMany(() => TbCh03LEntity, (ch03l) => ch03l.ua01mEntity, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  ch03lEntities: TbCh03LEntity[];
-
-  @OneToMany(() => TbCh04LEntity, (ch04l) => ch04l.ua01mEntity, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  ch04lEntities: TbCh03LEntity[];
-
-  @OneToMany(() => TbCh04LEntity, (ch04l) => ch04l.ua01mEntityAsBlock, {
-    onUpdate: 'CASCADE',
-    onDelete: 'RESTRICT',
-  })
-  ch04lEntitiesAsBlock: TbCh03LEntity[];
 }
