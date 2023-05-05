@@ -18,7 +18,7 @@ export class TbCh04LEntity {
   // ID
   @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
   id: number;
-  
+
   // USER_ID
   // @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
   @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.userId, {

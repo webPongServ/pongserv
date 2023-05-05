@@ -1,5 +1,15 @@
 import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
 import { TbGm01LEntity } from './tb-gm-01-l.entity';
 
 // game detail - 게임상세
@@ -8,7 +18,7 @@ import { TbGm01LEntity } from './tb-gm-01-l.entity';
 export class TbGm01DEntity {
   // ID
   @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
-  id: number
+  id: number;
 
   // GM_SRNO
   // @PrimaryColumn({ name: 'GM_SRNO', type: 'varchar', length: 12 })

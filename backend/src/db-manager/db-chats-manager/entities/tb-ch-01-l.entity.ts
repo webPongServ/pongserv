@@ -1,4 +1,12 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { TbCh02DEntity } from './tb-ch-02-d.entity';
 import { TbCh02LEntity } from './tb-ch-02-l.entity';
 import { TbCh03LEntity } from './tb-ch-03-l.entity';

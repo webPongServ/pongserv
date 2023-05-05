@@ -1,4 +1,12 @@
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { TbGm01DEntity } from './tb-gm-01-d.entity';
 
 // game list - 게임내역
@@ -34,7 +42,7 @@ export class TbGm01LEntity {
   gmType: string;
 
   // END_TYPE
-  @Column({ name: 'END_TYPE', type: 'varchar', length: 2, nullable: true, })
+  @Column({ name: 'END_TYPE', type: 'varchar', length: 2, nullable: true })
   endType: string;
 
   // TRGT_SCR

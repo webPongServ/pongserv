@@ -1,5 +1,15 @@
 import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity';
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
 
 // game statistics by user - 유저별 게임 통계
 @Entity({ name: 'TB_GM02S' })
@@ -7,7 +17,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn,
 export class TbGm02SEntity {
   // ID
   @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
-  id: number
+  id: number;
 
   // USER_ID
   // @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })

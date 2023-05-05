@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
 import { TbUa01MEntity } from './tb-ua-01-m.entity';
 import { TbUa03MEntity } from './tb-ua-03-m.entity';
 
@@ -7,7 +17,7 @@ import { TbUa03MEntity } from './tb-ua-03-m.entity';
 @Unique(['ua01mEntity', 'ua03mEntity'])
 export class TbUa03DEntity {
   // ID
-  @PrimaryGeneratedColumn({name: 'ID', type: 'bigint'})
+  @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
   id: number;
 
   // USER_ID

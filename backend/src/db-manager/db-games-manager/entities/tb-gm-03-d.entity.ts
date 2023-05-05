@@ -1,4 +1,12 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
 
 // game option detail - 게임옵션상세
 @Entity({ name: 'TB_GM03D' })
@@ -6,7 +14,7 @@ import { Column, CreateDateColumn, Entity, PrimaryColumn, PrimaryGeneratedColumn
 export class TbGm03DEntity {
   // ID
   @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
-  id: number
+  id: number;
 
   // OPT_CD
   @Column({ name: 'OPT_CD', type: 'varchar', length: 100 })

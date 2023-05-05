@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
 import { TbUa01MEntity } from './tb-ua-01-m.entity';
 
 // user agent friend list - 유저친구내역
@@ -7,7 +17,7 @@ import { TbUa01MEntity } from './tb-ua-01-m.entity';
 @Unique(['ua01mEntityAsFr'])
 export class TbUa02LEntity {
   // ID
-  @PrimaryGeneratedColumn({name: 'ID', type: 'bigint'})
+  @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
   id: number;
 
   // USER_ID
@@ -39,10 +49,18 @@ export class TbUa02LEntity {
   delTf: boolean;
 
   // FRST_DTTM
-  @CreateDateColumn({ name: 'FRST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @CreateDateColumn({
+    name: 'FRST_DTTM',
+    type: 'timestamp with time zone',
+    precision: 6,
+  })
   frstDttm: Date;
 
   // LAST_DTTM
-  @UpdateDateColumn({ name: 'LAST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @UpdateDateColumn({
+    name: 'LAST_DTTM',
+    type: 'timestamp with time zone',
+    precision: 6,
+  })
   lastDttm: Date;
 }

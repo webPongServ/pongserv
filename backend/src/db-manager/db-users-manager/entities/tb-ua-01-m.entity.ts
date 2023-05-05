@@ -13,9 +13,9 @@ import {
 @Unique(['nickname'])
 export class TbUa01MEntity {
   // ID
-  @PrimaryGeneratedColumn({name: 'ID', type: 'bigint'})
+  @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
   id: number;
-  
+
   // USER_ID
   @Column({ name: 'USER_ID', type: 'varchar', length: 8 })
   userId: string;

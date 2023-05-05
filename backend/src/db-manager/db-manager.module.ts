@@ -21,6 +21,6 @@ import { DbUsersManagerService } from './db-users-manager/db-users-manager.servi
     DbChatsManagerModule,
     DbGamesManagerModule,
     // DbCommonManagerModule,
-  ]
+  ],
 })
 export class DbManagerModule {}

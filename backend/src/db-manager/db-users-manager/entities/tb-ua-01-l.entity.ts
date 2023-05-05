@@ -16,7 +16,7 @@ import { TbUa01MEntity } from './tb-ua-01-m.entity';
 @Unique(['ua01mEntity', 'loginSeq'])
 export class TbUa01LEntity {
   // ID
-  @PrimaryGeneratedColumn({name: 'ID', type: 'bigint'})
+  @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
   id: number;
 
   // @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
@@ -25,9 +25,9 @@ export class TbUa01LEntity {
   ua01mEntity!: TbUa01MEntity;
 
   // LOGIN_SEQ
-    // NOTE: https://orkhan.gitbook.io/typeorm/docs/decorator-reference#versioncolumn
-    // OKKY에서 사용하길래 궁금함. 위에 링크 문서를 읽어보니까 incremental number를 입력해주는 것 같음.
-  @VersionColumn({ name: 'LOGIN_SEQ'})
+  // NOTE: https://orkhan.gitbook.io/typeorm/docs/decorator-reference#versioncolumn
+  // OKKY에서 사용하길래 궁금함. 위에 링크 문서를 읽어보니까 incremental number를 입력해주는 것 같음.
+  @VersionColumn({ name: 'LOGIN_SEQ' })
   loginSeq: number;
 
   // LOGIN_DTTM
@@ -43,7 +43,7 @@ export class TbUa01LEntity {
     name: 'LOGOUT_DTTM',
     type: 'timestamp with time zone',
     precision: 0,
-    nullable: true 
+    nullable: true,
   })
   logoutDttm: Date;
 
@@ -64,7 +64,7 @@ export class TbUa01LEntity {
   loginTf: boolean;
 
   // DEL_TF
-  @Column({ name: 'DEL_TF', type: 'boolean'})
+  @Column({ name: 'DEL_TF', type: 'boolean' })
   delTf: boolean;
 
   // FRST_DTTM
