@@ -43,9 +43,7 @@ const GamePlay = () => {
           </Toolbar>
         </TopBar>
       </Box>
-      <Box id="board" className="flex-container">
-        <GameBoard />
-      </Box>
+      <GameBoard id="board" />
     </Box>
   );
 };
