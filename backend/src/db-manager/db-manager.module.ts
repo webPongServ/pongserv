@@ -11,7 +11,7 @@ import { DbUsersManagerService } from './db-users-manager/db-users-manager.servi
   imports: [
     DbUsersManagerModule,
     DbChatsManagerModule,
-    // DbGamesManagerModule,
+    DbGamesManagerModule,
     // DbCommonManagerModule,
   ],
   controllers: [DbManagerController],
@@ -19,7 +19,7 @@ import { DbUsersManagerService } from './db-users-manager/db-users-manager.servi
   exports: [
     DbUsersManagerModule,
     DbChatsManagerModule,
-    // DbGamesManagerModule,
+    DbGamesManagerModule,
     // DbCommonManagerModule,
   ]
 })

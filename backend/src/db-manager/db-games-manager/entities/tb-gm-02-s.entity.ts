@@ -1,18 +1,23 @@
 import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from 'typeorm';
 
 // game statistics by user - 유저별 게임 통계
 @Entity({ name: 'TB_GM02S' })
+@Unique(['ua01mEntity'])
 export class TbGm02SEntity {
+  // ID
+  @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
+  id: number
+
   // USER_ID
-  @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
+  // @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
   @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.userId, {
     nullable: false,
     onUpdate: 'CASCADE',
     onDelete: 'RESTRICT',
   })
   @JoinColumn({ name: 'USER_ID' })
-  ua01mEntity: TbUa01MEntity; // NOTE - TB_UA01M 에서는 설정 안해도 돌아감
+  ua01mEntity: TbUa01MEntity;
 
   // TOT_RCD
   @Column({ name: 'TOT_RCD', type: 'integer' })
@@ -39,10 +44,18 @@ export class TbGm02SEntity {
   delTf: boolean;
 
   // FRST_DTTM
-  @Column({ name: 'FRST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @CreateDateColumn({
+    name: 'FRST_DTTM',
+    type: 'timestamp with time zone',
+    precision: 6,
+  })
   frstDttm: Date;
 
   // LAST_DTTM
-  @Column({ name: 'LAST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @UpdateDateColumn({
+    name: 'LAST_DTTM',
+    type: 'timestamp with time zone',
+    precision: 6,
+  })
   lastDttm: Date;
 }
