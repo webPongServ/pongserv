@@ -1,12 +1,14 @@
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './../auth/auth.service';
 import { Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly AuthService: AuthService,
     private readonly JwtService: JwtService,
+    private readonly dbmanagerUsersService: DbUsersManagerService,
   ) {}
 
   async verifyToken(token: string): Promise<any> {
@@ -18,5 +20,14 @@ export class UsersService {
     } catch (error) {
       return null;
     }
+  }
+
+  async getMe(intraId: string) {
+    return await this.dbmanagerUsersService.getMe(intraId);
+  }
+
+  async changeNickname(intraId: string, nickname: string) {
+    // return null;
+    return await this.dbmanagerUsersService.changeNickname(intraId, nickname);
   }
 }
