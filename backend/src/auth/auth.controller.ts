@@ -63,19 +63,22 @@ export class AuthController {
   async issueToken(@Body() codeBody: Code42OAuthData, @Res() res: Response) {
     // console.log(`codeBody.code: ${codeBody.code}`);
     try {
-      const accessToken = await this.authService.processAuthorization(
+      const resultToken = await this.authService.processAuthorization(
         codeBody.code,
       );
-      if (accessToken == null) {
-        res.redirect('http://localhost:3001/OAuth');
-        return null;
+      // res.setHeader('Set-Cookie', [
+      //   `accessToken=${accessToken}; HttpOnly; SameSite=None;`,
+      // ]);
+      const accessToken = resultToken.accessToken;
+      const OAuthData = resultToken.OAuthData;
+      const intraId = resultToken.intraId;
+      const intraImagePath = resultToken.intraImagePath;
+      console.log(`accessToken: ${resultToken.accessToken}`, OAuthData);
+      if (OAuthData == true) {
+        res.json({ OAuthData, intraId, intraImagePath });
+      } else {
+        res.json({ accessToken, OAuthData, intraId, intraImagePath });
       }
-      res.setHeader('Set-Cookie', [
-        `accessToken=${accessToken}; HttpOnly; SameSite=None;`,
-      ]);
-      console.log('IN THE AUTH/CODE', accessToken);
-      // return { accessToken: accessToken };
-      res.json({ accessToken: accessToken });
     } catch (err) {
       throw new HttpException('Forbidden', HttpStatus.FORBIDDEN, {
         cause: new Error('Something Happend in making Token'),
