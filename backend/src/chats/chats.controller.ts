@@ -1,5 +1,5 @@
 import { ChatsService } from './chats.service';
-import { Body, Controller, Get, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
@@ -82,9 +82,9 @@ export class ChatsController {
     description: '채팅방 유저목록 반환 실패',
   })
   @ApiOperation({ summary: '채팅방 유저목록' })
-  @Get('users/:chatroom_id')
-  getChatUsers() {
-    return 'Hello World! it is getChatUsers()';
+  @Get('users/:uuid')
+  async getChatUsers(@CurrentUser() userId: string, @Param() uuid: string) {
+    return (await this.chatsService.getLiveUserListInARoom(userId, uuid));
   }
 
   @ApiResponse({

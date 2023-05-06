@@ -149,4 +149,11 @@ export class ChatsService {
 		// 3 // TODO
 		return ;
 	}
+
+	async getLiveUserListInARoom(userId: string, uuid: string) {
+		// NOTE: userID not used
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(uuid);
+		const userListAndCount = await this.dbChatsManagerService.getLiveUserListAndCountInARoom(chtrm);
+		return userListAndCount[0];
+	}
 }
