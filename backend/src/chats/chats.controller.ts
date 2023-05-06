@@ -68,7 +68,7 @@ export class ChatsController {
     description: '채팅방 정보 수정 실패',
   })
   @ApiOperation({ summary: '채팅방 정보 수정' })
-  @Patch('edit/:chatroom_id/:chatroom_name/:chatroom_type/:password')
+  @Patch('edit')
   async editChatroomInfo(@CurrentUser() userId: string, @Body() chtrmEdit: ChatroomEditingDto) {
     return (await this.chatsService.editChatroomInfo(userId, chtrmEdit));
   }
