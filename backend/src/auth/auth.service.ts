@@ -1,3 +1,4 @@
+import { Payload } from './strategy/jwt.payload';
 import {
   HttpException,
   HttpStatus,
@@ -84,17 +85,23 @@ export class AuthService {
     const token42OAuth = await this.issueToken42OAuth(code42OAuth);
     const intraData: { intraId: string; intraImagePath: string } =
       await this.getIntraId(token42OAuth);
+    let OAuthData = false;
     // DEBUG
     // const intraData = { intraId: 'susong', intraImagePath: '' };
     // TODO: user checkin (DB)
     if (await this.dbmanagerUsersService.checkOauth(intraData.intraId)) {
-      return null;
+      OAuthData = true;
     }
     await this.dbmanagerUsersService.checkinUser(intraData);
     // Make AccessToken and return it
     const intraId = intraData.intraId;
     const payload = { intraId };
-    return { accessToken: await this.jwtService.signAsync(payload) };
+    return {
+      accessToken: await this.jwtService.signAsync(payload),
+      OAuthData,
+      intraId,
+      intraImagePath: intraData.intraImagePath,
+    };
   }
 
   async makeQrCode(userId: string) {
@@ -116,6 +123,10 @@ export class AuthService {
       window: 2,
       // Algorithm can be added (now removed for process)
     });
-    return verified;
+    console.log(verified);
+    const Payload = { userId };
+    if (verified == true) {
+      return { accessToken: await this.jwtService.signAsync(Payload) };
+    } else throw new UnauthorizedException('OTP Validation Failed');
   }
 }

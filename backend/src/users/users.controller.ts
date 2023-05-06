@@ -53,8 +53,5 @@ export class UsersController {
     } else {
       res.redirect('http://localhost:3001/game');
     }
-
-    // return await this.UsersService.loginProcess(userId);
-    // throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
   }
 }
