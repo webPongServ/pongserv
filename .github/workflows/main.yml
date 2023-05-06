@@ -5,15 +5,17 @@ on:
     branches:
       - main
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:  
-    - name: reload pm2 with new build files
-      uses: appleboy/ssh-action@v0.1.10
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
-        script: sh /home/ubuntu/pongserv/reload.sh
+#     steps:  
+#     - name: reload pm2 with new build files
+#       uses: appleboy/ssh-action@v0.1.10
+#       with:
+#         host: ${{ secrets.EC2_HOST }}
+#         username: ${{ secrets.EC2_USER }}
+#         key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+#         script: sh /home/ubuntu/pongserv/reload.sh
+
+# No EC2 Due to Credit shrotage
