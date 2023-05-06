@@ -6,6 +6,7 @@ import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01
 import { TbCh02LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-02-l.entity';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
+import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 
 @Injectable()
 export class ChatsService {
@@ -146,7 +147,7 @@ export class ChatsService {
 		targetRoom.chtRmType = chtrmEdit.type;
 		targetRoom.chtRmPwd = chtrmEdit.pwd;
 		await this.dbChatsManagerService.saveChatroom(targetRoom);
-		// 3 // TODO
+		// 3 // TODO: to use websocket
 		return ;
 	}
 
@@ -155,5 +156,40 @@ export class ChatsService {
 		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(uuid);
 		const userListAndCount = await this.dbChatsManagerService.getLiveUserListAndCountInARoom(chtrm);
 		return userListAndCount[0];
+	}
+
+	async kickUser(userId: string, chtrmKick: ChatroomKickingDto) {
+		/*!SECTION
+			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
+			2. 해당 방의 강퇴할 user의 정보를 확인한다.
+				2-1. 해당 방에 존재하는지 체크한다.
+				2-2. 강퇴할 타겟이 owner 이면 안 된다.
+			3. kick transaction 실행 // NOTE: 실제 transaction 적용은 안정화 스프린트에
+				3-1. ch02d에 kick user 정보를 등록
+				3-2. ch02l의 chtRmJoinTf를 false로 변경
+				(하나의 transaction은 DbChatsManagerService에서 하나의 메서드로 관리하는게 좋을 듯)
+			4. (websocket을 통해서 채팅방 구성원들에게 정보를 알린다.) // NOTE: 이건 그냥 target 유저 정보를 return 하면 될 듯
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(chtrmKick.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		if (requesterInChtrm.chtRmAuth !== '01' && requesterInChtrm.chtRmAuth !== '02')
+			throw new UnauthorizedException('You do not have permission.');
+		// 2
+		const targetUser = await this.dbUsersManagerService.getUserByUserId(chtrmKick.userIdToKick);
+		const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(targetUser, chtrm);
+			// 2-1
+		if (targetInChtrm.chtRmJoinTf === false)
+			throw new NotFoundException('The target isn\'t the chatroom');
+			// 2-2
+		if (targetInChtrm.chtRmAuth === '01')
+			throw new ForbiddenException('Are you going to go beyond the power of God?');
+		// 3
+		await this.dbChatsManagerService.kickUserTransaction(targetUser, chtrm, targetInChtrm);
+		// 4
+		return (targetUser.nickname);
 	}
 }

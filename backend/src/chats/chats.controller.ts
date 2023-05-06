@@ -6,6 +6,7 @@ import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
+import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -96,9 +97,9 @@ export class ChatsController {
     description: '채팅방 내보내기 실패',
   })
   @ApiOperation({ summary: '채팅방 내보내기' })
-  @Put('kick/:chatroom_id/:user_id_to_kick')
-  kickChatUser() {
-    return 'Hello World! it is kickChatUser()';
+  @Put('kick')
+  async kickUser(@CurrentUser() userId: string, @Body() chtrmKick: ChatroomKickingDto) {
+    return (await this.chatsService.kickUser(userId, chtrmKick));
   }
 
   @ApiResponse({

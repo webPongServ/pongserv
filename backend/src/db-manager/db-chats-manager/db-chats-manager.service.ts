@@ -170,4 +170,41 @@ export class DbChatsManagerService {
 	return (await this.ch01lRp.save(room));
   }
 
+  async kickUserTransaction(target: TbUa01MEntity, room: TbCh01LEntity, targetInChtrm: TbCh02LEntity) {
+	/*!SECTION
+		1. ch02d에 kick user 정보를 등록
+		2. ch02l의 chtRmJoinTf를 false로 변경
+	*/
+	// 1
+	let kickInfo = await this.ch02dRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '03',
+		}
+	});
+	if (kickInfo === null) {
+		kickInfo = this.ch02dRp.create({
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '03', // KICK: 03
+			// rstrCrtnDttm: new Date(),
+			// rstrTm: 60, // NOTE: tmp - 60s
+			// vldTf: true,
+		});
+	}
+	kickInfo.rstrCrtnDttm = new Date();
+	kickInfo.rstrTm = 60;
+	kickInfo.vldTf = true;
+	this.ch02dRp.save(kickInfo);
+	// 2
+	if (targetInChtrm.chtRmAuth === '02') {
+		targetInChtrm.chtRmAuth = '03';
+		targetInChtrm.authChgDttm = new Date();
+	}
+	targetInChtrm.chtRmJoinTf = false;
+	this.ch02lRp.save(targetInChtrm);
+	return ;
+  }
+  
 }
