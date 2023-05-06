@@ -180,14 +180,14 @@ export class DbChatsManagerService {
 		where: {
 			ch01lEntity: room,
 			ua01mEntity: target,
-			chtRmRstrCd: '03',
+			chtRmRstrCd: '03', // KICK: 03
 		}
 	});
 	if (kickInfo === null) {
 		kickInfo = this.ch02dRp.create({
 			ch01lEntity: room,
 			ua01mEntity: target,
-			chtRmRstrCd: '03', // KICK: 03
+			chtRmRstrCd: '03',
 			// rstrCrtnDttm: new Date(),
 			// rstrTm: 60, // NOTE: tmp - 60s
 			// vldTf: true,
@@ -195,6 +195,43 @@ export class DbChatsManagerService {
 	}
 	kickInfo.rstrCrtnDttm = new Date();
 	kickInfo.rstrTm = 60;
+	kickInfo.vldTf = true;
+	this.ch02dRp.save(kickInfo);
+	// 2
+	if (targetInChtrm.chtRmAuth === '02') {
+		targetInChtrm.chtRmAuth = '03';
+		targetInChtrm.authChgDttm = new Date();
+	}
+	targetInChtrm.chtRmJoinTf = false;
+	this.ch02lRp.save(targetInChtrm);
+	return ;
+  }
+
+  async banUserTransaction(target: TbUa01MEntity, room: TbCh01LEntity, targetInChtrm: TbCh02LEntity) {
+	/*!SECTION
+		1. ch02d에 ban user 정보를 등록
+		2. ch02l의 chtRmJoinTf를 false로 변경
+	*/
+	// 1
+	let kickInfo = await this.ch02dRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '02', // BAN: 03
+		}
+	});
+	if (kickInfo === null) {
+		kickInfo = this.ch02dRp.create({
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '02',
+			// rstrCrtnDttm: new Date(),
+			// rstrTm: -1, // NOTE: tmp - '-1' means infinity
+			// vldTf: true,
+		});
+	}
+	kickInfo.rstrCrtnDttm = new Date();
+	kickInfo.rstrTm = -1;
 	kickInfo.vldTf = true;
 	this.ch02dRp.save(kickInfo);
 	// 2

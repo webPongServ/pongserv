@@ -7,6 +7,7 @@ import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
 import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
+import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -111,9 +112,9 @@ export class ChatsController {
     description: '채팅방 차단 실패(권한 부족)',
   })
   @ApiOperation({ summary: '채팅방 차단' })
-  @Post('ban/:chatroom_id/:user_id_to_ban')
-  banChatUser() {
-    return 'Hello World! it is banChatUser()';
+  @Post('ban')
+  async banUser(@CurrentUser() userId: string, @Body() chtrmBan: ChatroomBanDto) {
+    return (await this.chatsService.banUser(userId, chtrmBan));
   }
 
   @ApiResponse({
