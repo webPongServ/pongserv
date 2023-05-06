@@ -217,7 +217,7 @@ export class DbChatsManagerService {
 		where: {
 			ch01lEntity: room,
 			ua01mEntity: target,
-			chtRmRstrCd: '02', // BAN: 03
+			chtRmRstrCd: '02', // BAN: 02
 		}
 	});
 	if (kickInfo === null) {
@@ -241,6 +241,31 @@ export class DbChatsManagerService {
 	}
 	targetInChtrm.chtRmJoinTf = false;
 	this.ch02lRp.save(targetInChtrm);
+	return ;
+  }
+
+  async setMuteUserInfo(target: TbUa01MEntity, room: TbCh01LEntity) {
+	let muteInfo = await this.ch02dRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '01', // MUTE: 01
+		}
+	})
+	if (muteInfo === null) {
+		muteInfo = this.ch02dRp.create({
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '01',
+			// rstrCrtnDttm: new Date(),
+			// rstrTm: 60, // NOTE: tmp - 60s
+			// vldTf: true,
+		});
+	}
+	muteInfo.rstrCrtnDttm = new Date();
+	muteInfo.rstrTm = 60;
+	muteInfo.vldTf = true;
+	this.ch02dRp.save(muteInfo);
 	return ;
   }
   

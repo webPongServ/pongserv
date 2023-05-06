@@ -8,6 +8,7 @@ import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
 import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 import { ChatroomBanDto } from './dto/chatroom-ban.dto';
+import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 
 @Injectable()
 export class ChatsService {
@@ -198,8 +199,8 @@ export class ChatsService {
 	async banUser(userId: string, infoBan: ChatroomBanDto) {
 		/*!SECTION
 			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
-			2. 해당 방의 강퇴할 user의 정보를 확인한다.
-				2-1. 강퇴할 타겟이 owner 이면 안 된다.
+			2. 해당 방의 밴할 user의 정보를 확인한다.
+				2-1. 밴할 타겟이 owner 이면 안 된다.
 			3. ban transaction 실행
 				3-1. ch02d에 ban user 정보를 등록
 				3-2. ch02l의 chtRmJoinTf를 false로 변경 (자동 강퇴)
@@ -221,6 +222,34 @@ export class ChatsService {
 			throw new ForbiddenException('Are you going to go beyond the power of God?');
 		// 3
 		await this.dbChatsManagerService.banUserTransaction(targetUser, chtrm, targetInChtrm);
+		// 4
+		return (targetUser.nickname);
+	}
+
+	async muteUser(userId: string, infoBan: ChatroomMuteDto) {
+		/*!SECTION
+			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
+			2. 해당 방의 뮤트할 user의 정보를 확인한다.
+				2-1. 뮤트할 타겟이 owner 이면 안 된다.
+			3. ch02d에 mute user 정보를 등록
+			4. target의 정보를 반환
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoBan.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		if (requesterInChtrm.chtRmAuth !== '01' && requesterInChtrm.chtRmAuth !== '02')
+			throw new UnauthorizedException('You do not have permission.');
+		// 2
+		const targetUser = await this.dbUsersManagerService.getUserByUserId(infoBan.userIdToMute);
+		const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(targetUser, chtrm);
+			// 2-1
+		if (targetInChtrm.chtRmAuth === '01')
+			throw new ForbiddenException('Are you going to go beyond the power of God?');
+		// 3
+		await this.dbChatsManagerService.setMuteUserInfo(targetUser, chtrm);
 		// 4
 		return (targetUser.nickname);
 	}
