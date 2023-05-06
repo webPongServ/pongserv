@@ -268,5 +268,9 @@ export class DbChatsManagerService {
 	this.ch02dRp.save(muteInfo);
 	return ;
   }
+
+  saveChtrmUser(chtrmUser: TbCh02LEntity) {
+	this.ch02lRp.save(chtrmUser);
+  }
   
 }

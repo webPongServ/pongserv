@@ -9,6 +9,7 @@ import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
 import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
+import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -50,13 +51,13 @@ export class ChatsController {
     return (await this.chatsService.setUserToEnter(userId, infoEntr));
   }
 
-  @Post('create')
   @ApiResponse({
     status: 201,
     description: '채팅방 생성 성공',
     type: String, // 성공시 Chatroom_id string 반환
   })
   @ApiOperation({ summary: '채팅방 생성' })
+  @Post('create')
   async createChatroom(@CurrentUser() userId: string, @Body() infoCrtn: ChatroomCreationDto) {
     return (await this.chatsService.createChatroom(userId, infoCrtn));
   }
@@ -142,8 +143,8 @@ export class ChatsController {
   })
   @ApiOperation({ summary: '관리자 권한 부여' })
   @Post('empowerment/:chatroom_id/:user_id_to_empower')
-  empowermentChatUser() {
-    return 'Hello World! it is empowermentChatUser()';
+  async empowerUser(@CurrentUser() userId: string, @Body() infoEmpwr: ChatroomEmpowermentDto) {
+    return (await this.chatsService.empowerUser(userId, infoEmpwr));
   }
 
   @ApiResponse({
