@@ -5,6 +5,10 @@ import AppBar from "components/common/AppBar";
 import FriendDrawer from "components/common/FriendDrawer";
 import ChattingDrawer from "components/common/ChattingDrawer";
 import { ChattingDrawerWidth } from "constant";
+import { useDispatch } from "react-redux";
+import instance from "API/api";
+import UserService from "API/UsersService";
+import { MyInfoActionTypes } from "types/redux/MyInfo";
 import "styles/global.scss";
 
 import { Box, CssBaseline } from "@mui/material";
@@ -31,6 +35,27 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 
 export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
+
+  const dispatch = useDispatch();
+
+  const loadMyData = async () => {
+    const token = localStorage.getItem("accessToken");
+
+    instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+    const response = await UserService.getMe();
+
+    dispatch({
+      type: MyInfoActionTypes.MYINFO_UPDATE,
+      payload: {
+        nickname: response.data.nickname,
+        imgURL: response.data.imgPath,
+        status: "login",
+      },
+    });
+  };
+
+  loadMyData();
 
   return (
     <Box id="AppHeader-container" className="flex-container">
