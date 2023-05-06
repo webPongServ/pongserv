@@ -123,9 +123,10 @@ export class AuthService {
       window: 2,
       // Algorithm can be added (now removed for process)
     });
-    const Payload = userId;
+    console.log(verified);
+    const Payload = { userId };
     if (verified == true) {
-      return await this.jwtService.signAsync(Payload);
-    } else return null;
+      return { accessToken: await this.jwtService.signAsync(Payload) };
+    } else throw new UnauthorizedException('OTP Validation Failed');
   }
 }
