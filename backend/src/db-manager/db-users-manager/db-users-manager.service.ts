@@ -129,4 +129,48 @@ export class DbUsersManagerService {
       throw new BadRequestException('No User or Twofactor not enabled');
     }
   }
+
+  async getMe(intraId: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: intraId,
+      },
+    });
+
+    if (user) {
+      return {
+        userId: user.userId,
+        nickname: user.nickname,
+        imgPath: user.imgPath,
+        lastDttm: user.lastDttm,
+      };
+    } else {
+      throw new BadRequestException('No User available');
+    }
+  }
+
+  async changeNickname(intraId: string, nickname: string) {
+    const isAvailable = await this.ua01mRp.findOne({
+      where: {
+        nickname: nickname,
+      },
+    });
+    if (isAvailable) {
+      throw new BadRequestException('Nickname already exists');
+    } else {
+      const user = await this.ua01mRp.findOne({
+        where: {
+          userId: intraId,
+        },
+      });
+      if (user) {
+        user.nickname = nickname;
+        await this.ua01mRp.save(user);
+        console.log('Nickname is sucessfuly changed');
+        return { Request: 'Success' };
+      } else {
+        throw new BadRequestException('No User available');
+      }
+    }
+  }
 }
