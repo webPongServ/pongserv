@@ -1,10 +1,11 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity';
 import { TbCh02LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-02-l.entity';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
+import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
 
 @Injectable()
 export class ChatsService {
@@ -123,5 +124,29 @@ export class ChatsService {
 			})
 		}
 		return [eachUserInfos, liveUserListAndCount[1]];
+	}
+
+	async editChatroomInfo(userId: string, chtrmEdit: ChatroomEditingDto) {
+		/*!SECTION
+			1. user의 방에 대한 권한을 확인한다.
+				1-1. owner가 아닌 경우에는 Exception을 throw 한다.
+					(owner의 경우에만 방의 정보를 변경할 수 있음)
+			2. 방의 정보를 바꾼다.
+			3. (바뀐 방의 정보를 방에 참여한 다른 유저에게 알려야 한다면 websocket gateway에게 요청해서 처리해야 할 듯) // NOTE
+		*/
+		// 1
+		const user = await this.dbUsersManagerService.getUserByUserId(userId);
+		const targetRoom = await this.dbChatsManagerService.getLiveChtrmByUuid(chtrmEdit.uuid);
+		const userInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(user, targetRoom);
+		if (userInChtrm.chtRmAuth !== '01') {
+			throw new UnauthorizedException('Not owner in this room');
+		}
+		// 2
+		targetRoom.chtRmNm = chtrmEdit.name;
+		targetRoom.chtRmType = chtrmEdit.type;
+		targetRoom.chtRmPwd = chtrmEdit.pwd;
+		await this.dbChatsManagerService.saveChatroom(targetRoom);
+		// 3 // TODO
+		return ;
 	}
 }

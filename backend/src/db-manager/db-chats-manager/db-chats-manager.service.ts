@@ -156,4 +156,18 @@ export class DbChatsManagerService {
 	return result;
   }
 
+  async getUserInfoInChatrm(user: TbUa01MEntity, room: TbCh01LEntity) {
+	const result = await this.ch02lRp.findOne({
+		where: {
+			ua01mEntity: user,
+			ch01lEntity: room,
+		}
+	})
+	return result;
+  }
+
+  async saveChatroom(room: TbCh01LEntity) {
+	return (await this.ch01lRp.save(room));
+  }
+
 }
