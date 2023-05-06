@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { TbCh01LEntity } from './entities/tb-ch-01-l.entity';
 import { TbCh02LEntity } from './entities/tb-ch-02-l.entity';
 import { TbCh02DEntity } from './entities/tb-ch-02-d.entity';
@@ -66,6 +66,7 @@ export class DbChatsManagerService {
 			chtRmTf: true
 		}
 	});
+	// NOTE: TypeOrm 기능에 좀 더 눈이 밝았다면 forEach를 남발하지 않았을텐데...
 	prvChtrms.forEach((prvChtrm) => {
 		prvChtrm.ch02lEntities.forEach((userOfChtrm) => {
 			if (userOfChtrm.ua01mEntity === user) {
@@ -76,7 +77,27 @@ export class DbChatsManagerService {
 	return results;
   }
 
-  getPublicAndProtectedChatrooms() {
-	
+  async getPublicAndProtectedChatrooms() {
+	const results: TbCh01LEntity[] = await this.ch01lRp.find({
+		where: {
+			// TODO: Search TypeOrm find options In, Any, ArrayContainedBy
+			chtRmType: In(['01','02']),
+			chtRmTf: true,
+		}
+	});
+	return results;
+  }
+
+  async getCurrUserListAndCount(chatroom: TbCh01LEntity) {
+	const currUserListAndCount = await this.ch02lRp.findAndCount({
+		relations: {
+			ua01mEntity: true,
+		},
+		where: {
+			ch01lEntity: chatroom,
+			chtRmJoinTf: true,
+		}
+	});
+	return currUserListAndCount;
   }
 }

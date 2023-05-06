@@ -26,9 +26,9 @@ export class ChatsController {
     // type: ChatDto,
   })
   @ApiOperation({ summary: '채팅방 목록' })
-  @Get('rooms-list')
-  getAllChats() {
-    return 'Hello World! it is getAllChats()';
+  @Get('rooms')
+  async getChatroomsForAUser(@CurrentUser() userId: string) {
+    return (await this.chatsService.getChatroomsForAUser(userId));
   }
 
   @ApiResponse({
@@ -52,7 +52,7 @@ export class ChatsController {
     type: String, // 성공시 Chatroom_id string 반환
   })
   @ApiOperation({ summary: '채팅방 생성' })
-  async createChat(@CurrentUser() userId: string, @Body() chatroomCreationDto: ChatroomCreationDto) {
+  async createChatroom(@CurrentUser() userId: string, @Body() chatroomCreationDto: ChatroomCreationDto) {
     return (await this.chatsService.createChatroom(userId, chatroomCreationDto));
   }
 
