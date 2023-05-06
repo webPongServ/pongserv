@@ -55,7 +55,7 @@ const TwoFactorModal = () => {
             <span>2차 인증 비밀번호를 입력하세요.</span>
             <Input
               type="password"
-              slotProps={{ input: { maxLength: 20 } }}
+              slotProps={{ input: { maxLength: 6 } }}
               onChange={(e) => {
                 setValue(e.target.value);
               }}
