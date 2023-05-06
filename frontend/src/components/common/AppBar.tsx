@@ -52,7 +52,7 @@ const AppBar = (props: HandleOpen) => {
           to={`/profile/${myInfo.nickname}`}
           className="flex-container"
         >
-          <img src={`/profile/${myInfo.imgURL}`} alt="AppBar-profile" />
+          <img src={`${myInfo.imgURL}`} alt="AppBar-profile" />
           {myInfo.nickname}
         </Link>
         <IconButton id="chat-button" edge="end" onClick={handleDrawerOpen}>
