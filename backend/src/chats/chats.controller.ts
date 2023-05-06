@@ -5,6 +5,7 @@ import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
+import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -67,8 +68,8 @@ export class ChatsController {
   })
   @ApiOperation({ summary: '채팅방 정보 수정' })
   @Patch('edit/:chatroom_id/:chatroom_name/:chatroom_type/:password')
-  editChat() {
-    return 'Hello World! it is editChat()';
+  async editChatroomInfo(@CurrentUser() userId: string, @Body() chtrmEdit: ChatroomEditingDto) {
+    return (await this.chatsService.editChatroomInfo(userId, chtrmEdit));
   }
 
   @ApiResponse({
