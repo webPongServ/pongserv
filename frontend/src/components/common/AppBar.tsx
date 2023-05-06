@@ -55,7 +55,12 @@ const AppBar = (props: HandleOpen) => {
           <img src={`${myInfo.imgURL}`} alt="AppBar-profile" />
           {myInfo.nickname}
         </Link>
-        <IconButton id="chat-button" edge="end" onClick={handleDrawerOpen}>
+        <IconButton
+          id="chat-button"
+          edge="end"
+          onClick={handleDrawerOpen}
+          sx={{ ...(props.open && { display: "none" }) }}
+        >
           <MenuIcon />
         </IconButton>
       </Toolbar>
