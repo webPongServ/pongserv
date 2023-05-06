@@ -1,5 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import Redirect from "pages/Redirect";
 import Profile from "pages/Profile";
 import Search from "pages/Search";
 import Game from "pages/game";
@@ -9,7 +8,6 @@ import GameReady from "components/game/GameReady";
 const MainRoute = (): JSX.Element => {
   return (
     <Routes>
-      <Route path="/redirect" element={<Redirect />} />
       <Route path="/profile/:nickname" element={<Profile />} />
       <Route path="/search" element={<Search />} />
       <Route path="/game" element={<Game />} />

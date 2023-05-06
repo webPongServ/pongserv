@@ -1,8 +1,7 @@
 import { apiURL } from "API/api";
 import { usersURL } from "API/UsersService";
 // import { useNavigate } from "react-router-dom";
-import NewSessionModal from "components/login/NewSessionModal";
-import TwoFactorModal from "components/login/TwoFactorModal";
+
 import "styles/Login.scss";
 
 import { Box } from "@mui/material";
@@ -24,8 +23,6 @@ const Login = () => {
           Login with 42
         </Button>
       </Box>
-      <NewSessionModal />
-      <TwoFactorModal />
     </Box>
   );
 };
