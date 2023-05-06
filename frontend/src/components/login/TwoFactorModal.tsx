@@ -5,6 +5,7 @@ import { IRootState } from "components/common/store";
 import { LoginStatusActionTypes } from "types/redux/Login";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import AuthService from "API/AuthService";
+import instance from "API/api";
 import "styles/Login.scss";
 import "styles/global.scss";
 
@@ -14,9 +15,24 @@ import CloseIcon from "@mui/icons-material/Close";
 
 const TwoFactorModal = () => {
   const loginStatus = useSelector((state: IRootState) => state.loginStatus);
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const [value, setValue] = useState<string>("");
   const dispatch = useDispatch();
-  const navigate = useNavigate;
+  const navigate = useNavigate();
+
+  const handleTwoFactorLogin = async () => {
+    let response;
+    response = await AuthService.postOtp({
+      userId: myInfo.nickname,
+      sixDigit: value,
+    });
+    localStorage.setItem("accessToken", response.data.accessToken);
+    instance.defaults.headers.common[
+      "Authorization"
+    ] = `Bearer ${response.data.accessToken}`;
+
+    navigate("/game");
+  };
 
   return (
     <Modal
@@ -46,17 +62,7 @@ const TwoFactorModal = () => {
             />
           </Box>
           <Box className="footer flex-container">
-            <Button
-              className="medium-size"
-              onClick={async () => {
-                const response = AuthService.postOtp({
-                  userId: "chanhyle",
-                  sixDigit: value,
-                });
-
-                // if (response.data.result) navigate("/game");
-              }}
-            >
+            <Button className="medium-size" onClick={handleTwoFactorLogin}>
               확인
             </Button>
           </Box>
