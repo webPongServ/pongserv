@@ -86,21 +86,18 @@ export class AuthService {
     const intraData: { intraId: string; intraImagePath: string } =
       await this.getIntraId(token42OAuth);
     let OAuthData = false;
-    // DEBUG
-    // const intraData = { intraId: 'susong', intraImagePath: '' };
-    // TODO: user checkin (DB)
     if (await this.dbmanagerUsersService.checkOauth(intraData.intraId)) {
       OAuthData = true;
     }
     await this.dbmanagerUsersService.checkinUser(intraData);
     // Make AccessToken and return it
-    const intraId = intraData.intraId;
-    const payload = { intraId };
+    const userId = intraData.intraId;
+    const payload = { userId };
     return {
       accessToken: await this.jwtService.signAsync(payload),
       OAuthData,
-      intraId,
-      intraImagePath: intraData.intraImagePath,
+      userId,
+      imgPath: intraData.intraImagePath,
     };
   }
 

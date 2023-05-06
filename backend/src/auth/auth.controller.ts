@@ -71,8 +71,8 @@ export class AuthController {
       // ]);
       const accessToken = resultToken.accessToken;
       const OAuthData = resultToken.OAuthData;
-      const intraId = resultToken.intraId;
-      const intraImagePath = resultToken.intraImagePath;
+      const intraId = resultToken.userId;
+      const intraImagePath = resultToken.imgPath;
       console.log(`accessToken: ${resultToken.accessToken}`, OAuthData);
       if (OAuthData == true) {
         res.json({ OAuthData, intraId, intraImagePath });

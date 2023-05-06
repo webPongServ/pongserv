@@ -9,6 +9,7 @@ import {
   HttpException,
   Res,
   Get,
+  Query,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -81,5 +82,34 @@ export class UsersController {
       );
     }
     return this.UsersService.changeNickname(user, body.nickname);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'User Profile Data 가져오기 성공!.',
+  })
+  @ApiOperation({ summary: 'Query가 있으면, 친구의 데이터 없으면 내 껏' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('/profile')
+  async getProfile(
+    @CurrentUser() user: string,
+    @Query('friendNickname') friendNickname?: string,
+  ) {
+    if (friendNickname) {
+      return await this.UsersService.getFriendProfile(user, friendNickname);
+    } else {
+      return await this.UsersService.getProfile(user);
+    }
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: '친구 요청 성공!.',
+  })
+  @ApiOperation({ summary: '친구요청하기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Post('/friend')
+  async makeFriend(@CurrentUser() user: string, @Body() body: any) {
+    return await this.UsersService.makeFriend(user, body.nickname);
   }
 }
