@@ -2,7 +2,7 @@ $border_size: 5px;
 $board_width: 1000px;
 $board_height: 600px;
 $paddle_width: 20px;
-$paddle_height: 100px;
+$paddle_height: 150px;
 
 #GameWaiting {
   width: 100%;
@@ -150,12 +150,12 @@ $paddle_height: 100px;
 
     .paddle_1 {
       top: $board_height * 0.1;
-      left: $board_width * 0.05;
+      left: $board_width * 0.03;
     }
 
     .paddle_2 {
       top: $board_height - $board_height * 0.3;
-      left: $board_width - $board_width * 0.05 - $paddle_width;
+      left: $board_width - $board_width * 0.03 - $paddle_width;
     }
 
     .player_1_score {

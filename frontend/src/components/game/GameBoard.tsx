@@ -7,6 +7,9 @@ interface GameBoardProps {
   id: string;
 }
 
+const quadrant = [[], [1, 0], [0, 0], [0, 1], [1, 1]];
+const random = 1;
+
 const GameBoard = (props: GameBoardProps) => {
   const [status, setStatus] = useState<string>("ready");
   const [score1, setScore1] = useState<number>(0);
@@ -22,24 +25,25 @@ const GameBoard = (props: GameBoardProps) => {
   let board_coord: DOMRect;
   let paddle_relative_coord: number;
   let ball_coord: DOMRect;
-  let initial_ball_coord: DOMRect;
-  let dx: number = 5;
-  let dy: number = 5;
-  let dxd: number = Math.floor(Math.random() * 2);
-  let dyd: number = Math.floor(Math.random() * 2);
+  let dx: number = 10;
+  let dy: number = 10;
+  let dxd: number = quadrant[random][0];
+  let dyd: number = quadrant[random][1];
 
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
     paddle_1_coord = paddleRef.current!.getBoundingClientRect();
+    paddle_2_coord = paddle2Ref.current!.getBoundingClientRect();
     board_coord = boardRef.current!.getBoundingClientRect();
+    ball_coord = ballRef.current!.getBoundingClientRect();
     paddle_relative_coord = paddle_1_coord.top - board_coord.top - 5;
 
     if (event.key === "Enter") {
       setStatus("play");
       requestAnimationFrame(() => {
-        dx = 5;
-        dy = 5;
-        dxd = Math.floor(Math.random() * 2);
-        dyd = Math.floor(Math.random() * 2);
+        dx = 10;
+        dy = 10;
+        dxd = quadrant[random][0];
+        dyd = quadrant[random][1];
         moveBall(dx, dy, dxd, dyd);
       });
     } else if (status === "play") {
@@ -60,15 +64,18 @@ const GameBoard = (props: GameBoardProps) => {
   };
 
   function moveBall(dx: number, dy: number, dxd: number, dyd: number) {
-    ball_coord = ballRef.current!.getBoundingClientRect();
+    paddle_1_coord = paddleRef.current!.getBoundingClientRect();
     paddle_2_coord = paddle2Ref.current!.getBoundingClientRect();
+    board_coord = boardRef.current!.getBoundingClientRect();
+    ball_coord = ballRef.current!.getBoundingClientRect();
 
-    if (ball_coord.top <= board_coord.top) {
-      console.log(1);
+    if (ball_coord.top - board_coord.top <= 0) {
       dyd = 1;
     }
-    if (ball_coord.top - board_coord.top >= GameBoardConst.GAMEBOARD_HEIGHT) {
-      console.log(2);
+    if (
+      ball_coord.bottom - board_coord.top >=
+      GameBoardConst.GAMEBOARD_HEIGHT
+    ) {
       dyd = 0;
     }
     if (
@@ -76,56 +83,47 @@ const GameBoard = (props: GameBoardProps) => {
       ball_coord.top >= paddle_1_coord.top &&
       ball_coord.bottom <= paddle_1_coord.bottom
     ) {
-      console.log(3);
-      dxd = 1;
-      dx = 5;
-      dy = 5;
+      // why?
+      if (ball_coord.left - paddle_1_coord.left <= -10) {
+        setScore2((prev) => score2 + 1);
+        setStatus("ready");
+        ballRef.current!.style.top = "285px";
+        ballRef.current!.style.left = "485px";
+        return;
+      } else dxd = 1;
     }
     if (
       ball_coord.right >= paddle_2_coord.left &&
       ball_coord.top >= paddle_2_coord.top &&
       ball_coord.bottom <= paddle_2_coord.bottom
     ) {
-      console.log(4);
-      dxd = 0;
-      dx = 5;
-      dy = 5;
+      if (ball_coord.left - paddle_2_coord.left <= -10) {
+        setScore1((prev) => score1 + 1);
+        setStatus("ready");
+        ballRef.current!.style.top = "285px";
+        ballRef.current!.style.left = "485px";
+        return;
+      } else dxd = 0;
     }
     if (
       ball_coord.left <= board_coord.left ||
       ball_coord.right >= board_coord.right
     ) {
-      console.log(5);
       if (ball_coord.left <= board_coord.left) {
         setScore2((prev) => score2 + 1);
       } else {
         setScore1((prev) => score1 + 1);
       }
       setStatus("ready");
-      // ball_coord = initial_ball_coord;
       ballRef.current!.style.top = "285px";
       ballRef.current!.style.left = "485px";
-      // message.innerHTML = "Press Enter to Play Pong";
-      // message.style.left = 38 + "vw";
       return;
     }
-    // console.log(6); // 벽에 닿아서 튕기는 부분
-    console.log(ballRef.current!.style.top, ballRef.current!.style.left);
-    // console.log(
-    //   ballRef.current!.getBoundingClientRect().top,
-    //   ballRef.current!.getBoundingClientRect().left
-    // );
     ballRef.current!.style.top =
-      ball_coord.top - board_coord.top + dy * (dyd === 0 ? -1 : 1) + "px";
+      ball_coord.top - board_coord.top + dy * (dyd === 0 ? -1 : 0) + "px";
     ballRef.current!.style.left =
-      ball_coord.left - board_coord.left + dx * (dxd === 0 ? -1 : 1) + "px";
-
-    console.log(ballRef.current!.style.top, ballRef.current!.style.left);
-    // console.log(
-    //   ballRef.current!.getBoundingClientRect().top,
-    //   ballRef.current!.getBoundingClientRect().left
-    // );
-    ball_coord = ballRef.current!.getBoundingClientRect();
+      ball_coord.left - board_coord.left + dx * (dxd === 0 ? -1 : 0) + "px";
+    // ball_coord = ballRef.current!.getBoundingClientRect();
     requestAnimationFrame(() => {
       moveBall(dx, dy, dxd, dyd);
     });
@@ -133,7 +131,6 @@ const GameBoard = (props: GameBoardProps) => {
 
   useEffect(() => {
     if (divRef.current !== null) divRef.current.focus();
-    // initial_ball_coord = ballRef.current!.getBoundingClientRect();
   }, []);
 
   return (
