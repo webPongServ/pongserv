@@ -5,6 +5,7 @@ import { TbGm01DEntity } from './entities/tb-gm-01-d.entity';
 import { TbGm02SEntity } from './entities/tb-gm-02-s.entity';
 import { TbGm03DEntity } from './entities/tb-gm-03-d.entity';
 import { TbGm04LEntity } from './entities/tb-gm-04-l.entity';
+import { DbGamesManagerService } from './db-games-manager.service';
 
 @Module({
   imports: [
@@ -16,6 +17,6 @@ import { TbGm04LEntity } from './entities/tb-gm-04-l.entity';
       TbGm04LEntity,
     ]),
   ],
-  providers: [],
+  providers: [DbGamesManagerService],
 })
 export class DbGamesManagerModule {}

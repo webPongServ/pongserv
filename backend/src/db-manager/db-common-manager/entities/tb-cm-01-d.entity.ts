@@ -1,10 +1,9 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'TB_CM01D' })
 export class TbCm01DEntity {
-  // TODO - Clean TMP_ID and Set PK
-  @PrimaryColumn()
-  tmpId: number;
+  @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
+  id: number;
 
   // CMMN_CD
   @Column({ name: 'CMMN_CD', type: 'varchar', length: 100 })

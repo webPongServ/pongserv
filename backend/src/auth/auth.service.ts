@@ -1,17 +1,30 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Payload } from './strategy/jwt.payload';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { Token42OAuthData } from './dto/token.dto';
+import { DbUsersManagerService } from '../db-manager/db-users-manager/db-users-manager.service';
+import { JwtService } from '@nestjs/jwt';
+import * as speakeasy from 'speakeasy';
+import * as QRCode from 'qrcode';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly httpService: HttpService,
     private readonly config: ConfigService,
+    private readonly dbmanagerUsersService: DbUsersManagerService,
+    private jwtService: JwtService,
   ) {}
-  async issueToken(code: string): Promise<Token42OAuthData> {
-    let result: Token42OAuthData;
 
+  async issueToken42OAuth(code: string): Promise<Token42OAuthData> {
+    let result: Token42OAuthData;
     try {
       const tokenResult = await this.httpService.axiosRef.post(
         'https://api.intra.42.fr/oauth/token',
@@ -36,100 +49,90 @@ export class AuthService {
       console.log('42 token 발급 실패');
       throw new HttpException(err, HttpStatus.UNAUTHORIZED);
     }
-    // console.log(result);
     return result;
   }
 
-  async getIntraId(ftTokens: Token42OAuthData): Promise<string> {
-    let intraInfo;
-    let uid;
-
-    try {
-      console.log(`ftTokens: `);
-      console.log(ftTokens);
-      const intraInfoResult = await this.httpService.axiosRef.get(
-        'https://api.intra.42.fr/v2/me',
-        {
-          headers: {
-            Authorization: `Bearer ${ftTokens.accessToken}`,
-            'content-type': 'application/json',
-          },
+  async getIntraId(
+    ftTokens: Token42OAuthData,
+  ): Promise<{ intraId: string; intraImagePath: string }> {
+    const intraInfoResult = await this.httpService.axiosRef.get(
+      'https://api.intra.42.fr/v2/me',
+      {
+        headers: {
+          Authorization: `Bearer ${ftTokens.accessToken}`,
+          'content-type': 'application/json',
         },
-      );
+      },
+    );
+    if (!intraInfoResult)
+      throw new UnauthorizedException('Token42OAuth You are not 42 User');
+    const intraId: string = intraInfoResult.data.login;
+    const intraImagePath: string = intraInfoResult.data.image.link;
+    return { intraId, intraImagePath };
+  }
 
-      // console.log('intraInfoResult: ');
-      // console.log(intraInfoResult);
-
-      intraInfo = {
-        intraId: intraInfoResult.data.login,
-        imageUrl: intraInfoResult.data.image.link,
-      };
-    } catch (err) {
-      console.log('42 사용자 정보 확인 실패');
-      throw new HttpException('message', HttpStatus.UNAUTHORIZED);
+  async processAuthorization(code42OAuth: string) {
+    // Release
+    const token42OAuth = await this.issueToken42OAuth(code42OAuth);
+    const intraData: { intraId: string; intraImagePath: string } =
+      await this.getIntraId(token42OAuth);
+    let OAuthData = false;
+    if (await this.dbmanagerUsersService.checkOauth(intraData.intraId)) {
+      OAuthData = true;
     }
+    // Make AccessToken and return it
+    const userId = intraData.intraId;
+    const Payload = { userId };
+    return {
+      accessToken: await this.jwtService.signAsync(Payload),
+      OAuthData,
+      userId,
+      imgPath: intraData.intraImagePath,
+    };
+  }
 
-    // try {
-    //   const user: Account = await await this.accountRepository.findOne({
-    //     where: { intraId: intraInfo.intraId },
-    //   });
+  async makeQrCode(userId: string) {
+    const secret = speakeasy.generateSecret({
+      length: 20,
+      // Algorithm can be added (now removed for process)
+    });
+    await this.dbmanagerUsersService.applyTwofactor(userId, secret.base32);
+    const QRCODE = await QRCode.toDataURL(secret.otpauth_url);
+    const QrcodeImage = '<img src="' + QRCODE + '"/>';
+    return QrcodeImage;
+  }
 
-    //   if (user === null) {
-    //     const insertedData = await this.accountRepository.save({
-    //       intraId: intraInfo.intraId,
-    //       imageUrl: intraInfo.imageUrl,
-    //     });
-    //     uid = insertedData.uid;
-    //   } else {
-    //     uid = user.uid;
-    //   }
-    // } catch (err) {
-    //   console.log('사용자 정보 저장 실패');
-    //   throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-    // }
+  async validateOtp(userId: string, sixDigit: string) {
+    const secret = await this.dbmanagerUsersService.findSecret(userId);
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: sixDigit,
+      window: 2,
+      // Algorithm can be added (now removed for process)
+    });
+    const Payload = { userId };
+    if (verified == true) {
+      return { accessToken: await this.jwtService.signAsync(Payload) };
+    } else throw new BadRequestException('OTP Validation Failed');
+  }
 
-    // const accessToken = this.jwtService.sign(
-    //   {
-    //     uid,
-    //     intraId: intraInfo.intraId,
-    //   },
-    //   {
-    //     expiresIn: this.config.get('JWT_ACCESS_EXPIRE'),
-    //   },
-    // );
-
-    // const refreshToken = this.jwtService.sign(
-    //   {
-    //     uid,
-    //   },
-    //   {
-    //     expiresIn: this.config.get('JWT_REFRESH_EXPIRE'),
-    //   },
-    // );
-
-    // try {
-    //   const updatedResult = await this.accountRepository.update(
-    //     { uid },
-    //     { refreshToken },
-    //   );
-
-    //   if (updatedResult.affected === 0) {
-    //     throw new InternalServerErrorException('토큰 저장 실패');
-    //   }
-    // } catch (err) {
-    //   console.log('refresh token 삽입 에러');
-    //   throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR);
-    // }
-
-    // return {
-    //   accessToken,
-    //   refreshToken,
-    //   ftAccessToken,
-    //   imageUrl: intraInfo.imageUrl,
-    // };
-
-    // console.log(`ftTokens.acessToken: ${ftTokens.accessToken}`);
-    // console.log(`ftTokens.refreshToken: ${ftTokens.refreshToken}`);
-    return intraInfo.intraId;
+  async activate2fa(userId: string, sixDigit: string) {
+    // console.log('IN ACTIVE\n\n', userId, sixDigit);
+    if (sixDigit.length != 6)
+      throw new BadRequestException('OTP Sholud be 6 digits');
+    const secret = await this.dbmanagerUsersService.findSecret(userId);
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: sixDigit,
+      window: 2,
+      // Algorithm can be added (now removed for process)
+    });
+    if (verified == true) {
+      await this.dbmanagerUsersService.activate2fa(userId);
+      console.log('Activate');
+      return { success: true };
+    } else throw new BadRequestException('OTP Validation Failed');
   }
 }

@@ -1,12 +1,36 @@
 import { HttpModule } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
+import { ConfigService, ConfigModule } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { JwtModule } from '@nestjs/jwt';
+import { PassportModule } from '@nestjs/passport';
+import { AccessTokenStrategy } from './strategy/jwt.access.strategy';
+import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
+import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-manager.module';
 
 @Module({
-  imports: [HttpModule],
+  imports: [
+    HttpModule,
+    ConfigModule,
+    PassportModule.register({ defaultStrategy: 'jwt' }),
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        secret: configService.get('JWT_SECRET'),
+        signOptions: { expiresIn: '1y' },
+      }),
+    }),
+    DbUsersManagerModule,
+  ],
   controllers: [AuthController],
-  providers: [AuthService, ConfigService],
+  providers: [
+    AuthService,
+    ConfigService,
+    AccessTokenStrategy,
+    DbUsersManagerService,
+  ],
+  exports: [AccessTokenStrategy, PassportModule, AuthService],
 })
 export class AuthModule {}

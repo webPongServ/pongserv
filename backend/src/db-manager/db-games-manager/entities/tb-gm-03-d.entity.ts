@@ -1,15 +1,28 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  PrimaryColumn,
+  PrimaryGeneratedColumn,
+  Unique,
+  UpdateDateColumn,
+} from 'typeorm';
 
 // game option detail - 게임옵션상세
 @Entity({ name: 'TB_GM03D' })
+@Unique(['optCd', 'optDtlCd'])
 export class TbGm03DEntity {
+  // ID
+  @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
+  id: number;
+
   // OPT_CD
-  @PrimaryColumn({ name: 'OPT_CD', type: 'varchar', length: 100 })
+  @Column({ name: 'OPT_CD', type: 'varchar', length: 100 })
   optCd: string;
 
   // OPT_DTL_CD
-  @PrimaryColumn({ name: 'OPT_DTL_CD', type: 'varchar', length: 100 })
-  optDTlCd: string;
+  @Column({ name: 'OPT_DTL_CD', type: 'varchar', length: 100 })
+  optDtlCd: string;
 
   // OPT_NM
   @Column({ name: 'OPT_NM', type: 'varchar', length: 200 })
@@ -24,10 +37,18 @@ export class TbGm03DEntity {
   delTf: boolean;
 
   // FRST_DTTM
-  @Column({ name: 'FRST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @CreateDateColumn({
+    name: 'FRST_DTTM',
+    type: 'timestamp with time zone',
+    precision: 6,
+  })
   frstDttm: Date;
 
   // LAST_DTTM
-  @Column({ name: 'LAST_DTTM', type: 'timestamp with time zone', precision: 6 })
+  @UpdateDateColumn({
+    name: 'LAST_DTTM',
+    type: 'timestamp with time zone',
+    precision: 6,
+  })
   lastDttm: Date;
 }
