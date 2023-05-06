@@ -57,7 +57,7 @@ export class TbCh02LEntity {
   authChgDttm: Date;
 
   // DEL_TF
-  @Column({ name: 'DEL_TF', type: 'boolean' })
+  @Column({ name: 'DEL_TF', type: 'boolean', default: false })
   delTf: boolean;
 
   // FRST_DTTM

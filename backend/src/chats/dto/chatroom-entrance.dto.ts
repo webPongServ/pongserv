@@ -1,12 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class ChatroomCreationDto {
+export class ChatroomEntranceDto {
     @ApiProperty({ type: String })
-    name: string;
-
-    // 01, 02, 03
-    @ApiProperty({ type: Boolean })
-    type: string;
+    uuid: string;
 
     @ApiProperty({ type: String })
     pwd: string;

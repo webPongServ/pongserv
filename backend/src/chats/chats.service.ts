@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity';
 import { TbCh02LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-02-l.entity';
+import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 
 @Injectable()
 export class ChatsService {
@@ -69,5 +70,58 @@ export class ChatsService {
 			})
 		}
 		return results;
+	}
+
+	async setUserToEnter(userId: string, chtrmEntr: ChatroomEntranceDto) {
+		/*!SECTION
+			1. 해당 uuid를 가진 채팅방을 찾음
+			2. 채팅방이 protected일 경우에 비밀번호 검증을 함
+			3. DM방일 경우에 유저가 해당 방의 user list에 속해있는지 검증을 함
+			4. 채팅방 인원이 꽉 찼는지 확인함
+			5. 조건이 맞을 경우에 chatrooms user list에 추가
+			6. 그 방의 유저 리스트 정보를 반환한다.
+		*/
+		// 1
+		const targetRoom = await this.dbChatsManagerService.getLiveChtrmByUuid(chtrmEntr.uuid);
+		if (targetRoom === null)
+			throw new NotFoundException('The chatroom not exist');
+		// 2
+		if (targetRoom.chtRmType === '02') {
+			if (targetRoom.chtRmPwd !== chtrmEntr.pwd) {
+				throw new ForbiddenException('Wrong chatroom password');
+			}
+		}
+		// 3
+		const user = await this.dbUsersManagerService.getUserByUserId(userId);
+		if (targetRoom.chtRmType === '03') {
+			if (await this.dbChatsManagerService.isUserListedInThisChatroom(user, targetRoom) === false) {
+				throw new ForbiddenException('Not DM chatroom for you');
+			}
+		}
+		// 4
+		let liveUserListAndCount: [TbCh02LEntity[], number] = 
+			await this.dbChatsManagerService.getLiveUserListAndCountInARoom(targetRoom);
+		if (liveUserListAndCount[1] >= targetRoom.maxUserCnt) {
+			throw new ForbiddenException('chatroom user count is full!');
+		}
+		// 5
+		const userInTarget: TbCh02LEntity = 
+			await this.dbChatsManagerService.setUserToEnterRoom(user, targetRoom); //NOTE - save에서 ua01l에 대한 정보를 안 줄 수가 있음. 테스트를 해보고 안 주면 findOne으로 찾아서 다시 뽑아내게 만들어야 할 듯
+		// 6
+		if (userInTarget === null)
+			throw new InternalServerErrorException('typeorm save error');
+		liveUserListAndCount[0].push(userInTarget);
+		++liveUserListAndCount[1];
+		let eachUserInfos: {
+			nickname: string,
+			chtRmAuth: string,
+		}[];
+		for (const eachInChtrm of liveUserListAndCount[0]) {
+			eachUserInfos.push({
+				nickname: eachInChtrm.ua01mEntity.nickname,
+				chtRmAuth: eachInChtrm.chtRmAuth,
+			})
+		}
+		return [eachUserInfos, liveUserListAndCount[1]];
 	}
 }
