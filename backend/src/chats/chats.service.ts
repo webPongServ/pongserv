@@ -6,6 +6,10 @@ import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01
 import { TbCh02LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-02-l.entity';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
+import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
+import { ChatroomBanDto } from './dto/chatroom-ban.dto';
+import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
+import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 
 @Injectable()
 export class ChatsService {
@@ -73,22 +77,23 @@ export class ChatsService {
 		return results;
 	}
 
-	async setUserToEnter(userId: string, chtrmEntr: ChatroomEntranceDto) {
+	async setUserToEnter(userId: string, infoEntr: ChatroomEntranceDto) {
 		/*!SECTION
 			1. 해당 uuid를 가진 채팅방을 찾음
 			2. 채팅방이 protected일 경우에 비밀번호 검증을 함
 			3. DM방일 경우에 유저가 해당 방의 user list에 속해있는지 검증을 함
 			4. 채팅방 인원이 꽉 찼는지 확인함
+			// TODO: user가 ban, kick 등의 제약이 걸려있는지 확인한다.
 			5. 조건이 맞을 경우에 chatrooms user list에 추가
 			6. 그 방의 유저 리스트 정보를 반환한다.
 		*/
 		// 1
-		const targetRoom = await this.dbChatsManagerService.getLiveChtrmByUuid(chtrmEntr.uuid);
+		const targetRoom = await this.dbChatsManagerService.getLiveChtrmByUuid(infoEntr.uuid);
 		if (targetRoom === null)
 			throw new NotFoundException('The chatroom not exist');
 		// 2
 		if (targetRoom.chtRmType === '02') {
-			if (targetRoom.chtRmPwd !== chtrmEntr.pwd) {
+			if (targetRoom.chtRmPwd !== infoEntr.pwd) {
 				throw new ForbiddenException('Wrong chatroom password');
 			}
 		}
@@ -126,7 +131,7 @@ export class ChatsService {
 		return [eachUserInfos, liveUserListAndCount[1]];
 	}
 
-	async editChatroomInfo(userId: string, chtrmEdit: ChatroomEditingDto) {
+	async editChatroomInfo(userId: string, infoEdit: ChatroomEditingDto) {
 		/*!SECTION
 			1. user의 방에 대한 권한을 확인한다.
 				1-1. owner가 아닌 경우에는 Exception을 throw 한다.
@@ -136,17 +141,158 @@ export class ChatsService {
 		*/
 		// 1
 		const user = await this.dbUsersManagerService.getUserByUserId(userId);
-		const targetRoom = await this.dbChatsManagerService.getLiveChtrmByUuid(chtrmEdit.uuid);
+		const targetRoom = await this.dbChatsManagerService.getLiveChtrmByUuid(infoEdit.uuid);
 		const userInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(user, targetRoom);
 		if (userInChtrm.chtRmAuth !== '01') {
 			throw new UnauthorizedException('Not owner in this room');
 		}
 		// 2
-		targetRoom.chtRmNm = chtrmEdit.name;
-		targetRoom.chtRmType = chtrmEdit.type;
-		targetRoom.chtRmPwd = chtrmEdit.pwd;
+		targetRoom.chtRmNm = infoEdit.name;
+		targetRoom.chtRmType = infoEdit.type;
+		targetRoom.chtRmPwd = infoEdit.pwd;
 		await this.dbChatsManagerService.saveChatroom(targetRoom);
-		// 3 // TODO
+		// 3 // TODO: to use websocket
 		return ;
+	}
+
+	async getLiveUserListInARoom(userId: string, uuid: string) {
+		// NOTE: userID not used
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(uuid);
+		const userListAndCount = await this.dbChatsManagerService.getLiveUserListAndCountInARoom(chtrm);
+		return userListAndCount[0];
+	}
+
+	async kickUser(userId: string, infoKick: ChatroomKickingDto) {
+		/*!SECTION
+			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
+			2. 해당 방의 강퇴할 target의 정보를 확인한다.
+				2-1. 해당 방에 존재하는지 체크한다.
+				2-2. 강퇴할 target이 owner 이면 안 된다.
+			3. kick transaction 실행 // NOTE: 실제 transaction 적용은 안정화 스프린트에
+				3-1. ch02d에 kick user 정보를 등록
+				3-2. ch02l의 chtRmJoinTf를 false로 변경
+				(하나의 transaction은 DbChatsManagerService에서 하나의 메서드로 관리하는게 좋을 듯)
+			4. (websocket을 통해서 채팅방 구성원들에게 정보를 알린다.) // NOTE: 이건 그냥 target 유저 정보를 return 하면 될 듯
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoKick.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		if (requesterInChtrm.chtRmAuth !== '01' && requesterInChtrm.chtRmAuth !== '02')
+			throw new UnauthorizedException('You do not have permission.');
+		// 2
+		const targetUser = await this.dbUsersManagerService.getUserByUserId(infoKick.userIdToKick);
+		const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(targetUser, chtrm);
+			// 2-1
+		if (targetInChtrm.chtRmJoinTf === false)
+			throw new NotFoundException('The target isn\'t the chatroom');
+			// 2-2
+		if (targetInChtrm.chtRmAuth === '01')
+			throw new ForbiddenException('Are you going to go beyond the power of God?');
+		// 3
+		await this.dbChatsManagerService.kickUserTransaction(targetUser, chtrm, targetInChtrm);
+		// 4
+		return (targetUser.nickname);
+	}
+
+	async banUser(userId: string, infoBan: ChatroomBanDto) {
+		/*!SECTION
+			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
+			2. 해당 방의 밴할 target의 정보를 확인한다.
+				2-1. 밴할 target이 owner 이면 안 된다.
+			3. ban transaction 실행
+				3-1. ch02d에 ban user 정보를 등록
+				3-2. ch02l의 chtRmJoinTf를 false로 변경 (자동 강퇴)
+			4. target의 정보를 반환
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoBan.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		if (requesterInChtrm.chtRmAuth !== '01' && requesterInChtrm.chtRmAuth !== '02')
+			throw new UnauthorizedException('You do not have permission.');
+		// 2
+		const targetUser = await this.dbUsersManagerService.getUserByUserId(infoBan.userIdToBan);
+		const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(targetUser, chtrm);
+			// 2-1
+		if (targetInChtrm.chtRmAuth === '01')
+			throw new ForbiddenException('Are you going to go beyond the power of God?');
+		// 3
+		await this.dbChatsManagerService.banUserTransaction(targetUser, chtrm, targetInChtrm);
+		// 4
+		return (targetUser.nickname);
+	}
+
+	async muteUser(userId: string, infoBan: ChatroomMuteDto) {
+		/*!SECTION
+			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
+			2. 해당 방의 뮤트할 target의 정보를 확인한다.
+				2-1. 해당 방에 존재하는지 체크한다.
+				2-2. 뮤트할 target이 owner 이면 안 된다.
+			3. ch02d에 mute user 정보를 등록
+			4. target의 정보를 반환
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoBan.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		if (requesterInChtrm.chtRmAuth !== '01' && requesterInChtrm.chtRmAuth !== '02')
+			throw new UnauthorizedException('You do not have permission.');
+		// 2
+		const targetUser = await this.dbUsersManagerService.getUserByUserId(infoBan.userIdToMute);
+		const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(targetUser, chtrm);
+			// 2-1
+		if (targetInChtrm.chtRmJoinTf === false)
+			throw new NotFoundException('The target isn\'t the chatroom');
+			// 2-2
+		if (targetInChtrm.chtRmAuth === '01')
+			throw new ForbiddenException('Are you going to go beyond the power of God?');
+		// 3
+		await this.dbChatsManagerService.setMuteUserInfo(targetUser, chtrm);
+		// 4
+		return (targetUser.nickname);
+	}
+
+	async empowerUser(userId: string, infoEmpwr: ChatroomEmpowermentDto) {
+		/*!SECTION
+			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
+			2. 해당 방의 뮤트할 target의 정보를 확인한다.
+				2-1. 해당 방에 존재하는지 체크한다.
+				2-2. 뮤트할 타겟이 owner 이면 안 된다.
+				2-3. 이미 administrator일 때도 거절한다.
+			3. target의 권한을 admin으로 바꾸고 저장한다.
+			4. target의 정보를 반환한다.
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoEmpwr.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		if (requesterInChtrm.chtRmAuth !== '01' && requesterInChtrm.chtRmAuth !== '02')
+			throw new UnauthorizedException('You do not have permission.');
+		// 2
+		const targetUser = await this.dbUsersManagerService.getUserByUserId(infoEmpwr.userIdToEmpower);
+		const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(targetUser, chtrm);
+			// 2-1
+		if (targetInChtrm.chtRmJoinTf === false)
+			throw new NotFoundException('The target isn\'t the chatroom');
+			// 2-2
+		if (targetInChtrm.chtRmAuth === '01')
+			throw new ForbiddenException('Are you going to go beyond the power of God?');
+			// 2-3
+		if (targetInChtrm.chtRmAuth === '02')
+			throw new ForbiddenException('The target is already administrator');
+		// 3
+		targetInChtrm.chtRmAuth = '02';
+		this.dbChatsManagerService.saveChtrmUser(targetInChtrm);
+		// 4
+		return targetUser.nickname;
 	}
 }

@@ -170,4 +170,107 @@ export class DbChatsManagerService {
 	return (await this.ch01lRp.save(room));
   }
 
+  async kickUserTransaction(target: TbUa01MEntity, room: TbCh01LEntity, targetInChtrm: TbCh02LEntity) {
+	/*!SECTION
+		1. ch02d에 kick user 정보를 등록
+		2. ch02l의 chtRmJoinTf를 false로 변경
+	*/
+	// 1
+	let kickInfo = await this.ch02dRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '03', // KICK: 03
+		}
+	});
+	if (kickInfo === null) {
+		kickInfo = this.ch02dRp.create({
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '03',
+			// rstrCrtnDttm: new Date(),
+			// rstrTm: 60, // NOTE: tmp - 60s
+			// vldTf: true,
+		});
+	}
+	kickInfo.rstrCrtnDttm = new Date();
+	kickInfo.rstrTm = 60;
+	kickInfo.vldTf = true;
+	this.ch02dRp.save(kickInfo);
+	// 2
+	if (targetInChtrm.chtRmAuth === '02') {
+		targetInChtrm.chtRmAuth = '03';
+		targetInChtrm.authChgDttm = new Date();
+	}
+	targetInChtrm.chtRmJoinTf = false;
+	this.ch02lRp.save(targetInChtrm);
+	return ;
+  }
+
+  async banUserTransaction(target: TbUa01MEntity, room: TbCh01LEntity, targetInChtrm: TbCh02LEntity) {
+	/*!SECTION
+		1. ch02d에 ban user 정보를 등록
+		2. ch02l의 chtRmJoinTf를 false로 변경
+	*/
+	// 1
+	let kickInfo = await this.ch02dRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '02', // BAN: 02
+		}
+	});
+	if (kickInfo === null) {
+		kickInfo = this.ch02dRp.create({
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '02',
+			// rstrCrtnDttm: new Date(),
+			// rstrTm: -1, // NOTE: tmp - '-1' means infinity
+			// vldTf: true,
+		});
+	}
+	kickInfo.rstrCrtnDttm = new Date();
+	kickInfo.rstrTm = -1;
+	kickInfo.vldTf = true;
+	this.ch02dRp.save(kickInfo);
+	// 2
+	if (targetInChtrm.chtRmAuth === '02') {
+		targetInChtrm.chtRmAuth = '03';
+		targetInChtrm.authChgDttm = new Date();
+	}
+	targetInChtrm.chtRmJoinTf = false;
+	this.ch02lRp.save(targetInChtrm);
+	return ;
+  }
+
+  async setMuteUserInfo(target: TbUa01MEntity, room: TbCh01LEntity) {
+	let muteInfo = await this.ch02dRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '01', // MUTE: 01
+		}
+	})
+	if (muteInfo === null) {
+		muteInfo = this.ch02dRp.create({
+			ch01lEntity: room,
+			ua01mEntity: target,
+			chtRmRstrCd: '01',
+			// rstrCrtnDttm: new Date(),
+			// rstrTm: 60, // NOTE: tmp - 60s
+			// vldTf: true,
+		});
+	}
+	muteInfo.rstrCrtnDttm = new Date();
+	muteInfo.rstrTm = 60;
+	muteInfo.vldTf = true;
+	this.ch02dRp.save(muteInfo);
+	return ;
+  }
+
+  saveChtrmUser(chtrmUser: TbCh02LEntity) {
+	this.ch02lRp.save(chtrmUser);
+  }
+  
 }

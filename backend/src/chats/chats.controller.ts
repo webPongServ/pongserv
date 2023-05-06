@@ -1,11 +1,15 @@
 import { ChatsService } from './chats.service';
-import { Body, Controller, Get, Patch, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatroomEditingDto } from './dto/chatroom-editing.dto';
+import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
+import { ChatroomBanDto } from './dto/chatroom-ban.dto';
+import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
+import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -43,19 +47,19 @@ export class ChatsController {
   })
   @ApiOperation({ summary: '채팅방 입장' })
   @Post('entrance')
-  async setUserToEnter(@CurrentUser() userId: string, @Body() chtrmEntr: ChatroomEntranceDto) {
-    return (await this.chatsService.setUserToEnter(userId, chtrmEntr));
+  async setUserToEnter(@CurrentUser() userId: string, @Body() infoEntr: ChatroomEntranceDto) {
+    return (await this.chatsService.setUserToEnter(userId, infoEntr));
   }
 
-  @Post('create')
   @ApiResponse({
     status: 201,
     description: '채팅방 생성 성공',
     type: String, // 성공시 Chatroom_id string 반환
   })
   @ApiOperation({ summary: '채팅방 생성' })
-  async createChatroom(@CurrentUser() userId: string, @Body() chatroomCreationDto: ChatroomCreationDto) {
-    return (await this.chatsService.createChatroom(userId, chatroomCreationDto));
+  @Post('create')
+  async createChatroom(@CurrentUser() userId: string, @Body() infoCrtn: ChatroomCreationDto) {
+    return (await this.chatsService.createChatroom(userId, infoCrtn));
   }
 
   @ApiResponse({
@@ -67,9 +71,9 @@ export class ChatsController {
     description: '채팅방 정보 수정 실패',
   })
   @ApiOperation({ summary: '채팅방 정보 수정' })
-  @Patch('edit/:chatroom_id/:chatroom_name/:chatroom_type/:password')
-  async editChatroomInfo(@CurrentUser() userId: string, @Body() chtrmEdit: ChatroomEditingDto) {
-    return (await this.chatsService.editChatroomInfo(userId, chtrmEdit));
+  @Patch('edit')
+  async editChatroomInfo(@CurrentUser() userId: string, @Body() infoEdit: ChatroomEditingDto) {
+    return (await this.chatsService.editChatroomInfo(userId, infoEdit));
   }
 
   @ApiResponse({
@@ -82,9 +86,9 @@ export class ChatsController {
     description: '채팅방 유저목록 반환 실패',
   })
   @ApiOperation({ summary: '채팅방 유저목록' })
-  @Get('users/:chatroom_id')
-  getChatUsers() {
-    return 'Hello World! it is getChatUsers()';
+  @Get('users/:uuid')
+  async getChatUsers(@CurrentUser() userId: string, @Param() uuid: string) {
+    return (await this.chatsService.getLiveUserListInARoom(userId, uuid));
   }
 
   @ApiResponse({
@@ -96,9 +100,9 @@ export class ChatsController {
     description: '채팅방 내보내기 실패',
   })
   @ApiOperation({ summary: '채팅방 내보내기' })
-  @Put('kick/:chatroom_id/:user_id_to_kick')
-  kickChatUser() {
-    return 'Hello World! it is kickChatUser()';
+  @Put('kick')
+  async kickUser(@CurrentUser() userId: string, @Body() infoKick: ChatroomKickingDto) {
+    return (await this.chatsService.kickUser(userId, infoKick));
   }
 
   @ApiResponse({
@@ -110,9 +114,9 @@ export class ChatsController {
     description: '채팅방 차단 실패(권한 부족)',
   })
   @ApiOperation({ summary: '채팅방 차단' })
-  @Post('ban/:chatroom_id/:user_id_to_ban')
-  banChatUser() {
-    return 'Hello World! it is banChatUser()';
+  @Post('ban')
+  async banUser(@CurrentUser() userId: string, @Body() infoBan: ChatroomBanDto) {
+    return (await this.chatsService.banUser(userId, infoBan));
   }
 
   @ApiResponse({
@@ -124,9 +128,9 @@ export class ChatsController {
     description: '벙어리 적용 실패(권한 부족)',
   })
   @ApiOperation({ summary: '벙어리 적용' })
-  @Post('mute/:chatroom_id/:user_id_to_mute')
-  muteChatUser() {
-    return 'Hello World! it is muteChatUser()';
+  @Post('mute')
+  async muteUser(@CurrentUser() userId: string, @Body() infoMute: ChatroomMuteDto) {
+    return (await this.chatsService.muteUser(userId, infoMute));
   }
 
   @ApiResponse({
@@ -139,8 +143,8 @@ export class ChatsController {
   })
   @ApiOperation({ summary: '관리자 권한 부여' })
   @Post('empowerment/:chatroom_id/:user_id_to_empower')
-  empowermentChatUser() {
-    return 'Hello World! it is empowermentChatUser()';
+  async empowerUser(@CurrentUser() userId: string, @Body() infoEmpwr: ChatroomEmpowermentDto) {
+    return (await this.chatsService.empowerUser(userId, infoEmpwr));
   }
 
   @ApiResponse({
