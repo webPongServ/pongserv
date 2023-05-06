@@ -3,8 +3,10 @@ import { MyInfoReducer } from "types/redux/MyInfo";
 import { FriendsReducer } from "types/redux/Friends";
 import { CurrentChattingReducer } from "types/redux/CurrentChatting";
 import { GameRoomsReducer } from "types/redux/GameRooms";
+import { LoginStatusReducer } from "types/redux/Login";
 
 const rootReducer = combineReducers({
+  loginStatus: LoginStatusReducer,
   myInfo: MyInfoReducer,
   friends: FriendsReducer,
   currentChatting: CurrentChattingReducer,

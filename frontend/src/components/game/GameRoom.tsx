@@ -2,6 +2,7 @@ import { useState } from "react";
 import GameReady from "components/game/GameReady";
 
 const GameRoom = () => {
+  // 게임 정보 받아오기 => 2명이면 setIsWaiting(false);
   const [isWaiting, setIsWaiting] = useState<boolean>(true);
 
   console.log(setIsWaiting);
