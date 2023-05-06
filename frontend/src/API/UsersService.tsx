@@ -6,6 +6,8 @@ export const usersURL = (path: string = ""): string => {
 
 const UserService = {
   getMe: async () => await instance.get(usersURL("me")),
+  getUserProfile: async (nickname: string) =>
+    await instance.get(usersURL(`profile?friendNickname=${nickname}`)),
 };
 
 export default UserService;
