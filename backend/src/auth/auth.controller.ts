@@ -61,19 +61,14 @@ export class AuthController {
   @ApiInternalServerErrorResponse({ description: '토큰 발급 실패' })
   @Post('code')
   async issueToken(@Body() codeBody: Code42OAuthData, @Res() res: Response) {
-    // console.log(`codeBody.code: ${codeBody.code}`);
     try {
       const resultToken = await this.authService.processAuthorization(
         codeBody.code,
       );
-      // res.setHeader('Set-Cookie', [
-      //   `accessToken=${accessToken}; HttpOnly; SameSite=None;`,
-      // ]);
       const accessToken = resultToken.accessToken;
       const OAuthData = resultToken.OAuthData;
       const intraId = resultToken.userId;
       const intraImagePath = resultToken.imgPath;
-      console.log(`accessToken: ${resultToken.accessToken}`, OAuthData);
       if (OAuthData == true) {
         res.json({ OAuthData, intraId, intraImagePath });
       } else {
@@ -107,5 +102,17 @@ export class AuthController {
   @Post('otp')
   async checkOtp(@Body() otpData: otpData) {
     return this.authService.validateOtp(otpData.userId, otpData.sixDigit);
+  }
+
+  @ApiOperation({
+    summary: '2차인증 설정',
+    description: '2차인증 활성화 검증',
+  })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiResponse({ status: 200, description: '2차인증 활성화 성공' })
+  @Post('activate2fa')
+  async activateOtp(@CurrentUser() userId: string, @Body() otpData: otpData) {
+    console.log('HELLOWORLD');
+    return this.authService.activate2fa(userId, otpData.sixDigit);
   }
 }

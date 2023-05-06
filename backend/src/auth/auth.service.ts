@@ -1,5 +1,6 @@
 import { Payload } from './strategy/jwt.payload';
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -54,8 +55,6 @@ export class AuthService {
   async getIntraId(
     ftTokens: Token42OAuthData,
   ): Promise<{ intraId: string; intraImagePath: string }> {
-    console.log(`42Tokens: `);
-    console.log(ftTokens);
     const intraInfoResult = await this.httpService.axiosRef.get(
       'https://api.intra.42.fr/v2/me',
       {
@@ -72,14 +71,6 @@ export class AuthService {
     return { intraId, intraImagePath };
   }
 
-  async checkinUser(intraId) {
-    // get user or set user in db
-    const user = await this.dbmanagerUsersService.getUserByUserId(intraId);
-    if (user === null) {
-      // await this.dbmanagerUsersService.setOne()
-    }
-  }
-
   async processAuthorization(code42OAuth: string) {
     // Release
     const token42OAuth = await this.issueToken42OAuth(code42OAuth);
@@ -89,12 +80,11 @@ export class AuthService {
     if (await this.dbmanagerUsersService.checkOauth(intraData.intraId)) {
       OAuthData = true;
     }
-    await this.dbmanagerUsersService.checkinUser(intraData);
     // Make AccessToken and return it
     const userId = intraData.intraId;
-    const payload = { userId };
+    const Payload = { userId };
     return {
-      accessToken: await this.jwtService.signAsync(payload),
+      accessToken: await this.jwtService.signAsync(Payload),
       OAuthData,
       userId,
       imgPath: intraData.intraImagePath,
@@ -108,7 +98,8 @@ export class AuthService {
     });
     await this.dbmanagerUsersService.applyTwofactor(userId, secret.base32);
     const QRCODE = await QRCode.toDataURL(secret.otpauth_url);
-    return QRCODE;
+    const QrcodeImage = '<img src="' + QRCODE + '"/>';
+    return QrcodeImage;
   }
 
   async validateOtp(userId: string, sixDigit: string) {
@@ -120,10 +111,28 @@ export class AuthService {
       window: 2,
       // Algorithm can be added (now removed for process)
     });
-    console.log(verified);
     const Payload = { userId };
     if (verified == true) {
       return { accessToken: await this.jwtService.signAsync(Payload) };
-    } else throw new UnauthorizedException('OTP Validation Failed');
+    } else throw new BadRequestException('OTP Validation Failed');
+  }
+
+  async activate2fa(userId: string, sixDigit: string) {
+    // console.log('IN ACTIVE\n\n', userId, sixDigit);
+    if (sixDigit.length != 6)
+      throw new BadRequestException('OTP Sholud be 6 digits');
+    const secret = await this.dbmanagerUsersService.findSecret(userId);
+    const verified = speakeasy.totp.verify({
+      secret: secret,
+      encoding: 'base32',
+      token: sixDigit,
+      window: 2,
+      // Algorithm can be added (now removed for process)
+    });
+    if (verified == true) {
+      await this.dbmanagerUsersService.activate2fa(userId);
+      console.log('Activate');
+      return { success: true };
+    } else throw new BadRequestException('OTP Validation Failed');
   }
 }
