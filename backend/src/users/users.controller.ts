@@ -31,28 +31,19 @@ export class UsersController {
   })
   @ApiOperation({ summary: '로그인' })
   @Get('/login')
-  async login(
-    @Headers('authorization') authHeader: string,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async login(@Headers('authorization') authHeader: string) {
+    // console.log(authHeader);/
     if (
       !authHeader ||
       (await this.UsersService.verifyToken(authHeader)) == null
     ) {
-      console.log('redirect');
-      try {
-        res.redirect(
-          `https://api.intra.42.fr/oauth/authorize?client_id=${this.config.get(
-            'API_UID',
-          )}&redirect_uri=${this.config.get(
-            'REDIRECT_URI',
-          )}&response_type=code`,
-        );
-      } catch (err) {
-        throw new HttpException(err, HttpStatus.FORBIDDEN);
-      }
+      console.log('redirect to 42API/V2');
+      return `https://api.intra.42.fr/oauth/authorize?client_id=${this.config.get(
+        'API_UID',
+      )}&redirect_uri=${this.config.get('REDIRECT_URI')}&response_type=code`;
     } else {
-      res.redirect('http://localhost:3001/game');
+      console.log('Already Logged in!');
+      return 'http://localhost:3001/game';
     }
   }
 
@@ -64,7 +55,8 @@ export class UsersController {
   @UseGuards(JwtAccessTokenGuard)
   @Get('/me')
   async me(@CurrentUser() user: string) {
-    return this.UsersService.getMe(user);
+    console.log('In USER/ME' + user);
+    return await this.UsersService.getMe(user);
   }
 
   @ApiResponse({

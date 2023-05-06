@@ -1,6 +1,11 @@
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './../auth/auth.service';
-import { Injectable, UnauthorizedException, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+  UseGuards,
+} from '@nestjs/common';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 
 @Injectable()
@@ -23,12 +28,36 @@ export class UsersService {
   }
 
   async getMe(intraId: string) {
-    return await this.dbmanagerUsersService.getMe(intraId);
+    const user = await this.dbmanagerUsersService.getUserByUserId(intraId);
+    if (user) {
+      return {
+        userId: user.userId,
+        nickname: user.nickname,
+        imgPath: user.imgPath,
+        lastDttm: user.lastDttm,
+      };
+    } else {
+      throw new BadRequestException('No User available');
+    }
   }
 
   async changeNickname(intraId: string, nickname: string) {
-    // return null;
-    return await this.dbmanagerUsersService.changeNickname(intraId, nickname);
+    const nicknameExist = await this.dbmanagerUsersService.checkNickname(
+      nickname,
+    );
+    if (nicknameExist) {
+      throw new BadRequestException('Nickname already exists');
+    } else {
+      // const user = await this.dbmanagerUsersService.getUserByUserId(intraId);
+      // if (user) {
+      //   user.nickname = nickname;
+      //   await this.dbmanagerUsersService.saveUser(user);
+      //   console.log('Nickname is sucessfuly changed');
+      //   return { Request: 'Success' };
+      // } else {
+      //   throw new BadRequestException('No User available');
+      // }
+    }
   }
 
   async getProfile(intraId: string) {
