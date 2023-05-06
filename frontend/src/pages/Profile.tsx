@@ -9,6 +9,7 @@ import UserInfo from "components/profile/UserInfo";
 import GameHistoryList from "components/profile/GameHistoryList";
 import AchievementList from "components/profile/AchievementList";
 import EditProfileModal from "components/profile/EditProfileModal";
+import SetTwoFactorModal from "components/profile/SetTwoFactorModal";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
@@ -94,7 +95,7 @@ const Profile = () => {
   };
 
   const handleTwoFactorButton = () => {
-    setModalStatus("set-two-factor");
+    setModalStatus("set-twofactor");
   };
 
   useEffect(() => {
@@ -186,6 +187,10 @@ const Profile = () => {
         </Box>
       </Tabs>
       <EditProfileModal
+        modalStatus={modalStatus}
+        setModalStatus={setModalStatus}
+      />
+      <SetTwoFactorModal
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
       />

@@ -9,6 +9,9 @@ const AuthService = {
     await instance.post(authURL("code"), body),
   postOtp: async (body: { userId: string; sixDigit: string }) =>
     await instance.post(authURL("otp"), body),
+  postActivate2fa: async (body: { userId: string; sixDigit: string }) =>
+    await instance.post(authURL("activate2fa"), body),
+  getQR: async () => await instance.get(authURL("qr")),
 };
 
 export default AuthService;
