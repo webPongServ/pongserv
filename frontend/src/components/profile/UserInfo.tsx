@@ -14,7 +14,7 @@ const UserInfo = (props: ProfileDetail) => {
           전적 : {props.total}G {props.win}W {props.lose}L
         </Box>
         <Box>
-          래더 점수 : {props.ELO} ({props.winRate * 100}%)
+          래더 점수 : {props.ELO} ({props.winRate}%)
         </Box>
       </Box>
     </Box>
