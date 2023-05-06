@@ -30,12 +30,10 @@ export class AccessTokenStrategy extends PassportStrategy(
   }
 
   async validate(payload: Payload): Promise<string> {
-    const { intraId } = payload;
-    const checked = await this.dbUsersManagerService.checkUserInDb(intraId);
-    if (checked == null) {
-      throw new UnauthorizedException();
-    }
-    return intraId;
+    const checked = await this.dbUsersManagerService.checkUserInDb(
+      payload.userId,
+    );
+    return checked;
   }
 
   // async checkUserInDb() {}
