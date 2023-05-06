@@ -100,4 +100,60 @@ export class DbChatsManagerService {
 	});
 	return currUserListAndCount;
   }
+
+  async getLiveChtrmByUuid(uuid: string) {
+	const result: TbCh01LEntity = await this.ch01lRp.findOne({
+		where: {
+			uuid: uuid,
+			chtRmTf: true,
+		}
+	})
+	return result;
+  }
+
+  async isUserListedInThisChatroom(user: TbUa01MEntity, room: TbCh01LEntity): Promise<boolean> {
+	const result = await this.ch02lRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: user,
+		}
+	})
+	if (result === null)
+		return false;
+	return true;
+  }
+
+  async setUserToEnterRoom(user: TbUa01MEntity, room: TbCh01LEntity) {
+	let userInChtrm = await this.ch02lRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: user,
+		}
+	});
+	if (userInChtrm === null) {
+		userInChtrm = this.ch02lRp.create({
+			ch01lEntity: room,
+			ua01mEntity: user,
+			chtRmAuth: '03',
+			chtRmJoinTf: true,
+		});
+	}
+	userInChtrm.entryDttm = new Date();
+	userInChtrm.authChgDttm = new Date();
+	return (await this.ch02lRp.save(userInChtrm));
+  }
+
+  async getLiveUserListAndCountInARoom(room: TbCh01LEntity) {
+	const result = await this.ch02lRp.findAndCount({
+		relations: {
+			ua01mEntity: true,
+		},
+		where: {
+			ch01lEntity: room,
+			chtRmJoinTf: true,
+		}
+	})
+	return result;
+  }
+
 }

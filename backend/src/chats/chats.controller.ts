@@ -4,6 +4,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
+import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -40,9 +41,9 @@ export class ChatsController {
     description: '채팅방 입장 실패',
   })
   @ApiOperation({ summary: '채팅방 입장' })
-  @Post('entrance/:chatroom_id/:password')
-  entryChat() {
-    return 'Hello World! it is entryChat()';
+  @Post('entrance')
+  async setUserToEnter(@CurrentUser() userId: string, @Body() chtrmEntr: ChatroomEntranceDto) {
+    return (await this.chatsService.setUserToEnter(userId, chtrmEntr));
   }
 
   @Post('create')
