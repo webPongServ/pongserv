@@ -30,4 +30,16 @@ export class UsersService {
     // return null;
     return await this.dbmanagerUsersService.changeNickname(intraId, nickname);
   }
+
+  async getProfile(intraId: string) {
+    return await this.dbmanagerUsersService.getProfile(intraId);
+  }
+
+  async makeFriend(intraId: string, friendId: string) {
+    return await this.dbmanagerUsersService.makeFriend(intraId, friendId);
+  }
+
+  async getFriendProfile(intraId: string, friendId: string) {
+    return await this.dbmanagerUsersService.getFriendProfile(intraId, friendId);
+  }
 }
