@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import CustomOnKeyUpInput from "components/common/utils/CustomOnKeyUpInput";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import "styles/global.scss";
 import "styles/Search.scss";
@@ -36,30 +37,24 @@ const Search = () => {
 
   console.log(value, setValue, setSearchedUser);
 
-  let typingTimer: NodeJS.Timeout;
-  let doneTypingInterval: number = 300;
-
-  const doneTyping = () => {
-    console.log(123);
-  };
-
-  const HandleKeyUP = () => {
-    clearTimeout(typingTimer);
-    typingTimer = setTimeout(doneTyping, doneTypingInterval);
-  };
-
-  const HandleKeyDown = () => {
-    clearTimeout(typingTimer);
+  const handleValue = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e) {
+      const target: HTMLInputElement = e.target;
+      setValue(target.value);
+    }
   };
 
   return (
     <Box id="Search" className="flex-container">
       <Box id="input-box" className="flex-container">
         <SearchIcon />
-        <Input
+        <CustomOnKeyUpInput
+          defaultValue=""
           placeholder="유저 이름을 입력하세요."
-          onKeyUp={HandleKeyUP}
-          onKeyDown={HandleKeyDown}
+          maxLength={8}
+          handleFunction={handleValue}
+          handleDoneTyping={() => {}}
+          isError={false}
         />
       </Box>
       <List id="result-box" className="overflow">

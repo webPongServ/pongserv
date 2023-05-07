@@ -1,6 +1,16 @@
 export interface CustomInputProps {
   name: string;
   defaultValue: string;
+  maxLength: number;
+  placeholder: string;
+  handleFunction: React.ChangeEventHandler<HTMLInputElement>;
+}
+export interface CustomOnKeyUpInputProps {
+  defaultValue: string;
+  maxLength: number;
+  placeholder: string;
+  isError: boolean;
+  handleDoneTyping: () => void;
   handleFunction: React.ChangeEventHandler<HTMLInputElement>;
 }
 
