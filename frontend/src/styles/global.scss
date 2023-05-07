@@ -54,6 +54,10 @@ body,
     margin-left: auto;
   }
 
+  .red {
+    color: red;
+  }
+
   #create {
     .header {
       height: 10%;
@@ -103,6 +107,129 @@ body,
       }
     }
   }
+
+  #two-factor {
+    .header {
+      height: 10%;
+      font-size: 25px;
+    }
+
+    .body {
+      flex-direction: column;
+      height: 80%;
+      row-gap: 5%;
+
+      span,
+      b {
+        font-size: 15px;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .footer {
+      height: 10%;
+
+      button {
+        width: 80%;
+      }
+    }
+  }
+
+  #edit {
+    .header {
+      height: 10%;
+      font-size: 25px;
+    }
+
+    .body {
+      flex-direction: column;
+      align-items: normal;
+      height: 80%;
+      row-gap: 5%;
+
+      span,
+      b {
+        font-size: 15px;
+      }
+
+      #new-nickname {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        row-gap: 5%;
+
+        .title {
+          display: flex;
+          align-items: center;
+          width: 20%;
+        }
+
+        .input {
+          width: 80%;
+          margin: 0 auto;
+        }
+
+        .inform {
+          font-size: 12px;
+          margin: 10px auto;
+        }
+
+        .success {
+          color: blue;
+        }
+
+        .fail {
+          color: red;
+        }
+      }
+
+      #new-image {
+        display: flex;
+        height: 40%;
+        flex-direction: column;
+        // justify-content: center;
+        row-gap: 5%;
+      }
+
+      .title {
+        display: flex;
+        align-items: center;
+        width: 20%;
+      }
+
+      .input {
+        width: 80%;
+        margin: 0 auto;
+      }
+
+      .inform {
+        font-size: 12px;
+        margin: 10px auto;
+      }
+
+      img {
+        width: 100px;
+        height: 100px;
+      }
+    }
+
+    .footer {
+      height: 10%;
+
+      button {
+        width: 80%;
+      }
+    }
+  }
+}
+
+.big-modal {
+  width: 700px;
+  height: 700px;
 }
 
 .empty-list {
