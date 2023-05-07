@@ -74,6 +74,8 @@ const CreateGameModal = (props: CreateGameModalProps) => {
             <CustomInput
               name="제목"
               defaultValue=""
+              maxLength={20}
+              placeholder="최대 20자"
               handleFunction={handleTitle}
             />
             <CustomSlider
