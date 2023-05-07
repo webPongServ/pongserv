@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { FriendsActionTypes } from "types/redux/Friends";
 import { IRootState } from "components/common/store";
-import { ProfileDetail } from "types/Detail";
+import { ProfileDetail, UserDetail } from "types/Detail";
 import UserInfo from "components/profile/UserInfo";
 import GameHistoryList from "components/profile/GameHistoryList";
 import AchievementList from "components/profile/AchievementList";
@@ -19,8 +19,10 @@ import Tab, { tabClasses } from "@mui/joy/Tab";
 import UserService from "API/UsersService";
 
 const Profile = () => {
-  const myInfo = useSelector((state: IRootState) => state.myInfo);
-  const friends = useSelector((state: IRootState) => state.friends.friends);
+  const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
+  const friends: UserDetail[] = useSelector(
+    (state: IRootState) => state.friends.friends
+  );
   const [isFriend, setIsFriend] = useState<boolean>(false);
   const [modalStatus, setModalStatus] = useState<string>("closed");
   const dispatch = useDispatch();
