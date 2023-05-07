@@ -327,4 +327,18 @@ export class ChatsService {
 		// 4
 		return target.userId;
 	}
+
+	async getBanListInARoom(userId: string, uuid: string) {
+		/*!SECTION
+			1. uuid에 해당하는 chatroom 정보를 가져옴
+			2. 해당 chatroom에서 현재 ban으로 등록된 유저 목록을 가져옴
+		*/
+		// 1
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(uuid);
+		if (chtrm === null)
+			throw new NotFoundException('The chatroom isn\'t exist currently.')
+		// 2
+		const banList = await this.dbChatsManagerService.getBanListInARoom(chtrm);
+		return banList;
+	}
 }

@@ -164,9 +164,9 @@ export class ChatsController {
     // type: ChatDto,  향후 추가
   })
   @ApiOperation({ summary: '채팅방 차단 유저목록' })
-  @Get('bans/:chatroom_id')
-  getChatBans() {
-    return 'Hello World! it is getChatBans()';
+  @Get('bans/:uuid')
+  async getBanListInARoom(@CurrentUser() userId: string, @Param() uuid: string) {
+    return (await this.chatsService.getBanListInARoom(userId, uuid));
   }
 
   @ApiResponse({

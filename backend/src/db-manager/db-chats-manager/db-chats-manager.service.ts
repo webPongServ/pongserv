@@ -272,5 +272,16 @@ export class DbChatsManagerService {
   saveChtrmUser(chtrmUser: TbCh02LEntity) {
 	this.ch02lRp.save(chtrmUser);
   }
+
+  async getBanListInARoom(room: TbCh01LEntity) {
+	const results = await this.ch02dRp.find({
+		where: {
+			ch01lEntity: room,
+			chtRmRstrCd: '02',
+			vldTf: true,
+		}
+	})
+	return results;
+  }
   
 }
