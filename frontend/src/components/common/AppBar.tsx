@@ -5,7 +5,7 @@ import { IRootState } from "components/common/store";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 
-import { Toolbar, IconButton } from "@mui/material";
+import { Toolbar, IconButton, Skeleton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -47,14 +47,21 @@ const AppBar = (props: HandleOpen) => {
         <Link id="logo" to="/game" className="fixed-center">
           WebPongServ
         </Link>
-        <Link
-          id="my-profile"
-          to={`/profile/${myInfo.nickname}`}
-          className="flex-container"
-        >
-          <img src={`${myInfo.imgURL}`} alt="AppBar-profile" />
-          {myInfo.nickname}
-        </Link>
+        {myInfo.nickname === "" ? (
+          <>
+            <Skeleton className="skeleton-img" variant="circular" />
+            <Skeleton className="skeleton-nickname" variant="rectangular" />
+          </>
+        ) : (
+          <Link
+            id="my-profile"
+            className="flex-container"
+            to={`/profile/${myInfo.nickname}`}
+          >
+            <img src={`${myInfo.imgURL}`} alt="AppBar-profile" />
+            {myInfo.nickname}
+          </Link>
+        )}
         <IconButton
           id="chat-button"
           edge="end"

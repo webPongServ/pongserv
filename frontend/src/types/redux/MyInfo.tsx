@@ -1,9 +1,9 @@
 import { UserDetail } from "types/Detail";
 
 const INITIAL_MYINFO: UserDetail = {
-  nickname: "susong",
-  imgURL: "../image.png",
-  status: "login",
+  nickname: "",
+  imgURL: "",
+  status: "",
 };
 
 export enum MyInfoActionTypes {
