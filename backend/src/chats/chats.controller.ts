@@ -10,6 +10,7 @@ import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
+import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -152,9 +153,9 @@ export class ChatsController {
     description: '대결 신청 성공',
   })
   @ApiOperation({ summary: '대결 신청' })
-  @Post('game-request/:chatroom_id/:user_id_to_game')
-  gameRequestChatUser() {
-    return 'Hello World! it is gameRequestChatUser()';
+  @Post('game-request')
+  async takeGameRequest(@CurrentUser() userId: string, @Body() infoGameReq: ChatroomGameRequestDto) {
+    return (await this.chatsService.takeGameRequest(userId, infoGameReq));
   }
 
   @ApiResponse({

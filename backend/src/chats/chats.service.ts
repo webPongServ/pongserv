@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
@@ -10,6 +10,7 @@ import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
+import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
 
 @Injectable()
 export class ChatsService {
@@ -294,5 +295,36 @@ export class ChatsService {
 		this.dbChatsManagerService.saveChtrmUser(targetInChtrm);
 		// 4
 		return targetUser.nickname;
+	}
+
+	async takeGameRequest(userId: string, infoGameReq: ChatroomGameRequestDto) {
+		/*!SECTION
+			1. user가 chatroom에 있는지 확인한다.
+			2. target 유저가 chatroom에 있는지 확인한다.
+			3. target 유저의 현재 로그인 정보를 가져와서 게임 중인지 확인한다.
+				// NOTE: 저번 회의 때 Tb_UA02L 테이블에 현재 게임 여부에 대해 정보를 알 수 잇다.
+				// 하지만 저번에 사용여부에 대해서 이야기 했기 때문에 이번에 확인해봐야 겠다.
+			4. game 신청 user와 target 정보를 반환한다.
+				// 웹소켓을 통해서 target 유저에게 game request를 보내게 하면 될 듯
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoGameReq.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		// 2
+		const target = await this.dbUsersManagerService.getUserByUserId(infoGameReq.userIdToGame);
+		const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(target, chtrm);
+		if (targetInChtrm.chtRmJoinTf === false)
+			throw new NotFoundException('The target isn\'t the chatroom');
+		// 3
+		const currTrgtLgn = await this.dbUsersManagerService.getCurrLoginData(target);
+		if (currTrgtLgn === null)
+			throw new NotFoundException('The target not logined');
+		if (currTrgtLgn.gmTf === true)
+			throw new BadRequestException('The target is gaming now.');
+		// 4
+		return target.userId;
 	}
 }

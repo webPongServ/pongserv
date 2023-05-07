@@ -273,4 +273,15 @@ export class DbUsersManagerService {
       throw new BadRequestException('No User available');
     }
   }
+
+  async getCurrLoginData(user: TbUa01MEntity) {
+    const result = await this.ua01lRp.findOne({
+      where: {
+        ua01mEntity: user,
+        loginTf: true,
+      }
+    })
+    return result;
+  }
+  
 }
