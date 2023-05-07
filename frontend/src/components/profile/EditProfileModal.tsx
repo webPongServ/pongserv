@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import CustomOnKeyUpInput from "components/common/utils/CustomOnKeyUpInput";
 import { useSelector, useDispatch } from "react-redux";
@@ -20,7 +20,7 @@ interface EditProfileModalProps {
 
 const EditProfileModal = (props: EditProfileModalProps) => {
   const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
-  const [newNickname, setNewNickname] = useState<string>(myInfo.nickname);
+  const [newNickname, setNewNickname] = useState<string>("");
   const [isError, setIsError] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
@@ -41,6 +41,10 @@ const EditProfileModal = (props: EditProfileModalProps) => {
       setPreview(null);
     }
   };
+
+  useEffect(() => {
+    setNewNickname(myInfo.nickname);
+  }, [myInfo]);
 
   return (
     <Modal
@@ -76,11 +80,13 @@ const EditProfileModal = (props: EditProfileModalProps) => {
                   />
                 </Box>
               </Box>
-              {newNickname === "susong" ? (
+              {newNickname === "" && null}
+              {isError && (
                 <Box className="inform fail">
                   중복된 닉네임입니다. 다시 입력해주세요.
                 </Box>
-              ) : (
+              )}
+              {!(newNickname === "" || isError) && (
                 <Box className="inform success">사용 가능한 닉네임입니다.</Box>
               )}
             </Box>

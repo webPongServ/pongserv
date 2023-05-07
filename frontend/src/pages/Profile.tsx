@@ -44,7 +44,7 @@ const Profile = () => {
 
   // loading 창 띄우기
   const [profileDetail, setProfileDetail] = useState<ProfileDetail>({
-    nickname: "skittles",
+    nickname: "susong",
     imgURL: "../image.png",
     total: 5,
     win: 5,
