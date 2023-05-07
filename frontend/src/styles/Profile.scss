@@ -35,6 +35,35 @@
         width: 150px;
       }
     }
+
+    .skeleton-img {
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .skeleton-title {
+      width: 150px;
+      height: 35px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+
+    .skeleton-info {
+      width: 150px;
+      height: 15px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
+
+    .skeleton-button {
+      width: 150px;
+      height: 35px;
+      margin-bottom: 5px;
+      border-radius: 5px;
+    }
   }
 
   #history-box {

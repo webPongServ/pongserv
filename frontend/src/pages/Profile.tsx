@@ -13,7 +13,7 @@ import SetTwoFactorModal from "components/profile/SetTwoFactorModal";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
-import { Box } from "@mui/material";
+import { Box, Skeleton } from "@mui/material";
 import { Button, Tabs, TabList } from "@mui/joy";
 import Tab, { tabClasses } from "@mui/joy/Tab";
 import UserService from "API/UsersService";
@@ -44,14 +44,14 @@ const Profile = () => {
 
   // loading 창 띄우기
   const [profileDetail, setProfileDetail] = useState<ProfileDetail>({
-    nickname: "susong",
-    imgURL: "../image.png",
-    total: 5,
-    win: 5,
+    nickname: "",
+    imgURL: "",
+    total: 0,
+    win: 0,
     lose: 0,
-    ELO: 150,
-    winRate: 0.8,
-    status: "login",
+    ELO: 0,
+    winRate: 0,
+    status: "",
   });
 
   const handleDMButton = () => {
@@ -107,7 +107,6 @@ const Profile = () => {
       }
     });
     getProfile();
-
     // check dependency list!!
   }, []);
 
@@ -127,16 +126,24 @@ const Profile = () => {
           />
         </Box>
         <Box className="button-group flex-container">
-          {profileDetail.nickname === myInfo.nickname ? (
+          {profileDetail.nickname === "" && (
             <>
-              <Button variant="outlined" onClick={handleEditButton}>
-                정보 수정
-              </Button>
-              <Button variant="solid" onClick={handleTwoFactorButton}>
-                2차 인증 설정
-              </Button>
+              <Skeleton className="skeleton-button" variant="rectangular" />
+              <Skeleton className="skeleton-button" variant="rectangular" />
             </>
-          ) : (
+          )}
+          {profileDetail.nickname !== "" &&
+            profileDetail.nickname === myInfo.nickname && (
+              <>
+                <Button variant="outlined" onClick={handleEditButton}>
+                  정보 수정
+                </Button>
+                <Button variant="solid" onClick={handleTwoFactorButton}>
+                  2차 인증 설정
+                </Button>
+              </>
+            )}
+          {profileDetail.nickname !== myInfo.nickname && (
             <>
               <Button variant="solid" onClick={handleDMButton}>
                 DM
@@ -149,9 +156,9 @@ const Profile = () => {
               >
                 {isFriend ? "친구 삭제" : "친구 추가"}
               </Button>
-              <Button variant="outlined" onClick={handleBlockButton}>
+              {/* <Button variant="outlined" onClick={handleBlockButton}>
                 차단
-              </Button>
+              </Button> */}
             </>
           )}
         </Box>
