@@ -11,6 +11,7 @@ import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
+import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -175,7 +176,7 @@ export class ChatsController {
   })
   @ApiOperation({ summary: '채팅방 차단 해제' })
   @Patch('ban-removal/:chatroom_id/:userid_to_free')
-  banRemovalChatUser() {
-    return 'Hello World! it is banRemovalChatUser()';
+  async removeBan(@CurrentUser() userId: string, @Body() infoBanRmv: ChatroomBanRemovalDto) {
+    return (await this.chatsService.removeBan(userId, infoBanRmv));
   }
 }

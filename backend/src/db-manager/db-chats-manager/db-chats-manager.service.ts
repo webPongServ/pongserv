@@ -283,5 +283,21 @@ export class DbChatsManagerService {
 	})
 	return results;
   }
+
+  async getBanInfoInAChtrm(user: TbUa01MEntity, room: TbCh01LEntity) {
+	const result = await this.ch02dRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: user,
+			chtRmRstrCd: '02',
+			vldTf: true,
+		}
+	})
+	return result;
+  }
+
+  saveChtrmRstrInfo(rstrInfo: TbCh02DEntity) {
+	this.ch02dRp.save(rstrInfo);
+  }
   
 }

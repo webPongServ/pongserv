@@ -11,6 +11,7 @@ import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
+import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 
 @Injectable()
 export class ChatsService {
@@ -340,5 +341,32 @@ export class ChatsService {
 		// 2
 		const banList = await this.dbChatsManagerService.getBanListInARoom(chtrm);
 		return banList;
+	}
+
+	async removeBan(userId: string, infoBanRmv: ChatroomBanRemovalDto) {
+		/*!SECTION
+			1. user(requester)의 권한을 확인한다. (owner, administrator가 아니면 throw)
+			2. target의 chatroom에서의 정보를 확인한다.
+				2-1. 현재 ban 상태가 아니라면 throw
+			3. ban을 해제하고 저장한다.
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoBanRmv.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		if (requesterInChtrm.chtRmAuth !== '01' && requesterInChtrm.chtRmAuth !== '02')
+			throw new UnauthorizedException('You do not have permission.');
+		// 2
+		const target = await this.dbUsersManagerService.getUserByUserId(infoBanRmv.userIdToFree);
+		const banInfoOfTarget = await this.dbChatsManagerService.getBanInfoInAChtrm(target, chtrm);
+			// 2-1
+		if (banInfoOfTarget === null)
+			throw new NotFoundException('The taget isn\'t in ban list.');
+		// 3
+		banInfoOfTarget.vldTf = false;
+		this.dbChatsManagerService.saveChtrmRstrInfo(banInfoOfTarget);
+		return ;
 	}
 }
