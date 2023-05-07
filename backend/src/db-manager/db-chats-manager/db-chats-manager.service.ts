@@ -29,6 +29,16 @@ export class DbChatsManagerService {
 	return (await this.ch01lRp.save(newChtrm));
   }
 
+  async createDmChatroom(name: string) {
+	const newDmChtrm = this.ch01lRp.create({
+		chtRmNm: name,
+		chtRmType: '03',
+		maxUserCnt: 2,
+		chtRmTf: true,
+	})
+	return (await this.ch01lRp.save(newDmChtrm));
+  }
+
   // NOTE: TbUa01MEntity 사용 주의! 에러가 난다면 InjectRepository에 추가!
   async createUserAsOwner(user: TbUa01MEntity, chatroom: TbCh01LEntity) {
 	const chatroomUser = this.ch02lRp.create({
@@ -138,6 +148,14 @@ export class DbChatsManagerService {
 			chtRmJoinTf: true,
 		});
 	}
+	const currCount = await this.ch02lRp.count({
+		where: {
+			ch01lEntity: room,
+			chtRmJoinTf: true,
+		}
+	})
+	if (currCount === 0)
+		userInChtrm.chtRmAuth = '01';
 	userInChtrm.entryDttm = new Date();
 	userInChtrm.authChgDttm = new Date();
 	return (await this.ch02lRp.save(userInChtrm));

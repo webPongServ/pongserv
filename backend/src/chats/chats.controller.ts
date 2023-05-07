@@ -1,6 +1,6 @@
 import { ChatsService } from './chats.service';
 import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
@@ -12,6 +12,7 @@ import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
 import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
+import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -23,9 +24,9 @@ export class ChatsController {
     description: 'DM 요청 성공',
   })
   @ApiOperation({ summary: 'DM 요청' })
-  @Post('dm/:user_id')
-  dmRequest() {
-    return 'Hello World! it is dmRequest()';
+  @Post('dm')
+  async takeDmRequest(@CurrentUser() userId: string, @Body() infoDmReq: ChatroomDmReqDto) {
+    return (await this.chatsService.takeDmRequest(userId, infoDmReq));
   }
 
   @ApiResponse({
@@ -59,7 +60,7 @@ export class ChatsController {
     type: String, // 성공시 Chatroom_id string 반환
   })
   @ApiOperation({ summary: '채팅방 생성' })
-  @Post('create')
+  @Post('creation')
   async createChatroom(@CurrentUser() userId: string, @Body() infoCrtn: ChatroomCreationDto) {
     return (await this.chatsService.createChatroom(userId, infoCrtn));
   }
@@ -88,8 +89,12 @@ export class ChatsController {
     description: '채팅방 유저목록 반환 실패',
   })
   @ApiOperation({ summary: '채팅방 유저목록' })
+	@ApiParam({
+		name: 'uuid',
+		type: String,
+	})
   @Get('users/:uuid')
-  async getChatUsers(@CurrentUser() userId: string, @Param() uuid: string) {
+  async getChatUsers(@CurrentUser() userId: string, @Param('uuid') uuid: string) {
     return (await this.chatsService.getLiveUserListInARoom(userId, uuid));
   }
 
@@ -144,7 +149,7 @@ export class ChatsController {
     description: '관리자 권한 부여 실패(권한 부족)',
   })
   @ApiOperation({ summary: '관리자 권한 부여' })
-  @Post('empowerment/:chatroom_id/:user_id_to_empower')
+  @Post('empowerment')
   async empowerUser(@CurrentUser() userId: string, @Body() infoEmpwr: ChatroomEmpowermentDto) {
     return (await this.chatsService.empowerUser(userId, infoEmpwr));
   }
@@ -165,8 +170,12 @@ export class ChatsController {
     // type: ChatDto,  향후 추가
   })
   @ApiOperation({ summary: '채팅방 차단 유저목록' })
+  @ApiParam({
+		name: 'uuid',
+		type: String,
+	})
   @Get('bans/:uuid')
-  async getBanListInARoom(@CurrentUser() userId: string, @Param() uuid: string) {
+  async getBanListInARoom(@CurrentUser() userId: string, @Param('uuid') uuid: string) {
     return (await this.chatsService.getBanListInARoom(userId, uuid));
   }
 
@@ -175,7 +184,7 @@ export class ChatsController {
     description: '채팅방 차단 해제 성공',
   })
   @ApiOperation({ summary: '채팅방 차단 해제' })
-  @Patch('ban-removal/:chatroom_id/:userid_to_free')
+  @Patch('ban-removal')
   async removeBan(@CurrentUser() userId: string, @Body() infoBanRmv: ChatroomBanRemovalDto) {
     return (await this.chatsService.removeBan(userId, infoBanRmv));
   }

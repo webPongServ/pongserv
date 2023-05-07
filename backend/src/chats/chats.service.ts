@@ -12,6 +12,7 @@ import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
 import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
+import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
 
 @Injectable()
 export class ChatsService {
@@ -28,6 +29,30 @@ export class ChatsService {
 		const user = await this.dbUsersManagerService.getUserByUserId(userId);
 		await this.dbChatsManagerService.createUserAsOwner(user, newChatroom); // set user as chatroom owner
 		return (newChatroom.uuid);
+	}
+
+	async takeDmRequest(userId: string, infoDmReq: ChatroomDmReqDto) {
+		/*!SECTION
+			1. requester와 target에 대한 유저 정보를 가져온다.
+			2. DM용 private type의 chatroom을 만든다.
+			3. requester와 target 모두 DM chatroom의 참여자에 등록한다.
+				3-1. requester는 방 참여 여부(chtRmJoinTf)를 true로 설정한다.
+				3-2. target의 방 참여 여부는 false로 설정한다.
+			4. DM chatroom 정보를 반환한다.
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const target = await this.dbUsersManagerService.getUserByUserId(infoDmReq.targetUserId); // NOTE: nickname으로 바뀔 가능성 있음 (프론트랑 협의)
+		// 2
+		const nameDmChtrm = '[DM]' + requester.nickname + '->' + target.nickname;
+		const newDmChtrm = await this.dbChatsManagerService.createDmChatroom(nameDmChtrm);
+		// 3
+		await this.dbChatsManagerService.setUserToEnterRoom(requester, newDmChtrm);
+		const targetInDmInfo = await this.dbChatsManagerService.setUserToEnterRoom(target, newDmChtrm);
+		targetInDmInfo.chtRmJoinTf = false;
+		this.dbChatsManagerService.saveChtrmUser(targetInDmInfo);
+		// 4
+		return (newDmChtrm.uuid);
 	}
 
 	async getChatroomsForAUser(userId: string) {
