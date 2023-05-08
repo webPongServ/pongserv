@@ -112,7 +112,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '2차인증 활성화 성공' })
   @Post('activate2fa')
   async activateOtp(@CurrentUser() userId: string, @Body() otpData: otpData) {
-    console.log('HELLOWORLD');
+    console.log('2Fa Activate', userId);
     return this.authService.activate2fa(userId, otpData.sixDigit);
   }
 }

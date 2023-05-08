@@ -10,6 +10,7 @@ import {
   Res,
   Get,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -78,6 +79,26 @@ export class UsersController {
 
   @ApiResponse({
     status: 201,
+    description: '중복되는 NickName이 없습니다.',
+  })
+  @ApiOperation({ summary: 'NickName 변경 가능여부 확인' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('/nickname')
+  async checkNickname(@Query('new') nickname?: string) {
+    if (!nickname) {
+      return { result: false };
+    }
+    if (nickname.length > 8) {
+      throw new HttpException(
+        '닉네임은 8자 이하로 입력해주세요.',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+    return this.UsersService.checkNickname(nickname);
+  }
+
+  @ApiResponse({
+    status: 201,
     description: 'User Profile Data 가져오기 성공!.',
   })
   @ApiOperation({ summary: 'Query가 있으면, 친구의 데이터 없으면 내 껏' })
@@ -92,6 +113,22 @@ export class UsersController {
     } else {
       return await this.UsersService.getProfile(user);
     }
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'User Profile Data 가져오기 성공!.',
+  })
+  @ApiOperation({ summary: 'Query가 있으면, 친구의 데이터 없으면 내 껏' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Post('/image')
+  async changeImage(
+    @CurrentUser() user: string,
+    @Body('base64Data') base64Data: string,
+  ) {
+    console.log(base64Data);
+    if (!base64Data) throw new BadRequestException('base64Data가 없습니다.');
+    return await this.UsersService.changeImage(user, base64Data);
   }
 
   @ApiResponse({

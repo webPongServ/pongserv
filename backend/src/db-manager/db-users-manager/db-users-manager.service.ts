@@ -120,6 +120,31 @@ export class DbUsersManagerService {
       throw new BadRequestException('No User available');
     }
   }
+
+  async saveUser(user: TbUa01MEntity) {
+    try {
+      const result = await this.ua01mRp.save(user);
+      console.log(result);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async changeImagePath(userId: string, imagePath: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    if (user) {
+      user.imgPath = imagePath;
+      await this.ua01mRp.save(user);
+      console.log('Image path is sucessfuly saved');
+    } else {
+      throw new BadRequestException('No User available');
+    }
+  }
+
   async activate2fa(userId: string) {
     const user = await this.ua01mRp.findOne({
       where: {
@@ -279,9 +304,8 @@ export class DbUsersManagerService {
       where: {
         ua01mEntity: user,
         loginTf: true,
-      }
-    })
+      },
+    });
     return result;
   }
-  
 }
