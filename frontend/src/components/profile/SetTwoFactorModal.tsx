@@ -41,8 +41,8 @@ const SetTwoFactorModal = (props: SetTwoFactorModalProps) => {
       setQR(response.data);
     };
 
-    getQR();
-  }, []);
+    if (props.modalStatus === "set-twofactor") getQR();
+  }, [props.modalStatus]);
 
   return (
     <Modal
