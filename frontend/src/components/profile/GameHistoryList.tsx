@@ -78,8 +78,6 @@ const GameHistoryList = () => {
     },
   ]);
 
-  console.log(setHistoryList);
-
   const userProfile = (nickname: string, imgURL: string): JSX.Element => {
     return (
       <Link className="user flex-container" to={`/profile/${nickname}`}>

@@ -53,8 +53,6 @@ const CreateGameModal = (props: CreateGameModalProps) => {
     }
   };
 
-  console.log(setRoomID);
-
   return (
     <Modal
       open={props.roomStatus === "create-game"}

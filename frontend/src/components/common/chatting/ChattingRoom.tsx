@@ -23,8 +23,6 @@ const ChattingRoom = () => {
     role: "owner",
   });
 
-  console.log(setMyDetail);
-
   return (
     <Box id="page">
       {roomStatus === "chat" && (
