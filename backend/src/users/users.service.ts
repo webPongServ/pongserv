@@ -1,3 +1,4 @@
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './../auth/auth.service';
 import {
@@ -9,6 +10,7 @@ import {
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import * as fs from 'fs-extra';
 import * as path from 'path';
+import { config } from 'dotenv';
 
 @Injectable()
 export class UsersService {
@@ -16,6 +18,7 @@ export class UsersService {
     private readonly AuthService: AuthService,
     private readonly JwtService: JwtService,
     private readonly dbmanagerUsersService: DbUsersManagerService,
+    private readonly config: ConfigService,
   ) {}
 
   async verifyToken(token: string): Promise<any> {
@@ -89,8 +92,10 @@ export class UsersService {
 
     await fs.ensureDir(path.dirname(uploadPath));
     await fs.writeFile(uploadPath, buffer);
-    await this.dbmanagerUsersService.changeImagePath(userId, fileName);
-    return uploadPath;
+    const IMAGE_URL = this.config.get('IMAGE_URL');
+    const filePath = IMAGE_URL + fileName;
+    await this.dbmanagerUsersService.changeImagePath(userId, filePath);
+    return filePath;
   }
 
   async makeFriend(intraId: string, friendId: string) {
