@@ -23,9 +23,10 @@ export class UsersService {
 
   async verifyToken(token: string): Promise<any> {
     try {
-      // console.log(token);
+      console.log(token);
       token = token.split(' ')[1];
       const decoded = await this.JwtService.verifyAsync(token);
+      console.log(decoded);
       return decoded;
     } catch (error) {
       return null;

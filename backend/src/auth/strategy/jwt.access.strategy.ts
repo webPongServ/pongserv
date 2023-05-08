@@ -33,6 +33,8 @@ export class AccessTokenStrategy extends PassportStrategy(
     const checked = await this.dbUsersManagerService.checkUserInDb(
       payload.userId,
     );
+    console.log('payload: ');
+    console.log(payload);
     return checked;
   }
 
