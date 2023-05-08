@@ -29,7 +29,7 @@ export class TbUa01MEntity {
   twofactor: boolean;
 
   // TWOFACTOR_DATA
-  @Column({ name: 'TWOFACTOR_DATA', type: 'varchar', length: 50 })
+  @Column({ name: 'TWOFACTOR_DATA', type: 'varchar', length: 50, nullable: true })
   twofactorData: string;
 
   // IMG_PATH

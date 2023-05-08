@@ -33,12 +33,6 @@ export class DbUsersManagerService {
     return user;
   }
 
-  setUser() {
-    const test = this.ua01mRp.create();
-    console.log(test);
-    console.log(`in DbManagerService.serUser`);
-  }
-
   // TODO: move to UsersModule
   async checkinUser(intraData: { intraId: string; intraImagePath: string }) {
     /*!SECTION
@@ -57,12 +51,10 @@ export class DbUsersManagerService {
     if (!userMaster) {
       userMaster = await this.ua01mRp.save(
         this.ua01mRp.create({
-          userId: userId, // userID string...
+          userId: userId,
           nickname: userId,
           twofactor: false,
-          twofactorData: '',
           imgPath: intraData.intraImagePath,
-          delTf: false,
         }),
       );
     }
