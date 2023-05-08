@@ -2,19 +2,10 @@ import { ProfileDetail } from "types/Detail";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
-import { Box, Skeleton } from "@mui/material";
+import { Box } from "@mui/material";
 
 const UserInfo = (props: ProfileDetail) => {
-  return props.nickname === "" ? (
-    <Box className="flex-container">
-      <Skeleton className="skeleton-img" variant="circular" />
-      <Box>
-        <Skeleton className="skeleton-title" variant="rectangular" />
-        <Skeleton className="skeleton-info" variant="rectangular" />
-        <Skeleton className="skeleton-info" variant="rectangular" />
-      </Box>
-    </Box>
-  ) : (
+  return (
     <Box className="flex-container">
       <img src={props.imgURL} alt="profile_image" />
       <Box>
