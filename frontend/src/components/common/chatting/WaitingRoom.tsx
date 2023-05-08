@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import PasswordFormCard from "./PasswordFormCard";
+import { useSelector, useDispatch } from "react-redux";
+import PasswordFormCard from "components/common/chatting/PasswordFormCard";
 import RoomCard from "components/common/chatting/RoomCard";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
-import { ChatRoomDetail } from "types/Detail";
-import { useSelector, useDispatch } from "react-redux";
-import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import CustomIconButton from "components/common/utils/CustomIconButton";
+import { ChatRoomDetail } from "types/Detail";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
+import ChattingService from "API/ChattingService";
 import "styles/ChattingDrawer.scss";
 import "styles/global.scss";
 
@@ -22,85 +23,11 @@ const WaitingRoom = () => {
   const [pwIndex, setPwIndex] = useState<number>(-1);
   const [page, setPage] = useState<number>(1);
 
-  const getChatRoomList = () => {
+  const getChatRoomList = async () => {
     // fetch data
-    setChatRoomList([
-      {
-        id: "202304230001",
-        title: "이기면 100만원~",
-        owner: "noname_12",
-        type: "public",
-        current: 4,
-        max: 5,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230002",
-        title: "옥상으로 따라와",
-        owner: "mgo",
-        type: "protected",
-        current: 4,
-        max: 9,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230003",
-        title: "[DM] susong, mgo",
-        owner: "mgo",
-        type: "private",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230002",
-        title: "비밀번호 486",
-        owner: "seongtki",
-        type: "protected",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230002",
-        title: "비밀번호 486",
-        owner: "seongtki",
-        type: "protected",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230002",
-        title: "비밀번호 486",
-        owner: "seongtki",
-        type: "protected",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230002",
-        title: "비밀번호 486",
-        owner: "seongtki",
-        type: "protected",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-      {
-        id: "202304230002",
-        title: "비밀번호 486",
-        owner: "seongtki",
-        type: "protected",
-        current: 1,
-        max: 2,
-        createdAt: new Date(),
-      },
-    ]);
+    const response = await ChattingService.getChattingRooms();
+    setChatRoomList(response.data);
   };
-
-  console.log(useSelector);
 
   useEffect(() => {
     getChatRoomList();
@@ -135,7 +62,6 @@ const WaitingRoom = () => {
             variant="outlined"
             shape="rounded"
             onChange={(e, number) => {
-              console.log(e);
               setPage(number);
             }}
           />
