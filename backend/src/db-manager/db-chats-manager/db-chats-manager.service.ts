@@ -76,14 +76,27 @@ export class DbChatsManagerService {
 			chtRmTf: true
 		}
 	});
-	// NOTE: TypeOrm 기능에 좀 더 눈이 밝았다면 forEach를 남발하지 않았을텐데...
-	prvChtrms.forEach((prvChtrm) => {
-		prvChtrm.ch02lEntities.forEach((userOfChtrm) => {
-			if (userOfChtrm.ua01mEntity === user) {
-				results.push(prvChtrm);
+	for (const prvChtrm of prvChtrms) {
+		let canUserSee: boolean = false;
+		for (const userOfChtrm of prvChtrm.ch02lEntities) {
+			const userOfChtrmWithRel = await this.ch02lRp.findOne({
+				relations: {
+					ua01mEntity: true,
+				},
+				where: {
+					id: userOfChtrm.id,
+				}
+			})
+			console.log('userOfChtrmWithRel: ');
+			console.log(userOfChtrmWithRel);
+			if (userOfChtrmWithRel.ua01mEntity.userId === user.userId) {
+				canUserSee = true;
+				break ;
 			}
-		})
-	})
+		}
+		if (canUserSee === true)
+			results.push(prvChtrm);
+	}
 	return results;
   }
 

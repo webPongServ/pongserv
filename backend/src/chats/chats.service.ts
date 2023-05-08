@@ -42,15 +42,25 @@ export class ChatsService {
 			4. DM chatroom 정보를 반환한다.
 		*/
 		// 1
+		console.log('userId: ');
+		console.log(userId);
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		console.log('requester: ');
+		console.log(requester);
 		const target = await this.dbUsersManagerService.getUserByUserId(infoDmReq.targetUserId); // NOTE: nickname으로 바뀔 가능성 있음 (프론트랑 협의)
+		console.log('target: ');
+		console.log(target);
 		// 2
 		const nameDmChtrm = '[DM]' + requester.nickname + '->' + target.nickname;
 		const newDmChtrm = await this.dbChatsManagerService.createDmChatroom(nameDmChtrm);
+		console.log('newDmChtrm: ');
+		console.log(newDmChtrm);
 		// 3
 		await this.dbChatsManagerService.setUserToEnterRoom(requester, newDmChtrm);
 		const targetInDmInfo = await this.dbChatsManagerService.setUserToEnterRoom(target, newDmChtrm);
 		targetInDmInfo.chtRmJoinTf = false;
+		console.log('targetInDmInfo: ');
+		console.log(targetInDmInfo);
 		this.dbChatsManagerService.saveChtrmUser(targetInDmInfo);
 		// 4
 		return (newDmChtrm.uuid);
@@ -70,8 +80,14 @@ export class ChatsService {
 				uuid, name, owner, type, current, max
 		*/
 		// 1
+		console.log('userId: ');
+		console.log(userId);
 		const user: TbUa01MEntity = await this.dbUsersManagerService.getUserByUserId(userId);
+		console.log(`user: `);
+		console.log(user);
 		let dmChtrms: TbCh01LEntity[] = await this.dbChatsManagerService.getDMChatroomsForUser(user);
+		console.log(`dmChtrms: `);
+		console.log(dmChtrms);
 		// 2
 		let pblAndprtChtrms: TbCh01LEntity[] = await this.dbChatsManagerService.getPublicAndProtectedChatrooms();
 		// 3
@@ -83,7 +99,7 @@ export class ChatsService {
 			type: string,
 			currentCount: number,
 			maxCount: number,
-		}[];
+		}[] = [];
 		for (const eachChtrm of combinedChtrms) {
 			const currUserListAndCount = await this.dbChatsManagerService.getCurrUserListAndCount(eachChtrm);
 			let owner: TbCh02LEntity;
@@ -102,6 +118,8 @@ export class ChatsService {
 				maxCount: eachChtrm.maxUserCnt,
 			})
 		}
+		console.log(`results: `);
+		console.log(results);
 		return results;
 	}
 
@@ -349,7 +367,7 @@ export class ChatsService {
 		const currTrgtLgn = await this.dbUsersManagerService.getCurrLoginData(target);
 		if (currTrgtLgn === null)
 			throw new NotFoundException('The target not logined');
-		if (currTrgtLgn.gmTf === true)
+		if (currTrgtLgn.stsCd === '03')
 			throw new BadRequestException('The target is gaming now.');
 		// 4
 		return target.userId;

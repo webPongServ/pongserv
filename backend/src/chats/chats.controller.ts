@@ -13,6 +13,7 @@ import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
 import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
+import { AccessTokenStrategy } from 'src/auth/strategy/jwt.access.strategy';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -24,6 +25,7 @@ export class ChatsController {
     description: 'DM 요청 성공',
   })
   @ApiOperation({ summary: 'DM 요청' })
+  // @UseGuards(AccessTokenStrategy)
   @Post('dm')
   async takeDmRequest(@CurrentUser() userId: string, @Body() infoDmReq: ChatroomDmReqDto) {
     return (await this.chatsService.takeDmRequest(userId, infoDmReq));
@@ -107,7 +109,7 @@ export class ChatsController {
     description: '채팅방 내보내기 실패',
   })
   @ApiOperation({ summary: '채팅방 내보내기' })
-  @Put('kick')
+  @Patch('kick')
   async kickUser(@CurrentUser() userId: string, @Body() infoKick: ChatroomKickingDto) {
     return (await this.chatsService.kickUser(userId, infoKick));
   }
@@ -121,7 +123,7 @@ export class ChatsController {
     description: '채팅방 차단 실패(권한 부족)',
   })
   @ApiOperation({ summary: '채팅방 차단' })
-  @Post('ban')
+  @Put('ban')
   async banUser(@CurrentUser() userId: string, @Body() infoBan: ChatroomBanDto) {
     return (await this.chatsService.banUser(userId, infoBan));
   }
@@ -135,7 +137,7 @@ export class ChatsController {
     description: '벙어리 적용 실패(권한 부족)',
   })
   @ApiOperation({ summary: '벙어리 적용' })
-  @Post('mute')
+  @Put('mute')
   async muteUser(@CurrentUser() userId: string, @Body() infoMute: ChatroomMuteDto) {
     return (await this.chatsService.muteUser(userId, infoMute));
   }
@@ -149,7 +151,7 @@ export class ChatsController {
     description: '관리자 권한 부여 실패(권한 부족)',
   })
   @ApiOperation({ summary: '관리자 권한 부여' })
-  @Post('empowerment')
+  @Patch('empowerment')
   async empowerUser(@CurrentUser() userId: string, @Body() infoEmpwr: ChatroomEmpowermentDto) {
     return (await this.chatsService.empowerUser(userId, infoEmpwr));
   }
