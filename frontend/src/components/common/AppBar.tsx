@@ -2,10 +2,11 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ChattingDrawerWidth } from "constant";
 import { IRootState } from "components/common/store";
+import SkeletonMyInfo from "./utils/SkeletonMyInfo";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 
-import { Toolbar, IconButton, Skeleton } from "@mui/material";
+import { Toolbar, IconButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -48,10 +49,7 @@ const AppBar = (props: HandleOpen) => {
           WebPongServ
         </Link>
         {myInfo.nickname === "" ? (
-          <>
-            <Skeleton className="skeleton-img" variant="circular" />
-            <Skeleton className="skeleton-nickname" variant="rectangular" />
-          </>
+          <SkeletonMyInfo />
         ) : (
           <Link
             id="my-profile"

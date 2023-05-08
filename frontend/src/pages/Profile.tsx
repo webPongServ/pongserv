@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
-import { FriendsActionTypes } from "types/redux/Friends";
 import { IRootState } from "components/common/store";
 import { ProfileDetail, UserDetail } from "types/Detail";
 import UserInfo from "components/profile/UserInfo";
@@ -11,11 +9,15 @@ import AchievementList from "components/profile/AchievementList";
 import EditNicknameModal from "components/profile/EditNicknameModal";
 import EditImageModal from "components/profile/EditImageModal";
 import SetTwoFactorModal from "components/profile/SetTwoFactorModal";
+import SkeletonProfile from "components/common/utils/SkeletonProfile";
+import SkeletonButtons from "components/common/utils/SkeletonButtons";
+import MyButtons from "components/profile/MyButtons";
+import OthersButtons from "components/profile/OthersButtons";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
-import { Box, Skeleton } from "@mui/material";
-import { Button, Tabs, TabList } from "@mui/joy";
+import { Box } from "@mui/material";
+import { Tabs, TabList } from "@mui/joy";
 import Tab, { tabClasses } from "@mui/joy/Tab";
 import UserService from "API/UsersService";
 
@@ -26,11 +28,11 @@ const Profile = () => {
   );
   const [isFriend, setIsFriend] = useState<boolean>(false);
   const [modalStatus, setModalStatus] = useState<string>("closed");
-  const { nickname } = useParams();
   const [profileDetail, setProfileDetail] = useState<ProfileDetail | null>(
     null
   );
-  const dispatch = useDispatch();
+  const { nickname } = useParams();
+
   const navigate = useNavigate();
 
   const getProfile = async () => {
@@ -52,56 +54,6 @@ const Profile = () => {
     }
   };
 
-  const handleDMButton = () => {
-    // const data = ... // 채팅방 생성 API 요청
-    dispatch({
-      type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-      payload: {
-        id: "202304280001", // API를 통해 받아온 데이터
-        title: `[DM] ${profileDetail!.nickname}, ${myInfo.nickname}`,
-        owner: `${myInfo.nickname}`,
-        type: "private",
-        max: 2,
-        current: 1,
-        createdAt: new Date(),
-      },
-    });
-  };
-
-  const handleFriendAddButton = () => {
-    dispatch({
-      type: FriendsActionTypes.FRIENDS_ADD,
-      payload: {
-        nickname: profileDetail!.nickname,
-        imgURL: profileDetail!.imgURL,
-        status: profileDetail!.status,
-      },
-    });
-    setIsFriend(!isFriend);
-  };
-
-  const handleFriendDeleteButton = () => {
-    dispatch({
-      type: FriendsActionTypes.FRIENDS_DELETE,
-      payload: profileDetail!.nickname,
-    });
-    setIsFriend(!isFriend);
-  };
-
-  const handleBlockButton = () => {};
-
-  const handleEditNicknameButton = () => {
-    setModalStatus("edit-nickname");
-  };
-
-  const handleTwoFactorButton = () => {
-    setModalStatus("set-twofactor");
-  };
-
-  const handleEditImageButton = () => {
-    setModalStatus("edit-image");
-  };
-
   useEffect(() => {
     if (friends !== null) {
       friends.forEach((element) => {
@@ -119,14 +71,7 @@ const Profile = () => {
       <Box id="user-info-box" className="flex-container">
         <Box className="user-info flex-container">
           {profileDetail === null ? (
-            <Box className="flex-container">
-              <Skeleton className="skeleton-img" variant="circular" />
-              <Box>
-                <Skeleton className="skeleton-title" variant="rectangular" />
-                <Skeleton className="skeleton-info" variant="rectangular" />
-                <Skeleton className="skeleton-info" variant="rectangular" />
-              </Box>
-            </Box>
+            <SkeletonProfile />
           ) : (
             <UserInfo
               nickname={profileDetail!.nickname}
@@ -141,45 +86,18 @@ const Profile = () => {
           )}
         </Box>
         <Box className="button-group flex-container">
-          {profileDetail === null && (
-            <>
-              <Skeleton className="skeleton-button" variant="rectangular" />
-              <Skeleton className="skeleton-button" variant="rectangular" />
-              <Skeleton className="skeleton-button" variant="rectangular" />
-            </>
-          )}
+          {profileDetail === null && <SkeletonButtons />}
           {profileDetail !== null &&
             profileDetail.nickname === myInfo.nickname && (
-              <>
-                <Button variant="outlined" onClick={handleEditNicknameButton}>
-                  닉네임 수정
-                </Button>
-                <Button variant="outlined" onClick={handleEditImageButton}>
-                  프로필 이미지 수정
-                </Button>
-                <Button variant="solid" onClick={handleTwoFactorButton}>
-                  2차 인증 설정
-                </Button>
-              </>
+              <MyButtons setModalStatus={setModalStatus} />
             )}
           {profileDetail !== null &&
             profileDetail!.nickname !== myInfo.nickname && (
-              <>
-                <Button variant="solid" onClick={handleDMButton}>
-                  DM
-                </Button>
-                <Button
-                  variant={isFriend ? "outlined" : "solid"}
-                  onClick={
-                    isFriend ? handleFriendDeleteButton : handleFriendAddButton
-                  }
-                >
-                  {isFriend ? "친구 삭제" : "친구 추가"}
-                </Button>
-                <Button variant="outlined" onClick={handleBlockButton}>
-                  차단
-                </Button>
-              </>
+              <OthersButtons
+                isFriend={isFriend}
+                setIsFriend={setIsFriend}
+                profileDetail={profileDetail}
+              />
             )}
         </Box>
       </Box>
