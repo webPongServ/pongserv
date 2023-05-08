@@ -96,6 +96,7 @@ const UserList = (props: UserListProps) => {
                     )
                   );
                   props.setBans([...props.bans, selectedUser]);
+                  setAnchorEl(null);
                 }}
               >
                 채팅방 차단

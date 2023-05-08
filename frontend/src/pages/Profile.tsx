@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { FriendsActionTypes } from "types/redux/Friends";
 import { IRootState } from "components/common/store";
@@ -7,15 +8,39 @@ import { ProfileDetail } from "types/Detail";
 import UserInfo from "components/profile/UserInfo";
 import GameHistoryList from "components/profile/GameHistoryList";
 import AchievementList from "components/profile/AchievementList";
+import EditProfileModal from "components/profile/EditProfileModal";
+import SetTwoFactorModal from "components/profile/SetTwoFactorModal";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
 import { Box } from "@mui/material";
 import { Button, Tabs, TabList } from "@mui/joy";
 import Tab, { tabClasses } from "@mui/joy/Tab";
+import UserService from "API/UsersService";
 
 const Profile = () => {
-  // 다른 사람 정보도 요청해야 하니까 여기서 요청하기
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
+  const friends = useSelector((state: IRootState) => state.friends.friends);
+  const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [modalStatus, setModalStatus] = useState<string>("closed");
+  const dispatch = useDispatch();
+  const { nickname } = useParams();
+
+  const getProfile = async () => {
+    const response = await UserService.getUserProfile(nickname!);
+    setProfileDetail({
+      nickname: response.data.nickname,
+      imgURL: response.data.imgPath,
+      total: response.data.total,
+      win: response.data.win,
+      lose: response.data.lose,
+      ELO: response.data.ELO,
+      winRate: response.data.winRate,
+      status: "",
+    });
+  };
+
+  // loading 창 띄우기
   const [profileDetail, setProfileDetail] = useState<ProfileDetail>({
     nickname: "skittles",
     imgURL: "../image.png",
@@ -26,13 +51,6 @@ const Profile = () => {
     winRate: 0.8,
     status: "login",
   });
-
-  const myInfo = useSelector((state: IRootState) => state.myInfo);
-  const friends = useSelector((state: IRootState) => state.friends.friends);
-  const dispatch = useDispatch();
-  const [isFriend, setIsFriend] = useState<boolean>(false);
-
-  console.log(setProfileDetail);
 
   const handleDMButton = () => {
     // const data = ... // 채팅방 생성 API 요청
@@ -72,14 +90,24 @@ const Profile = () => {
 
   const handleBlockButton = () => {};
 
+  const handleEditButton = () => {
+    setModalStatus("edit-profile");
+  };
+
+  const handleTwoFactorButton = () => {
+    setModalStatus("set-twofactor");
+  };
+
   useEffect(() => {
     friends.forEach((element) => {
       if (element.nickname === profileDetail.nickname) {
         setIsFriend(true);
       }
     });
+    getProfile();
+
     // check dependency list!!
-  }, [friends, profileDetail.nickname]);
+  }, []);
 
   return (
     <Box id="Profile" className="flex-container">
@@ -97,20 +125,33 @@ const Profile = () => {
           />
         </Box>
         <Box className="button-group flex-container">
-          <Button variant="solid" onClick={handleDMButton}>
-            DM
-          </Button>
-          <Button
-            variant={isFriend ? "outlined" : "solid"}
-            onClick={
-              isFriend ? handleFriendDeleteButton : handleFriendAddButton
-            }
-          >
-            {isFriend ? "친구 삭제" : "친구 추가"}
-          </Button>
-          <Button variant="outlined" onClick={handleBlockButton}>
-            차단
-          </Button>
+          {profileDetail.nickname === myInfo.nickname ? (
+            <>
+              <Button variant="outlined" onClick={handleEditButton}>
+                정보 수정
+              </Button>
+              <Button variant="solid" onClick={handleTwoFactorButton}>
+                2차 인증 설정
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="solid" onClick={handleDMButton}>
+                DM
+              </Button>
+              <Button
+                variant={isFriend ? "outlined" : "solid"}
+                onClick={
+                  isFriend ? handleFriendDeleteButton : handleFriendAddButton
+                }
+              >
+                {isFriend ? "친구 삭제" : "친구 추가"}
+              </Button>
+              <Button variant="outlined" onClick={handleBlockButton}>
+                차단
+              </Button>
+            </>
+          )}
         </Box>
       </Box>
       <Tabs id="history-box" aria-label="tabs" defaultValue={0}>
@@ -145,6 +186,14 @@ const Profile = () => {
           <AchievementList />
         </Box>
       </Tabs>
+      <EditProfileModal
+        modalStatus={modalStatus}
+        setModalStatus={setModalStatus}
+      />
+      <SetTwoFactorModal
+        modalStatus={modalStatus}
+        setModalStatus={setModalStatus}
+      />
     </Box>
   );
 };

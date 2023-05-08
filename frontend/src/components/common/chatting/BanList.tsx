@@ -87,6 +87,7 @@ const BanList = (props: BanListProps) => {
                 (value) => value.nickname !== selectedUser.nickname
               )
             );
+            setAnchorEl(null);
           }}
         >
           채팅방 차단 해제

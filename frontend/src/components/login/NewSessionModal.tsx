@@ -1,3 +1,6 @@
+import { useSelector, useDispatch } from "react-redux";
+import { IRootState } from "components/common/store";
+import { LoginStatusActionTypes } from "types/redux/Login";
 import "styles/global.scss";
 import "styles/Login.scss";
 
@@ -8,16 +11,14 @@ import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
 
-interface HandleModalStatus {
-  modalStatus: string;
-  setModalStatus: Function;
-}
+const NewSessionModal = () => {
+  const loginStatus = useSelector((state: IRootState) => state.loginStatus);
+  const dispatch = useDispatch();
 
-const NewSessionModal = (props: HandleModalStatus) => {
   return (
     <Modal
-      open={props.modalStatus === "new-session"}
-      onClose={() => props.setModalStatus("closed")}
+      open={loginStatus === "new-session"}
+      onClose={() => dispatch({ type: LoginStatusActionTypes.STATUS_MAIN })}
     >
       <ModalDialog className="modal" variant="outlined">
         <Box id="inform" className="outframe">
@@ -26,7 +27,9 @@ const NewSessionModal = (props: HandleModalStatus) => {
             <CustomIconButton
               class="right"
               icon={<CloseIcon />}
-              handleFunction={() => props.setModalStatus("closed")}
+              handleFunction={() =>
+                dispatch({ type: LoginStatusActionTypes.STATUS_MAIN })
+              }
             />
           </Box>
           <Box className="body flex-container">

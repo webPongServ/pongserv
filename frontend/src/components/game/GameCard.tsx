@@ -27,10 +27,12 @@ const GameCard = (props: GameCardProps) => {
         props.setSelectedID(props.id);
       }}
     >
-      <Box className="preview flex-container">
-        {userNickname(props.owner, "../image.png")}
-        <img className="vs" src="../swords.png" alt="sword_img" />
-        {userNickname("ㅤ", "../question.png")}
+      <Box className="flex-container">
+        <Box className="preview flex-container">
+          {userNickname(props.owner, "../image.png")}
+          <img className="vs" src="../swords.png" alt="sword_img" />
+          {userNickname("ㅤ", "../question.png")}
+        </Box>
       </Box>
       <Box className="title flex-container">{props.title}</Box>
       <Divider />

@@ -1,3 +1,9 @@
+$border_size: 5px;
+$board_width: 1000px;
+$board_height: 600px;
+$paddle_width: 20px;
+$paddle_height: 150px;
+
 #GameWaiting {
   width: 100%;
   height: 105%;
@@ -5,57 +11,68 @@
   row-gap: 5%;
 
   #game-box {
+    width: 800px;
     height: 80%;
     padding: 3%;
 
-    .game-card {
-      width: 250px;
-      height: 250px;
-      cursor: pointer;
-      margin: 1%;
-      &:hover {
-        border: 3px solid skyblue;
-      }
+    .list {
+      height: 90%;
+      justify-content: space-evenly;
 
-      .preview {
-        height: 130px;
-        justify-content: space-between;
+      .game-card {
+        width: 300px;
+        height: 200px;
+        cursor: pointer;
+        margin: 1%;
+        &:hover {
+          border: 3px solid skyblue;
+        }
 
-        .user {
-          flex-direction: column;
+        .preview {
+          width: 250px;
+          height: 100px;
+          justify-content: space-between;
 
-          img {
-            width: 75px;
-            height: 75px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            border-radius: 50%;
-            border: 0px solid #fff;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
-              0 3px 6px rgba(0, 0, 0, 0.23);
+          .user {
+            flex-direction: column;
+
+            img {
+              width: 75px;
+              height: 75px;
+              margin-bottom: 10px;
+              display: flex;
+              align-items: center;
+              border-radius: 50%;
+              border: 0px solid #fff;
+              box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                0 3px 6px rgba(0, 0, 0, 0.23);
+            }
+          }
+
+          .vs {
+            width: 30px;
+            height: 30px;
           }
         }
 
-        .vs {
-          width: 30px;
-          height: 30px;
+        .title {
+          height: 60px;
+          font-size: 20px;
+          font-weight: bold;
+        }
+
+        .card-overflow {
+          font-size: 13px;
+          height: 40px;
+          // color: #aaaaaa;
+          column-gap: 2%;
+          padding: 0.5% var(--Card-padding) 0.5% var(--Card-padding);
         }
       }
+    }
 
-      .title {
-        height: 80px;
-        font-size: 15px;
-        font-weight: bold;
-      }
-
-      .card-overflow {
-        font-size: 13px;
-        height: 40px;
-        color: #aaaaaa;
-        column-gap: 2%;
-        padding: 0.5% var(--Card-padding) 0.5% var(--Card-padding);
-      }
+    .pagination {
+      height: 10%;
     }
   }
 
@@ -65,7 +82,7 @@
     height: 10%;
 
     button {
-      width: 50%;
+      width: 40%;
       margin-bottom: 5px;
     }
   }
@@ -76,4 +93,96 @@
   height: 105%;
   row-gap: 5%;
   flex-direction: column;
+}
+
+#GamePlay {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  #app-bar {
+    /* non-flexible sizing */
+    flex: 0 0 auto;
+  }
+
+  #board {
+    /* flexible sizing */
+    flex: 1 1 auto;
+    background-color: black;
+    color: white;
+    position: relative;
+
+    .board {
+      position: fixed;
+      height: $board_height + $border_size * 2;
+      width: $board_width + $border_size * 2;
+      // background-image: linear-gradient(to right, #5c6e91, #839b97);
+      border: solid $border_size white;
+      border-radius: 14px;
+      margin: auto auto;
+    }
+
+    .ball {
+      height: 15px;
+      width: 15px;
+      border-radius: 50%;
+      position: absolute;
+      top: $board_height * 0.5 - 15px;
+      left: $board_width * 0.5 - 15px;
+      background-color: white;
+    }
+
+    // .ball_effect {
+    //   height: 100%;
+    //   width: 100%;
+    //   border-radius: 100px;
+    //   animation: spinBall 0.1s linear infinite;
+    // }
+
+    .paddle {
+      height: $paddle_height;
+      width: $paddle_width;
+      border-radius: 5%;
+      position: absolute;
+      background-color: white;
+    }
+
+    .paddle_1 {
+      top: $board_height * 0.1;
+      left: $board_width * 0.03;
+    }
+
+    .paddle_2 {
+      top: $board_height - $board_height * 0.3;
+      left: $board_width - $board_width * 0.03 - $paddle_width;
+    }
+
+    .player_1_score {
+      height: 50px;
+      width: 50px;
+      position: absolute;
+      left: $board_width * 0.3;
+      top: $board_height * 0.2;
+    }
+
+    .player_2_score {
+      height: 50px;
+      width: 50px;
+      position: absolute;
+      left: $board_width * 0.7;
+      top: $board_height * 0.2;
+    }
+
+    .message {
+      position: absolute;
+      /* color: #48426d; */
+      font-size: 20px;
+      height: 100px;
+      width: 300px;
+      color: #c9cbff;
+      left: $board_width * 0.4;
+      top: $board_height * 0.2;
+    }
+  }
 }
