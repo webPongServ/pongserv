@@ -38,6 +38,15 @@ export class TbUa01LEntity {
   })
   loginDttm: Date;
 
+  // CONN_DTTM  // NOTE: 마지막 통신 시간
+  @Column({
+    name: 'CONN_DTTM',
+    type: 'timestamp with time zone',
+    precision: 0,
+    nullable: true
+  })
+  connDttm: Date;
+
   // LOGOUT_DTTM
   @Column({
     name: 'LOGOUT_DTTM',
@@ -47,13 +56,9 @@ export class TbUa01LEntity {
   })
   logoutDttm: Date;
 
-  // CHT_TF
-  @Column({ name: 'CHT_TF', type: 'boolean' })
-  chtTf: boolean;
-
-  // GM_TF
-  @Column({ name: 'GM_TF', type: 'boolean' })
-  gmTf: boolean;
+  // STS_CD   // NOTE: 상태코드 '01': 일반상태, '02': 채팅상태, '03': 게임상태
+  @Column({ name: 'STTS_CD', type: 'varchar', length: 2, nullable: true })
+  stsCd: string;
 
   // REFRESH_TKN
   @Column({ name: 'REFRESH_TKN', type: 'varchar', length: 200 })

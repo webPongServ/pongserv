@@ -29,6 +29,16 @@ export class DbChatsManagerService {
 	return (await this.ch01lRp.save(newChtrm));
   }
 
+  async createDmChatroom(name: string) {
+	const newDmChtrm = this.ch01lRp.create({
+		chtRmNm: name,
+		chtRmType: '03',
+		maxUserCnt: 2,
+		chtRmTf: true,
+	})
+	return (await this.ch01lRp.save(newDmChtrm));
+  }
+
   // NOTE: TbUa01MEntity 사용 주의! 에러가 난다면 InjectRepository에 추가!
   async createUserAsOwner(user: TbUa01MEntity, chatroom: TbCh01LEntity) {
 	const chatroomUser = this.ch02lRp.create({
@@ -56,7 +66,7 @@ export class DbChatsManagerService {
 		chatroom user list table에 등록이 된다.
 		다만 delTf가 true로 초기에 설정됨.
 	*/
-	let results: TbCh01LEntity[];
+	let results: TbCh01LEntity[] = []; // NOTE: 초기화 하지 않으면 에러 발생
 	let prvChtrms: TbCh01LEntity[] = await this.ch01lRp.find({
 		relations: {
 			ch02lEntities: true,
@@ -66,14 +76,27 @@ export class DbChatsManagerService {
 			chtRmTf: true
 		}
 	});
-	// NOTE: TypeOrm 기능에 좀 더 눈이 밝았다면 forEach를 남발하지 않았을텐데...
-	prvChtrms.forEach((prvChtrm) => {
-		prvChtrm.ch02lEntities.forEach((userOfChtrm) => {
-			if (userOfChtrm.ua01mEntity === user) {
-				results.push(prvChtrm);
+	for (const prvChtrm of prvChtrms) {
+		let canUserSee: boolean = false;
+		for (const userOfChtrm of prvChtrm.ch02lEntities) {
+			const userOfChtrmWithRel = await this.ch02lRp.findOne({
+				relations: {
+					ua01mEntity: true,
+				},
+				where: {
+					id: userOfChtrm.id,
+				}
+			})
+			console.log('userOfChtrmWithRel: ');
+			console.log(userOfChtrmWithRel);
+			if (userOfChtrmWithRel.ua01mEntity.userId === user.userId) {
+				canUserSee = true;
+				break ;
 			}
-		})
-	})
+		}
+		if (canUserSee === true)
+			results.push(prvChtrm);
+	}
 	return results;
   }
 
@@ -138,6 +161,14 @@ export class DbChatsManagerService {
 			chtRmJoinTf: true,
 		});
 	}
+	const currCount = await this.ch02lRp.count({
+		where: {
+			ch01lEntity: room,
+			chtRmJoinTf: true,
+		}
+	})
+	if (currCount === 0)
+		userInChtrm.chtRmAuth = '01';
 	userInChtrm.entryDttm = new Date();
 	userInChtrm.authChgDttm = new Date();
 	return (await this.ch02lRp.save(userInChtrm));
@@ -271,6 +302,33 @@ export class DbChatsManagerService {
 
   saveChtrmUser(chtrmUser: TbCh02LEntity) {
 	this.ch02lRp.save(chtrmUser);
+  }
+
+  async getBanListInARoom(room: TbCh01LEntity) {
+	const results = await this.ch02dRp.find({
+		where: {
+			ch01lEntity: room,
+			chtRmRstrCd: '02',
+			vldTf: true,
+		}
+	})
+	return results;
+  }
+
+  async getBanInfoInAChtrm(user: TbUa01MEntity, room: TbCh01LEntity) {
+	const result = await this.ch02dRp.findOne({
+		where: {
+			ch01lEntity: room,
+			ua01mEntity: user,
+			chtRmRstrCd: '02',
+			vldTf: true,
+		}
+	})
+	return result;
+  }
+
+  saveChtrmRstrInfo(rstrInfo: TbCh02DEntity) {
+	this.ch02dRp.save(rstrInfo);
   }
   
 }

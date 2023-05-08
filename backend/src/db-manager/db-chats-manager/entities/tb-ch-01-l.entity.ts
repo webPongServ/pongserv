@@ -32,7 +32,7 @@ export class TbCh01LEntity {
   maxUserCnt: number;
 
   // CHT_RM_PWD
-  @Column({ name: 'CHT_RM_PWD', type: 'varchar', length: 64 })
+  @Column({ name: 'CHT_RM_PWD', type: 'varchar', length: 64, default: '' })
   chtRmPwd: string;
 
   // CHT_RM_TF
