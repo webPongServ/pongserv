@@ -37,7 +37,7 @@ export class TbUa01MEntity {
   imgPath: string;
 
   // DEL_TF
-  @Column({ name: 'DEL_TF', type: 'boolean' })
+  @Column({ name: 'DEL_TF', type: 'boolean', default: false })
   delTf: boolean;
 
   // FRST_DTTM
