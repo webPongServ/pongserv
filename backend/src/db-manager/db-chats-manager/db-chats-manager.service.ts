@@ -66,7 +66,7 @@ export class DbChatsManagerService {
 		chatroom user list table에 등록이 된다.
 		다만 delTf가 true로 초기에 설정됨.
 	*/
-	let results: TbCh01LEntity[];
+	let results: TbCh01LEntity[] = []; // NOTE: 초기화 하지 않으면 에러 발생
 	let prvChtrms: TbCh01LEntity[] = await this.ch01lRp.find({
 		relations: {
 			ch02lEntities: true,

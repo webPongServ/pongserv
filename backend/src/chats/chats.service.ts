@@ -13,6 +13,7 @@ import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
 import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
+import { TbCh01LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-01-l.entity';
 
 @Injectable()
 export class ChatsService {
@@ -70,11 +71,11 @@ export class ChatsService {
 		*/
 		// 1
 		const user: TbUa01MEntity = await this.dbUsersManagerService.getUserByUserId(userId);
-		let dmChtrms = await this.dbChatsManagerService.getDMChatroomsForUser(user);
+		let dmChtrms: TbCh01LEntity[] = await this.dbChatsManagerService.getDMChatroomsForUser(user);
 		// 2
-		let pblAndprtChtrms = await this.dbChatsManagerService.getPublicAndProtectedChatrooms();
+		let pblAndprtChtrms: TbCh01LEntity[] = await this.dbChatsManagerService.getPublicAndProtectedChatrooms();
 		// 3
-		const combinedChtrms = [...dmChtrms, ...pblAndprtChtrms];
+		const combinedChtrms: TbCh01LEntity[] = [...dmChtrms, ...pblAndprtChtrms];
 		let results: {
 			uuid: string,
 			chatroomName: string,
