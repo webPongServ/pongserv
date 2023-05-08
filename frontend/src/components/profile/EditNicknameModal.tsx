@@ -94,18 +94,15 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
               <Box className="inform">
                 닉네임은 1 ~ 8자리 한글 / 영어(대, 소문자) / 숫자만 가능합니다.
               </Box>
-              <Box className="flex-container">
-                <Typography className="title">새 닉네임</Typography>
-                <Box className="input">
-                  <CustomOnKeyUpInput
-                    placeholder="새 닉네임을 입력하세요."
-                    defaultValue={myInfo.nickname}
-                    maxLength={8}
-                    handleFunction={handleNewNickname}
-                    handleDoneTyping={doneTyping}
-                    isError={isError}
-                  />
-                </Box>
+              <Box className="input">
+                <CustomOnKeyUpInput
+                  placeholder="새 닉네임을 입력하세요."
+                  defaultValue={myInfo.nickname}
+                  maxLength={8}
+                  handleFunction={handleNewNickname}
+                  handleDoneTyping={doneTyping}
+                  isError={isError}
+                />
               </Box>
               {newNickname === "" && null}
               {isError && (

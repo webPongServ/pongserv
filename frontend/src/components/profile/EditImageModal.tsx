@@ -85,13 +85,12 @@ const EditImageModal = (props: EditImageModalProps) => {
               <Box className="inform">
                 프로필 사진은 10MB 이내의 png, jpg, jpeg, gif 파일만 가능합니다.
               </Box>
-              <Box className="flex-container">
-                <Typography className="title">새 프로필 이미지</Typography>
-                <Box className="input">
-                  <input type="file" onChange={handleFileInputChange} />
-                </Box>
+              <Box className="input">
+                <input type="file" onChange={handleFileInputChange} />
               </Box>
-              {preview && <img src={preview} alt="Preview" />}
+              <Box className="preview flex-container">
+                <Box>{preview && <img src={preview} alt="Preview" />}</Box>
+              </Box>
             </Box>
           </Box>
           <Box className="footer flex-container">
