@@ -148,6 +148,7 @@ body,
     .body {
       flex-direction: column;
       align-items: normal;
+      justify-content: flex-start;
       height: 80%;
       row-gap: 5%;
 
@@ -159,9 +160,8 @@ body,
       #new-nickname {
         display: flex;
         flex-direction: column;
-        // justify-content: center;
-        height: 15%;
-        row-gap: 5%;
+        row-gap: 15%;
+        margin-top: 10%;
 
         .title {
           display: flex;
@@ -190,31 +190,30 @@ body,
 
       #new-image {
         display: flex;
-        height: 40%;
         flex-direction: column;
-        // justify-content: center;
-        row-gap: 5%;
-      }
+        row-gap: 15%;
+        margin-top: 10%;
 
-      .title {
-        display: flex;
-        align-items: center;
-        width: 20%;
-      }
+        .title {
+          display: flex;
+          align-items: center;
+          width: 30%;
+        }
 
-      .input {
-        width: 80%;
-        margin: 0 auto;
-      }
+        .input {
+          width: 70%;
+          margin: 0 auto;
+        }
 
-      .inform {
-        font-size: 12px;
-        margin: 10px auto;
-      }
+        .inform {
+          font-size: 12px;
+          margin: 10px auto;
+        }
 
-      img {
-        width: 100px;
-        height: 100px;
+        img {
+          width: 100px;
+          height: 100px;
+        }
       }
     }
 
