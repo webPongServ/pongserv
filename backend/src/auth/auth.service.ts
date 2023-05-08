@@ -45,6 +45,7 @@ export class AuthService {
         accessToken: tokenResult.data.access_token,
         refreshToken: tokenResult.data.refresh_token,
       };
+      console.log(result);
     } catch (err) {
       console.log('42 token 발급 실패');
       throw new HttpException(err, HttpStatus.UNAUTHORIZED);
@@ -77,7 +78,10 @@ export class AuthService {
     const intraData: { intraId: string; intraImagePath: string } =
       await this.getIntraId(token42OAuth);
     // NOTE: TB_UA01M에 유저 자체가 있는지 검증하고 없으면 등록하는 로직 추가 (2023-05-08, mgo)
-    await this.dbmanagerUsersService.checkinUser(intraData);
+    console.log(intraData);
+    const user = await this.dbmanagerUsersService.checkinUser(intraData);
+    console.log(`user: `);
+    console.log(user);
     // let user = await this.dbmanagerUsersService.getUserByUserId(intraData.intraId);
     // if (user === null)
     //   await this.dbmanagerUsersService.setUser()

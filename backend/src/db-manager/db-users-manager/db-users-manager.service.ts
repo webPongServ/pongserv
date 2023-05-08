@@ -47,18 +47,25 @@ export class DbUsersManagerService {
         userId: userId,
       },
     });
+    console.log(`upper userMaster: `);
+    console.log(userMaster);
     // 1-1
-    if (!userMaster) {
-      userMaster = await this.ua01mRp.save(
-        this.ua01mRp.create({
+    if (userMaster === null) {
+      userMaster = this.ua01mRp.create({
           userId: userId,
           nickname: userId,
           twofactor: false,
           imgPath: intraData.intraImagePath,
-        }),
-      );
+        });
+        console.log(`userMaster after create: `);
+      console.log(userMaster);
+      userMaster = await this.ua01mRp.save(userMaster);
+      console.log(`userMaster after save: `);
+      console.log(userMaster);
+      
     }
-    // console.log(userMaster);
+    console.log(`under userMaster: `);
+    console.log(userMaster);
     // 2
     // const result = await this.ua01lRp.save(
     //   this.ua01lRp.create({
@@ -71,6 +78,7 @@ export class DbUsersManagerService {
     //   }),
     // );
     // console.log('Second ', result);
+    return userMaster;
   }
 
   async checkUserInDb(userId: string) {

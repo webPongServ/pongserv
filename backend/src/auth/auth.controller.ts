@@ -61,7 +61,8 @@ export class AuthController {
   @ApiInternalServerErrorResponse({ description: '토큰 발급 실패' })
   @Post('code')
   async issueToken(@Body() codeBody: Code42OAuthData, @Res() res: Response) {
-    try {
+    // try {
+      console.log(codeBody);
       const resultToken = await this.authService.processAuthorization(
         codeBody.code,
       );
@@ -74,11 +75,11 @@ export class AuthController {
       } else {
         res.json({ accessToken, OAuthData, intraId, intraImagePath });
       }
-    } catch (err) {
-      throw new HttpException('Forbidden', HttpStatus.FORBIDDEN, {
-        cause: new Error('Something Happend in making Token'),
-      });
-    }
+    // } catch (err) {
+    //   throw new HttpException('Forbidden', HttpStatus.FORBIDDEN, {
+    //     cause: new Error('Something Happend in making Token'),
+    //   });
+    // }
   }
 
   @ApiOperation({
