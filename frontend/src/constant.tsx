@@ -8,3 +8,9 @@ export const GameBoardConst = {
   PADDLE_WIDTH: 20,
   PADDLE_HEIGHT: 150,
 };
+
+export const ChattingRoomType = {
+  public: "01",
+  protected: "02",
+  private: "03",
+};
