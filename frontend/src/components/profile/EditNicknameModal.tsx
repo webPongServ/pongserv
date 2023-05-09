@@ -1,33 +1,29 @@
 import { useEffect, useState } from "react";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import CustomOnKeyUpInput from "components/common/utils/CustomOnKeyUpInput";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { IRootState } from "components/common/store";
-import { UserDetail, ProfileDetail } from "types/Detail";
+import { UserDetail } from "types/Detail";
 import "styles/Game.scss";
 import "styles/global.scss";
 
 import { Button } from "@mui/joy";
 import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import UserService from "API/UsersService";
-import { MyInfoActionTypes } from "types/redux/MyInfo";
 
 interface EditNicknameModalProps {
   modalStatus: string;
   setModalStatus: Function;
-  profileDetail: ProfileDetail | null;
-  setProfileDetail: Function;
 }
 
 const EditNicknameModal = (props: EditNicknameModalProps) => {
   const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
   const [newNickname, setNewNickname] = useState<string>("");
   const [isError, setIsError] = useState<boolean>(true);
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const doneTyping = async () => {
@@ -50,23 +46,13 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
       nickname: newNickname,
     });
 
-    const newNick: string = response.data.new;
-
-    dispatch({
-      type: MyInfoActionTypes.MYINFO_UPDATE_NICKNAME,
-      payload: newNick,
-    });
     props.setModalStatus("closed");
-    props.setProfileDetail({
-      ...props.profileDetail,
-      nickname: newNick,
-    });
-    navigate(`/profile/${newNick}`);
+    navigate(`/profile/${response.data.new}`);
   };
 
   useEffect(() => {
     setNewNickname(myInfo.nickname);
-  }, [myInfo]);
+  }, []);
 
   return (
     <Modal

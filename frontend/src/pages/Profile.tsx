@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
 import { IRootState } from "components/common/store";
 import { ProfileDetail, UserDetail } from "types/Detail";
@@ -13,6 +13,7 @@ import SkeletonProfile from "components/common/utils/SkeletonProfile";
 import SkeletonButtons from "components/common/utils/SkeletonButtons";
 import MyButtons from "components/profile/MyButtons";
 import OthersButtons from "components/profile/OthersButtons";
+import { MyInfoActionTypes } from "types/redux/MyInfo";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
@@ -34,6 +35,7 @@ const Profile = () => {
   const { nickname } = useParams();
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const getProfile = async () => {
     try {
@@ -47,6 +49,10 @@ const Profile = () => {
         ELO: response.data.ELO,
         winRate: response.data.winRate,
         status: "",
+      });
+      dispatch({
+        type: MyInfoActionTypes.MYINFO_UPDATE_NICKNAME,
+        payload: nickname,
       });
     } catch {
       alert("유저가 존재하지 않습니다! 홈 화면으로 돌아갑니다.");
@@ -64,7 +70,7 @@ const Profile = () => {
     }
     getProfile();
     // check dependency list!!
-  }, [myInfo]);
+  }, [nickname]);
 
   return (
     <Box id="Profile" className="flex-container">
@@ -136,8 +142,6 @@ const Profile = () => {
       <EditNicknameModal
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
-        profileDetail={profileDetail}
-        setProfileDetail={setProfileDetail}
       />
       <EditImageModal
         modalStatus={modalStatus}
