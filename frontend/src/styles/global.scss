@@ -205,14 +205,20 @@ body,
           margin: 0 auto;
         }
 
+        .preview {
+          flex-direction: column;
+          width: 80%;
+          margin: 30px auto;
+
+          img {
+            width: 150px;
+            height: 150px;
+          }
+        }
+
         .inform {
           font-size: 12px;
           margin: 10px auto;
-        }
-
-        img {
-          width: 100px;
-          height: 100px;
         }
       }
     }
