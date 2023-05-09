@@ -1,21 +1,24 @@
 import { useState } from "react";
-import CustomIconButton from "components/common/utils/CustomIconButton";
-import { MyInfoActionTypes } from "types/redux/MyInfo";
 import { useDispatch } from "react-redux";
 import { AxiosResponse } from "axios";
+import CustomIconButton from "components/common/utils/CustomIconButton";
+import { MyInfoActionTypes } from "types/redux/MyInfo";
+import { UserDetail } from "types/Detail";
 import "styles/Game.scss";
 import "styles/global.scss";
 
 import { Button } from "@mui/joy";
 import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import UserService from "API/UsersService";
 
 interface EditImageModalProps {
   modalStatus: string;
   setModalStatus: Function;
+  profileDetail: UserDetail;
+  setProfileDetail: Function;
 }
 
 const EditImageModal = (props: EditImageModalProps) => {
@@ -51,6 +54,10 @@ const EditImageModal = (props: EditImageModalProps) => {
         dispatch({
           type: MyInfoActionTypes.MYINFO_UPDATE_IMAGE,
           payload: response.data,
+        });
+        props.setProfileDetail({
+          ...props.profileDetail,
+          imgURL: response.data,
         });
         props.setModalStatus("closed");
         setFile(null);

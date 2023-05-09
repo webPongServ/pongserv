@@ -33,7 +33,6 @@ const Profile = () => {
     null
   );
   const { nickname } = useParams();
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -48,12 +47,13 @@ const Profile = () => {
         lose: response.data.lose,
         ELO: response.data.ELO,
         winRate: response.data.winRate,
-        status: "",
+        status: "login",
       });
-      dispatch({
-        type: MyInfoActionTypes.MYINFO_UPDATE_NICKNAME,
-        payload: nickname,
-      });
+      if (myInfo.nickname !== nickname)
+        dispatch({
+          type: MyInfoActionTypes.MYINFO_UPDATE_NICKNAME,
+          payload: nickname,
+        });
     } catch {
       alert("유저가 존재하지 않습니다! 홈 화면으로 돌아갑니다.");
       navigate("/game");
@@ -146,6 +146,8 @@ const Profile = () => {
       <EditImageModal
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
+        profileDetail={profileDetail!}
+        setProfileDetail={setProfileDetail}
       />
       <SetTwoFactorModal
         modalStatus={modalStatus}
