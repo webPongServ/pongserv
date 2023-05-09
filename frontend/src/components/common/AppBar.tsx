@@ -9,7 +9,7 @@ import "styles/global.scss";
 import { Toolbar, IconButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
-import MenuIcon from "@mui/icons-material/Menu";
+import ForumIcon from "@mui/icons-material/Forum";
 
 type HandleOpen = { open: boolean; setOpen: Function };
 
@@ -66,7 +66,7 @@ const AppBar = (props: HandleOpen) => {
           onClick={handleDrawerOpen}
           sx={{ ...(props.open && { display: "none" }) }}
         >
-          <MenuIcon />
+          <ForumIcon />
         </IconButton>
       </Toolbar>
     </TopBar>
