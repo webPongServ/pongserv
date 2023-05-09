@@ -1,7 +1,7 @@
 import { IRootState } from "components/common/store";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
-import { ChatRoomDetail } from "types/Detail";
+import { ChattingRoomDetail } from "types/Detail";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -11,7 +11,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import Person from "@mui/icons-material/Person";
 
 interface RoomCardProps {
-  room: ChatRoomDetail;
+  room: ChattingRoomDetail;
   index: number;
   setPwIndex: Function;
 }

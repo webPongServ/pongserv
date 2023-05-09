@@ -1,11 +1,11 @@
-export interface ChatRoomForm {
+export interface ChattingRoomForm {
   title: string;
   max: number;
   type: string;
   password: string;
 }
 
-export interface ChatRoomEditForm {
+export interface ChattingRoomEditForm {
   title: string;
   max: number;
   type: string;

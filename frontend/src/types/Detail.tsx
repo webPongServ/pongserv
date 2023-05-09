@@ -4,7 +4,7 @@ export interface UserDetail {
   status: string;
 }
 
-export interface ChatRoomDetail {
+export interface ChattingRoomDetail {
   id: string;
   title: string;
   owner: string;
@@ -14,7 +14,7 @@ export interface ChatRoomDetail {
   createdAt: Date;
 }
 
-export interface ChatUserDetail {
+export interface ChattingUserDetail {
   nickname: string;
   imgURL: string;
   role: string;

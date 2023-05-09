@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import PasswordFormCard from "components/common/chatting/PasswordFormCard";
 import RoomCard from "components/common/chatting/RoomCard";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import CustomIconButton from "components/common/utils/CustomIconButton";
-import { ChatRoomDetail } from "types/Detail";
+import { ChattingRoomDetail } from "types/Detail";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import ChattingService from "API/ChattingService";
 import "styles/ChattingDrawer.scss";
@@ -19,18 +19,20 @@ const WaitingRoom = () => {
 
   // chatroom은 전역에서 관리하지 않음 => 로컬에서도 처음에 받아오는 것만(없어진 것 예외처리 필요)
   // 보이지 않을 수도 있는데, 상태로 관리하는 것은 불필요한 낭비일 수 있음 => 새로고침 버튼을 두자
-  const [chatRoomList, setChatRoomList] = useState<ChatRoomDetail[]>([]);
+  const [chattingRoomList, setChattingRoomList] = useState<
+    ChattingRoomDetail[]
+  >([]);
   const [pwIndex, setPwIndex] = useState<number>(-1);
   const [page, setPage] = useState<number>(1);
 
-  const getChatRoomList = async () => {
+  const getChattingRoomList = async () => {
     // fetch data
     const response = await ChattingService.getChattingRooms();
-    setChatRoomList(response.data);
+    setChattingRoomList(response.data);
   };
 
   useEffect(() => {
-    getChatRoomList();
+    getChattingRoomList();
   }, []);
 
   return (
@@ -38,10 +40,10 @@ const WaitingRoom = () => {
       <Box className="page-header">채팅 대기실</Box>
       <Box className="page-body">
         <Box className="list">
-          {chatRoomList.length === 0 ? (
+          {chattingRoomList.length === 0 ? (
             <EmptyListMessage message="채팅방이 존재하지 않습니다!" />
           ) : (
-            chatRoomList.map((value, index) =>
+            chattingRoomList.map((value, index) =>
               5 * (page - 1) <= index && index < 5 * page ? (
                 index === pwIndex ? (
                   <PasswordFormCard room={value} setPwIndex={setPwIndex} />
@@ -58,7 +60,7 @@ const WaitingRoom = () => {
         </Box>
         <Box className="pagination flex-container">
           <Pagination
-            count={Math.floor(chatRoomList.length / 5) + 1}
+            count={Math.floor(chattingRoomList.length / 5) + 1}
             variant="outlined"
             shape="rounded"
             onChange={(e, number) => {
@@ -82,7 +84,7 @@ const WaitingRoom = () => {
         <CustomIconButton
           class=""
           icon={<SyncIcon />}
-          handleFunction={getChatRoomList}
+          handleFunction={getChattingRoomList}
         />
       </Box>
     </Box>

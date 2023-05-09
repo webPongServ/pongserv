@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChatUserDetail } from "types/Detail";
+import { ChattingUserDetail } from "types/Detail";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import "styles/global.scss";
@@ -11,11 +11,11 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 interface BanListProps {
-  bans: ChatUserDetail[];
-  users: ChatUserDetail[];
+  bans: ChattingUserDetail[];
+  users: ChattingUserDetail[];
   setUsers: Function;
   setBans: Function;
-  myDetail: ChatUserDetail;
+  myDetail: ChattingUserDetail;
 }
 
 const BanList = (props: BanListProps) => {
@@ -38,7 +38,7 @@ const BanList = (props: BanListProps) => {
     setAnchorEl(null);
   };
 
-  const [selectedUser, setSelectedUser] = useState<ChatUserDetail>({
+  const [selectedUser, setSelectedUser] = useState<ChattingUserDetail>({
     nickname: "",
     imgURL: "",
     role: "normal",

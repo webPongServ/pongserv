@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { ChatRoomForm } from "types/Form";
+import { ChattingRoomForm } from "types/Form";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { IRootState } from "components/common/store";
 import CustomInput from "components/common/utils/CustomInput";
@@ -18,7 +18,7 @@ import CloseIcon from "@mui/icons-material/Close";
 
 const RoomCreator = () => {
   const [isPublic, setIsPublic] = useState<boolean>(true);
-  const [chatRoomForm, setChatRoomForm] = useState<ChatRoomForm>({
+  const [chattingRoomForm, setChattingRoomForm] = useState<ChattingRoomForm>({
     title: "",
     max: 2,
     type: ChattingRoomType.public,
@@ -31,15 +31,15 @@ const RoomCreator = () => {
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target;
-      setChatRoomForm({ ...chatRoomForm, title: target.value });
+      setChattingRoomForm({ ...chattingRoomForm, title: target.value });
     }
   };
 
   const handleMax = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target as HTMLInputElement;
-      setChatRoomForm({
-        ...chatRoomForm,
+      setChattingRoomForm({
+        ...chattingRoomForm,
         max: parseInt(target.value),
       });
     }
@@ -48,8 +48,8 @@ const RoomCreator = () => {
   const handleType = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target as HTMLInputElement;
-      setChatRoomForm({
-        ...chatRoomForm,
+      setChattingRoomForm({
+        ...chattingRoomForm,
         type: `${
           target.innerText === "공개"
             ? ChattingRoomType.public
@@ -62,31 +62,32 @@ const RoomCreator = () => {
   const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target = e.target as HTMLInputElement;
-      setChatRoomForm({ ...chatRoomForm, password: target.value });
+      setChattingRoomForm({ ...chattingRoomForm, password: target.value });
     }
   };
 
   const createChattingRoom = async () => {
-    if (chatRoomForm.title.length === 0) return alert("제목을 입력해주세요!");
+    if (chattingRoomForm.title.length === 0)
+      return alert("제목을 입력해주세요!");
     else if (
-      chatRoomForm.type === ChattingRoomType.protected &&
-      chatRoomForm.password.length === 0
+      chattingRoomForm.type === ChattingRoomType.protected &&
+      chattingRoomForm.password.length === 0
     )
       return alert("비밀번호를 입력해주세요!");
     // API call
     const response = await ChattingService.postNewChattingRoom({
-      name: chatRoomForm.title,
-      type: chatRoomForm.type,
-      pwd: chatRoomForm.password,
+      name: chattingRoomForm.title,
+      type: chattingRoomForm.type,
+      pwd: chattingRoomForm.password,
     });
     dispatch({
       type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
       payload: {
         id: response.data,
-        title: chatRoomForm.title,
+        title: chattingRoomForm.title,
         owner: myInfo.nickname,
-        type: chatRoomForm.type,
-        max: chatRoomForm.max,
+        type: chattingRoomForm.type,
+        max: chattingRoomForm.max,
         current: 1,
         createdAt: new Date(),
       },

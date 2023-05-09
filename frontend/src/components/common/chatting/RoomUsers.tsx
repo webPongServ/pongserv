@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import UserList from "components/common/chatting/UserList";
 import BanList from "components/common/chatting/BanList";
 import CustomIconButton from "components/common/utils/CustomIconButton";
-import { ChatUserDetail } from "types/Detail";
+import { ChattingUserDetail } from "types/Detail";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -12,19 +12,19 @@ import Option from "@mui/joy/Option";
 import CloseIcon from "@mui/icons-material/Close";
 
 type RoomUsersProps = {
-  myDetail: ChatUserDetail;
+  myDetail: ChattingUserDetail;
   setRoomStatus: Function;
 };
 
 const RoomUsers = (props: RoomUsersProps) => {
-  const [users, setUsers] = useState<ChatUserDetail[]>([
+  const [users, setUsers] = useState<ChattingUserDetail[]>([
     { nickname: "chanhyle", role: "owner", imgURL: "../image.png" },
     { nickname: "susong", role: "admin", imgURL: "../image.png" },
     { nickname: "mgo", role: "normal", imgURL: "../image.png" },
     { nickname: "noname_12", role: "normal", imgURL: "../image.png" },
     { nickname: "seongtki", role: "admin", imgURL: "../image.png" },
   ]);
-  const [bans, setBans] = useState<ChatUserDetail[]>([]);
+  const [bans, setBans] = useState<ChattingUserDetail[]>([]);
   const [selected, setSelected] = useState<string>("users");
   const divRef = useRef<HTMLDivElement>(null);
 

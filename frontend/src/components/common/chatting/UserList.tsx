@@ -1,6 +1,6 @@
 import { useState } from "react";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
-import { ChatUserDetail } from "types/Detail";
+import { ChattingUserDetail } from "types/Detail";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
@@ -12,15 +12,15 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 interface UserListProps {
-  myDetail: ChatUserDetail;
-  users: ChatUserDetail[];
-  bans: ChatUserDetail[];
+  myDetail: ChattingUserDetail;
+  users: ChattingUserDetail[];
+  bans: ChattingUserDetail[];
   setUsers: Function;
   setBans: Function;
 }
 
 const UserList = (props: UserListProps) => {
-  const [selectedUser, setSelectedUser] = useState<ChatUserDetail>({
+  const [selectedUser, setSelectedUser] = useState<ChattingUserDetail>({
     nickname: "",
     imgURL: "",
     role: "normal",

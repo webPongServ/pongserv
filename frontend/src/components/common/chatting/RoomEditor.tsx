@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
-import { ChatRoomForm } from "types/Form";
+import { ChattingRoomForm } from "types/Form";
 import CustomInput from "components/common/utils/CustomInput";
 import CustomSlider from "components/common/utils/CustomSlider";
 import ChattingTypeSelect from "components/common/utils/ChattingTypeSelect";
@@ -22,7 +22,7 @@ interface HandleRoomDetail {
 
 const RoomEditor = (props: HandleRoomDetail) => {
   const [isPublic, setIsPublic] = useState<boolean>(props.type === "public");
-  const [chatRoomForm, setChatRoomForm] = useState<ChatRoomForm>({
+  const [chattingRoomForm, setChattingRoomForm] = useState<ChattingRoomForm>({
     title: props.title,
     max: props.max,
     type: props.type,
@@ -34,15 +34,15 @@ const RoomEditor = (props: HandleRoomDetail) => {
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target;
-      setChatRoomForm({ ...chatRoomForm, title: target.value });
+      setChattingRoomForm({ ...chattingRoomForm, title: target.value });
     }
   };
 
   const handleMax = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target as HTMLInputElement;
-      setChatRoomForm({
-        ...chatRoomForm,
+      setChattingRoomForm({
+        ...chattingRoomForm,
         max: parseInt(target.value),
       });
     }
@@ -51,8 +51,8 @@ const RoomEditor = (props: HandleRoomDetail) => {
   const handleType = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target as HTMLInputElement;
-      setChatRoomForm({
-        ...chatRoomForm,
+      setChattingRoomForm({
+        ...chattingRoomForm,
         type: `${target.innerText === "공개" ? "public" : "protected"}`,
       });
     }
@@ -61,24 +61,25 @@ const RoomEditor = (props: HandleRoomDetail) => {
   const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target = e.target as HTMLInputElement;
-      setChatRoomForm({ ...chatRoomForm, password: target.value });
+      setChattingRoomForm({ ...chattingRoomForm, password: target.value });
     }
   };
 
   const editChattingRoom = () => {
-    if (chatRoomForm.title.length === 0) return alert("제목을 입력해주세요!");
+    if (chattingRoomForm.title.length === 0)
+      return alert("제목을 입력해주세요!");
     else if (
-      chatRoomForm.type === "protected" &&
-      chatRoomForm.password.length === 0
+      chattingRoomForm.type === "protected" &&
+      chattingRoomForm.password.length === 0
     )
       return alert("비밀번호를 입력해주세요!");
     // API call
     dispatch({
       type: CurrentChattingActionTypes.EDIT_CHATTINGROOM,
       payload: {
-        title: `${chatRoomForm.title}`,
-        type: `${chatRoomForm.type}`,
-        max: `${chatRoomForm.max}`,
+        title: `${chattingRoomForm.title}`,
+        type: `${chattingRoomForm.type}`,
+        max: `${chattingRoomForm.max}`,
       },
     });
     props.setRoomStatus("chat");

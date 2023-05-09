@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
-import { ChatRoomDetail } from "types/Detail";
+import { ChattingRoomDetail } from "types/Detail";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -11,7 +11,7 @@ import { Input } from "@mui/joy";
 import { ButtonGroup, Button } from "@mui/material";
 
 interface PasswordFormCardProps {
-  room: ChatRoomDetail;
+  room: ChattingRoomDetail;
   setPwIndex: Function;
 }
 

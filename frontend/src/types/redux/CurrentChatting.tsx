@@ -1,16 +1,16 @@
-import { ChatUserDetail, ChatRoomDetail } from "types/Detail";
-import { ChatRoomEditForm } from "types/Form";
+import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
+import { ChattingRoomEditForm } from "types/Form";
 
 export interface CurrentChatting {
   status: string;
-  chatRoom: ChatRoomDetail;
-  userList: ChatUserDetail[];
-  banList: ChatUserDetail[];
+  chattingRoom: ChattingRoomDetail;
+  userList: ChattingUserDetail[];
+  banList: ChattingUserDetail[];
 }
 
 const INITIAL_CURRENTCHATTING: CurrentChatting = {
   status: "waiting",
-  chatRoom: {
+  chattingRoom: {
     id: "",
     title: "",
     owner: "",
@@ -48,12 +48,12 @@ export interface CurrentChatting_UpdateStatusCreatingAction {
 
 export interface CurrentChatting_UpdateStatusChattingAction {
   type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING;
-  payload: ChatRoomDetail;
+  payload: ChattingRoomDetail;
 }
 
 export interface CurrentChatting_EditChattingRoomAction {
   type: CurrentChattingActionTypes.EDIT_CHATTINGROOM;
-  payload: ChatRoomEditForm;
+  payload: ChattingRoomEditForm;
 }
 
 type CurrentChattingAction =
@@ -78,13 +78,13 @@ export const CurrentChattingReducer = (
       return {
         ...state,
         status: "chatting",
-        chatRoom: action.payload,
+        chattingRoom: action.payload,
       };
     case CurrentChattingActionTypes.EDIT_CHATTINGROOM:
       return {
         ...state,
-        chatRoom: {
-          ...state.chatRoom,
+        chattingRoom: {
+          ...state.chattingRoom,
           title: action.payload.title,
           type: action.payload.type,
           max: action.payload.max,

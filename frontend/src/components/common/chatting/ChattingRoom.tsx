@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChatUserDetail } from "types/Detail";
+import { ChattingUserDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
 import RoomLeave from "components/common/chatting/RoomLeave";
@@ -13,11 +13,11 @@ import { Input, Button } from "@mui/joy";
 
 const ChattingRoom = () => {
   const currentChatting = useSelector(
-    (state: IRootState) => state.currentChatting.chatRoom
+    (state: IRootState) => state.currentChatting.chattingRoom
   );
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
-  const [myDetail, setMyDetail] = useState<ChatUserDetail>({
+  const [myDetail, setMyDetail] = useState<ChattingUserDetail>({
     nickname: "chanhyle",
     imgURL: "../image.png",
     role: "owner",
