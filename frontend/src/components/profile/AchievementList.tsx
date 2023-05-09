@@ -51,8 +51,6 @@ const Achievements = () => {
     },
   ]);
 
-  console.log(setAchievementList);
-
   return (
     <TabPanel value={1}>
       {achievementList.length === 0 ? (

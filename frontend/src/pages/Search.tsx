@@ -35,8 +35,6 @@ const Search = () => {
     "seongyle",
   ]);
 
-  console.log(value, setValue, setSearchedUser);
-
   const handleValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target;

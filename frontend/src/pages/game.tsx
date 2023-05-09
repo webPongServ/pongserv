@@ -51,7 +51,6 @@ const Game = () => {
           variant="outlined"
           shape="rounded"
           onChange={(e, number) => {
-            console.log(e);
             setPage(number);
           }}
         />
