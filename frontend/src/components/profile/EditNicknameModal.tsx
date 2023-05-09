@@ -18,6 +18,7 @@ import UserService from "API/UsersService";
 interface EditNicknameModalProps {
   modalStatus: string;
   setModalStatus: Function;
+  setIsNew: Function;
 }
 
 const EditNicknameModal = (props: EditNicknameModalProps) => {
@@ -47,6 +48,7 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
     });
 
     props.setModalStatus("closed");
+    props.setIsNew(true);
     navigate(`/profile/${response.data.new}`);
   };
 

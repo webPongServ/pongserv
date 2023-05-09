@@ -28,6 +28,7 @@ const Profile = () => {
     (state: IRootState) => state.friends.friends
   );
   const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [isNew, setIsNew] = useState<boolean>(false);
   const [modalStatus, setModalStatus] = useState<string>("closed");
   const [profileDetail, setProfileDetail] = useState<ProfileDetail | null>(
     null
@@ -49,11 +50,12 @@ const Profile = () => {
         winRate: response.data.winRate,
         status: "login",
       });
-      if (myInfo.nickname !== nickname)
+      if (isNew)
         dispatch({
           type: MyInfoActionTypes.MYINFO_UPDATE_NICKNAME,
           payload: nickname,
         });
+      setIsNew(false);
     } catch {
       alert("유저가 존재하지 않습니다! 홈 화면으로 돌아갑니다.");
       navigate("/game");
@@ -142,6 +144,7 @@ const Profile = () => {
       <EditNicknameModal
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
+        setIsNew={setIsNew}
       />
       <EditImageModal
         modalStatus={modalStatus}
