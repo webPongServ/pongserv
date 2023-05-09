@@ -7,6 +7,8 @@ import CustomInput from "components/common/utils/CustomInput";
 import CustomSlider from "components/common/utils/CustomSlider";
 import ChattingTypeSelect from "components/common/utils/ChattingTypeSelect";
 import CustomIconButton from "components/common/utils/CustomIconButton";
+import ChattingService from "API/ChattingService";
+import { ChattingRoomType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -19,7 +21,7 @@ const RoomCreator = () => {
   const [chatRoomForm, setChatRoomForm] = useState<ChatRoomForm>({
     title: "",
     max: 2,
-    type: "public",
+    type: ChattingRoomType.public,
     password: "",
   });
   const divRef = useRef<HTMLDivElement>(null);
@@ -48,7 +50,11 @@ const RoomCreator = () => {
       const target: HTMLInputElement = e.target as HTMLInputElement;
       setChatRoomForm({
         ...chatRoomForm,
-        type: `${target.innerText === "공개" ? "public" : "protected"}`,
+        type: `${
+          target.innerText === "공개"
+            ? ChattingRoomType.public
+            : ChattingRoomType.protected
+        }`,
       });
     }
   };
@@ -60,22 +66,27 @@ const RoomCreator = () => {
     }
   };
 
-  const createChattingRoom = () => {
+  const createChattingRoom = async () => {
     if (chatRoomForm.title.length === 0) return alert("제목을 입력해주세요!");
     else if (
-      chatRoomForm.type === "protected" &&
+      chatRoomForm.type === ChattingRoomType.protected &&
       chatRoomForm.password.length === 0
     )
       return alert("비밀번호를 입력해주세요!");
     // API call
+    const response = await ChattingService.postNewChattingRoom({
+      name: chatRoomForm.title,
+      type: chatRoomForm.type,
+      pwd: chatRoomForm.password,
+    });
     dispatch({
       type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
       payload: {
-        id: "202304280001",
-        title: `${chatRoomForm.title}`,
-        owner: `${myInfo.nickname}`,
-        type: `${chatRoomForm.type}`,
-        max: `${chatRoomForm.max}`,
+        id: response.data,
+        title: chatRoomForm.title,
+        owner: myInfo.nickname,
+        type: chatRoomForm.type,
+        max: chatRoomForm.max,
         current: 1,
         createdAt: new Date(),
       },
@@ -127,13 +138,11 @@ const RoomCreator = () => {
         />
         <ChattingTypeSelect
           name="채팅방 유형"
-          defaultValue="public"
+          defaultValue="공개"
           setIsPublic={setIsPublic}
           handleFunction={handleType}
         />
-        {isPublic ? (
-          ""
-        ) : (
+        {isPublic ? null : (
           <CustomInput
             name="비밀번호"
             defaultValue=""

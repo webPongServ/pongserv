@@ -8,7 +8,7 @@ const ChattingService = {
   getChattingRooms: async () => await instance.get(chatsURL("rooms")),
   postNewChattingRoom: async (body: {
     name: string;
-    type: boolean;
+    type: string;
     pwd: string;
   }) => await instance.post(chatsURL("creation"), body),
   postEntrance: async (body: { uuid: string; pwd: string }) =>
