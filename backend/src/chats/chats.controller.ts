@@ -1,6 +1,6 @@
 import { ChatsService } from './chats.service';
 import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
@@ -25,7 +25,8 @@ export class ChatsController {
     description: 'DM 요청 성공',
   })
   @ApiOperation({ summary: 'DM 요청' })
-  // @UseGuards(AccessTokenStrategy)
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Post('dm')
   async takeDmRequest(@CurrentUser() userId: string, @Body() infoDmReq: ChatroomDmReqDto) {
     return (await this.chatsService.takeDmRequest(userId, infoDmReq));
@@ -37,8 +38,10 @@ export class ChatsController {
     // type: ChatDto,
   })
   @ApiOperation({ summary: '채팅방 목록' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Get('rooms')
-  async getChatroomsForAUser(@CurrentUser() userId: string) {
+  async getChatroomsForAUser(@CurrentUser() userId: any) {
     return (await this.chatsService.getChatroomsForAUser(userId));
   }
 
@@ -51,6 +54,8 @@ export class ChatsController {
     description: '채팅방 입장 실패',
   })
   @ApiOperation({ summary: '채팅방 입장' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Post('entrance')
   async setUserToEnter(@CurrentUser() userId: string, @Body() infoEntr: ChatroomEntranceDto) {
     return (await this.chatsService.setUserToEnter(userId, infoEntr));
@@ -62,6 +67,8 @@ export class ChatsController {
     type: String, // 성공시 Chatroom_id string 반환
   })
   @ApiOperation({ summary: '채팅방 생성' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Post('creation')
   async createChatroom(@CurrentUser() userId: string, @Body() infoCrtn: ChatroomCreationDto) {
     return (await this.chatsService.createChatroom(userId, infoCrtn));
@@ -76,6 +83,8 @@ export class ChatsController {
     description: '채팅방 정보 수정 실패',
   })
   @ApiOperation({ summary: '채팅방 정보 수정' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Patch('edit')
   async editChatroomInfo(@CurrentUser() userId: string, @Body() infoEdit: ChatroomEditingDto) {
     return (await this.chatsService.editChatroomInfo(userId, infoEdit));
@@ -95,6 +104,8 @@ export class ChatsController {
 		name: 'uuid',
 		type: String,
 	})
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Get('users/:uuid')
   async getChatUsers(@CurrentUser() userId: string, @Param('uuid') uuid: string) {
     return (await this.chatsService.getLiveUserListInARoom(userId, uuid));
@@ -109,6 +120,8 @@ export class ChatsController {
     description: '채팅방 내보내기 실패',
   })
   @ApiOperation({ summary: '채팅방 내보내기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Patch('kick')
   async kickUser(@CurrentUser() userId: string, @Body() infoKick: ChatroomKickingDto) {
     return (await this.chatsService.kickUser(userId, infoKick));
@@ -123,6 +136,8 @@ export class ChatsController {
     description: '채팅방 차단 실패(권한 부족)',
   })
   @ApiOperation({ summary: '채팅방 차단' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Put('ban')
   async banUser(@CurrentUser() userId: string, @Body() infoBan: ChatroomBanDto) {
     return (await this.chatsService.banUser(userId, infoBan));
@@ -137,6 +152,8 @@ export class ChatsController {
     description: '벙어리 적용 실패(권한 부족)',
   })
   @ApiOperation({ summary: '벙어리 적용' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Put('mute')
   async muteUser(@CurrentUser() userId: string, @Body() infoMute: ChatroomMuteDto) {
     return (await this.chatsService.muteUser(userId, infoMute));
@@ -151,6 +168,8 @@ export class ChatsController {
     description: '관리자 권한 부여 실패(권한 부족)',
   })
   @ApiOperation({ summary: '관리자 권한 부여' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Patch('empowerment')
   async empowerUser(@CurrentUser() userId: string, @Body() infoEmpwr: ChatroomEmpowermentDto) {
     return (await this.chatsService.empowerUser(userId, infoEmpwr));
@@ -161,6 +180,8 @@ export class ChatsController {
     description: '대결 신청 성공',
   })
   @ApiOperation({ summary: '대결 신청' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Post('game-request')
   async takeGameRequest(@CurrentUser() userId: string, @Body() infoGameReq: ChatroomGameRequestDto) {
     return (await this.chatsService.takeGameRequest(userId, infoGameReq));
@@ -176,6 +197,8 @@ export class ChatsController {
 		name: 'uuid',
 		type: String,
 	})
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Get('bans/:uuid')
   async getBanListInARoom(@CurrentUser() userId: string, @Param('uuid') uuid: string) {
     return (await this.chatsService.getBanListInARoom(userId, uuid));
@@ -186,6 +209,8 @@ export class ChatsController {
     description: '채팅방 차단 해제 성공',
   })
   @ApiOperation({ summary: '채팅방 차단 해제' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
   @Patch('ban-removal')
   async removeBan(@CurrentUser() userId: string, @Body() infoBanRmv: ChatroomBanRemovalDto) {
     return (await this.chatsService.removeBan(userId, infoBanRmv));

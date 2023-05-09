@@ -66,7 +66,7 @@ export class ChatsService {
 		return (newDmChtrm.uuid);
 	}
 
-	async getChatroomsForAUser(userId: string) {
+	async getChatroomsForAUser(userId: any) {
 		/*!SECTION
 			특정 유저에게 보이는 채팅방 조건은 다음과 같다.
 			1. public type
@@ -80,13 +80,13 @@ export class ChatsService {
 				uuid, name, owner, type, current, max
 		*/
 		// 1
-		console.log('userId: ');
+		console.log('userId in ChatsService.getChatroomsForAUser(): ');
 		console.log(userId);
 		const user: TbUa01MEntity = await this.dbUsersManagerService.getUserByUserId(userId);
-		console.log(`user: `);
+		console.log(`user in ChatsService.getChatroomsForAUser(): `);
 		console.log(user);
 		let dmChtrms: TbCh01LEntity[] = await this.dbChatsManagerService.getDMChatroomsForUser(user);
-		console.log(`dmChtrms: `);
+		console.log(`dmChtrms in ChatsService.getChatroomsForAUser(): `);
 		console.log(dmChtrms);
 		// 2
 		let pblAndprtChtrms: TbCh01LEntity[] = await this.dbChatsManagerService.getPublicAndProtectedChatrooms();
@@ -100,15 +100,25 @@ export class ChatsService {
 			currentCount: number,
 			maxCount: number,
 		}[] = [];
+		console.log(`combinedChtrms in ChatsService.getChatroomsForAUser(): `);
+		console.log(combinedChtrms);
 		for (const eachChtrm of combinedChtrms) {
 			const currUserListAndCount = await this.dbChatsManagerService.getCurrUserListAndCount(eachChtrm);
+			console.log(`eachChtrm in ChatsService.getChatroomsForAUser(): `);
+			console.log(eachChtrm);
+			if (currUserListAndCount[1] === 0)
+				continue ;
 			let owner: TbCh02LEntity;
-			for (const eachUser of currUserListAndCount[0]) {
-				if (eachUser.chtRmAuth === '01') {
-					owner = eachUser;
+			console.log(`currUserListAndCount in ChatsService.getChatroomsForAUser(): `);
+			console.log(currUserListAndCount);
+			for (const eachUserInChtrm of currUserListAndCount[0]) {
+				if (eachUserInChtrm.chtRmAuth === '01') {
+					owner = eachUserInChtrm;
 					break ;
 				}
 			}
+			console.log(`owner in ChatsService.getChatroomsForAUser(): `)
+			console.log(owner)
 			results.push({
 				uuid: eachChtrm.uuid,
 				chatroomName: eachChtrm.chtRmNm,
