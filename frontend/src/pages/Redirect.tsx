@@ -59,7 +59,7 @@ const Redirect = () => {
   return (
     <Box id="Redirect" className="flex-container">
       <img src="../loading.gif" alt="loading_gif" />
-      <LoadingString message="로딩 중입니다" />
+      <LoadingString message="로그인 중입니다" />
       <NewSessionModal />
       <TwoFactorModal />
     </Box>
