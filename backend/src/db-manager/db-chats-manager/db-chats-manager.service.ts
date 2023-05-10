@@ -199,7 +199,9 @@ export class DbChatsManagerService {
 			ua01mEntity: true,
 		},
 		where: {
-			ch01lEntity: room,
+			ch01lEntity: {
+				id: room.id,
+			},
 			chtRmJoinTf: true,
 		}
 	})
