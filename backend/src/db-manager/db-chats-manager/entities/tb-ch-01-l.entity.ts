@@ -2,22 +2,29 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { TbCh02LEntity } from './tb-ch-02-l.entity';
+import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity';
 
 // chatroom list
 @Entity({ name: 'TB_CH01L' })
 export class TbCh01LEntity {
   // UUID
   @PrimaryGeneratedColumn('uuid')
-  uuid: string;
+  id: string;
 
   // CHT_RM_ID - YYYYMMDDNNNN
   // @PrimaryColumn({ name: 'CHT_RM_ID', type: 'varchar', length: 12 })
   // chtRmId: string;
+
+  // @ManyToOne(() => TbUa01MEntity)
+  // @JoinColumn({ name: 'OWNER_ID' })
+  // ua01mEntity: TbUa01MEntity;
 
   // CHT_RM_NM
   @Column({ name: 'CHT_RM_NM', type: 'varchar', length: 50 })

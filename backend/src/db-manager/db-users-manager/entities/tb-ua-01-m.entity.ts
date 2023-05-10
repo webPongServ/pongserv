@@ -17,11 +17,11 @@ export class TbUa01MEntity {
   id: number;
 
   // USER_ID
-  @Column({ name: 'USER_ID', type: 'varchar', length: 8 })
+  @Column({ name: 'USER_ID', type: 'varchar', length: 10 })
   userId: string;
 
   // NICKNAME
-  @Column({ name: 'NICKNAME', type: 'varchar', length: 8 })
+  @Column({ name: 'NICKNAME', type: 'varchar', length: 10 })
   nickname: string;
 
   // TWOFACTOR

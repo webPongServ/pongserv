@@ -29,7 +29,7 @@ export class ChatsService {
 		const newChatroom = await this.dbChatsManagerService.createChatroom(name, type, pwd);
 		const user = await this.dbUsersManagerService.getUserByUserId(userId);
 		await this.dbChatsManagerService.createUserAsOwner(user, newChatroom); // set user as chatroom owner
-		return (newChatroom.uuid);
+		return (newChatroom.id);
 	}
 
 	async takeDmRequest(userId: string, infoDmReq: ChatroomDmReqDto) {
@@ -63,7 +63,7 @@ export class ChatsService {
 		console.log(targetInDmInfo);
 		this.dbChatsManagerService.saveChtrmUser(targetInDmInfo);
 		// 4
-		return (newDmChtrm.uuid);
+		return (newDmChtrm.id);
 	}
 
 	async getChatroomsForAUser(userId: any) {
@@ -93,7 +93,7 @@ export class ChatsService {
 		// 3
 		const combinedChtrms: TbCh01LEntity[] = [...dmChtrms, ...pblAndprtChtrms];
 		let results: {
-			uuid: string,
+			id: string,
 			chatroomName: string,
 			ownerNickname: string,
 			type: string,
@@ -103,9 +103,9 @@ export class ChatsService {
 		console.log(`combinedChtrms in ChatsService.getChatroomsForAUser(): `);
 		console.log(combinedChtrms);
 		for (const eachChtrm of combinedChtrms) {
-			const currUserListAndCount = await this.dbChatsManagerService.getCurrUserListAndCount(eachChtrm);
 			console.log(`eachChtrm in ChatsService.getChatroomsForAUser(): `);
 			console.log(eachChtrm);
+			const currUserListAndCount = await this.dbChatsManagerService.getCurrUserListAndCount(eachChtrm);
 			if (currUserListAndCount[1] === 0)
 				continue ;
 			let owner: TbCh02LEntity;
@@ -120,7 +120,7 @@ export class ChatsService {
 			console.log(`owner in ChatsService.getChatroomsForAUser(): `)
 			console.log(owner)
 			results.push({
-				uuid: eachChtrm.uuid,
+				id: eachChtrm.id,
 				chatroomName: eachChtrm.chtRmNm,
 				ownerNickname: owner.ua01mEntity.nickname,
 				type: eachChtrm.chtRmType,
@@ -144,7 +144,7 @@ export class ChatsService {
 			6. 그 방의 유저 리스트 정보를 반환한다.
 		*/
 		// 1
-		const targetRoom = await this.dbChatsManagerService.getLiveChtrmByUuid(infoEntr.uuid);
+		const targetRoom = await this.dbChatsManagerService.getLiveChtrmById(infoEntr.id);
 		if (targetRoom === null)
 			throw new NotFoundException('The chatroom not exist');
 		// 2
@@ -197,7 +197,7 @@ export class ChatsService {
 		*/
 		// 1
 		const user = await this.dbUsersManagerService.getUserByUserId(userId);
-		const targetRoom = await this.dbChatsManagerService.getLiveChtrmByUuid(infoEdit.uuid);
+		const targetRoom = await this.dbChatsManagerService.getLiveChtrmById(infoEdit.id);
 		const userInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(user, targetRoom);
 		if (userInChtrm.chtRmAuth !== '01') {
 			throw new UnauthorizedException('Not owner in this room');
@@ -211,9 +211,9 @@ export class ChatsService {
 		return ;
 	}
 
-	async getLiveUserListInARoom(userId: string, uuid: string) {
+	async getLiveUserListInARoom(userId: string, id: string) {
 		// NOTE: userID not used
-		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(uuid);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(id);
 		const userListAndCount = await this.dbChatsManagerService.getLiveUserListAndCountInARoom(chtrm);
 		return userListAndCount[0];
 	}
@@ -232,7 +232,7 @@ export class ChatsService {
 		*/
 		// 1
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
-		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoKick.uuid);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(infoKick.id);
 		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
 		if (requesterInChtrm.chtRmJoinTf === false)
 			throw new UnauthorizedException('You are not in the chatroom.');
@@ -265,7 +265,7 @@ export class ChatsService {
 		*/
 		// 1
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
-		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoBan.uuid);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(infoBan.id);
 		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
 		if (requesterInChtrm.chtRmJoinTf === false)
 			throw new UnauthorizedException('You are not in the chatroom.');
@@ -294,7 +294,7 @@ export class ChatsService {
 		*/
 		// 1
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
-		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoBan.uuid);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(infoBan.id);
 		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
 		if (requesterInChtrm.chtRmJoinTf === false)
 			throw new UnauthorizedException('You are not in the chatroom.');
@@ -327,7 +327,7 @@ export class ChatsService {
 		*/
 		// 1
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
-		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoEmpwr.uuid);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(infoEmpwr.id);
 		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
 		if (requesterInChtrm.chtRmJoinTf === false)
 			throw new UnauthorizedException('You are not in the chatroom.');
@@ -364,7 +364,7 @@ export class ChatsService {
 		*/
 		// 1
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
-		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoGameReq.uuid);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(infoGameReq.id);
 		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
 		if (requesterInChtrm.chtRmJoinTf === false)
 			throw new UnauthorizedException('You are not in the chatroom.');
@@ -383,13 +383,13 @@ export class ChatsService {
 		return target.userId;
 	}
 
-	async getBanListInARoom(userId: string, uuid: string) {
+	async getBanListInARoom(userId: string, id: string) {
 		/*!SECTION
 			1. uuid에 해당하는 chatroom 정보를 가져옴
 			2. 해당 chatroom에서 현재 ban으로 등록된 유저 목록을 가져옴
 		*/
 		// 1
-		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(uuid);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(id);
 		if (chtrm === null)
 			throw new NotFoundException('The chatroom isn\'t exist currently.')
 		// 2
@@ -406,7 +406,7 @@ export class ChatsService {
 		*/
 		// 1
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
-		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoBanRmv.uuid);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(infoBanRmv.id);
 		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
 		if (requesterInChtrm.chtRmJoinTf === false)
 			throw new UnauthorizedException('You are not in the chatroom.');
