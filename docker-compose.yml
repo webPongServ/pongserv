@@ -1,0 +1,36 @@
+version: '3'
+services:
+  backend:
+    container_name: backend
+    build: ./backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    networks:
+      - total_network
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    ports:
+      - "3001:3001"
+  db:
+    container_name: db
+    image: postgres
+    environment:
+      POSTGRE_USER : postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pongserv
+    ports:
+      - "5433:5432"
+    networks:
+      - total_network 
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+volumes:
+  postgres:
+
+networks:
+  total_network:
+    driver: bridge
