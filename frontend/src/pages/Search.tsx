@@ -49,7 +49,7 @@ const Search = () => {
         <CustomOnKeyUpInput
           defaultValue=""
           placeholder="유저 이름을 입력하세요."
-          maxLength={8}
+          maxLength={10}
           handleFunction={handleValue}
           handleDoneTyping={() => {}}
           isError={false}
