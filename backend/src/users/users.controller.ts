@@ -133,12 +133,37 @@ export class UsersController {
 
   @ApiResponse({
     status: 201,
-    description: '친구 요청 성공!.',
+    description: '친구 요청 성공!',
   })
   @ApiOperation({ summary: '친구요청하기' })
   @UseGuards(JwtAccessTokenGuard)
   @Post('/friend')
   async makeFriend(@CurrentUser() user: string, @Body() body: any) {
+    console.log('In makeFriend', user, body);
     return await this.UsersService.makeFriend(user, body.nickname);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: '친구 요청 성공!',
+  })
+  @ApiOperation({ summary: '친구요청하기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Post('/friend/delete')
+  async deleteFriend(@CurrentUser() user: string, @Body() body: any) {
+    console.log('In deleteFriend', user, body);
+    return await this.UsersService.deleteFriend(user, body.nickname);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: '친구 목록 성공!',
+  })
+  @ApiOperation({ summary: '친구목록 가져오기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('/friend')
+  async getFriendList(@CurrentUser() user: string) {
+    console.log('In getFriendList', user);
+    return await this.UsersService.getFriendList(user);
   }
 }

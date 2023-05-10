@@ -99,11 +99,39 @@ export class UsersService {
     return filePath;
   }
 
-  async makeFriend(intraId: string, friendId: string) {
-    return await this.dbmanagerUsersService.makeFriend(intraId, friendId);
+  async makeFriend(intraId: string, friendNickname: string) {
+    //friendId는 닉네임으로 온다!
+    const friendUserId = await this.dbmanagerUsersService.findUserIdByNickname(
+      friendNickname,
+    );
+    const friendEntity = await this.dbmanagerUsersService.getMasterEntity(
+      friendUserId,
+    );
+    const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
+    return await this.dbmanagerUsersService.makeFriend(myEntity, friendEntity);
+  }
+
+  async deleteFriend(intraId: string, friendNickname: string) {
+    //friendId는 닉네임으로 온다!
+    const friendUserId = await this.dbmanagerUsersService.findUserIdByNickname(
+      friendNickname,
+    );
+    const friendEntity = await this.dbmanagerUsersService.getMasterEntity(
+      friendUserId,
+    );
+    const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
+    return await this.dbmanagerUsersService.deleteFriend(
+      myEntity,
+      friendEntity,
+    );
   }
 
   async getFriendProfile(intraId: string, friendId: string) {
     return await this.dbmanagerUsersService.getFriendProfile(intraId, friendId);
+  }
+
+  async getFriendList(intraId: string) {
+    const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
+    return await this.dbmanagerUsersService.getFriendList(myEntity);
   }
 }
