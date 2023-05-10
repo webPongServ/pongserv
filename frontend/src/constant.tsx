@@ -14,3 +14,9 @@ export const ChattingRoomType = {
   protected: "02",
   private: "03",
 };
+
+export const ProfileStatusType = {
+  self: "01",
+  friend: "02",
+  notFriend: "03",
+};
