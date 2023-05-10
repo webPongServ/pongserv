@@ -34,6 +34,18 @@
   #chat-button {
     color: #ffffff;
   }
+
+  .skeleton-img {
+    width: 35px;
+    height: 35px;
+    margin-right: 5px;
+  }
+
+  .skeleton-nickname {
+    height: 30px;
+    width: 80px;
+    border-radius: 5px;
+  }
 }
 
 #FriendDrawer {
@@ -57,5 +69,17 @@
     .logout {
       opacity: 0.3;
     }
+  }
+
+  .skeleton-img {
+    width: 35px;
+    height: 35px;
+    margin-right: 5px;
+  }
+
+  .skeleton-nickname {
+    height: 30px;
+    width: 80px;
+    border-radius: 10%;
   }
 }

@@ -1,8 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as express from 'express';
 import * as expressBasicAuth from 'express-basic-auth';
+import { join } from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
+import * as serveStatic from 'serve-static';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -35,7 +38,7 @@ async function bootstrap() {
         name: 'JWT',
         in: 'header',
       },
-      'access-token',
+      'accessToken',
     )
     .build();
   const document = SwaggerModule.createDocument(app, config);
@@ -46,7 +49,9 @@ async function bootstrap() {
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
-
+  const publicPath = join(__dirname, '..', 'images');
+  app.use('/images', serveStatic(publicPath, { index: false }));
+  app.use(express.json({ limit: '10mb' }));
   await app.listen(3000);
 }
 bootstrap();

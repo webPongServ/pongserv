@@ -53,8 +53,6 @@ const CreateGameModal = (props: CreateGameModalProps) => {
     }
   };
 
-  console.log(setRoomID);
-
   return (
     <Modal
       open={props.roomStatus === "create-game"}
@@ -74,6 +72,8 @@ const CreateGameModal = (props: CreateGameModalProps) => {
             <CustomInput
               name="제목"
               defaultValue=""
+              maxLength={20}
+              placeholder="최대 20자"
               handleFunction={handleTitle}
             />
             <CustomSlider

@@ -1,16 +1,11 @@
 import { UserDetail } from "types/Detail";
 
 export interface Friends {
-  friends: UserDetail[];
+  friends: UserDetail[] | null;
 }
 
 const INITIAL_FRIENDS: Friends = {
-  friends: [
-    { nickname: "chanhyle", imgURL: "../image.png", status: "login" },
-    { nickname: "seongtki", imgURL: "../image.png", status: "login" },
-    { nickname: "mgo", imgURL: "../image.png", status: "login" },
-    { nickname: "noname_12", imgURL: "../image.png", status: "logout" },
-  ],
+  friends: null,
 };
 
 export enum FriendsActionTypes {
@@ -21,7 +16,7 @@ export enum FriendsActionTypes {
 
 export interface FriendsGetAction {
   type: FriendsActionTypes.FRIENDS_GET;
-  payload: Friends;
+  payload: UserDetail[];
 }
 export interface FriendsAddAction {
   type: FriendsActionTypes.FRIENDS_ADD;
@@ -41,16 +36,16 @@ export const FriendsReducer = (
 ): Friends => {
   switch (action.type) {
     case FriendsActionTypes.FRIENDS_GET:
-      return action.payload;
+      return { friends: action.payload }; // { friends : [] }를 리턴해야 함
     case FriendsActionTypes.FRIENDS_ADD:
       return {
         ...state,
-        friends: [...state.friends, action.payload],
+        friends: [...state.friends!, action.payload],
       };
     case FriendsActionTypes.FRIENDS_DELETE:
       return {
         ...state,
-        friends: state.friends.filter(
+        friends: state.friends!.filter(
           (friend) => friend.nickname !== action.payload
         ),
       };

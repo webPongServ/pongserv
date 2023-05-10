@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, InternalServerErrorException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
@@ -10,6 +10,10 @@ import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
+import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
+import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
+import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
+import { TbCh01LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-01-l.entity';
 
 @Injectable()
 export class ChatsService {
@@ -28,7 +32,41 @@ export class ChatsService {
 		return (newChatroom.uuid);
 	}
 
-	async getChatroomsForAUser(userId: string) {
+	async takeDmRequest(userId: string, infoDmReq: ChatroomDmReqDto) {
+		/*!SECTION
+			1. requester와 target에 대한 유저 정보를 가져온다.
+			2. DM용 private type의 chatroom을 만든다.
+			3. requester와 target 모두 DM chatroom의 참여자에 등록한다.
+				3-1. requester는 방 참여 여부(chtRmJoinTf)를 true로 설정한다.
+				3-2. target의 방 참여 여부는 false로 설정한다.
+			4. DM chatroom 정보를 반환한다.
+		*/
+		// 1
+		console.log('userId: ');
+		console.log(userId);
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		console.log('requester: ');
+		console.log(requester);
+		const target = await this.dbUsersManagerService.getUserByUserId(infoDmReq.targetUserId); // NOTE: nickname으로 바뀔 가능성 있음 (프론트랑 협의)
+		console.log('target: ');
+		console.log(target);
+		// 2
+		const nameDmChtrm = '[DM]' + requester.nickname + '->' + target.nickname;
+		const newDmChtrm = await this.dbChatsManagerService.createDmChatroom(nameDmChtrm);
+		console.log('newDmChtrm: ');
+		console.log(newDmChtrm);
+		// 3
+		await this.dbChatsManagerService.setUserToEnterRoom(requester, newDmChtrm);
+		const targetInDmInfo = await this.dbChatsManagerService.setUserToEnterRoom(target, newDmChtrm);
+		targetInDmInfo.chtRmJoinTf = false;
+		console.log('targetInDmInfo: ');
+		console.log(targetInDmInfo);
+		this.dbChatsManagerService.saveChtrmUser(targetInDmInfo);
+		// 4
+		return (newDmChtrm.uuid);
+	}
+
+	async getChatroomsForAUser(userId: any) {
 		/*!SECTION
 			특정 유저에게 보이는 채팅방 조건은 다음과 같다.
 			1. public type
@@ -42,12 +80,18 @@ export class ChatsService {
 				uuid, name, owner, type, current, max
 		*/
 		// 1
+		console.log('userId in ChatsService.getChatroomsForAUser(): ');
+		console.log(userId);
 		const user: TbUa01MEntity = await this.dbUsersManagerService.getUserByUserId(userId);
-		let dmChtrms = await this.dbChatsManagerService.getDMChatroomsForUser(user);
+		console.log(`user in ChatsService.getChatroomsForAUser(): `);
+		console.log(user);
+		let dmChtrms: TbCh01LEntity[] = await this.dbChatsManagerService.getDMChatroomsForUser(user);
+		console.log(`dmChtrms in ChatsService.getChatroomsForAUser(): `);
+		console.log(dmChtrms);
 		// 2
-		let pblAndprtChtrms = await this.dbChatsManagerService.getPublicAndProtectedChatrooms();
+		let pblAndprtChtrms: TbCh01LEntity[] = await this.dbChatsManagerService.getPublicAndProtectedChatrooms();
 		// 3
-		const combinedChtrms = [...dmChtrms, ...pblAndprtChtrms];
+		const combinedChtrms: TbCh01LEntity[] = [...dmChtrms, ...pblAndprtChtrms];
 		let results: {
 			uuid: string,
 			chatroomName: string,
@@ -55,16 +99,26 @@ export class ChatsService {
 			type: string,
 			currentCount: number,
 			maxCount: number,
-		}[];
+		}[] = [];
+		console.log(`combinedChtrms in ChatsService.getChatroomsForAUser(): `);
+		console.log(combinedChtrms);
 		for (const eachChtrm of combinedChtrms) {
 			const currUserListAndCount = await this.dbChatsManagerService.getCurrUserListAndCount(eachChtrm);
+			console.log(`eachChtrm in ChatsService.getChatroomsForAUser(): `);
+			console.log(eachChtrm);
+			if (currUserListAndCount[1] === 0)
+				continue ;
 			let owner: TbCh02LEntity;
-			for (const eachUser of currUserListAndCount[0]) {
-				if (eachUser.chtRmAuth === '01') {
-					owner = eachUser;
+			console.log(`currUserListAndCount in ChatsService.getChatroomsForAUser(): `);
+			console.log(currUserListAndCount);
+			for (const eachUserInChtrm of currUserListAndCount[0]) {
+				if (eachUserInChtrm.chtRmAuth === '01') {
+					owner = eachUserInChtrm;
 					break ;
 				}
 			}
+			console.log(`owner in ChatsService.getChatroomsForAUser(): `)
+			console.log(owner)
 			results.push({
 				uuid: eachChtrm.uuid,
 				chatroomName: eachChtrm.chtRmNm,
@@ -74,6 +128,8 @@ export class ChatsService {
 				maxCount: eachChtrm.maxUserCnt,
 			})
 		}
+		console.log(`results: `);
+		console.log(results);
 		return results;
 	}
 
@@ -294,5 +350,77 @@ export class ChatsService {
 		this.dbChatsManagerService.saveChtrmUser(targetInChtrm);
 		// 4
 		return targetUser.nickname;
+	}
+
+	async takeGameRequest(userId: string, infoGameReq: ChatroomGameRequestDto) {
+		/*!SECTION
+			1. user가 chatroom에 있는지 확인한다.
+			2. target 유저가 chatroom에 있는지 확인한다.
+			3. target 유저의 현재 로그인 정보를 가져와서 게임 중인지 확인한다.
+				// NOTE: 저번 회의 때 Tb_UA02L 테이블에 현재 게임 여부에 대해 정보를 알 수 잇다.
+				// 하지만 저번에 사용여부에 대해서 이야기 했기 때문에 이번에 확인해봐야 겠다.
+			4. game 신청 user와 target 정보를 반환한다.
+				// 웹소켓을 통해서 target 유저에게 game request를 보내게 하면 될 듯
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoGameReq.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		// 2
+		const target = await this.dbUsersManagerService.getUserByUserId(infoGameReq.userIdToGame);
+		const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(target, chtrm);
+		if (targetInChtrm.chtRmJoinTf === false)
+			throw new NotFoundException('The target isn\'t the chatroom');
+		// 3
+		const currTrgtLgn = await this.dbUsersManagerService.getCurrLoginData(target);
+		if (currTrgtLgn === null)
+			throw new NotFoundException('The target not logined');
+		if (currTrgtLgn.stsCd === '03')
+			throw new BadRequestException('The target is gaming now.');
+		// 4
+		return target.userId;
+	}
+
+	async getBanListInARoom(userId: string, uuid: string) {
+		/*!SECTION
+			1. uuid에 해당하는 chatroom 정보를 가져옴
+			2. 해당 chatroom에서 현재 ban으로 등록된 유저 목록을 가져옴
+		*/
+		// 1
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(uuid);
+		if (chtrm === null)
+			throw new NotFoundException('The chatroom isn\'t exist currently.')
+		// 2
+		const banList = await this.dbChatsManagerService.getBanListInARoom(chtrm);
+		return banList;
+	}
+
+	async removeBan(userId: string, infoBanRmv: ChatroomBanRemovalDto) {
+		/*!SECTION
+			1. user(requester)의 권한을 확인한다. (owner, administrator가 아니면 throw)
+			2. target의 chatroom에서의 정보를 확인한다.
+				2-1. 현재 ban 상태가 아니라면 throw
+			3. ban을 해제하고 저장한다.
+		*/
+		// 1
+		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmByUuid(infoBanRmv.uuid);
+		const requesterInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(requester, chtrm);
+		if (requesterInChtrm.chtRmJoinTf === false)
+			throw new UnauthorizedException('You are not in the chatroom.');
+		if (requesterInChtrm.chtRmAuth !== '01' && requesterInChtrm.chtRmAuth !== '02')
+			throw new UnauthorizedException('You do not have permission.');
+		// 2
+		const target = await this.dbUsersManagerService.getUserByUserId(infoBanRmv.userIdToFree);
+		const banInfoOfTarget = await this.dbChatsManagerService.getBanInfoInAChtrm(target, chtrm);
+			// 2-1
+		if (banInfoOfTarget === null)
+			throw new NotFoundException('The taget isn\'t in ban list.');
+		// 3
+		banInfoOfTarget.vldTf = false;
+		this.dbChatsManagerService.saveChtrmRstrInfo(banInfoOfTarget);
+		return ;
 	}
 }

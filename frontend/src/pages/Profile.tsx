@@ -1,157 +1,110 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useParams } from "react-router-dom";
-import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
-import { FriendsActionTypes } from "types/redux/Friends";
+import { useParams, useNavigate } from "react-router-dom";
 import { IRootState } from "components/common/store";
-import { ProfileDetail } from "types/Detail";
+import { ProfileDetail, UserDetail } from "types/Detail";
 import UserInfo from "components/profile/UserInfo";
 import GameHistoryList from "components/profile/GameHistoryList";
 import AchievementList from "components/profile/AchievementList";
-import EditProfileModal from "components/profile/EditProfileModal";
+import EditNicknameModal from "components/profile/EditNicknameModal";
+import EditImageModal from "components/profile/EditImageModal";
 import SetTwoFactorModal from "components/profile/SetTwoFactorModal";
+import SkeletonProfile from "components/common/utils/SkeletonProfile";
+import SkeletonButtons from "components/common/utils/SkeletonButtons";
+import MyButtons from "components/profile/MyButtons";
+import OthersButtons from "components/profile/OthersButtons";
+import { MyInfoActionTypes } from "types/redux/MyInfo";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
 import { Box } from "@mui/material";
-import { Button, Tabs, TabList } from "@mui/joy";
+import { Tabs, TabList } from "@mui/joy";
 import Tab, { tabClasses } from "@mui/joy/Tab";
 import UserService from "API/UsersService";
 
 const Profile = () => {
-  const myInfo = useSelector((state: IRootState) => state.myInfo);
-  const friends = useSelector((state: IRootState) => state.friends.friends);
+  const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
+  const friends: UserDetail[] | null = useSelector(
+    (state: IRootState) => state.friends.friends
+  );
   const [isFriend, setIsFriend] = useState<boolean>(false);
   const [modalStatus, setModalStatus] = useState<string>("closed");
-  const dispatch = useDispatch();
+  const [profileDetail, setProfileDetail] = useState<ProfileDetail | null>(
+    null
+  );
   const { nickname } = useParams();
 
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const getProfile = async () => {
-    const response = await UserService.getUserProfile(nickname!);
-    setProfileDetail({
-      nickname: response.data.nickname,
-      imgURL: response.data.imgPath,
-      total: response.data.total,
-      win: response.data.win,
-      lose: response.data.lose,
-      ELO: response.data.ELO,
-      winRate: response.data.winRate,
-      status: "",
-    });
-  };
-
-  // loading 창 띄우기
-  const [profileDetail, setProfileDetail] = useState<ProfileDetail>({
-    nickname: "skittles",
-    imgURL: "../image.png",
-    total: 5,
-    win: 5,
-    lose: 0,
-    ELO: 150,
-    winRate: 0.8,
-    status: "login",
-  });
-
-  const handleDMButton = () => {
-    // const data = ... // 채팅방 생성 API 요청
-    dispatch({
-      type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-      payload: {
-        id: "202304280001", // API를 통해 받아온 데이터
-        title: `[DM] ${profileDetail.nickname}, ${myInfo.nickname}`,
-        owner: `${myInfo.nickname}`,
-        type: "private",
-        max: 2,
-        current: 1,
-        createdAt: new Date(),
-      },
-    });
-  };
-
-  const handleFriendAddButton = () => {
-    dispatch({
-      type: FriendsActionTypes.FRIENDS_ADD,
-      payload: {
-        nickname: profileDetail.nickname,
-        imgURL: profileDetail.imgURL,
-        status: profileDetail.status,
-      },
-    });
-    setIsFriend(!isFriend);
-  };
-
-  const handleFriendDeleteButton = () => {
-    dispatch({
-      type: FriendsActionTypes.FRIENDS_DELETE,
-      payload: profileDetail.nickname,
-    });
-    setIsFriend(!isFriend);
-  };
-
-  const handleBlockButton = () => {};
-
-  const handleEditButton = () => {
-    setModalStatus("edit-profile");
-  };
-
-  const handleTwoFactorButton = () => {
-    setModalStatus("set-twofactor");
+    try {
+      const response = await UserService.getUserProfile(nickname!);
+      setProfileDetail({
+        nickname: response.data.nickname,
+        imgURL: response.data.imgPath,
+        total: response.data.total,
+        win: response.data.win,
+        lose: response.data.lose,
+        ELO: response.data.ELO,
+        winRate: response.data.winRate,
+        status: "",
+      });
+      dispatch({
+        type: MyInfoActionTypes.MYINFO_UPDATE_NICKNAME,
+        payload: nickname,
+      });
+    } catch {
+      alert("유저가 존재하지 않습니다! 홈 화면으로 돌아갑니다.");
+      navigate("/game");
+    }
   };
 
   useEffect(() => {
-    friends.forEach((element) => {
-      if (element.nickname === profileDetail.nickname) {
-        setIsFriend(true);
-      }
-    });
+    if (friends !== null) {
+      friends.forEach((element) => {
+        if (profileDetail && element.nickname === profileDetail.nickname) {
+          setIsFriend(true);
+        }
+      });
+    }
     getProfile();
-
     // check dependency list!!
-  }, []);
+  }, [nickname]);
 
   return (
     <Box id="Profile" className="flex-container">
       <Box id="user-info-box" className="flex-container">
         <Box className="user-info flex-container">
-          <UserInfo
-            nickname={profileDetail.nickname}
-            imgURL={profileDetail.imgURL}
-            total={profileDetail.total}
-            win={profileDetail.win}
-            lose={profileDetail.lose}
-            ELO={profileDetail.ELO}
-            winRate={profileDetail.winRate}
-            status={profileDetail.status}
-          />
+          {profileDetail === null ? (
+            <SkeletonProfile />
+          ) : (
+            <UserInfo
+              nickname={profileDetail!.nickname}
+              imgURL={profileDetail!.imgURL}
+              total={profileDetail!.total}
+              win={profileDetail!.win}
+              lose={profileDetail!.lose}
+              ELO={profileDetail!.ELO}
+              winRate={profileDetail!.winRate}
+              status={profileDetail!.status}
+            />
+          )}
         </Box>
         <Box className="button-group flex-container">
-          {profileDetail.nickname === myInfo.nickname ? (
-            <>
-              <Button variant="outlined" onClick={handleEditButton}>
-                정보 수정
-              </Button>
-              <Button variant="solid" onClick={handleTwoFactorButton}>
-                2차 인증 설정
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button variant="solid" onClick={handleDMButton}>
-                DM
-              </Button>
-              <Button
-                variant={isFriend ? "outlined" : "solid"}
-                onClick={
-                  isFriend ? handleFriendDeleteButton : handleFriendAddButton
-                }
-              >
-                {isFriend ? "친구 삭제" : "친구 추가"}
-              </Button>
-              <Button variant="outlined" onClick={handleBlockButton}>
-                차단
-              </Button>
-            </>
-          )}
+          {profileDetail === null && <SkeletonButtons />}
+          {profileDetail !== null &&
+            profileDetail.nickname === myInfo.nickname && (
+              <MyButtons setModalStatus={setModalStatus} />
+            )}
+          {profileDetail !== null &&
+            profileDetail!.nickname !== myInfo.nickname && (
+              <OthersButtons
+                isFriend={isFriend}
+                setIsFriend={setIsFriend}
+                profileDetail={profileDetail}
+              />
+            )}
         </Box>
       </Box>
       <Tabs id="history-box" aria-label="tabs" defaultValue={0}>
@@ -186,7 +139,11 @@ const Profile = () => {
           <AchievementList />
         </Box>
       </Tabs>
-      <EditProfileModal
+      <EditNicknameModal
+        modalStatus={modalStatus}
+        setModalStatus={setModalStatus}
+      />
+      <EditImageModal
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
       />

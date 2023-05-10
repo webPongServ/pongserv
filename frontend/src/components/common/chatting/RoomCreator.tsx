@@ -111,7 +111,13 @@ const RoomCreator = () => {
         />
       </Box>
       <Box className="modal-body flex-container">
-        <CustomInput name="제목" defaultValue="" handleFunction={handleTitle} />
+        <CustomInput
+          name="제목"
+          defaultValue=""
+          maxLength={20}
+          placeholder="최대 20자"
+          handleFunction={handleTitle}
+        />
         <CustomSlider
           name="최대 인원"
           defaultValue={2}
@@ -131,6 +137,8 @@ const RoomCreator = () => {
           <CustomInput
             name="비밀번호"
             defaultValue=""
+            maxLength={20}
+            placeholder="최대 20자"
             handleFunction={handlePassword}
           />
         )}

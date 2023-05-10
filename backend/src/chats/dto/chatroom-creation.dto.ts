@@ -5,7 +5,7 @@ export class ChatroomCreationDto {
     name: string;
 
     // 01, 02, 03
-    @ApiProperty({ type: Boolean })
+    @ApiProperty({ type: String })
     type: string;
 
     @ApiProperty({ type: String })

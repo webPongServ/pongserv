@@ -15,11 +15,11 @@ const CustomInput = (props: CustomInputProps) => {
       </Typography>
       <Box style={{ width: "80%", margin: "0 auto" }}>
         <Input
-          placeholder="최대 20자"
+          placeholder={props.placeholder}
           defaultValue={props.defaultValue}
           type={props.name === "비밀번호" ? "password" : "text"}
           required
-          slotProps={{ input: { maxLength: 20 } }}
+          slotProps={{ input: { maxLength: props.maxLength } }}
           onChange={props.handleFunction}
         />
       </Box>

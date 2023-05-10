@@ -2,13 +2,14 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ChattingDrawerWidth } from "constant";
 import { IRootState } from "components/common/store";
+import SkeletonMyInfo from "./utils/SkeletonMyInfo";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 
 import { Toolbar, IconButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
-import MenuIcon from "@mui/icons-material/Menu";
+import ForumIcon from "@mui/icons-material/Forum";
 
 type HandleOpen = { open: boolean; setOpen: Function };
 
@@ -47,21 +48,25 @@ const AppBar = (props: HandleOpen) => {
         <Link id="logo" to="/game" className="fixed-center">
           WebPongServ
         </Link>
-        <Link
-          id="my-profile"
-          to={`/profile/${myInfo.nickname}`}
-          className="flex-container"
-        >
-          <img src={`${myInfo.imgURL}`} alt="AppBar-profile" />
-          {myInfo.nickname}
-        </Link>
+        {myInfo.nickname === "" ? (
+          <SkeletonMyInfo />
+        ) : (
+          <Link
+            id="my-profile"
+            className="flex-container"
+            to={`/profile/${myInfo.nickname}`}
+          >
+            <img src={`${myInfo.imgURL}`} alt="AppBar-profile" />
+            {myInfo.nickname}
+          </Link>
+        )}
         <IconButton
           id="chat-button"
           edge="end"
           onClick={handleDrawerOpen}
           sx={{ ...(props.open && { display: "none" }) }}
         >
-          <MenuIcon />
+          <ForumIcon />
         </IconButton>
       </Toolbar>
     </TopBar>

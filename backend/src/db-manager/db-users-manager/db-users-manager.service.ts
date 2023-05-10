@@ -33,12 +33,6 @@ export class DbUsersManagerService {
     return user;
   }
 
-  setUser() {
-    const test = this.ua01mRp.create();
-    console.log(test);
-    console.log(`in DbManagerService.serUser`);
-  }
-
   // TODO: move to UsersModule
   async checkinUser(intraData: { intraId: string; intraImagePath: string }) {
     /*!SECTION
@@ -53,32 +47,23 @@ export class DbUsersManagerService {
         userId: userId,
       },
     });
-    // 1-1
-    if (!userMaster) {
-      userMaster = await this.ua01mRp.save(
-        this.ua01mRp.create({
-          userId: userId, // userID string...
-          nickname: userId,
-          twofactor: false,
-          twofactorData: '',
-          imgPath: intraData.intraImagePath,
-          delTf: false,
-        }),
-      );
-    }
+    // console.log(`upper userMaster: `);
     // console.log(userMaster);
-    // 2
-    // const result = await this.ua01lRp.save(
-    //   this.ua01lRp.create({
-    //     ua01mEntity: userMaster,
-    //     chtTf: false,
-    //     gmTf: false,
-    //     refreshTkn: 'null', // TODO: set as refresh token
-    //     loginTf: true,
-    //     delTf: false,
-    //   }),
-    // );
-    // console.log('Second ', result);
+    // 1-1
+    if (userMaster === null) {
+      userMaster = this.ua01mRp.create({
+        userId: userId,
+        nickname: userId,
+        twofactor: false,
+        imgPath: intraData.intraImagePath,
+      });
+      // console.log(`userMaster after create: `);
+      // console.log(userMaster);
+      userMaster = await this.ua01mRp.save(userMaster);
+      // console.log(`userMaster after save: `);
+      // console.log(userMaster);
+    }
+    return userMaster;
   }
 
   async checkUserInDb(userId: string) {
@@ -120,6 +105,31 @@ export class DbUsersManagerService {
       throw new BadRequestException('No User available');
     }
   }
+
+  async saveUser(user: TbUa01MEntity) {
+    try {
+      const result = await this.ua01mRp.save(user);
+      console.log(result);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  async changeImagePath(userId: string, imagePath: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    if (user) {
+      user.imgPath = imagePath;
+      await this.ua01mRp.save(user);
+      console.log('Image path is sucessfuly saved');
+    } else {
+      throw new BadRequestException('No User available');
+    }
+  }
+
   async activate2fa(userId: string) {
     const user = await this.ua01mRp.findOne({
       where: {
@@ -206,47 +216,101 @@ export class DbUsersManagerService {
     }
     // const userGame = await this.ua02lRp.find({
   }
-  async makeFriend(userId: string, friendNickname: string) {
-    // // TODO: check if friendId is valid
-    // const friend = await this.ua01mRp.findOne({
-    //   where: {
-    //     nickname: friendNickname,
-    //   },
-    // });
-    // if (friend) {
-    //   const friendId = friend.userId;
-    //   const user = await this.ua01mRp.findOne({
-    //     where: {
-    //       userId: userId,
-    //     },
-    //   });
-    //   if (user) {
-    //     const friendList = await this.ua02lRp.findOne({
-    //       where: {
-    //         ua01mEntity: user,
-    //       },
-    //     });
-    //     if (friendList) {
-    //       const friendListArray = friendList.friendList.split(',');
-    //       if (friendListArray.includes(friendId)) {
-    //         throw new BadRequestException('Already Friend');
-    //       } else {
-    //         friendList.friendList = friendList.friendList + ',' + friendId;
-    //         await this.ua03mRp.save(friendList);
-    //         console.log('Friend is sucessfuly added');
-    //         return { Request: 'Success' };
-    //       }
-    //     } else {
-    //       throw new BadRequestException('No FriendList available');
-    //     }
-    //   } else {
-    //     throw new BadRequestException('No User available');
-    //   }
-    // } else {
-    //   throw new BadRequestException('No User available');
-    // }
-    // // TODO: check if friendId is already friend
-    // // TODO: make friend in DB(ua02lRp)
+
+  async getMasterEntity(userId: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    if (!user) throw new BadRequestException('No User available');
+    else {
+      return user;
+    }
+  }
+
+  async makeFriend(myEntity: TbUa01MEntity, friendEntity: TbUa01MEntity) {
+    if (myEntity.id == friendEntity.id)
+      throw new BadRequestException('Cannot be friend of myself');
+
+    const friend = await this.ua02lRp.findOne({
+      relations: {
+        ua01mEntity: true,
+        ua01mEntityAsFr: true,
+      },
+      where: {
+        ua01mEntity: {
+          id: myEntity.id,
+        },
+        ua01mEntityAsFr: {
+          id: friendEntity.id,
+        },
+      },
+    });
+    if (friend && friend.stCd == '01')
+      throw new BadRequestException('Already Friend');
+    else if (friend && friend.stCd == '02') {
+      friend.stCd = '01';
+      friend.rsstDttm = new Date();
+      await this.ua02lRp.save(friend);
+      console.log('Friend is sucessfuly added(change from deleted status');
+      return { result: 'Success' };
+    } else {
+      const friendList = await this.ua02lRp.create({
+        ua01mEntity: myEntity,
+        ua01mEntityAsFr: friendEntity,
+        rsstDttm: new Date(),
+        releDttm: new Date(),
+        stCd: '01',
+        delTf: false,
+      });
+      await this.ua02lRp.save(friendList);
+      console.log('make new friend');
+      return { result: 'Success' };
+    }
+  }
+
+  async deleteFriend(myEntity: TbUa01MEntity, friendEntity: TbUa01MEntity) {
+    if (myEntity.id == friendEntity.id)
+      throw new BadRequestException('Cannot delete myself');
+    const friend = await this.ua02lRp.findOne({
+      relations: {
+        ua01mEntity: true,
+        ua01mEntityAsFr: true,
+      },
+      where: {
+        ua01mEntity: {
+          id: myEntity.id,
+        },
+        ua01mEntityAsFr: {
+          id: friendEntity.id,
+        },
+      },
+    });
+    if (friend && friend.stCd == '02')
+      throw new BadRequestException('Already both are not Friend');
+    else if (friend && friend.stCd == '01') {
+      friend.stCd = '02';
+      friend.rsstDttm = new Date();
+      await this.ua02lRp.save(friend);
+      console.log('Friend is sucessfuly deleted(change from added status)');
+      return { result: 'Success' };
+    } else {
+      throw new BadRequestException('No Friend available');
+    }
+  }
+
+  async findUserIdByNickname(nickname: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        nickname: nickname,
+      },
+    });
+    if (user) {
+      return user.userId;
+    } else {
+      throw new BadRequestException('No User available');
+    }
   }
 
   async getFriendProfile(userId: string, friendNickname: string) {
@@ -272,5 +336,38 @@ export class DbUsersManagerService {
     } else {
       throw new BadRequestException('No User available');
     }
+  }
+
+  async getCurrLoginData(user: TbUa01MEntity) {
+    const result = await this.ua01lRp.findOne({
+      where: {
+        ua01mEntity: user,
+        loginTf: true,
+      },
+    });
+    return result;
+  }
+
+  async getFriendList(myEntity: TbUa01MEntity) {
+    const friendList = await this.ua02lRp.findAndCount({
+      relations: {
+        ua01mEntity: true,
+        ua01mEntityAsFr: true,
+      },
+      where: {
+        ua01mEntity: {
+          id: myEntity.id,
+        },
+      },
+    });
+    if (!friendList) throw new BadRequestException('No Friend available');
+    const friendData = friendList[0].map((friend) => {
+      return {
+        nickname: friend.ua01mEntityAsFr.nickname,
+        imageUrl: friend.ua01mEntityAsFr.imgPath,
+      };
+    });
+    if (friendData) return friendData;
+    else throw new BadRequestException('No Friend available');
   }
 }

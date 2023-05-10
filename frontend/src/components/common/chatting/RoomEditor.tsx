@@ -110,6 +110,8 @@ const RoomEditor = (props: HandleRoomDetail) => {
         <CustomInput
           name="제목"
           defaultValue={props.title}
+          maxLength={20}
+          placeholder="최대 20자"
           handleFunction={handleTitle}
         />
         <CustomSlider
@@ -131,6 +133,8 @@ const RoomEditor = (props: HandleRoomDetail) => {
           <CustomInput
             name="비밀번호"
             defaultValue=""
+            maxLength={20}
+            placeholder="최대 20자"
             handleFunction={handlePassword}
           />
         )}
