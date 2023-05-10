@@ -137,20 +137,19 @@ $ChattingDrawerWidth: 500px;
       }
 
       .title {
-        // height: 70px;
         // height: 50%;
-        width: 50%;
+        // width: 50%;
         font-size: 20px;
         margin-bottom: 0.5px;
+        word-break: break-all;
       }
 
       .content {
-        // height: 40px;
         // height: 30%;
         display: flex;
         align-items: center;
-        font-size: 13px;
-        column-gap: 2%;
+        font-size: 12px;
+        column-gap: 3%;
         padding-bottom: 1%;
 
         svg {
@@ -166,10 +165,10 @@ $ChattingDrawerWidth: 500px;
     }
 
     #password-form {
+      height: 18%;
       flex-direction: row;
       justify-content: space-around;
-      height: 18%;
-      margin-bottom: 15px;
+      margin-bottom: 2%;
       background-color: #aaaaaa;
 
       .content {
