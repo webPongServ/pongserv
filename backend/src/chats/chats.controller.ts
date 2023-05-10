@@ -30,6 +30,9 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Post('dm')
   async takeDmRequest(@CurrentUser() userId: string, @Body() infoDmReq: ChatroomDmReqDto) {
+    console.log(`[${userId}: `, `POST /chats/dm]`);
+    console.log(`ChatroomDmReqDto: `);
+    console.log(infoDmReq);
     return (await this.chatsService.takeDmRequest(userId, infoDmReq));
   }
 

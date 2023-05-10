@@ -43,25 +43,16 @@ export class ChatsService {
 			4. DM chatroom 정보를 반환한다.
 		*/
 		// 1
-		console.log('userId: ');
-		console.log(userId);
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
-		console.log('requester: ');
-		console.log(requester);
-		const target = await this.dbUsersManagerService.getUserByUserId(infoDmReq.targetUserId); // NOTE: nickname으로 바뀔 가능성 있음 (프론트랑 협의)
-		console.log('target: ');
-		console.log(target);
+		const trgtUserId = await this.dbUsersManagerService.findUserIdByNickname(infoDmReq.targetNickname);
+		const target = await this.dbUsersManagerService.getUserByUserId(trgtUserId);
 		// 2
 		const nameDmChtrm = '[DM]' + requester.nickname + '->' + target.nickname;
 		const newDmChtrm = await this.dbChatsManagerService.createDmChatroom(nameDmChtrm);
-		console.log('newDmChtrm: ');
-		console.log(newDmChtrm);
 		// 3
 		await this.dbChatsManagerService.setUserToEnterRoom(requester, newDmChtrm);
 		const targetInDmInfo = await this.dbChatsManagerService.setUserToEnterRoom(target, newDmChtrm);
 		targetInDmInfo.chtRmJoinTf = false;
-		console.log('targetInDmInfo: ');
-		console.log(targetInDmInfo);
 		this.dbChatsManagerService.saveChtrmUser(targetInDmInfo);
 		// 4
 		return (newDmChtrm.id);
