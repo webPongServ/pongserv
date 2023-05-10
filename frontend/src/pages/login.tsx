@@ -1,6 +1,5 @@
-import instance, { apiURL } from "API/api";
-import { usersURL } from "API/UsersService";
-import UserService from "API/UsersService";
+import instance from "API/api";
+import UserService from "API/UserService";
 // import { useNavigate } from "react-router-dom";
 
 import "styles/Login.scss";
