@@ -3,7 +3,7 @@ import "styles/global.scss";
 
 const LoadingCircle = () => {
   return (
-    <Box className="flex-container">
+    <Box className="flex-container" sx={{ height: "100%" }}>
       <CircularProgress />
     </Box>
   );
