@@ -14,6 +14,7 @@ import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
 import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
 import { TbCh01LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-01-l.entity';
+import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 
 @Injectable()
 export class ChatsService {
@@ -177,7 +178,7 @@ export class ChatsService {
 		let eachUserInfos: {
 			nickname: string,
 			chtRmAuth: string,
-		}[];
+		}[] = [];
 		for (const eachInChtrm of liveUserListAndCount[0]) {
 			eachUserInfos.push({
 				nickname: eachInChtrm.ua01mEntity.nickname,
@@ -215,7 +216,22 @@ export class ChatsService {
 		// NOTE: userID not used
 		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(id);
 		const userListAndCount = await this.dbChatsManagerService.getLiveUserListAndCountInARoom(chtrm);
-		return userListAndCount[0];
+		// NOTE: 유저 몇명인지는 안 보내도 됨
+		// TODO: needed datas: nickname, img, authInRoom
+		let results: {
+			nickname: string,
+			imgPath: string,
+			authInChtrm: string,
+		}[] = [];
+		for (const eachInChtrm of userListAndCount[0]) {
+			const eachUser: TbUa01MEntity = eachInChtrm.ua01mEntity;
+			results.push({
+				nickname: eachUser.nickname,
+				imgPath: eachUser.imgPath,
+				authInChtrm: eachInChtrm.chtRmAuth,
+			});
+		}
+		return results;
 	}
 
 	async kickUser(userId: string, infoKick: ChatroomKickingDto) {
@@ -421,6 +437,70 @@ export class ChatsService {
 		// 3
 		banInfoOfTarget.vldTf = false;
 		this.dbChatsManagerService.saveChtrmRstrInfo(banInfoOfTarget);
+		return ;
+	}
+
+	async leaveChatroom(userId: string, infoLeav: ChatroomLeavingDto) {
+		/*!SECTION
+			1. 유저가 채팅방 내에 있는지 확인한다.
+			2. 인원이 혼자인 경우
+				2-1. chatroom의 존재 여부를 false로 바꾼다.
+			3. 인원이 2명 이상인 경우
+				3-1. 권한이 owner일 경우에 참여자 중 한명의 권한을 owner로 설정한다.
+					3-1-1. admin이 있는 경우에 admin 중 한명으로 설정
+					3-1-2. admin이 없는 경우에 나머지 참여자 중 한명으로 설정
+					// TODO: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
+					// TODO: 기존 채팅방 인원이 나간 사실을 websocket을 이용해서 알려야 한다.
+				3-2. 나가는 유저의 권한을 normal로 바꾼다.
+			4. 채널 참여 여부를 false로 바꾸고 반환한다.
+		*/
+		// 1
+		const user = await this.dbUsersManagerService.getUserByUserId(userId);
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(infoLeav.id);
+		if (chtrm === null) {
+			throw new NotFoundException('The chatroom is not found');
+		}
+		const userInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(user, chtrm);
+		if (userInChtrm === null || userInChtrm.chtRmJoinTf === false) {
+			throw new NotFoundException('You\'re not in the chatroom');
+		}
+		const [ userListInChtrm, countInChtrm ]: [TbCh02LEntity[], number]
+			 = await this.dbChatsManagerService.getLiveUserListAndCountInARoom(chtrm);
+		if (countInChtrm === 1) {
+		// 2
+			// 2-1
+			chtrm.chtRmTf = false;
+			this.dbChatsManagerService.saveChatroom(chtrm);
+		} else if (countInChtrm > 1) {
+		// 3
+			// 3-1
+			if (userInChtrm.chtRmAuth === '01') {
+				let sccssrToOwner: TbCh02LEntity = null;
+				// 3-1-1
+				for (const eachUserInChtrm of userListInChtrm) {
+					if (eachUserInChtrm.chtRmAuth === '02') {
+						sccssrToOwner = eachUserInChtrm;
+						break ;
+					}
+				}
+				if (sccssrToOwner === null) {
+				// 3-1-2
+					for (const eachUserInChtrm of userListInChtrm) {
+						if (eachUserInChtrm.chtRmAuth === '03') {
+							sccssrToOwner = eachUserInChtrm;
+							break ;
+						}
+					}
+				}
+				sccssrToOwner.chtRmAuth = '01';
+				this.dbChatsManagerService.saveChtrmUser(sccssrToOwner);
+			}
+			// 3-2
+			userInChtrm.chtRmAuth = '03';
+		}
+		// 4
+		userInChtrm.chtRmJoinTf = false;
+		this.dbChatsManagerService.saveChtrmUser(userInChtrm);
 		return ;
 	}
 }

@@ -14,6 +14,7 @@ import { ChatroomGameRequestDto } from './dto/chatroom-game-req.dto';
 import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
 import { AccessTokenStrategy } from 'src/auth/strategy/jwt.access.strategy';
+import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -215,4 +216,18 @@ export class ChatsController {
   async removeBan(@CurrentUser() userId: string, @Body() infoBanRmv: ChatroomBanRemovalDto) {
     return (await this.chatsService.removeBan(userId, infoBanRmv));
   }
+
+  @ApiResponse({
+    status: 201,
+    description: '채팅방 나가기 성공',
+    type: String, // 성공시 Chatroom_id string 반환
+  })
+  @ApiOperation({ summary: '채팅방 나가기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @Post('leaving')
+  async leaveChatroom(@CurrentUser() userId: string, @Body() infoLeav: ChatroomLeavingDto) {
+    return (await this.chatsService.leaveChatroom(userId, infoLeav));
+  }
+
 }
