@@ -16,7 +16,11 @@ const UserService = {
   postNewImage: async (body: {
     base64Data: string | ArrayBuffer | null | undefined;
   }) => await instance.post(usersURL("image"), body),
-  // postFriend : async (body : {}) => await instance.post(usersURL("friend"), body);
+  getFriend: async () => await instance.get(usersURL("friend")),
+  postFriend: async (body: { nickname: string }) =>
+    await instance.post(usersURL("friend"), body),
+  postDeleteFriend: async (body: { nickname: string }) =>
+    await instance.post(usersURL("friend/delete"), body),
 };
 
 export default UserService;
