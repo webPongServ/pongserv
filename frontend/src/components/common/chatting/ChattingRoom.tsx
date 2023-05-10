@@ -27,7 +27,7 @@ const ChattingRoom = () => {
     <Box id="page">
       {roomStatus === "chat" && (
         <>
-          <Box className="page-header">{currentChatting.title}</Box>
+          <Box className="page-header">{currentChatting.chatroomName}</Box>
           <Box className="page-body chatting-box">
             <Box className="chatting-display overflow">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -93,9 +93,9 @@ const ChattingRoom = () => {
       )}
       {roomStatus === "edit" && (
         <RoomEditor
-          title={currentChatting.title}
+          title={currentChatting.chatroomName}
           type={currentChatting.type}
-          max={currentChatting.max}
+          max={currentChatting.maxCount}
           setRoomStatus={setRoomStatus}
         />
       )}

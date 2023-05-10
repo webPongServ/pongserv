@@ -6,12 +6,11 @@ export interface UserDetail {
 
 export interface ChattingRoomDetail {
   id: string;
-  title: string;
-  owner: string;
+  chatroomName: string;
+  ownerNickname: string;
   type: string;
-  current: number;
-  max: number;
-  createdAt: Date;
+  currentCount: number;
+  maxCount: number;
 }
 
 export interface ChattingUserDetail {

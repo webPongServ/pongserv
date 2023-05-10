@@ -12,12 +12,11 @@ const INITIAL_CURRENTCHATTING: CurrentChatting = {
   status: "waiting",
   chattingRoom: {
     id: "",
-    title: "",
-    owner: "",
+    chatroomName: "",
+    ownerNickname: "",
     type: "",
-    max: 0,
-    current: 0,
-    createdAt: new Date("1970-01-01"),
+    maxCount: 0,
+    currentCount: 0,
   },
   userList: [],
   banList: [],
@@ -85,9 +84,9 @@ export const CurrentChattingReducer = (
         ...state,
         chattingRoom: {
           ...state.chattingRoom,
-          title: action.payload.title,
+          chatroomName: action.payload.chatroomName,
           type: action.payload.type,
-          max: action.payload.max,
+          maxCount: action.payload.maxCount,
         },
       };
     default:

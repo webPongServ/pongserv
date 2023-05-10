@@ -6,8 +6,8 @@ export interface ChattingRoomForm {
 }
 
 export interface ChattingRoomEditForm {
-  title: string;
-  max: number;
+  chatroomName: string;
+  maxCount: number;
   type: string;
 }
 
