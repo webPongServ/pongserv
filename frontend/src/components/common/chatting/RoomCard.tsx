@@ -2,9 +2,10 @@ import { IRootState } from "components/common/store";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChattingRoomDetail } from "types/Detail";
+import ChattingService from "API/ChattingService";
+import { ChattingRoomType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
-import { ChattingRoomType } from "constant";
 
 import Card from "@mui/joy/Card";
 import Box from "@mui/joy/Box";
@@ -24,27 +25,30 @@ const RoomCard = (props: RoomCardProps) => {
   );
   const dispatch = useDispatch();
 
+  const handleCardClick = async () => {
+    if (props.room.type === ChattingRoomType.protected)
+      props.setPwIndex(props.index);
+    else {
+      const response = await ChattingService.postEntrance({
+        id: props.room.id,
+        pwd: "",
+      });
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
+        payload: {
+          id: props.room.id,
+          chatroomName: props.room.chatroomName,
+          ownerNickname: props.room.ownerNickname,
+          type: props.room.type,
+          currentCount: props.room.currentCount,
+          maxCount: props.room.maxCount,
+        },
+      });
+    }
+  };
+
   return (
-    <Card
-      id="card"
-      variant="outlined"
-      className="flex-wrap-container"
-      onClick={() => {
-        props.room.type === ChattingRoomType.protected
-          ? props.setPwIndex(props.index)
-          : dispatch({
-              type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-              payload: {
-                id: props.room.id,
-                chatroomName: props.room.chatroomName,
-                ownerNickname: props.room.ownerNickname,
-                type: props.room.type,
-                currentCount: props.room.currentCount,
-                maxCount: props.room.maxCount,
-              },
-            });
-      }}
-    >
+    <Card id="card" variant="outlined" onClick={handleCardClick}>
       <Box className="title">
         <b>{props.room.chatroomName}</b>
       </Box>
