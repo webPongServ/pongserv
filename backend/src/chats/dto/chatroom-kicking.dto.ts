@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class ChatroomKickingDto {
     @ApiProperty({ type: String })
-    uuid: string;
+    id: string;
 
 	@ApiProperty({ type: String })
     userIdToKick: string;
