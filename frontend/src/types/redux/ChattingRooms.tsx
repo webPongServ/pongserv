@@ -1,39 +1,11 @@
 import { ChattingRoomDetail } from "types/Detail";
 
 export interface ChattingRooms {
-  chattingRooms: ChattingRoomDetail[];
+  chattingRooms: ChattingRoomDetail[] | null;
 }
 
 const INITIAL_CHATROOMS: ChattingRooms = {
-  chattingRooms: [
-    {
-      id: "202304230001",
-      title: "이기면 100만원~",
-      owner: "noname_12",
-      type: "public",
-      current: 4,
-      max: 5,
-      createdAt: new Date(),
-    },
-    {
-      id: "202304230002",
-      title: "옥상으로 따라와",
-      owner: "mgo",
-      type: "protected",
-      current: 4,
-      max: 9,
-      createdAt: new Date(),
-    },
-    {
-      id: "202304230003",
-      title: "[DM] mgo님과의 채팅방",
-      owner: "mgo",
-      type: "private",
-      current: 1,
-      max: 2,
-      createdAt: new Date(),
-    },
-  ],
+  chattingRooms: null,
 };
 
 export enum ChattingRoomsActionTypes {
@@ -44,7 +16,7 @@ export enum ChattingRoomsActionTypes {
 
 export interface ChattingRoomsGetAction {
   type: ChattingRoomsActionTypes.CHATTINGROOMS_GET;
-  payload: ChattingRooms;
+  payload: ChattingRoomDetail[];
 }
 export interface ChattingRoomsAddAction {
   type: ChattingRoomsActionTypes.CHATTINGROOMS_ADD;
@@ -67,16 +39,16 @@ export const ChattingRoomsReducer = (
 ): ChattingRooms => {
   switch (action.type) {
     case ChattingRoomsActionTypes.CHATTINGROOMS_GET:
-      return action.payload;
+      return { chattingRooms: action.payload };
     case ChattingRoomsActionTypes.CHATTINGROOMS_ADD:
       return {
         ...state,
-        chattingRooms: [...state.chattingRooms, action.payload],
+        chattingRooms: [...state.chattingRooms!, action.payload],
       };
     case ChattingRoomsActionTypes.CHATTINGROOMS_DELETE:
       return {
         ...state,
-        chattingRooms: state.chattingRooms.filter(
+        chattingRooms: state.chattingRooms!.filter(
           (chattingRoom) => chattingRoom.id !== action.payload
         ),
       };

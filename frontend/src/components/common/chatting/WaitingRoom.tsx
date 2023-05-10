@@ -13,6 +13,7 @@ import "styles/global.scss";
 import { Box, Pagination } from "@mui/material";
 import { Button } from "@mui/joy";
 import SyncIcon from "@mui/icons-material/Sync";
+import LoadingCircle from "../utils/LoadingCircle";
 
 const WaitingRoom = () => {
   const dispatch = useDispatch();
@@ -20,13 +21,13 @@ const WaitingRoom = () => {
   // chatroom은 전역에서 관리하지 않음 => 로컬에서도 처음에 받아오는 것만(없어진 것 예외처리 필요)
   // 보이지 않을 수도 있는데, 상태로 관리하는 것은 불필요한 낭비일 수 있음 => 새로고침 버튼을 두자
   const [chattingRoomList, setChattingRoomList] = useState<
-    ChattingRoomDetail[]
-  >([]);
+    ChattingRoomDetail[] | null
+  >(null);
   const [pwIndex, setPwIndex] = useState<number>(-1);
   const [page, setPage] = useState<number>(1);
 
   const getChattingRoomList = async () => {
-    // fetch data
+    setChattingRoomList(null);
     const response = await ChattingService.getChattingRooms();
     setChattingRoomList(response.data);
   };
@@ -40,9 +41,12 @@ const WaitingRoom = () => {
       <Box className="page-header">채팅 대기실</Box>
       <Box className="page-body">
         <Box className="list">
-          {chattingRoomList.length === 0 ? (
+          {chattingRoomList === null && <LoadingCircle />}
+          {chattingRoomList !== null && chattingRoomList.length === 0 && (
             <EmptyListMessage message="채팅방이 존재하지 않습니다!" />
-          ) : (
+          )}
+          {chattingRoomList !== null &&
+            chattingRoomList.length !== 0 &&
             chattingRoomList.map((value, index) =>
               5 * (page - 1) <= index && index < 5 * page ? (
                 index === pwIndex ? (
@@ -60,12 +64,13 @@ const WaitingRoom = () => {
                   />
                 )
               ) : null
-            )
-          )}
+            )}
         </Box>
         <Box className="pagination flex-container">
           <Pagination
-            count={Math.floor(chattingRoomList.length / 5) + 1}
+            count={Math.ceil(
+              chattingRoomList === null ? 1 : chattingRoomList.length / 5
+            )}
             variant="outlined"
             shape="rounded"
             onChange={(e, number) => {
