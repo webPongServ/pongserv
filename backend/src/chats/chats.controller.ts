@@ -33,7 +33,16 @@ export class ChatsController {
     console.log(`[${userId}: `, `POST /chats/dm]`);
     console.log(`ChatroomDmReqDto: `);
     console.log(infoDmReq);
-    return (await this.chatsService.takeDmRequest(userId, infoDmReq));
+    try {
+      const result = await this.chatsService.takeDmRequest(userId, infoDmReq);
+      console.log(`result: `);
+      console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
