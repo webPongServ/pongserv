@@ -13,6 +13,7 @@ import { ButtonGroup, Button } from "@mui/material";
 interface PasswordFormCardProps {
   room: ChattingRoomDetail;
   setPwIndex: Function;
+  key: string;
 }
 
 const PasswordFormCard = (props: PasswordFormCardProps) => {
@@ -47,12 +48,11 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
                 type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
                 payload: {
                   id: props.room.id,
-                  title: props.room.title,
-                  owner: props.room.owner,
+                  title: props.room.chatroomName,
+                  owner: props.room.ownerNickname,
                   type: props.room.type,
-                  current: props.room.current,
-                  max: props.room.max,
-                  createdAt: props.room.createdAt,
+                  current: props.room.currentCount,
+                  max: props.room.maxCount,
                 },
               });
             }}

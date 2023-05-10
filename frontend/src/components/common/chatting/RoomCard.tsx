@@ -4,6 +4,7 @@ import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChattingRoomDetail } from "types/Detail";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
+import { ChattingRoomType } from "constant";
 
 import Card from "@mui/joy/Card";
 import Box from "@mui/joy/Box";
@@ -14,6 +15,7 @@ interface RoomCardProps {
   room: ChattingRoomDetail;
   index: number;
   setPwIndex: Function;
+  key: string;
 }
 
 const RoomCard = (props: RoomCardProps) => {
@@ -27,40 +29,39 @@ const RoomCard = (props: RoomCardProps) => {
       id="card"
       variant="outlined"
       onClick={() => {
-        props.room.type === "protected"
+        props.room.type === ChattingRoomType.protected
           ? props.setPwIndex(props.index)
           : dispatch({
               type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
               payload: {
                 id: props.room.id,
-                title: props.room.title,
-                owner: props.room.owner,
+                chatroomName: props.room.chatroomName,
+                ownerNickname: props.room.ownerNickname,
                 type: props.room.type,
-                current: props.room.current,
-                max: props.room.max,
-                createdAt: props.room.createdAt,
+                currentCount: props.room.currentCount,
+                maxCount: props.room.maxCount,
               },
             });
       }}
     >
       <Box className="title">
-        <b>{props.room.title}</b>
+        <b>{props.room.chatroomName}</b>
       </Box>
       <Box className="content">
         <Box className="flex-container">
           <StarBorderIcon />
-          {props.room.owner}
+          {props.room.ownerNickname}
         </Box>
         <Box>|</Box>
         <Box className="flex-container">
           <Person />
-          {props.room.current} / {props.room.max}
+          {props.room.currentCount} / {props.room.maxCount}
         </Box>
         <Box>|</Box>
         <Box>
-          {props.room.type === "public" && "공개"}
-          {props.room.type === "protected" && "비공개"}
-          {props.room.type === "private" && "DM"}
+          {props.room.type === ChattingRoomType.public && "공개"}
+          {props.room.type === ChattingRoomType.protected && "비공개"}
+          {props.room.type === ChattingRoomType.private && "DM"}
         </Box>
       </Box>
     </Card>

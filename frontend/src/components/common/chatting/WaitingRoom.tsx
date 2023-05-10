@@ -46,12 +46,17 @@ const WaitingRoom = () => {
             chattingRoomList.map((value, index) =>
               5 * (page - 1) <= index && index < 5 * page ? (
                 index === pwIndex ? (
-                  <PasswordFormCard room={value} setPwIndex={setPwIndex} />
+                  <PasswordFormCard
+                    room={value}
+                    setPwIndex={setPwIndex}
+                    key={"password" + value.id}
+                  />
                 ) : (
                   <RoomCard
                     room={value}
                     index={index}
                     setPwIndex={setPwIndex}
+                    key={"chattingRoom" + value.id}
                   />
                 )
               ) : null
