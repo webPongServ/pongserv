@@ -45,9 +45,6 @@ const AppBar = (props: HandleOpen) => {
   return (
     <TopBar id="AppBar" position="fixed" open={props.open}>
       <Toolbar>
-        <Link id="logo" to="/game" className="fixed-center">
-          WebPongServ
-        </Link>
         {myInfo.nickname === "" ? (
           <SkeletonMyInfo />
         ) : (
@@ -60,6 +57,9 @@ const AppBar = (props: HandleOpen) => {
             {myInfo.nickname}
           </Link>
         )}
+        <Link id="logo" to="/game">
+          WebPongServ
+        </Link>
         <IconButton
           id="chat-button"
           edge="end"
