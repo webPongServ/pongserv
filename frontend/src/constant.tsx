@@ -16,7 +16,7 @@ export const ChattingRoomType = {
 };
 
 export const ProfileStatusType = {
-  self: "01",
-  friend: "02",
-  notFriend: "03",
+  self: "00",
+  friend: "01",
+  notFriend: "02",
 };

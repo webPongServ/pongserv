@@ -14,28 +14,24 @@ import SkeletonButtons from "components/common/utils/SkeletonButtons";
 import MyButtons from "components/profile/MyButtons";
 import OthersButtons from "components/profile/OthersButtons";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
+import { ProfileStatusType } from "constant";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
 import { Box } from "@mui/material";
 import { Tabs, TabList } from "@mui/joy";
 import Tab, { tabClasses } from "@mui/joy/Tab";
-import UserService from "API/UsersService";
+import UserService from "API/UserService";
 
 const Profile = () => {
-  const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
-  const friends: UserDetail[] | null = useSelector(
-    (state: IRootState) => state.friends.friends
-  );
-  const [isFriend, setIsFriend] = useState<boolean>(false);
   const [isNew, setIsNew] = useState<boolean>(false);
   const [modalStatus, setModalStatus] = useState<string>("closed");
   const [profileDetail, setProfileDetail] = useState<ProfileDetail | null>(
     null
   );
-  const { nickname } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { nickname } = useParams();
 
   const getProfile = async () => {
     try {
@@ -48,7 +44,7 @@ const Profile = () => {
         lose: response.data.lose,
         ELO: response.data.ELO,
         winRate: response.data.winRate,
-        status: "login",
+        status: response.data.status,
       });
       if (isNew)
         dispatch({
@@ -63,13 +59,6 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (friends !== null) {
-      friends.forEach((element) => {
-        if (profileDetail && element.nickname === profileDetail.nickname) {
-          setIsFriend(true);
-        }
-      });
-    }
     getProfile();
     // check dependency list!!
   }, [nickname]);
@@ -96,15 +85,14 @@ const Profile = () => {
         <Box className="button-group flex-container">
           {profileDetail === null && <SkeletonButtons />}
           {profileDetail !== null &&
-            profileDetail.nickname === myInfo.nickname && (
+            profileDetail.status === ProfileStatusType.self && (
               <MyButtons setModalStatus={setModalStatus} />
             )}
           {profileDetail !== null &&
-            profileDetail!.nickname !== myInfo.nickname && (
+            profileDetail!.status !== ProfileStatusType.self && (
               <OthersButtons
-                isFriend={isFriend}
-                setIsFriend={setIsFriend}
                 profileDetail={profileDetail}
+                setProfileDetail={setProfileDetail}
               />
             )}
         </Box>
