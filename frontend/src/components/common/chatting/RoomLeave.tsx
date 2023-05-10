@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { IRootState } from "../store";
+import { IRootState } from "components/common/store";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import ChattingService from "API/ChattingService";
