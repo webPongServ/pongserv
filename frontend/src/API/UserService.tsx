@@ -21,6 +21,8 @@ const UserService = {
     await instance.post(usersURL("friend"), body),
   postDeleteFriend: async (body: { nickname: string }) =>
     await instance.post(usersURL("friend/delete"), body),
+  getSearchedUser: async (search: string) =>
+    await instance.get(usersURL(`list?search=${search}`)),
 };
 
 export default UserService;

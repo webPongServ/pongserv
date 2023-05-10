@@ -1,39 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CustomOnKeyUpInput from "components/common/utils/CustomOnKeyUpInput";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
+import { UserDetail } from "types/Detail";
+import UserService from "API/UserService";
 import "styles/global.scss";
 import "styles/Search.scss";
 
-import { Input } from "@mui/joy";
 import { Box, ListItem, List } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
+
+interface serverFriend {
+  nickname: string;
+  imagePath: string;
+  status: string;
+}
 
 const Search = () => {
   const navigate = useNavigate();
   const [value, setValue] = useState<string>("");
-  const [searchedUser, setSearchedUser] = useState<string[]>([
-    "mgo",
-    "seongtki",
-    "chanhyle",
-    "seongyle",
-    "mgo",
-    "seongtki",
-    "chanhyle",
-    "seongyle",
-    "mgo",
-    "seongtki",
-    "chanhyle",
-    "seongyle",
-    "mgo",
-    "seongtki",
-    "chanhyle",
-    "seongyle",
-    "mgo",
-    "seongtki",
-    "chanhyle",
-    "seongyle",
-  ]);
+  const [searchedUsers, setSearchedUsers] = useState<UserDetail[]>([]);
 
   const handleValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
@@ -41,6 +27,24 @@ const Search = () => {
       setValue(target.value);
     }
   };
+
+  const getSearched = async () => {
+    const response = await UserService.getSearchedUser(value);
+
+    setSearchedUsers(
+      response.data.map(
+        (value: serverFriend): UserDetail => ({
+          nickname: value.nickname,
+          imgURL: value.imagePath,
+          status: value.status,
+        })
+      )
+    );
+  };
+
+  useEffect(() => {
+    getSearched();
+  }, [value]);
 
   return (
     <Box id="Search" className="flex-container">
@@ -56,19 +60,25 @@ const Search = () => {
         />
       </Box>
       <List id="result-box" className="overflow">
-        {searchedUser.map((value, index) => (
-          <ListItem key={value + index} disablePadding>
-            <CustomProfileButton
-              class=""
-              nickname={value}
-              imgURL={"../image.png"}
-              position="Search"
-              handleFunction={() => {
-                navigate(`/profile/${index}`);
-              }}
-            />
-          </ListItem>
-        ))}
+        {searchedUsers.length === 0 ? (
+          <Box className="flex-container" style={{}}>
+            검색 결과가 없습니다.
+          </Box>
+        ) : (
+          searchedUsers.map((value, index) => (
+            <ListItem key={value.nickname + index} disablePadding>
+              <CustomProfileButton
+                class=""
+                nickname={value.nickname}
+                imgURL={value.imgURL}
+                position="Search"
+                handleFunction={() => {
+                  navigate(`/profile/${value.nickname}`);
+                }}
+              />
+            </ListItem>
+          ))
+        )}
       </List>
     </Box>
   );
