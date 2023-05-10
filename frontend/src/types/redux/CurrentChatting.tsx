@@ -27,13 +27,13 @@ export enum CurrentChattingActionTypes {
   UPDATE_STATUS_CREATING = "UPDATE_STATUS_CREATING",
   UPDATE_STATUS_CHATTING = "UPDATE_STATUS_CHATTING",
   EDIT_CHATTINGROOM = "EDIT_CHATTINGROOM",
+  EDIT_CHATTING = "EDIT_CHATTING",
   GET_USERLIST = "GET_USERLIST",
   ADD_USERLIST = "ADD_USERLIST",
   DELETE_USERLIST = "DELETE_USERLIST",
   GET_BANLIST = "GET_BANLIST",
   ADD_BANLIST = "ADD_BANLIST",
   DELETE_BANLIST = "DELETE_BANLIST",
-  EDIT_CHATTING = "EDIT_CHATTING",
 }
 
 export interface CurrentChatting_UpdateStatusWaitingAction {
@@ -55,11 +55,46 @@ export interface CurrentChatting_EditChattingRoomAction {
   payload: ChattingRoomEditForm;
 }
 
+export interface CurrentChatting_GetUserListAction {
+  type: CurrentChattingActionTypes.GET_USERLIST;
+  payload: ChattingUserDetail[];
+}
+
+export interface CurrentChatting_AddUserListAction {
+  type: CurrentChattingActionTypes.ADD_USERLIST;
+  payload: ChattingUserDetail;
+}
+
+export interface CurrentChatting_DeleteUserListAction {
+  type: CurrentChattingActionTypes.DELETE_USERLIST;
+  payload: string;
+}
+export interface CurrentChatting_GetBanListAction {
+  type: CurrentChattingActionTypes.GET_BANLIST;
+  payload: ChattingUserDetail[];
+}
+
+export interface CurrentChatting_AddBanListAction {
+  type: CurrentChattingActionTypes.ADD_BANLIST;
+  payload: ChattingUserDetail;
+}
+
+export interface CurrentChatting_DeleteBanListAction {
+  type: CurrentChattingActionTypes.DELETE_BANLIST;
+  payload: string;
+}
+
 type CurrentChattingAction =
   | CurrentChatting_UpdateStatusWaitingAction
   | CurrentChatting_UpdateStatusChattingAction
   | CurrentChatting_UpdateStatusCreatingAction
-  | CurrentChatting_EditChattingRoomAction;
+  | CurrentChatting_EditChattingRoomAction
+  | CurrentChatting_GetUserListAction
+  | CurrentChatting_AddUserListAction
+  | CurrentChatting_DeleteUserListAction
+  | CurrentChatting_GetBanListAction
+  | CurrentChatting_AddBanListAction
+  | CurrentChatting_DeleteBanListAction;
 
 export const CurrentChattingReducer = (
   state = INITIAL_CURRENTCHATTING,
@@ -88,6 +123,40 @@ export const CurrentChattingReducer = (
           type: action.payload.type,
           maxCount: action.payload.maxCount,
         },
+      };
+    case CurrentChattingActionTypes.GET_USERLIST:
+      return {
+        ...state,
+        userList: action.payload,
+      };
+    case CurrentChattingActionTypes.ADD_USERLIST:
+      return {
+        ...state,
+        userList: [...state.userList, action.payload],
+      };
+    case CurrentChattingActionTypes.DELETE_USERLIST:
+      return {
+        ...state,
+        userList: state.userList.filter(
+          (value) => value.nickname !== action.payload
+        ),
+      };
+    case CurrentChattingActionTypes.GET_BANLIST:
+      return {
+        ...state,
+        banList: action.payload,
+      };
+    case CurrentChattingActionTypes.ADD_BANLIST:
+      return {
+        ...state,
+        banList: [...state.banList, action.payload],
+      };
+    case CurrentChattingActionTypes.DELETE_BANLIST:
+      return {
+        ...state,
+        banList: state.banList.filter(
+          (value) => value.nickname !== action.payload
+        ),
       };
     default:
       return state;

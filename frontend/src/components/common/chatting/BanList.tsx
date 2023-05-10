@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { ChattingUserDetail } from "types/Detail";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -13,8 +15,8 @@ import MenuItem from "@mui/material/MenuItem";
 interface BanListProps {
   bans: ChattingUserDetail[];
   users: ChattingUserDetail[];
-  setUsers: Function;
-  setBans: Function;
+  // setUsers: Function;
+  // setBans: Function;
   myDetail: ChattingUserDetail;
 }
 
@@ -25,6 +27,7 @@ const BanList = (props: BanListProps) => {
     mouseY: number;
   } | null>(null);
   const open = Boolean(anchorEl);
+  const dispatch = useDispatch();
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -81,12 +84,16 @@ const BanList = (props: BanListProps) => {
       >
         <MenuItem
           onClick={() => {
-            props.setUsers([...props.users, selectedUser]);
-            props.setBans(
-              props.bans.filter(
+            dispatch({
+              type: CurrentChattingActionTypes.DELETE_BANLIST,
+              payload: props.users.filter(
                 (value) => value.nickname !== selectedUser.nickname
-              )
-            );
+              ),
+            });
+            dispatch({
+              type: CurrentChattingActionTypes.ADD_USERLIST,
+              payload: selectedUser,
+            });
             setAnchorEl(null);
           }}
         >

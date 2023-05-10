@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import { ChattingUserDetail } from "types/Detail";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -15,8 +17,8 @@ interface UserListProps {
   myDetail: ChattingUserDetail;
   users: ChattingUserDetail[];
   bans: ChattingUserDetail[];
-  setUsers: Function;
-  setBans: Function;
+  // setUsers: Function;
+  // setBans: Function;
 }
 
 const UserList = (props: UserListProps) => {
@@ -31,6 +33,7 @@ const UserList = (props: UserListProps) => {
     mouseY: number;
   } | null>(null);
   const open = Boolean(anchorEl);
+  const dispatch = useDispatch();
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -90,12 +93,16 @@ const UserList = (props: UserListProps) => {
               <MenuItem>채팅방 내보내기</MenuItem>
               <MenuItem
                 onClick={() => {
-                  props.setUsers(
-                    props.users.filter(
+                  dispatch({
+                    type: CurrentChattingActionTypes.DELETE_USERLIST,
+                    payload: props.users.filter(
                       (value) => value.nickname !== selectedUser.nickname
-                    )
-                  );
-                  props.setBans([...props.bans, selectedUser]);
+                    ),
+                  });
+                  dispatch({
+                    type: CurrentChattingActionTypes.ADD_BANLIST,
+                    payload: selectedUser,
+                  });
                   setAnchorEl(null);
                 }}
               >

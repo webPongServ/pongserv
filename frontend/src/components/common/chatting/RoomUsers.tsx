@@ -1,8 +1,12 @@
 import { useState, useRef, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import UserList from "components/common/chatting/UserList";
 import BanList from "components/common/chatting/BanList";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import { ChattingUserDetail } from "types/Detail";
+import ChattingService from "API/ChattingService";
+import { IRootState } from "components/common/store";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -17,16 +21,12 @@ type RoomUsersProps = {
 };
 
 const RoomUsers = (props: RoomUsersProps) => {
-  const [users, setUsers] = useState<ChattingUserDetail[]>([
-    { nickname: "chanhyle", role: "owner", imgURL: "../image.png" },
-    { nickname: "susong", role: "admin", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "noname_12", role: "normal", imgURL: "../image.png" },
-    { nickname: "seongtki", role: "admin", imgURL: "../image.png" },
-  ]);
-  const [bans, setBans] = useState<ChattingUserDetail[]>([]);
+  const currentChatting = useSelector(
+    (state: IRootState) => state.currentChatting
+  );
   const [selected, setSelected] = useState<string>("users");
   const divRef = useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
 
   const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape" || event.key === "Esc") {
@@ -34,8 +34,23 @@ const RoomUsers = (props: RoomUsersProps) => {
     }
   };
 
+  const getUsers = async () => {
+    const response = await ChattingService.getUsersList(
+      currentChatting.chattingRoom.id
+    );
+    dispatch({
+      type: CurrentChattingActionTypes.GET_USERLIST,
+      payload: response.data,
+    });
+    dispatch({
+      type: CurrentChattingActionTypes.GET_BANLIST,
+      payload: [],
+    });
+  };
+
   useEffect(() => {
     if (divRef.current) divRef.current.focus();
+    getUsers();
   }, []);
 
   return (
@@ -52,18 +67,7 @@ const RoomUsers = (props: RoomUsersProps) => {
       </Box>
       <Box className="modal-body flex-container">
         <Box>
-          <Select
-            defaultValue={selected}
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target: HTMLInputElement = e.target as HTMLInputElement;
-            //     props.setPartyForm({
-            //       ...props.partyForm,
-            //       category: target.outerText,
-            //     });
-            //   }
-            // }}
-          >
+          <Select defaultValue={selected}>
             <Option
               value="users"
               onClick={() => {
@@ -85,18 +89,14 @@ const RoomUsers = (props: RoomUsersProps) => {
         <Box className="users-box overflow">
           {selected === "users" ? (
             <UserList
-              users={users}
-              bans={bans}
-              setUsers={setUsers}
-              setBans={setBans}
+              users={currentChatting.userList}
+              bans={currentChatting.banList}
               myDetail={props.myDetail}
             />
           ) : (
             <BanList
-              bans={bans}
-              users={users}
-              setUsers={setUsers}
-              setBans={setBans}
+              bans={currentChatting.banList}
+              users={currentChatting.userList}
               myDetail={props.myDetail}
             />
           )}
