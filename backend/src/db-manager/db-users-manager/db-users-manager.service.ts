@@ -313,6 +313,32 @@ export class DbUsersManagerService {
     }
   }
 
+  async getRelation(userId: string, friendUserId: string) {
+    if (userId == friendUserId) {
+      return '00';
+    }
+    const isFriend = await this.ua02lRp.find({
+      relations: {
+        ua01mEntity: true,
+        ua01mEntityAsFr: true,
+      },
+      where: {
+        ua01mEntity: {
+          userId: userId,
+        },
+        ua01mEntityAsFr: {
+          userId: friendUserId,
+        },
+        stCd: '01',
+      },
+    });
+    console.log('isFriend', isFriend);
+    if (isFriend && isFriend.length != 0) {
+      // console.log('we are friend');
+      return '01';
+    } else return '02';
+  }
+
   async getFriendProfile(userId: string, friendNickname: string) {
     const user = await this.ua01mRp.findOne({
       where: {
@@ -332,6 +358,7 @@ export class DbUsersManagerService {
         lose: 0,
         ELO: 9999,
         winRate: 100.0,
+        status: await this.getRelation(userId, user.userId),
       };
     } else {
       throw new BadRequestException('No User available');
@@ -358,6 +385,7 @@ export class DbUsersManagerService {
         ua01mEntity: {
           id: myEntity.id,
         },
+        stCd: '01',
       },
     });
     if (!friendList) throw new BadRequestException('No Friend available');
