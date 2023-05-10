@@ -9,6 +9,7 @@ import Card from "@mui/joy/Card";
 import Box from "@mui/joy/Box";
 import { Input } from "@mui/joy";
 import { ButtonGroup, Button } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
 
 interface PasswordFormCardProps {
   room: ChattingRoomDetail;
@@ -27,11 +28,9 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
     }
   };
   return (
-    <Card id="password-form" variant="outlined">
-      <Box className="title">
-        <b>비밀번호 입력</b>
-      </Box>
+    <Card id="password-form" className="flex-container" variant="outlined">
       <Box className="content flex-container">
+        <LockIcon />
         <Input
           className="input"
           type="password"
