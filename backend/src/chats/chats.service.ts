@@ -36,6 +36,7 @@ export class ChatsService {
 	async takeDmRequest(userId: string, infoDmReq: ChatroomDmReqDto) {
 		/*!SECTION
 			1. requester와 target에 대한 유저 정보를 가져온다.
+				1-1. requester와 target이 같은 유저일 경우에 403 에러를 던진다.
 			2. DM용 private type의 chatroom을 만든다.
 			3. requester와 target 모두 DM chatroom의 참여자에 등록한다.
 				3-1. requester는 방 참여 여부(chtRmJoinTf)를 true로 설정한다.
@@ -44,6 +45,10 @@ export class ChatsService {
 		*/
 		// 1
 		const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+			// 1-1
+		if (requester.nickname === infoDmReq.targetNickname) {
+			throw new BadRequestException('Self DM not allowed.');
+		}
 		const trgtUserId = await this.dbUsersManagerService.findUserIdByNickname(infoDmReq.targetNickname);
 		const target = await this.dbUsersManagerService.getUserByUserId(trgtUserId);
 		// 2
