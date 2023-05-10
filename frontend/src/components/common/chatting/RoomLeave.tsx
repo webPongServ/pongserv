@@ -1,7 +1,9 @@
 import { useRef, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { IRootState } from "../store";
 import CustomIconButton from "components/common/utils/CustomIconButton";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
+import ChattingService from "API/ChattingService";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -14,6 +16,9 @@ interface RoomLeaveProps {
 }
 
 const RoomLeave = (props: RoomLeaveProps) => {
+  const currentChatting = useSelector(
+    (state: IRootState) => state.currentChatting.chattingRoom
+  );
   const divRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
@@ -21,6 +26,17 @@ const RoomLeave = (props: RoomLeaveProps) => {
     if (event.key === "Escape" || event.key === "Esc") {
       props.setRoomStatus("chat");
     }
+  };
+
+  const handleLeaveRoom = async () => {
+    console.log(currentChatting.id);
+    const response = await ChattingService.postLeaving({
+      id: currentChatting.id,
+    });
+    dispatch({
+      type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
+      payload: "",
+    });
   };
 
   useEffect(() => {
@@ -43,16 +59,7 @@ const RoomLeave = (props: RoomLeaveProps) => {
         <b>현재 채팅방에서 퇴장하시겠습니까?</b>
       </Box>
       <Box className="modal-footer flex-container">
-        <Button
-          onClick={() => {
-            dispatch({
-              type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
-              payload: "",
-            });
-          }}
-        >
-          퇴장
-        </Button>
+        <Button onClick={handleLeaveRoom}>퇴장</Button>
       </Box>
     </Box>
   );
