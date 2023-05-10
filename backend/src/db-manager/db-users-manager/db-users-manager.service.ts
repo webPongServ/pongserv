@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { TbUa01MEntity } from './entities/tb-ua-01-m.entity';
 import { TbUa01LEntity } from './entities/tb-ua-01-l.entity';
 import { TbUa02LEntity } from './entities/tb-ua-02-l.entity';
@@ -332,7 +332,7 @@ export class DbUsersManagerService {
         stCd: '01',
       },
     });
-    console.log('isFriend', isFriend);
+    // console.log('isFriend', isFriend);
     if (isFriend && isFriend.length != 0) {
       // console.log('we are friend');
       return '01';
@@ -397,5 +397,21 @@ export class DbUsersManagerService {
     });
     if (friendData) return friendData;
     else throw new BadRequestException('No Friend available');
+  }
+  async getUserList(startswith: string) {
+    const users = await this.ua01mRp.find({
+      where: {
+        nickname: Like(startswith),
+      },
+    });
+    if (users.length == 0) {
+      return { result: 'no users' };
+    }
+    const result = users.map(({ nickname, imgPath }) => ({
+      nickname,
+      imgPath: imgPath ?? '', // imgPath가 null일 경우 빈 문자열("")을 할당
+    }));
+
+    return result;
   }
 }

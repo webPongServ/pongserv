@@ -17,6 +17,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ConfigService } from '@nestjs/config';
+import { start } from 'repl';
 
 @ApiTags('users')
 @Controller('users')
@@ -165,5 +166,16 @@ export class UsersController {
   async getFriendList(@CurrentUser() user: string) {
     console.log('In getFriendList', user);
     return await this.UsersService.getFriendList(user);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: '유저 목록 가져오기 성공!',
+  })
+  @ApiOperation({ summary: '유저 목록 가져오기 쿼리, 시작하는 것 가져다주기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('/list')
+  async getUserList(@Query('search') startswith: string) {
+    return this.UsersService.getUserList(startswith);
   }
 }

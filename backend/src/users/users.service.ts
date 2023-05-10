@@ -134,4 +134,9 @@ export class UsersService {
     const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
     return await this.dbmanagerUsersService.getFriendList(myEntity);
   }
+
+  async getUserList(startsWith: string) {
+    const withPercent = startsWith + '%';
+    return await this.dbmanagerUsersService.getUserList(withPercent);
+  }
 }
