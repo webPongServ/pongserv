@@ -93,9 +93,9 @@ const ChattingRoom = () => {
       )}
       {roomStatus === "edit" && (
         <RoomEditor
-          title={currentChatting.chatroomName}
+          chatroomName={currentChatting.chatroomName}
           type={currentChatting.type}
-          max={currentChatting.maxCount}
+          maxCount={currentChatting.maxCount}
           setRoomStatus={setRoomStatus}
         />
       )}

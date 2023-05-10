@@ -19,8 +19,8 @@ import CloseIcon from "@mui/icons-material/Close";
 const RoomCreator = () => {
   const [isPublic, setIsPublic] = useState<boolean>(true);
   const [chattingRoomForm, setChattingRoomForm] = useState<ChattingRoomForm>({
-    title: "",
-    max: 2,
+    chatroomName: "",
+    maxCount: 2,
     type: ChattingRoomType.public,
     password: "",
   });
@@ -31,7 +31,7 @@ const RoomCreator = () => {
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target;
-      setChattingRoomForm({ ...chattingRoomForm, title: target.value });
+      setChattingRoomForm({ ...chattingRoomForm, chatroomName: target.value });
     }
   };
 
@@ -40,7 +40,7 @@ const RoomCreator = () => {
       const target: HTMLInputElement = e.target as HTMLInputElement;
       setChattingRoomForm({
         ...chattingRoomForm,
-        max: parseInt(target.value),
+        maxCount: parseInt(target.value),
       });
     }
   };
@@ -67,7 +67,7 @@ const RoomCreator = () => {
   };
 
   const createChattingRoom = async () => {
-    if (chattingRoomForm.title.length === 0)
+    if (chattingRoomForm.chatroomName.length === 0)
       return alert("제목을 입력해주세요!");
     else if (
       chattingRoomForm.type === ChattingRoomType.protected &&
@@ -76,7 +76,7 @@ const RoomCreator = () => {
       return alert("비밀번호를 입력해주세요!");
     // API call
     const response = await ChattingService.postNewChattingRoom({
-      name: chattingRoomForm.title,
+      name: chattingRoomForm.chatroomName,
       type: chattingRoomForm.type,
       pwd: chattingRoomForm.password,
     });
@@ -84,12 +84,11 @@ const RoomCreator = () => {
       type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
       payload: {
         id: response.data,
-        title: chattingRoomForm.title,
-        owner: myInfo.nickname,
+        chatroomName: chattingRoomForm.chatroomName,
+        ownerNickname: myInfo.nickname,
         type: chattingRoomForm.type,
-        max: chattingRoomForm.max,
-        current: 1,
-        createdAt: new Date(),
+        maxCount: chattingRoomForm.maxCount,
+        currentCount: 1,
       },
     });
   };

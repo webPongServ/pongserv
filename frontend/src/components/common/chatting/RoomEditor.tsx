@@ -14,17 +14,17 @@ import { Button } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
 
 interface HandleRoomDetail {
-  title: string;
+  chatroomName: string;
   type: string;
-  max: number;
+  maxCount: number;
   setRoomStatus: Function;
 }
 
 const RoomEditor = (props: HandleRoomDetail) => {
   const [isPublic, setIsPublic] = useState<boolean>(props.type === "public");
   const [chattingRoomForm, setChattingRoomForm] = useState<ChattingRoomForm>({
-    title: props.title,
-    max: props.max,
+    chatroomName: props.chatroomName,
+    maxCount: props.maxCount,
     type: props.type,
     password: "",
   });
@@ -34,7 +34,7 @@ const RoomEditor = (props: HandleRoomDetail) => {
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target;
-      setChattingRoomForm({ ...chattingRoomForm, title: target.value });
+      setChattingRoomForm({ ...chattingRoomForm, chatroomName: target.value });
     }
   };
 
@@ -43,7 +43,7 @@ const RoomEditor = (props: HandleRoomDetail) => {
       const target: HTMLInputElement = e.target as HTMLInputElement;
       setChattingRoomForm({
         ...chattingRoomForm,
-        max: parseInt(target.value),
+        maxCount: parseInt(target.value),
       });
     }
   };
@@ -66,7 +66,7 @@ const RoomEditor = (props: HandleRoomDetail) => {
   };
 
   const editChattingRoom = () => {
-    if (chattingRoomForm.title.length === 0)
+    if (chattingRoomForm.chatroomName.length === 0)
       return alert("제목을 입력해주세요!");
     else if (
       chattingRoomForm.type === "protected" &&
@@ -77,9 +77,9 @@ const RoomEditor = (props: HandleRoomDetail) => {
     dispatch({
       type: CurrentChattingActionTypes.EDIT_CHATTINGROOM,
       payload: {
-        title: `${chattingRoomForm.title}`,
+        chatroomName: `${chattingRoomForm.chatroomName}`,
         type: `${chattingRoomForm.type}`,
-        max: `${chattingRoomForm.max}`,
+        maxCount: `${chattingRoomForm.maxCount}`,
       },
     });
     props.setRoomStatus("chat");
@@ -110,14 +110,14 @@ const RoomEditor = (props: HandleRoomDetail) => {
       <Box className="modal-body flex-container">
         <CustomInput
           name="제목"
-          defaultValue={props.title}
+          defaultValue={props.chatroomName}
           maxLength={20}
           placeholder="최대 20자"
           handleFunction={handleTitle}
         />
         <CustomSlider
           name="최대 인원"
-          defaultValue={props.max}
+          defaultValue={props.maxCount}
           min={2}
           max={10}
           handleFunction={handleMax}

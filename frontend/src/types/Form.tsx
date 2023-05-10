@@ -1,6 +1,6 @@
 export interface ChattingRoomForm {
-  title: string;
-  max: number;
+  chatroomName: string;
+  maxCount: number;
   type: string;
   password: string;
 }
