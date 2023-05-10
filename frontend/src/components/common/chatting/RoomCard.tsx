@@ -28,6 +28,7 @@ const RoomCard = (props: RoomCardProps) => {
     <Card
       id="card"
       variant="outlined"
+      className="flex-wrap-container"
       onClick={() => {
         props.room.type === ChattingRoomType.protected
           ? props.setPwIndex(props.index)
@@ -52,12 +53,12 @@ const RoomCard = (props: RoomCardProps) => {
           <StarBorderIcon />
           {props.room.ownerNickname}
         </Box>
-        <Box>|</Box>
+        <Box className="divider">|</Box>
         <Box className="flex-container">
           <Person />
           {props.room.currentCount} / {props.room.maxCount}
         </Box>
-        <Box>|</Box>
+        <Box className="divider">|</Box>
         <Box>
           {props.room.type === ChattingRoomType.public && "공개"}
           {props.room.type === ChattingRoomType.protected && "비공개"}

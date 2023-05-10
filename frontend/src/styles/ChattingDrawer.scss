@@ -127,8 +127,10 @@ $ChattingDrawerWidth: 500px;
 
     #card {
       // height: 110px;
+
       height: 18%;
       cursor: pointer;
+      justify-content: space-around;
       margin-bottom: 2%;
       &:hover {
         border: 3px solid skyblue;
@@ -136,17 +138,18 @@ $ChattingDrawerWidth: 500px;
 
       .title {
         // height: 70px;
-        height: 60%;
+        // height: 50%;
+        width: 50%;
         font-size: 20px;
         margin-bottom: 0.5px;
       }
 
       .content {
         // height: 40px;
-        height: 40%;
+        // height: 30%;
         display: flex;
         align-items: center;
-        font-size: 15px;
+        font-size: 13px;
         column-gap: 2%;
         padding-bottom: 1%;
 
@@ -155,38 +158,36 @@ $ChattingDrawerWidth: 500px;
           height: 20px;
           margin-right: 5px;
         }
+
+        .divider {
+          color: lightgray;
+        }
       }
     }
 
     #password-form {
-      // height: 110px;
-      height: 15%;
+      flex-direction: row;
+      justify-content: space-around;
+      height: 18%;
       margin-bottom: 15px;
       background-color: #aaaaaa;
 
-      .title {
-        // height: 20px;
-        height: 20%;
-        margin-bottom: 10px;
-      }
-
       .content {
-        // height: 90px;
-        height: 80%;
         column-gap: 3%;
+        width: 100%;
 
         .input {
-          width: 60%;
+          width: 50%;
         }
 
         .submit {
-          font-size: 15px;
+          font-size: 13px;
         }
 
         .cancel {
           background-color: white;
           color: blue;
-          font-size: 15px;
+          font-size: 13px;
         }
       }
     }
