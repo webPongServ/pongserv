@@ -78,6 +78,7 @@ const RoomCreator = () => {
     const response = await ChattingService.postNewChattingRoom({
       name: chattingRoomForm.chatroomName,
       type: chattingRoomForm.type,
+      max: chattingRoomForm.maxCount,
       pwd: chattingRoomForm.password,
     });
     dispatch({
