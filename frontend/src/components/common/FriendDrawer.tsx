@@ -98,7 +98,7 @@ const FriendDrawer = () => {
       <Box id="body" className="overflow">
         {friends === null && <LoadingCircle />}
         {friends !== null && friends.length === 0 && (
-          <EmptyListMessage message="친구인 사용자가 없습니다!" />
+          <EmptyListMessage message="친구를 추가해 보세요!" />
         )}
         {friends !== null && friends.length !== 0 && (
           <List>
