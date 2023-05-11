@@ -69,11 +69,12 @@ export class AuthController {
     const OAuthData = resultToken.OAuthData;
     const intraId = resultToken.userId;
     const intraImagePath = resultToken.imgPath;
+    const isMember = resultToken.isMember;
     console.log(accessToken);
     if (OAuthData == true) {
       res.json({ OAuthData, intraId, intraImagePath });
     } else {
-      res.json({ accessToken, OAuthData, intraId, intraImagePath });
+      res.json({ isMember, accessToken, OAuthData, intraId, intraImagePath });
     }
   }
 
