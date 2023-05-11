@@ -22,7 +22,7 @@ export interface ChatObject {
 
 const ChattingRoom = () => {
   const currentChatting: ChattingRoomDetail | null = useSelector(
-    (state: IRootState) => state.currentChatting.chattingRoom
+    (state: IRootState) => state.currentChatting.chattingRoom!
   );
   const myDetail: ChattingUserDetail = useSelector(
     (state: IRootState) => state.currentChatting.myDetail!
@@ -59,6 +59,10 @@ const ChattingRoom = () => {
 
   const handleAddChatting = (e: React.FormEvent) => {
     e.preventDefault();
+    socket.emit("chatroomMessage", {
+      id: currentChatting.id,
+      msg: chattingInput,
+    });
     setChatting([
       ...chatting,
       {
@@ -68,6 +72,23 @@ const ChattingRoom = () => {
     ]);
     setChattingInput("");
   };
+
+  const handleClickSend = () => {};
+
+  socket.on("chatroomMessage", (data) => {
+    setChatting([
+      ...chatting,
+      {
+        user: {
+          nickname: data.nickname,
+          imgURL: data.imgPath,
+          role: data.role,
+        },
+        message: data.msg,
+      },
+    ]);
+    setChattingInput("");
+  });
 
   // const queryClient = useQueryClient();
 
@@ -112,7 +133,7 @@ const ChattingRoom = () => {
                   onChange={handleChattingInput}
                 ></Input>
               </form>
-              <Button>전송</Button>
+              <Button onClick={handleClickSend}>전송</Button>
             </Box>
           </Box>
           <Box className="page-footer flex-container">
