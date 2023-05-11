@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import MainRoute from "components/common/MainRoute";
 import AppBar from "components/common/AppBar";
@@ -55,7 +55,9 @@ export default function AppHeader() {
     });
   };
 
+  // useEffect(() => {
   loadMyData();
+  // }, []);
 
   return (
     <Box id="AppHeader-container" className="flex-container">
