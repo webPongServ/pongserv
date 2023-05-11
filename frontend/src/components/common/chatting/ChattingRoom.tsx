@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
@@ -24,6 +24,7 @@ const ChattingRoom = () => {
   const currentChatting: ChattingRoomDetail | null = useSelector(
     (state: IRootState) => state.currentChatting.chattingRoom
   );
+  const chattingRef = useRef<HTMLDivElement>(null);
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
   const [myDetail, setMyDetail] = useState<ChattingUserDetail>({
@@ -79,6 +80,11 @@ const ChattingRoom = () => {
   //   });
   // }, [queryClient]);
 
+  useEffect(() => {
+    if (chattingRef.current)
+      chattingRef.current.scrollTop = chattingRef.current.scrollHeight;
+  }, [chatting]);
+
   return (
     <Box id="page">
       {roomStatus === "chat" && (
@@ -87,7 +93,7 @@ const ChattingRoom = () => {
             <Box>{currentChatting!.chatroomName}</Box>
           </Box>
           <Box className="page-body chatting-box">
-            <Box className="chatting-display overflow">
+            <Box className="chatting-display overflow" ref={chattingRef}>
               {chatting.map((value) => {
                 return (
                   <Box className="chatting">
