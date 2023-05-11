@@ -1,16 +1,28 @@
 import { useState } from "react";
-import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
+import { useSelector } from "react-redux";
+import {
+  ChattingUserDetail,
+  ChattingRoomDetail,
+  UserDetail,
+} from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
 import RoomLeave from "components/common/chatting/RoomLeave";
+import MyMessage from "components/common/chatting/MyMessage";
+import OtherMessage from "components/common/chatting/OtherMessage";
 import { ChattingUserRoleType } from "constant";
-import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
+import { socket } from "socket";
 
 import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
+
+export interface ChatObject {
+  user: UserDetail;
+  message: string;
+}
 
 const ChattingRoom = () => {
   const currentChatting: ChattingRoomDetail | null = useSelector(
@@ -23,40 +35,79 @@ const ChattingRoom = () => {
     imgURL: "../image.png",
     role: ChattingUserRoleType.owner,
   });
+  const [chatting, setChatting] = useState<ChatObject[]>([
+    {
+      user: { nickname: "chanhyle", imgURL: "../image.png", status: "login" },
+      message:
+        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+    },
+    {
+      user: { nickname: "mgo", imgURL: "../image.png", status: "login" },
+      message: "2",
+    },
+    {
+      user: { nickname: "susong", imgURL: "../image.png", status: "login" },
+      message: "3",
+    },
+    {
+      user: { nickname: "seongtki", imgURL: "../image.png", status: "login" },
+      message: "4",
+    },
+    {
+      user: { nickname: "mgo", imgURL: "../image.png", status: "login" },
+      message: "5",
+    },
+    {
+      user: { nickname: "susong", imgURL: "../image.png", status: "login" },
+      message: "6",
+    },
+    {
+      user: { nickname: "seongtki", imgURL: "../image.png", status: "login" },
+      message: "7",
+    },
+    {
+      user: { nickname: "chanhyle", imgURL: "../image.png", status: "login" },
+      message: "8",
+    },
+    {
+      user: { nickname: "chanhyle", imgURL: "../image.png", status: "login" },
+      message: "9",
+    },
+    {
+      user: { nickname: "mgo", imgURL: "../image.png", status: "login" },
+      message: "10",
+    },
+  ]);
+
+  // const queryClient = useQueryClient();
+
+  // useEffect(() => {
+  //   socket.on('data', (data) => {
+  //     // 데이터를 수신할 때마다, 쿼리 캐시를 업데이트합니다.
+  //     queryClient.setQueryData('data', data);
+  //   });
+  // }, [queryClient]);
 
   return (
     <Box id="page">
       {roomStatus === "chat" && (
         <>
-          <Box className="page-header">{currentChatting!.chatroomName}</Box>
+          <Box className="page-header">
+            <Box>{currentChatting!.chatroomName}</Box>
+          </Box>
           <Box className="page-body chatting-box">
             <Box className="chatting-display overflow">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              Rhoncus dolor purus non enim praesent elementum facilisis leo vel.
-              Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
-              gravida rutrum quisque non tellus. Convallis convallis tellus id
-              interdum velit laoreet id donec ultrices. Odio morbi quis commodo
-              odio aenean sed adipiscing. Amet nisl suscipit adipiscing bibendum
-              est ultricies integer quis. Cursus euismod quis viverra nibh cras.
-              Metus vulputate eu scelerisque felis imperdiet proin fermentum
-              leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt
-              lobortis feugiat vivamus at augue. At augue eget arcu dictum
-              varius duis at consectetur lorem. Velit sed ullamcorper morbi
-              tincidunt. Lorem donec massa sapien faucibus et molestie ac.
-              Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-              ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-              elementum integer enim neque volutpat ac tincidunt. Ornare
-              suspendisse sed nisi lacus sed viverra tellus. Purus sit amet
-              volutpat consequat mauris. Elementum eu facilisis sed odio morbi.
-              Euismod lacinia at quis risus sed vulputate odio. Morbi tincidunt
-              ornare massa eget egestas purus viverra accumsan in. In hendrerit
-              gravida rutrum quisque non tellus orci ac. Pellentesque nec nam
-              aliquam sem et tortor. Habitant morbi tristique senectus et.
-              Adipiscing elit duis tristique sollicitudin nibh sit. Ornare
-              aenean euismod elementum nisi quis eleifend. Commodo viverra
-              maecenas accumsan lacus vel facilisis. Nulla posuere sollicitudin
-              aliquam ultrices sagittis orci a.
+              {chatting.map((value) => {
+                return (
+                  <Box className="chatting">
+                    {myDetail.nickname === value.user.nickname ? (
+                      <MyMessage myChat={value} />
+                    ) : (
+                      <OtherMessage otherChat={value} />
+                    )}
+                  </Box>
+                );
+              })}
             </Box>
             <Box className="chatting-input flex-container">
               <Input className="input" placeholder="채팅을 입력하세요."></Input>
