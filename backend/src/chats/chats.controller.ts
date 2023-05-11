@@ -55,7 +55,17 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Get('rooms')
   async getChatroomsForAUser(@CurrentUser() userId: any) {
-    return (await this.chatsService.getChatroomsForAUser(userId));
+    console.log(`[${userId}: `, `GET /chats/rooms]`);
+    try {
+      const result = await this.chatsService.getChatroomsForAUser(userId);
+      console.log(`result: `);
+      console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -71,7 +81,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Post('entrance')
   async setUserToEnter(@CurrentUser() userId: string, @Body() infoEntr: ChatroomEntranceDto) {
-    return (await this.chatsService.setUserToEnter(userId, infoEntr));
+    console.log(`[${userId}: `, `POST /chats/entrance]`);
+    console.log(`ChatroomEntranceDto: `);
+    console.log(infoEntr);
+    try {
+      const result = await this.chatsService.setUserToEnter(userId, infoEntr);
+      console.log(`result: `);
+      console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -84,7 +106,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Post('creation')
   async createChatroom(@CurrentUser() userId: string, @Body() infoCrtn: ChatroomCreationDto) {
-    return (await this.chatsService.createChatroom(userId, infoCrtn));
+    console.log(`[${userId}: `, `POST /chats/creation]`);
+    console.log(`ChatroomCreationDto: `);
+    console.log(infoCrtn);
+    try {
+      const result = await this.chatsService.createChatroom(userId, infoCrtn);
+      console.log(`result: `);
+      console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -100,7 +134,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Patch('edit')
   async editChatroomInfo(@CurrentUser() userId: string, @Body() infoEdit: ChatroomEditingDto) {
-    return (await this.chatsService.editChatroomInfo(userId, infoEdit));
+    console.log(`[${userId}: `, `PATCH /chats/edit]`);
+    console.log(`ChatroomEditingDto: `);
+    console.log(infoEdit);
+    try {
+      const result = await this.chatsService.editChatroomInfo(userId, infoEdit);
+      console.log(`result: `);
+      console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
