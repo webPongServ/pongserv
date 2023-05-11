@@ -18,11 +18,11 @@ export class DbChatsManagerService {
 	@InjectRepository(TbCh04LEntity) private ch04lRp: Repository<TbCh04LEntity>,
   ) {}
 
-  async createChatroom(name: string, type: string, pwd: string) {
+  async createChatroom(name: string, type: string, pwd: string, max: number) {
 	const newChtrm = this.ch01lRp.create({
 		chtRmNm: name,
 		chtRmType: type,
-		maxUserCnt: 5, // default
+		maxUserCnt: max,
 		chtRmPwd: pwd,
 		chtRmTf: true,
 	})
