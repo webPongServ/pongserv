@@ -11,7 +11,8 @@ $paddle_height: 150px;
   row-gap: 5%;
 
   #game-box {
-    width: 800px;
+    width: 100%;
+    overflow: auto;
     height: 80%;
     padding: 3%;
 
@@ -20,7 +21,7 @@ $paddle_height: 150px;
       justify-content: space-evenly;
 
       .game-card {
-        width: 300px;
+        width: 40%;
         height: 200px;
         cursor: pointer;
         margin: 1%;
