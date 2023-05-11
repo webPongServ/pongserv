@@ -7,7 +7,7 @@ import ChattingDrawer from "components/common/ChattingDrawer";
 import { ChattingDrawerWidth } from "constant";
 import { useDispatch } from "react-redux";
 import instance from "API/api";
-import UserService from "API/UsersService";
+import UserService from "API/UserService";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 import "styles/global.scss";
 

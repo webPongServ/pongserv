@@ -1,6 +1,8 @@
 import axios from "axios";
 
-export const apiURL: string = "http://localhost:3000";
+// export const apiURL: string = "http://10.19.213.129:3000";
+export const apiURL: string = "http://10.19.210.0:3000";
+// export const apiURL: string = "http://localhost:3000";
 
 const instance = axios.create({
   baseURL: apiURL,
@@ -14,6 +16,7 @@ instance.interceptors.response.use(
   (error) => {
     if (error.response.status === 401) {
       alert("로그인이 필요합니다.");
+      localStorage.removeItem("accessToken");
       window.location.href = "/login";
     } else if (error.response.status === 403) {
       alert("설정 권한이 없습니다.");

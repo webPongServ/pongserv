@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChatUserDetail } from "types/Detail";
+import { ChattingUserDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
 import RoomLeave from "components/common/chatting/RoomLeave";
@@ -13,11 +13,11 @@ import { Input, Button } from "@mui/joy";
 
 const ChattingRoom = () => {
   const currentChatting = useSelector(
-    (state: IRootState) => state.currentChatting.chatRoom
+    (state: IRootState) => state.currentChatting.chattingRoom
   );
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
-  const [myDetail, setMyDetail] = useState<ChatUserDetail>({
+  const [myDetail, setMyDetail] = useState<ChattingUserDetail>({
     nickname: "chanhyle",
     imgURL: "../image.png",
     role: "owner",
@@ -27,7 +27,7 @@ const ChattingRoom = () => {
     <Box id="page">
       {roomStatus === "chat" && (
         <>
-          <Box className="page-header">{currentChatting.title}</Box>
+          <Box className="page-header">{currentChatting.chatroomName}</Box>
           <Box className="page-body chatting-box">
             <Box className="chatting-display overflow">
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
@@ -93,9 +93,9 @@ const ChattingRoom = () => {
       )}
       {roomStatus === "edit" && (
         <RoomEditor
-          title={currentChatting.title}
+          chatroomName={currentChatting.chatroomName}
           type={currentChatting.type}
-          max={currentChatting.max}
+          maxCount={currentChatting.maxCount}
           setRoomStatus={setRoomStatus}
         />
       )}

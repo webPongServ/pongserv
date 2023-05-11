@@ -1,7 +1,9 @@
 import { useState } from "react";
-import { ChatUserDetail } from "types/Detail";
+import { useDispatch } from "react-redux";
+import { ChattingUserDetail } from "types/Detail";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -11,11 +13,11 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 interface BanListProps {
-  bans: ChatUserDetail[];
-  users: ChatUserDetail[];
-  setUsers: Function;
-  setBans: Function;
-  myDetail: ChatUserDetail;
+  bans: ChattingUserDetail[];
+  users: ChattingUserDetail[];
+  // setUsers: Function;
+  // setBans: Function;
+  myDetail: ChattingUserDetail;
 }
 
 const BanList = (props: BanListProps) => {
@@ -25,6 +27,7 @@ const BanList = (props: BanListProps) => {
     mouseY: number;
   } | null>(null);
   const open = Boolean(anchorEl);
+  const dispatch = useDispatch();
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -38,7 +41,7 @@ const BanList = (props: BanListProps) => {
     setAnchorEl(null);
   };
 
-  const [selectedUser, setSelectedUser] = useState<ChatUserDetail>({
+  const [selectedUser, setSelectedUser] = useState<ChattingUserDetail>({
     nickname: "",
     imgURL: "",
     role: "normal",
@@ -81,12 +84,16 @@ const BanList = (props: BanListProps) => {
       >
         <MenuItem
           onClick={() => {
-            props.setUsers([...props.users, selectedUser]);
-            props.setBans(
-              props.bans.filter(
+            dispatch({
+              type: CurrentChattingActionTypes.DELETE_BANLIST,
+              payload: props.users.filter(
                 (value) => value.nickname !== selectedUser.nickname
-              )
-            );
+              ),
+            });
+            dispatch({
+              type: CurrentChattingActionTypes.ADD_USERLIST,
+              payload: selectedUser,
+            });
             setAnchorEl(null);
           }}
         >

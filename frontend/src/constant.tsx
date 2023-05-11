@@ -8,3 +8,15 @@ export const GameBoardConst = {
   PADDLE_WIDTH: 20,
   PADDLE_HEIGHT: 150,
 };
+
+export const ChattingRoomType = {
+  public: "01",
+  protected: "02",
+  private: "03",
+};
+
+export const ProfileStatusType = {
+  self: "00",
+  friend: "01",
+  notFriend: "02",
+};
