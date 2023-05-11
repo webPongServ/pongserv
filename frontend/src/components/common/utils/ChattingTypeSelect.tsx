@@ -18,10 +18,10 @@ const ChattingTypeSelect = (props: ChattingTypeSelectProps) => {
           defaultValue={props.defaultValue}
           onChange={props.handleFunction}
         >
-          <Option value="public" onClick={() => props.setIsPublic(true)}>
+          <Option value="공개" onClick={() => props.setIsPublic(true)}>
             공개
           </Option>
-          <Option value="protected" onClick={() => props.setIsPublic(false)}>
+          <Option value="비공개" onClick={() => props.setIsPublic(false)}>
             비공개
           </Option>
         </Select>

@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
-import { ChatRoomDetail } from "types/Detail";
+import { ChattingRoomDetail } from "types/Detail";
+import ChattingService from "API/ChattingService";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -9,10 +10,12 @@ import Card from "@mui/joy/Card";
 import Box from "@mui/joy/Box";
 import { Input } from "@mui/joy";
 import { ButtonGroup, Button } from "@mui/material";
+import LockIcon from "@mui/icons-material/Lock";
 
 interface PasswordFormCardProps {
-  room: ChatRoomDetail;
+  room: ChattingRoomDetail;
   setPwIndex: Function;
+  key: string;
 }
 
 const PasswordFormCard = (props: PasswordFormCardProps) => {
@@ -25,12 +28,36 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
       setValue(target.value);
     }
   };
+
+  const handleSubmitPassword = async () => {
+    if (value.length === 0) return alert("비밀번호를 입력해주세요!");
+
+    try {
+      const response = await ChattingService.postEntrance({
+        id: props.room.id,
+        pwd: value,
+      });
+
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
+        payload: {
+          id: props.room.id,
+          chatroomName: props.room.chatroomName,
+          ownerNickname: props.room.ownerNickname,
+          type: props.room.type,
+          currentCount: props.room.currentCount,
+          maxCount: props.room.maxCount,
+        },
+      });
+    } catch {
+      alert("비밀번호가 일치하지 않습니다.");
+    }
+  };
+
   return (
-    <Card id="password-form" variant="outlined">
-      <Box className="title">
-        <b>비밀번호 입력</b>
-      </Box>
+    <Card id="password-form" className="flex-container" variant="outlined">
       <Box className="content flex-container">
+        <LockIcon />
         <Input
           className="input"
           type="password"
@@ -39,24 +66,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
           onChange={handlePassword}
         />
         <ButtonGroup variant="contained">
-          <Button
-            className="submit"
-            onClick={() => {
-              if (value.length === 0) return alert("비밀번호를 입력해주세요!");
-              dispatch({
-                type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-                payload: {
-                  id: props.room.id,
-                  title: props.room.title,
-                  owner: props.room.owner,
-                  type: props.room.type,
-                  current: props.room.current,
-                  max: props.room.max,
-                  createdAt: props.room.createdAt,
-                },
-              });
-            }}
-          >
+          <Button className="submit" onClick={handleSubmitPassword}>
             확인
           </Button>
           <Button

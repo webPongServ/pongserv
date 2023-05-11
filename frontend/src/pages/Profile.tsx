@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { IRootState } from "components/common/store";
-import { ProfileDetail, UserDetail } from "types/Detail";
+import { ProfileDetail } from "types/Detail";
 import UserInfo from "components/profile/UserInfo";
 import GameHistoryList from "components/profile/GameHistoryList";
 import AchievementList from "components/profile/AchievementList";
@@ -14,28 +13,24 @@ import SkeletonButtons from "components/common/utils/SkeletonButtons";
 import MyButtons from "components/profile/MyButtons";
 import OthersButtons from "components/profile/OthersButtons";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
+import { ProfileStatusType } from "constant";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
 import { Box } from "@mui/material";
 import { Tabs, TabList } from "@mui/joy";
 import Tab, { tabClasses } from "@mui/joy/Tab";
-import UserService from "API/UsersService";
+import UserService from "API/UserService";
 
 const Profile = () => {
-  const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
-  const friends: UserDetail[] | null = useSelector(
-    (state: IRootState) => state.friends.friends
-  );
-  const [isFriend, setIsFriend] = useState<boolean>(false);
+  const [isNew, setIsNew] = useState<boolean>(false);
   const [modalStatus, setModalStatus] = useState<string>("closed");
   const [profileDetail, setProfileDetail] = useState<ProfileDetail | null>(
     null
   );
-  const { nickname } = useParams();
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { nickname } = useParams();
 
   const getProfile = async () => {
     try {
@@ -48,12 +43,14 @@ const Profile = () => {
         lose: response.data.lose,
         ELO: response.data.ELO,
         winRate: response.data.winRate,
-        status: "",
+        status: response.data.status,
       });
-      dispatch({
-        type: MyInfoActionTypes.MYINFO_UPDATE_NICKNAME,
-        payload: nickname,
-      });
+      if (isNew)
+        dispatch({
+          type: MyInfoActionTypes.MYINFO_UPDATE_NICKNAME,
+          payload: nickname,
+        });
+      setIsNew(false);
     } catch {
       alert("유저가 존재하지 않습니다! 홈 화면으로 돌아갑니다.");
       navigate("/game");
@@ -61,13 +58,6 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    if (friends !== null) {
-      friends.forEach((element) => {
-        if (profileDetail && element.nickname === profileDetail.nickname) {
-          setIsFriend(true);
-        }
-      });
-    }
     getProfile();
     // check dependency list!!
   }, [nickname]);
@@ -94,15 +84,14 @@ const Profile = () => {
         <Box className="button-group flex-container">
           {profileDetail === null && <SkeletonButtons />}
           {profileDetail !== null &&
-            profileDetail.nickname === myInfo.nickname && (
+            profileDetail.status === ProfileStatusType.self && (
               <MyButtons setModalStatus={setModalStatus} />
             )}
           {profileDetail !== null &&
-            profileDetail!.nickname !== myInfo.nickname && (
+            profileDetail!.status !== ProfileStatusType.self && (
               <OthersButtons
-                isFriend={isFriend}
-                setIsFriend={setIsFriend}
                 profileDetail={profileDetail}
+                setProfileDetail={setProfileDetail}
               />
             )}
         </Box>
@@ -142,10 +131,13 @@ const Profile = () => {
       <EditNicknameModal
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
+        setIsNew={setIsNew}
       />
       <EditImageModal
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
+        profileDetail={profileDetail!}
+        setProfileDetail={setProfileDetail}
       />
       <SetTwoFactorModal
         modalStatus={modalStatus}

@@ -27,7 +27,8 @@ export class ChatsService {
 		const name: string = chatroomCreationDto.name;
 		const type: string = chatroomCreationDto.type;
 		const pwd: string = chatroomCreationDto.pwd;
-		const newChatroom = await this.dbChatsManagerService.createChatroom(name, type, pwd);
+		const max: number = chatroomCreationDto.max;
+		const newChatroom = await this.dbChatsManagerService.createChatroom(name, type, pwd, max);
 		const user = await this.dbUsersManagerService.getUserByUserId(userId);
 		await this.dbChatsManagerService.createUserAsOwner(user, newChatroom); // set user as chatroom owner
 		return (newChatroom.id);
@@ -203,6 +204,7 @@ export class ChatsService {
 		targetRoom.chtRmNm = infoEdit.name;
 		targetRoom.chtRmType = infoEdit.type;
 		targetRoom.chtRmPwd = infoEdit.pwd;
+		targetRoom.maxUserCnt = infoEdit.max;
 		await this.dbChatsManagerService.saveChatroom(targetRoom);
 		// 3 // TODO: to use websocket
 		return ;
