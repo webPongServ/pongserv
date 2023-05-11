@@ -21,7 +21,9 @@ $paddle_height: 150px;
       justify-content: space-evenly;
 
       .game-card {
-        width: 40%;
+        width: 40%; // minWidth 추가해보기
+        min-width: 400px;
+        // max-width: 500px;
         height: 200px;
         cursor: pointer;
         margin: 1%;
