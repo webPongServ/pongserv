@@ -1,66 +1,139 @@
-import { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
 import RoomLeave from "components/common/chatting/RoomLeave";
+import MyMessage from "components/common/chatting/MyMessage";
+import OtherMessage from "components/common/chatting/OtherMessage";
 import { ChattingUserRoleType } from "constant";
-import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
+import { socket } from "socket";
 
 import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
 
+export interface ChatObject {
+  user: ChattingUserDetail;
+  message: string;
+}
+
 const ChattingRoom = () => {
   const currentChatting: ChattingRoomDetail | null = useSelector(
-    (state: IRootState) => state.currentChatting.chattingRoom
+    (state: IRootState) => state.currentChatting.chattingRoom!
   );
+  const myDetail: ChattingUserDetail = useSelector(
+    (state: IRootState) => state.currentChatting.myDetail!
+  );
+  const chattingRef = useRef<HTMLDivElement>(null);
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
-  const [myDetail, setMyDetail] = useState<ChattingUserDetail>({
-    nickname: "chanhyle",
-    imgURL: "../image.png",
-    role: ChattingUserRoleType.owner,
+  const [chatting, setChatting] = useState<ChatObject[]>([
+    {
+      user: {
+        nickname: "chanhyle",
+        imgURL: "../image.png",
+        role: ChattingUserRoleType.owner,
+      },
+      message:
+        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+    },
+    {
+      user: {
+        nickname: "mgo",
+        imgURL: "../image.png",
+        role: ChattingUserRoleType.admin,
+      },
+      message: "2",
+    },
+  ]);
+
+  const [chattingInput, setChattingInput] = useState<string>("");
+
+  const handleChattingInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const target: HTMLInputElement = e.target;
+    setChattingInput(target.value);
+  };
+
+  const handleAddChatting = (e: React.FormEvent) => {
+    e.preventDefault();
+    socket.emit("chatroomMessage", {
+      id: currentChatting.id,
+      msg: chattingInput,
+    });
+    setChatting([
+      ...chatting,
+      {
+        user: myDetail,
+        message: chattingInput,
+      },
+    ]);
+    setChattingInput("");
+  };
+
+  const handleClickSend = () => {};
+
+  socket.on("chatroomMessage", (data) => {
+    setChatting([
+      ...chatting,
+      {
+        user: {
+          nickname: data.nickname,
+          imgURL: data.imgPath,
+          role: data.role,
+        },
+        message: data.msg,
+      },
+    ]);
+    setChattingInput("");
   });
+
+  // const queryClient = useQueryClient();
+
+  // useEffect(() => {
+  //   socket.on('data', (data) => {
+  //     // 데이터를 수신할 때마다, 쿼리 캐시를 업데이트합니다.
+  //     queryClient.setQueryData('data', data);
+  //   });
+  // }, [queryClient]);
+
+  useEffect(() => {
+    if (chattingRef.current)
+      chattingRef.current.scrollTop = chattingRef.current.scrollHeight;
+  }, [chatting]);
 
   return (
     <Box id="page">
       {roomStatus === "chat" && (
         <>
-          <Box className="page-header">{currentChatting!.chatroomName}</Box>
+          <Box className="page-header">
+            <Box>{currentChatting!.chatroomName}</Box>
+          </Box>
           <Box className="page-body chatting-box">
-            <Box className="chatting-display overflow">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
-              Rhoncus dolor purus non enim praesent elementum facilisis leo vel.
-              Risus at ultrices mi tempus imperdiet. Semper risus in hendrerit
-              gravida rutrum quisque non tellus. Convallis convallis tellus id
-              interdum velit laoreet id donec ultrices. Odio morbi quis commodo
-              odio aenean sed adipiscing. Amet nisl suscipit adipiscing bibendum
-              est ultricies integer quis. Cursus euismod quis viverra nibh cras.
-              Metus vulputate eu scelerisque felis imperdiet proin fermentum
-              leo. Mauris commodo quis imperdiet massa tincidunt. Cras tincidunt
-              lobortis feugiat vivamus at augue. At augue eget arcu dictum
-              varius duis at consectetur lorem. Velit sed ullamcorper morbi
-              tincidunt. Lorem donec massa sapien faucibus et molestie ac.
-              Consequat mauris nunc congue nisi vitae suscipit. Fringilla est
-              ullamcorper eget nulla facilisi etiam dignissim diam. Pulvinar
-              elementum integer enim neque volutpat ac tincidunt. Ornare
-              suspendisse sed nisi lacus sed viverra tellus. Purus sit amet
-              volutpat consequat mauris. Elementum eu facilisis sed odio morbi.
-              Euismod lacinia at quis risus sed vulputate odio. Morbi tincidunt
-              ornare massa eget egestas purus viverra accumsan in. In hendrerit
-              gravida rutrum quisque non tellus orci ac. Pellentesque nec nam
-              aliquam sem et tortor. Habitant morbi tristique senectus et.
-              Adipiscing elit duis tristique sollicitudin nibh sit. Ornare
-              aenean euismod elementum nisi quis eleifend. Commodo viverra
-              maecenas accumsan lacus vel facilisis. Nulla posuere sollicitudin
-              aliquam ultrices sagittis orci a.
+            <Box className="chatting-display overflow" ref={chattingRef}>
+              {chatting.map((value) => {
+                return (
+                  <Box className="chatting">
+                    {myDetail.nickname === value.user.nickname ? (
+                      <MyMessage myChat={value} />
+                    ) : (
+                      <OtherMessage otherChat={value} />
+                    )}
+                  </Box>
+                );
+              })}
             </Box>
             <Box className="chatting-input flex-container">
-              <Input className="input" placeholder="채팅을 입력하세요."></Input>
-              <Button>전송</Button>
+              <form className="input" onSubmit={handleAddChatting}>
+                <Input
+                  value={chattingInput}
+                  placeholder="채팅을 입력하세요."
+                  onChange={handleChattingInput}
+                ></Input>
+              </form>
+              <Button onClick={handleClickSend}>전송</Button>
             </Box>
           </Box>
           <Box className="page-footer flex-container">

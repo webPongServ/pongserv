@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CustomOnKeyUpInput from "components/common/utils/CustomOnKeyUpInput";
-import CustomProfileButton from "components/common/utils/CustomProfileButton";
+import CustomOnKeyUpInput from "components/utils/CustomOnKeyUpInput";
+import CustomProfileButton from "components/utils/CustomProfileButton";
 import { UserDetail } from "types/Detail";
 import UserService from "API/UserService";
 import "styles/global.scss";
@@ -12,7 +12,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 interface serverFriend {
   nickname: string;
-  imagePath: string;
+  imgPath: string;
   status: string;
 }
 
@@ -35,7 +35,7 @@ const Search = () => {
       response.data.map(
         (value: serverFriend): UserDetail => ({
           nickname: value.nickname,
-          imgURL: value.imagePath,
+          imgURL: value.imgPath,
           status: value.status,
         })
       )

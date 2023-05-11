@@ -3,12 +3,12 @@ import { useSelector, useDispatch } from "react-redux";
 import { ChattingRoomForm } from "types/Form";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { IRootState } from "components/common/store";
-import CustomInput from "components/common/utils/CustomInput";
-import CustomSlider from "components/common/utils/CustomSlider";
-import ChattingTypeSelect from "components/common/utils/ChattingTypeSelect";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomInput from "components/utils/CustomInput";
+import CustomSlider from "components/utils/CustomSlider";
+import ChattingTypeSelect from "components/utils/ChattingTypeSelect";
+import CustomIconButton from "components/utils/CustomIconButton";
 import ChattingService from "API/ChattingService";
-import { ChattingRoomType } from "constant";
+import { ChattingRoomType, ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -90,6 +90,14 @@ const RoomCreator = () => {
         type: chattingRoomForm.type,
         maxCount: chattingRoomForm.maxCount,
         currentCount: 1,
+      },
+    });
+    dispatch({
+      type: CurrentChattingActionTypes.ADD_MYDETAIL,
+      payload: {
+        nickname: myInfo.nickname,
+        imgURL: myInfo.imgURL,
+        role: ChattingUserRoleType.owner,
       },
     });
   };

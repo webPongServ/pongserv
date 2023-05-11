@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import LoadingString from "components/common/utils/LoadingString";
+import LoadingString from "components/utils/LoadingString";
 import "styles/global.scss";
 import "styles/Game.scss";
 

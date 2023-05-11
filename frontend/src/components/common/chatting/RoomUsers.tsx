@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import UserList from "components/common/chatting/UserList";
 import BanList from "components/common/chatting/BanList";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
