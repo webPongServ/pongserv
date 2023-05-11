@@ -12,7 +12,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 interface serverFriend {
   nickname: string;
-  imagePath: string;
+  imgPath: string;
   status: string;
 }
 
@@ -35,7 +35,7 @@ const Search = () => {
       response.data.map(
         (value: serverFriend): UserDetail => ({
           nickname: value.nickname,
-          imgURL: value.imagePath,
+          imgURL: value.imgPath,
           status: value.status,
         })
       )
