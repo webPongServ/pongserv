@@ -1,3 +1,4 @@
+import { start } from 'repl';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { AuthService } from './../auth/auth.service';
@@ -136,7 +137,16 @@ export class UsersService {
   }
 
   async getUserList(startsWith: string) {
+    console.log(startsWith);
+    if (startsWith.length === 0) return [];
     const withPercent = startsWith + '%';
     return await this.dbmanagerUsersService.getUserList(withPercent);
   }
+  
+  async blockUser(nickName : string){
+    console.log('blockUser', nickName);
+    const user = await this.dbmanagerUsersService.findUserIdByNickname(nickName);
+    if(user.length == 0){
+      throw new BadRequestException('존재하지 않는 사용자입니다.');
+    }
 }
