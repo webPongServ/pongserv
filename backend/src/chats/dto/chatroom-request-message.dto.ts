@@ -1,8 +1,8 @@
 import { ApiProperty } from "@nestjs/swagger";
 
-export class ChatroomMessageDto {
+export class ChatroomRequestMessageDto {
     @ApiProperty({ type: String })
-    chtrmId: string;
+    id: string;
 
     @ApiProperty({ type: String })
     msg: string;
