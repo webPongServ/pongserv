@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CustomInput from "components/common/utils/CustomInput";
-import CustomSlider from "components/common/utils/CustomSlider";
-import GameDifficultyRadioGroup from "components/common/utils/GameDifficultyRadioGroup";
+import CustomInput from "components/utils/CustomInput";
+import CustomSlider from "components/utils/CustomSlider";
+import GameDifficultyRadioGroup from "components/utils/GameDifficultyRadioGroup";
 import { GameRoomForm } from "types/Form";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import "styles/global.scss";
 import "styles/Game.scss";
 

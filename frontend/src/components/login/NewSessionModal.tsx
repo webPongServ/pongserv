@@ -4,7 +4,7 @@ import { LoginStatusActionTypes } from "types/redux/Login";
 import "styles/global.scss";
 import "styles/Login.scss";
 
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import { Button } from "@mui/joy";
 import Modal from "@mui/joy/Modal";

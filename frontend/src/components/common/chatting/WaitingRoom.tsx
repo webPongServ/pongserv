@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import PasswordFormCard from "components/common/chatting/PasswordFormCard";
 import RoomCard from "components/common/chatting/RoomCard";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import EmptyListMessage from "components/utils/EmptyListMessage";
+import CustomIconButton from "components/utils/CustomIconButton";
 import { ChattingRoomDetail } from "types/Detail";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import ChattingService from "API/ChattingService";
@@ -13,7 +13,7 @@ import "styles/global.scss";
 import { Box, Pagination } from "@mui/material";
 import { Button } from "@mui/joy";
 import SyncIcon from "@mui/icons-material/Sync";
-import LoadingCircle from "../utils/LoadingCircle";
+import LoadingCircle from "../../utils/LoadingCircle";
 
 const WaitingRoom = () => {
   const dispatch = useDispatch();

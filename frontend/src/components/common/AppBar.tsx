@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ChattingDrawerWidth } from "constant";
 import { IRootState } from "components/common/store";
-import SkeletonMyInfo from "components/common/utils/SkeletonMyInfo";
+import SkeletonMyInfo from "components/utils/SkeletonMyInfo";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 

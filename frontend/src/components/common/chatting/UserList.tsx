@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import CustomProfileButton from "components/common/utils/CustomProfileButton";
+import CustomProfileButton from "components/utils/CustomProfileButton";
 import { ChattingUserDetail } from "types/Detail";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import EmptyListMessage from "components/utils/EmptyListMessage";
 import {
   CurrentChatting,
   CurrentChattingActionTypes,

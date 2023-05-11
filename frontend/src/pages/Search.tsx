@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CustomOnKeyUpInput from "components/common/utils/CustomOnKeyUpInput";
-import CustomProfileButton from "components/common/utils/CustomProfileButton";
+import CustomOnKeyUpInput from "components/utils/CustomOnKeyUpInput";
+import CustomProfileButton from "components/utils/CustomProfileButton";
 import { UserDetail } from "types/Detail";
 import UserService from "API/UserService";
 import "styles/global.scss";

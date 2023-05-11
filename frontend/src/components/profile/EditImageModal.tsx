@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { AxiosResponse } from "axios";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 import { UserDetail } from "types/Detail";
 import "styles/Game.scss";

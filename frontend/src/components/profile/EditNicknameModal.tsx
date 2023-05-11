@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import CustomIconButton from "components/common/utils/CustomIconButton";
-import CustomOnKeyUpInput from "components/common/utils/CustomOnKeyUpInput";
+import CustomIconButton from "components/utils/CustomIconButton";
+import CustomOnKeyUpInput from "components/utils/CustomOnKeyUpInput";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { IRootState } from "components/common/store";

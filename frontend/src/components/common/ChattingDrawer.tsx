@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 

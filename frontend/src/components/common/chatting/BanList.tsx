@@ -7,8 +7,8 @@ import {
 } from "types/redux/CurrentChatting";
 import ChattingService from "API/ChattingService";
 import { IRootState } from "components/common/store";
-import CustomProfileButton from "components/common/utils/CustomProfileButton";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import CustomProfileButton from "components/utils/CustomProfileButton";
+import EmptyListMessage from "components/utils/EmptyListMessage";
 import { ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";

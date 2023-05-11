@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Achievement } from "types/Profile";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import EmptyListMessage from "components/utils/EmptyListMessage";
 import "styles/global.scss";
 import "styles/Profile.scss";
 
