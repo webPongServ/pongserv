@@ -3,6 +3,7 @@ import { ChattingRoomEditForm } from "types/Form";
 
 export interface CurrentChatting {
   status: string;
+  myDetail: ChattingUserDetail | null;
   chattingRoom: ChattingRoomDetail | null;
   userList: ChattingUserDetail[];
   banList: ChattingUserDetail[];
@@ -10,6 +11,7 @@ export interface CurrentChatting {
 
 const INITIAL_CURRENTCHATTING: CurrentChatting = {
   status: "waiting",
+  myDetail: null,
   chattingRoom: null,
   userList: [],
   banList: [],
@@ -27,6 +29,8 @@ export enum CurrentChattingActionTypes {
   GET_BANLIST = "GET_BANLIST",
   ADD_BANLIST = "ADD_BANLIST",
   DELETE_BANLIST = "DELETE_BANLIST",
+  ADD_MYDETAIL = "ADD_MYDETAIL",
+  DELETE_MYDETAIL = "DELETE_MYDETAIL",
 }
 
 export interface CurrentChatting_UpdateStatusWaitingAction {
@@ -77,6 +81,16 @@ export interface CurrentChatting_DeleteBanListAction {
   payload: string;
 }
 
+export interface CurrentChatting_AddMyDetail {
+  type: CurrentChattingActionTypes.ADD_MYDETAIL;
+  payload: ChattingUserDetail;
+}
+
+export interface CurrentChatting_DeleteMyDetail {
+  type: CurrentChattingActionTypes.DELETE_MYDETAIL;
+  payload: string;
+}
+
 type CurrentChattingAction =
   | CurrentChatting_UpdateStatusWaitingAction
   | CurrentChatting_UpdateStatusChattingAction
@@ -87,7 +101,9 @@ type CurrentChattingAction =
   | CurrentChatting_DeleteUserListAction
   | CurrentChatting_GetBanListAction
   | CurrentChatting_AddBanListAction
-  | CurrentChatting_DeleteBanListAction;
+  | CurrentChatting_DeleteBanListAction
+  | CurrentChatting_AddMyDetail
+  | CurrentChatting_DeleteMyDetail;
 
 export const CurrentChattingReducer = (
   state = INITIAL_CURRENTCHATTING,
@@ -151,6 +167,17 @@ export const CurrentChattingReducer = (
           (value) => value.nickname !== action.payload
         ),
       };
+    case CurrentChattingActionTypes.ADD_MYDETAIL:
+      return {
+        ...state,
+        myDetail: action.payload,
+      };
+    case CurrentChattingActionTypes.DELETE_MYDETAIL:
+      return {
+        ...state,
+        myDetail: null,
+      };
+
     default:
       return state;
   }

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { IRootState } from "components/common/store";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChattingRoomDetail } from "types/Detail";
+import { ChattingUserRoleType } from "constant";
 import ChattingService from "API/ChattingService";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
@@ -19,6 +21,7 @@ interface PasswordFormCardProps {
 }
 
 const PasswordFormCard = (props: PasswordFormCardProps) => {
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const [value, setValue] = useState<string>("");
   const dispatch = useDispatch();
 
@@ -49,6 +52,14 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
           maxCount: props.room.maxCount,
         },
       });
+      dispatch({
+        type: CurrentChattingActionTypes.ADD_MYDETAIL,
+        payload: {
+          nickname: myInfo.nickname,
+          imgURL: myInfo.imgURL,
+          role: ChattingUserRoleType.normal,
+        },
+      });
     } catch {
       alert("비밀번호가 일치하지 않습니다.");
     }
@@ -73,6 +84,14 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
           type: props.room.type,
           currentCount: props.room.currentCount,
           maxCount: props.room.maxCount,
+        },
+      });
+      dispatch({
+        type: CurrentChattingActionTypes.ADD_MYDETAIL,
+        payload: {
+          nickname: myInfo.nickname,
+          imgURL: myInfo.imgURL,
+          role: ChattingUserRoleType.normal,
         },
       });
     } catch {

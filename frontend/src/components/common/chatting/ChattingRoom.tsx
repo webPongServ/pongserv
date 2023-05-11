@@ -24,14 +24,12 @@ const ChattingRoom = () => {
   const currentChatting: ChattingRoomDetail | null = useSelector(
     (state: IRootState) => state.currentChatting.chattingRoom
   );
+  const myDetail: ChattingUserDetail = useSelector(
+    (state: IRootState) => state.currentChatting.myDetail!
+  );
   const chattingRef = useRef<HTMLDivElement>(null);
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
-  const [myDetail, setMyDetail] = useState<ChattingUserDetail>({
-    nickname: "chanhyle",
-    imgURL: "../image.png",
-    role: ChattingUserRoleType.owner,
-  });
   const [chatting, setChatting] = useState<ChatObject[]>([
     {
       user: {
