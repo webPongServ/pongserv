@@ -1,10 +1,6 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  ChattingUserDetail,
-  ChattingRoomDetail,
-  UserDetail,
-} from "types/Detail";
+import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
 import RoomLeave from "components/common/chatting/RoomLeave";
@@ -20,7 +16,7 @@ import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
 
 export interface ChatObject {
-  user: UserDetail;
+  user: ChattingUserDetail;
   message: string;
 }
 
@@ -37,47 +33,42 @@ const ChattingRoom = () => {
   });
   const [chatting, setChatting] = useState<ChatObject[]>([
     {
-      user: { nickname: "chanhyle", imgURL: "../image.png", status: "login" },
+      user: {
+        nickname: "chanhyle",
+        imgURL: "../image.png",
+        role: ChattingUserRoleType.owner,
+      },
       message:
         "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
     },
     {
-      user: { nickname: "mgo", imgURL: "../image.png", status: "login" },
+      user: {
+        nickname: "mgo",
+        imgURL: "../image.png",
+        role: ChattingUserRoleType.admin,
+      },
       message: "2",
     },
-    {
-      user: { nickname: "susong", imgURL: "../image.png", status: "login" },
-      message: "3",
-    },
-    {
-      user: { nickname: "seongtki", imgURL: "../image.png", status: "login" },
-      message: "4",
-    },
-    {
-      user: { nickname: "mgo", imgURL: "../image.png", status: "login" },
-      message: "5",
-    },
-    {
-      user: { nickname: "susong", imgURL: "../image.png", status: "login" },
-      message: "6",
-    },
-    {
-      user: { nickname: "seongtki", imgURL: "../image.png", status: "login" },
-      message: "7",
-    },
-    {
-      user: { nickname: "chanhyle", imgURL: "../image.png", status: "login" },
-      message: "8",
-    },
-    {
-      user: { nickname: "chanhyle", imgURL: "../image.png", status: "login" },
-      message: "9",
-    },
-    {
-      user: { nickname: "mgo", imgURL: "../image.png", status: "login" },
-      message: "10",
-    },
   ]);
+
+  const [chattingInput, setChattingInput] = useState<string>("");
+
+  const handleChattingInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const target: HTMLInputElement = e.target;
+    setChattingInput(target.value);
+  };
+
+  const handleAddChatting = (e: React.FormEvent) => {
+    e.preventDefault();
+    setChatting([
+      ...chatting,
+      {
+        user: myDetail,
+        message: chattingInput,
+      },
+    ]);
+    setChattingInput("");
+  };
 
   // const queryClient = useQueryClient();
 
@@ -110,7 +101,13 @@ const ChattingRoom = () => {
               })}
             </Box>
             <Box className="chatting-input flex-container">
-              <Input className="input" placeholder="채팅을 입력하세요."></Input>
+              <form className="input" onSubmit={handleAddChatting}>
+                <Input
+                  value={chattingInput}
+                  placeholder="채팅을 입력하세요."
+                  onChange={handleChattingInput}
+                ></Input>
+              </form>
               <Button>전송</Button>
             </Box>
           </Box>
