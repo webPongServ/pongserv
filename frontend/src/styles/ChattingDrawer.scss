@@ -65,6 +65,8 @@ $ChattingDrawerWidth: 500px;
       padding: 3%;
 
       .page-header {
+        display: flex;
+        align-items: center;
         height: 10%;
         font-size: 20px;
       }
@@ -111,7 +113,57 @@ $ChattingDrawerWidth: 500px;
 
         .chatting-display {
           height: 90%;
-          padding: 5%;
+          padding: 3%;
+
+          .chatting {
+            display: flex;
+            margin-bottom: 5%;
+            // flex-direction: column;
+            // align-items: center;
+
+            .profile {
+              flex-direction: column;
+              width: 20%;
+              color: black;
+              text-decoration: none;
+
+              img {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                border-radius: 50%;
+                border: 0px solid #fff;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                  0 3px 6px rgba(0, 0, 0, 0.23);
+              }
+            }
+
+            .message {
+              display: flex;
+              align-items: center;
+              width: 80%;
+              word-break: break-all;
+
+              .balloon {
+                position: relative;
+                display: inline-block;
+                padding: 10px;
+                border-radius: 10px;
+                background-color: #eee;
+                color: #333;
+                font-size: 14px;
+              }
+            }
+
+            .other {
+              justify-content: flex-start;
+            }
+
+            .my {
+              justify-content: flex-end;
+            }
+          }
         }
 
         .chatting-input {
