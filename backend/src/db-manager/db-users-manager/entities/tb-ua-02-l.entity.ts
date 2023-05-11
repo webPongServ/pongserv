@@ -13,8 +13,8 @@ import { TbUa01MEntity } from './tb-ua-01-m.entity';
 
 // user agent friend list - 유저친구내역
 @Entity({ name: 'TB_UA02L' })
-@Unique(['ua01mEntity'])
-@Unique(['ua01mEntityAsFr'])
+// @Unique(['ua01mEntity', 'ua01mEntityAsFr'])
+// @Unique(['ua01mEntityAsFr'])
 export class TbUa02LEntity {
   // ID
   @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
@@ -22,13 +22,13 @@ export class TbUa02LEntity {
 
   // USER_ID
   // @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
-  @ManyToOne(() => TbUa01MEntity)
+  @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.ua02lEntitys)
   @JoinColumn({ name: 'USER_ID' })
   ua01mEntity: TbUa01MEntity;
 
   // FR_USER_ID
   // @PrimaryColumn({ name: 'FR_USER_ID', type: 'varchar', length: 8 })
-  @ManyToOne(() => TbUa01MEntity)
+  @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.ua02lEntityAsFrs)
   @JoinColumn({ name: 'FR_USER_ID' })
   ua01mEntityAsFr: TbUa01MEntity;
 

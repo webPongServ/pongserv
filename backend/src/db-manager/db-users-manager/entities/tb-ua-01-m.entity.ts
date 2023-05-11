@@ -1,7 +1,9 @@
+import { TbUa02LEntity } from './tb-ua-02-l.entity';
 import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   Unique,
   UpdateDateColumn,
@@ -17,11 +19,11 @@ export class TbUa01MEntity {
   id: number;
 
   // USER_ID
-  @Column({ name: 'USER_ID', type: 'varchar', length: 8 })
+  @Column({ name: 'USER_ID', type: 'varchar', length: 10 })
   userId: string;
 
   // NICKNAME
-  @Column({ name: 'NICKNAME', type: 'varchar', length: 8 })
+  @Column({ name: 'NICKNAME', type: 'varchar', length: 10 })
   nickname: string;
 
   // TWOFACTOR
@@ -29,7 +31,12 @@ export class TbUa01MEntity {
   twofactor: boolean;
 
   // TWOFACTOR_DATA
-  @Column({ name: 'TWOFACTOR_DATA', type: 'varchar', length: 50, nullable: true })
+  @Column({
+    name: 'TWOFACTOR_DATA',
+    type: 'varchar',
+    length: 50,
+    nullable: true,
+  })
   twofactorData: string;
 
   // IMG_PATH
@@ -55,4 +62,12 @@ export class TbUa01MEntity {
     precision: 6,
   })
   lastDttm: Date;
+
+  // USER_ID
+  @OneToMany(() => TbUa02LEntity, (ua02l) => ua02l.ua01mEntity)
+  ua02lEntitys: TbUa02LEntity[];
+
+  // FR_USER_ID
+  @OneToMany(() => TbUa02LEntity, (ua02l) => ua02l.ua01mEntityAsFr)
+  ua02lEntityAsFrs: TbUa02LEntity[];
 }

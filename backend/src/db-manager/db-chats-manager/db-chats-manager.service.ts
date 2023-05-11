@@ -18,11 +18,11 @@ export class DbChatsManagerService {
 	@InjectRepository(TbCh04LEntity) private ch04lRp: Repository<TbCh04LEntity>,
   ) {}
 
-  async createChatroom(name: string, type: string, pwd: string) {
+  async createChatroom(name: string, type: string, pwd: string, max: number) {
 	const newChtrm = this.ch01lRp.create({
 		chtRmNm: name,
 		chtRmType: type,
-		maxUserCnt: 5, // default
+		maxUserCnt: max,
 		chtRmPwd: pwd,
 		chtRmTf: true,
 	})
@@ -111,23 +111,42 @@ export class DbChatsManagerService {
 	return results;
   }
 
+  // NOTE: uuid가 원인일 수도 있겠다.
   async getCurrUserListAndCount(chatroom: TbCh01LEntity) {
 	const currUserListAndCount = await this.ch02lRp.findAndCount({
 		relations: {
+			ch01lEntity: true,
 			ua01mEntity: true,
 		},
 		where: {
-			ch01lEntity: chatroom,
+			ch01lEntity: {
+				id: chatroom.id,
+			},
 			chtRmJoinTf: true,
 		}
 	});
+	// const [result, totalCount] = await this.ch02lRp.findAndCount({
+	// 	where: (qb: SelectQueryBuilder<TbCh02LEntity>) => {
+	// 	  qb.where('ch02l.ch01lEntity.uuid = :chtRmId', { chtRmId: uuid });
+	// 	  qb.andWhere('ch02l.chtRmJoinTf = true');
+	// 	},
+	// 	relations: ['ua01mEntity'],
+	// 	order: { ua01mEntity: 'ASC' },
+	// 	skip: page * rpp,
+	// 	take: rpp,
+	//   });
+	  
+	console.log('chatroom in DbChatsManagerService.getCurrUserListAndCount(): ')
+	console.log(chatroom)
+	console.log('currUserListAndCount in DbChatsManagerService.getCurrUserListAndCount(): ')
+	console.log(currUserListAndCount)
 	return currUserListAndCount;
   }
 
-  async getLiveChtrmByUuid(uuid: string) {
+  async getLiveChtrmById(id: string) {
 	const result: TbCh01LEntity = await this.ch01lRp.findOne({
 		where: {
-			uuid: uuid,
+			id: id,
 			chtRmTf: true,
 		}
 	})
@@ -180,7 +199,9 @@ export class DbChatsManagerService {
 			ua01mEntity: true,
 		},
 		where: {
-			ch01lEntity: room,
+			ch01lEntity: {
+				id: room.id,
+			},
 			chtRmJoinTf: true,
 		}
 	})
