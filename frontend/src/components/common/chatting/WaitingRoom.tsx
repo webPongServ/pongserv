@@ -39,7 +39,7 @@ const WaitingRoom = () => {
   return (
     <Box id="page">
       <Box className="page-header">
-        <Box>채팅 대기실</Box>
+        <Box>대기실</Box>
       </Box>
       <Box className="page-body">
         <Box className="list">
