@@ -34,15 +34,10 @@ const GamePlay = () => {
             {myInfo.nickname === "" ? (
               <SkeletonMyInfo />
             ) : (
-              // box로 바꾸기
-              <Link
-                id="my-profile"
-                to={`/profile/${myInfo.nickname}`}
-                className="flex-container"
-              >
-                <img src={`/profile/${myInfo.imgURL}`} alt="AppBar-profile" />
+              <Box id="my-profile" className="flex-container">
+                <img src={`${myInfo.imgURL}`} alt="AppBar-profile" />
                 {myInfo.nickname}
-              </Link>
+              </Box>
             )}
             <Link id="logo" to="/game">
               WebPongServ
