@@ -20,3 +20,9 @@ export const ProfileStatusType = {
   friend: "01",
   notFriend: "02",
 };
+
+export const ChattingUserRoleType = {
+  owner: "01",
+  admin: "02",
+  normal: "03",
+};

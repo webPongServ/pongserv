@@ -1,26 +1,34 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { ChattingUserDetail } from "types/Detail";
+import {
+  CurrentChatting,
+  CurrentChattingActionTypes,
+} from "types/redux/CurrentChatting";
+import ChattingService from "API/ChattingService";
+import { IRootState } from "components/common/store";
 import CustomProfileButton from "components/common/utils/CustomProfileButton";
 import EmptyListMessage from "components/common/utils/EmptyListMessage";
-import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
+import { ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import { Box, List, ListItem, Menu, MenuItem } from "@mui/material";
 
 interface BanListProps {
-  bans: ChattingUserDetail[];
-  users: ChattingUserDetail[];
-  // setUsers: Function;
-  // setBans: Function;
   myDetail: ChattingUserDetail;
 }
 
+interface serverChattingUserDetail {
+  nickname: string;
+  imgPath: string;
+  authInChtrm: string;
+}
+
 const BanList = (props: BanListProps) => {
+  const currentChatting: CurrentChatting = useSelector(
+    (state: IRootState) => state.currentChatting
+  );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
@@ -44,15 +52,29 @@ const BanList = (props: BanListProps) => {
   const [selectedUser, setSelectedUser] = useState<ChattingUserDetail>({
     nickname: "",
     imgURL: "",
-    role: "normal",
+    role: ChattingUserRoleType.normal,
   });
 
-  return props.bans.length === 0 ? (
+  const getBansList = async () => {
+    const response = await ChattingService.getBansList(
+      currentChatting.chattingRoom!.id
+    );
+    dispatch({
+      type: CurrentChattingActionTypes.GET_BANLIST,
+      payload: response.data,
+    });
+  };
+
+  useEffect(() => {
+    getBansList();
+  }, []);
+
+  return currentChatting.banList.length === 0 ? (
     <EmptyListMessage message="차단한 사용자가 없습니다!" />
   ) : (
     <>
       <List>
-        {props.bans.map((value, index) => (
+        {currentChatting.banList.map((value, index) => (
           <ListItem key={value.nickname + index} disablePadding>
             <CustomProfileButton
               class="login"
@@ -82,23 +104,27 @@ const BanList = (props: BanListProps) => {
             : undefined
         }
       >
-        <MenuItem
-          onClick={() => {
-            dispatch({
-              type: CurrentChattingActionTypes.DELETE_BANLIST,
-              payload: props.users.filter(
-                (value) => value.nickname !== selectedUser.nickname
-              ),
-            });
-            dispatch({
-              type: CurrentChattingActionTypes.ADD_USERLIST,
-              payload: selectedUser,
-            });
-            setAnchorEl(null);
-          }}
-        >
-          채팅방 차단 해제
-        </MenuItem>
+        {props.myDetail.role === ChattingUserRoleType.normal ? (
+          <Box>권한이 없습니다.</Box>
+        ) : (
+          <MenuItem
+            onClick={() => {
+              dispatch({
+                type: CurrentChattingActionTypes.DELETE_BANLIST,
+                payload: currentChatting.userList.filter(
+                  (value) => value.nickname !== selectedUser.nickname
+                ),
+              });
+              dispatch({
+                type: CurrentChattingActionTypes.ADD_USERLIST,
+                payload: selectedUser,
+              });
+              setAnchorEl(null);
+            }}
+          >
+            채팅방 차단 해제
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

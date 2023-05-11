@@ -3,21 +3,14 @@ import { ChattingRoomEditForm } from "types/Form";
 
 export interface CurrentChatting {
   status: string;
-  chattingRoom: ChattingRoomDetail;
+  chattingRoom: ChattingRoomDetail | null;
   userList: ChattingUserDetail[];
   banList: ChattingUserDetail[];
 }
 
 const INITIAL_CURRENTCHATTING: CurrentChatting = {
   status: "waiting",
-  chattingRoom: {
-    id: "",
-    chatroomName: "",
-    ownerNickname: "",
-    type: "",
-    maxCount: 0,
-    currentCount: 0,
-  },
+  chattingRoom: null,
   userList: [],
   banList: [],
 };
@@ -118,7 +111,7 @@ export const CurrentChattingReducer = (
       return {
         ...state,
         chattingRoom: {
-          ...state.chattingRoom,
+          ...state.chattingRoom!,
           chatroomName: action.payload.chatroomName,
           type: action.payload.type,
           maxCount: action.payload.maxCount,

@@ -32,21 +32,26 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
   const handleSubmitPassword = async () => {
     if (value.length === 0) return alert("비밀번호를 입력해주세요!");
 
-    const response = await ChattingService.postEntrance({
-      id: props.room.id,
-      pwd: value,
-    });
-    dispatch({
-      type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-      payload: {
+    try {
+      const response = await ChattingService.postEntrance({
         id: props.room.id,
-        chatroomName: props.room.chatroomName,
-        ownerNickname: props.room.ownerNickname,
-        type: props.room.type,
-        currentCount: props.room.currentCount,
-        maxCount: props.room.maxCount,
-      },
-    });
+        pwd: value,
+      });
+
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
+        payload: {
+          id: props.room.id,
+          chatroomName: props.room.chatroomName,
+          ownerNickname: props.room.ownerNickname,
+          type: props.room.type,
+          currentCount: props.room.currentCount,
+          maxCount: props.room.maxCount,
+        },
+      });
+    } catch {
+      alert("비밀번호가 일치하지 않습니다.");
+    }
   };
 
   return (

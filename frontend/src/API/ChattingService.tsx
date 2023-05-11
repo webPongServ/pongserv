@@ -9,6 +9,7 @@ const ChattingService = {
   postNewChattingRoom: async (body: {
     name: string;
     type: string;
+    max: number;
     pwd: string;
   }) => await instance.post(chatsURL("creation"), body),
   postEntrance: async (body: { id: string; pwd: string }) =>
@@ -19,6 +20,7 @@ const ChattingService = {
     id: string;
     name: string;
     type: string;
+    max: number;
     pwd: string;
   }) => await instance.patch(chatsURL("edit"), body),
   getUsersList: async (id: string) =>

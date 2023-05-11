@@ -1,13 +1,15 @@
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { IRootState } from "components/common/store";
-import GameBoard from "./GameBoard";
+import GameBoard from "components/game/GameBoard";
+import SkeletonMyInfo from "components/common/utils/SkeletonMyInfo";
 import "styles/global.scss";
 import "styles/Game.scss";
 
-import { Box, CssBaseline, Toolbar } from "@mui/material";
+import { Box, CssBaseline, Toolbar, IconButton } from "@mui/material";
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
 import { styled } from "@mui/material/styles";
+import ForumIcon from "@mui/icons-material/Forum";
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -27,19 +29,22 @@ const GamePlay = () => {
     <Box id="GamePlay">
       <Box id="app-bar">
         <CssBaseline />
-        <TopBar id="AppBar">
+        <TopBar id="AppBar" position="fixed">
           <Toolbar>
-            <Link id="logo" to="/game" className="fixed-center">
+            {myInfo.nickname === "" ? (
+              <SkeletonMyInfo />
+            ) : (
+              <Box id="my-profile" className="flex-container">
+                <img src={`${myInfo.imgURL}`} alt="AppBar-profile" />
+                {myInfo.nickname}
+              </Box>
+            )}
+            <Link id="logo" to="/game">
               WebPongServ
             </Link>
-            <Link
-              id="my-profile"
-              to={`/profile/${myInfo.nickname}`}
-              className="flex-container"
-            >
-              <img src={`/profile/${myInfo.imgURL}`} alt="AppBar-profile" />
-              {myInfo.nickname}
-            </Link>
+            <IconButton id="chat-button" edge="end" disabled>
+              <ForumIcon className="disabled" />
+            </IconButton>
           </Toolbar>
         </TopBar>
       </Box>

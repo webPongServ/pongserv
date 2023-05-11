@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useParams, useNavigate } from "react-router-dom";
-import { IRootState } from "components/common/store";
-import { ProfileDetail, UserDetail } from "types/Detail";
+import { ProfileDetail } from "types/Detail";
 import UserInfo from "components/profile/UserInfo";
 import GameHistoryList from "components/profile/GameHistoryList";
 import AchievementList from "components/profile/AchievementList";

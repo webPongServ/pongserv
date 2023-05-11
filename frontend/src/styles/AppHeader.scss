@@ -20,6 +20,7 @@
     color: #ffffff;
     text-decoration: none;
     margin-right: 10px;
+    margin-left: 2%;
 
     img {
       width: 40px;
@@ -51,6 +52,10 @@
       width: 100px;
       border-radius: 5px;
     }
+  }
+
+  .disabled {
+    color: cornflowerblue;
   }
 }
 

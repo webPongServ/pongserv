@@ -3,10 +3,8 @@ import { useSelector, useDispatch } from "react-redux";
 import UserList from "components/common/chatting/UserList";
 import BanList from "components/common/chatting/BanList";
 import CustomIconButton from "components/common/utils/CustomIconButton";
-import { ChattingUserDetail } from "types/Detail";
-import ChattingService from "API/ChattingService";
+import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
 import { IRootState } from "components/common/store";
-import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -15,14 +13,14 @@ import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import CloseIcon from "@mui/icons-material/Close";
 
-type RoomUsersProps = {
+interface RoomUsersProps {
   myDetail: ChattingUserDetail;
   setRoomStatus: Function;
-};
+}
 
 const RoomUsers = (props: RoomUsersProps) => {
-  const currentChatting = useSelector(
-    (state: IRootState) => state.currentChatting
+  const currentChatting: ChattingRoomDetail | null = useSelector(
+    (state: IRootState) => state.currentChatting.chattingRoom
   );
   const [selected, setSelected] = useState<string>("users");
   const divRef = useRef<HTMLDivElement>(null);
@@ -34,24 +32,9 @@ const RoomUsers = (props: RoomUsersProps) => {
     }
   };
 
-  const getUsers = async () => {
-    const response = await ChattingService.getUsersList(
-      currentChatting.chattingRoom.id
-    );
-    dispatch({
-      type: CurrentChattingActionTypes.GET_USERLIST,
-      payload: response.data,
-    });
-    dispatch({
-      type: CurrentChattingActionTypes.GET_BANLIST,
-      payload: [],
-    });
-  };
-
   useEffect(() => {
     if (divRef.current) divRef.current.focus();
-    getUsers();
-  }, []);
+  }, [selected]);
 
   return (
     <Box id="modal" ref={divRef} onKeyDown={pressESC} tabIndex={0}>
@@ -88,17 +71,9 @@ const RoomUsers = (props: RoomUsersProps) => {
         </Box>
         <Box className="users-box overflow">
           {selected === "users" ? (
-            <UserList
-              users={currentChatting.userList}
-              bans={currentChatting.banList}
-              myDetail={props.myDetail}
-            />
+            <UserList myDetail={props.myDetail} />
           ) : (
-            <BanList
-              bans={currentChatting.banList}
-              users={currentChatting.userList}
-              myDetail={props.myDetail}
-            />
+            <BanList myDetail={props.myDetail} />
           )}
         </Box>
       </Box>
