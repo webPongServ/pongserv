@@ -2,7 +2,6 @@ import { IRootState } from "components/common/store";
 import { useSelector, useDispatch } from "react-redux";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChattingRoomDetail } from "types/Detail";
-import ChattingService from "API/ChattingService";
 import { ChattingRoomType, ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
@@ -28,45 +27,27 @@ const RoomCard = (props: RoomCardProps) => {
     if (props.room.type === ChattingRoomType.protected)
       props.setPwIndex(props.index);
     else {
-      const response = await ChattingService.postEntrance({
-        id: props.room.id,
-        pwd: "",
+      socket.emit("chatroomEntrance", { id: props.room.id, pwd: "" }, () => {
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
+          payload: {
+            id: props.room.id,
+            chatroomName: props.room.chatroomName,
+            ownerNickname: props.room.ownerNickname,
+            type: props.room.type,
+            currentCount: props.room.currentCount,
+            maxCount: props.room.maxCount,
+          },
+        });
+        dispatch({
+          type: CurrentChattingActionTypes.ADD_MYDETAIL,
+          payload: {
+            nickname: myInfo.nickname,
+            imgURL: myInfo.imgURL,
+            role: ChattingUserRoleType.normal,
+          },
+        });
       });
-
-      dispatch({
-        type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-        payload: {
-          id: props.room.id,
-          chatroomName: props.room.chatroomName,
-          ownerNickname: props.room.ownerNickname,
-          type: props.room.type,
-          currentCount: props.room.currentCount,
-          maxCount: props.room.maxCount,
-        },
-      });
-      dispatch({
-        type: CurrentChattingActionTypes.ADD_MYDETAIL,
-        payload: {
-          nickname: myInfo.nickname,
-          imgURL: myInfo.imgURL,
-          role: ChattingUserRoleType.normal,
-        },
-      });
-      // 방에 입장
-      // // 서버에 보낼 message or object
-      // socket.emit("enter_room", () => {
-      //   dispatch({
-      //     type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-      //     payload: {
-      //       id: props.room.id,
-      //       chatroomName: props.room.chatroomName,
-      //       ownerNickname: props.room.ownerNickname,
-      //       type: props.room.type,
-      //       currentCount: props.room.currentCount,
-      //       maxCount: props.room.maxCount,
-      //     },
-      //   });
-      // });
     }
   };
 
