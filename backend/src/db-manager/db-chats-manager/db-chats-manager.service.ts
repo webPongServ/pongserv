@@ -210,10 +210,10 @@ export class DbChatsManagerService {
 
   async getUserInfoInChatrm(user: TbUa01MEntity, room: TbCh01LEntity) {
 	const result = await this.ch02lRp.findOne({
-		relations: {
-			ua01mEntity: true,
-			ch01lEntity: true,
-		},
+		// relations: {
+		// 	ua01mEntity: true,
+		// 	ch01lEntity: true,
+		// },
 		where: {
 			ua01mEntity: {
 				id: user.id,
