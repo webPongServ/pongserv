@@ -3,7 +3,7 @@ import { Server, Socket } from 'socket.io';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatsService } from './chats.service';
-import { BadRequestException, UseGuards } from '@nestjs/common';
+import { BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
@@ -11,6 +11,8 @@ import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
 import { WsJwtGuard } from 'src/auth/guard/ws.jwt.guard';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
+import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
+import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -31,6 +33,28 @@ export class ChatsGateway
   @WebSocketServer()
   server: Server;
 
+  validateAccessToken(socket: Socket): string {
+    try {
+      const token = socket?.handshake?.headers?.authorization?.split(' ')[1];
+      const secret = this.config.get('JWT_SECRET');
+      const decoded = jwt.verify(token, secret);
+      const userId = decoded['userId'];
+      return userId;
+    } catch (e) {
+      throw new UnauthorizedException('Not validated Access Token');
+    }
+  }
+
+  @SubscribeMessage('chatroomCreation')
+  async createChatroom(
+    @ConnectedSocket() socket: Socket, 
+    @MessageBody() infoCrtn: ChatroomCreationDto,) {
+      const userId = this.validateAccessToken(socket);
+      const newChtrmId = await this.chatsService.createChatroom(userId, infoCrtn)
+      socket.join(newChtrmId);
+      return { chtrmId: newChtrmId };
+  }
+
   // @UseGuards(JwtAccessTokenGuard)
   @SubscribeMessage('chatroomEntrance')
   async enterChatroom(
@@ -39,24 +63,7 @@ export class ChatsGateway
     @ConnectedSocket() socket: Socket, 
     @MessageBody() infoEntr: ChatroomEntranceDto,
     ) {
-    // let userId;
-    const token = socket?.handshake?.headers?.authorization?.split(' ')[1];
-    console.log(`token: `);
-    console.log(token);
-	  const secret = this.config.get('JWT_SECRET');
-    const decoded = jwt.verify(token, secret);
-    console.log(`decoded: `);
-    console.log(decoded);
-    console.log(typeof(decoded));
-    console.log(decoded['userId']);
-    const userId = decoded['userId'];
-  
-    console.log(`userId: `);
-    console.log(userId);
-    // console.log(`infoEntr in chatroom-entrance: `);
-    // console.log(infoEntr);
-    // console.log(`payload: `);
-    // console.log(payload);
+    const userId: string = this.validateAccessToken(socket);
     const userListInChtrm = await this.chatsService.setUserToEnter(userId, infoEntr);
     if (userListInChtrm === null)
       throw new BadRequestException();
@@ -74,12 +81,9 @@ export class ChatsGateway
   async sendMessage(
     // @CurrentUser() userId: string, 
     @ConnectedSocket() socket: Socket, 
-    @MessageBody() infoMsg: ChatroomRequestMessageDto) {
-      const token = socket?.handshake?.headers?.authorization?.split(' ')[1];
-      const secret = this.config.get('JWT_SECRET');
-      const decoded = jwt.verify(token, secret);
-      let userId = decoded['userId'];
-      console.log('In chatroomMessage');
+    @MessageBody() infoMsg: ChatroomRequestMessageDto
+    ) {
+    const userId: string = this.validateAccessToken(socket);
     /*!SECTION
       1. user 정보를 가져온다.
       2. user가 chatroom에 있는지 확인한다.
@@ -114,31 +118,33 @@ export class ChatsGateway
     };
     socket.to(infoMsg.id).emit('chatroomMessage', toSendInChtrm);
     // this.server.emit('chatroomMessage', toSendInChtrm);
-    return ;
+    return true;
   }
 
   // chatroom-leaving
+  @SubscribeMessage('chatroomLeaving')
+  async leaveChatroom(
+    @ConnectedSocket() socket: Socket, 
+    @MessageBody() infoLeav: ChatroomLeavingDto,
+    ) {
+    const userId: string = this.validateAccessToken(socket);
+    console.log(infoLeav);
+    await this.chatsService.leaveChatroom(userId, infoLeav);
+    socket.leave(infoLeav.id);
+    console.log('잘 나가짐');
+    return "잘 나가짐";
+  }
 
   @SubscribeMessage('test')
-  testSocket(@CurrentUser() userId: string, 
-             @ConnectedSocket() socket: Socket, 
-             @MessageBody() infoEntr: ChatroomEntranceDto) {
-    
+  testSocket(
+    // @CurrentUser() userId: string, 
+    @ConnectedSocket() socket: Socket, 
+    @MessageBody() msgBody: any
+    ) {
     // console.log(`socket: `);
     // console.log(socket);
-    
     console.log(`socket.id: `);
     console.log(socket.id);
-
-    console.log(`infoEntr: `);
-    console.log(infoEntr);
-
-    // console.log(`socket.rooms: `);
-    // console.log(socket.rooms);
-    // socket.rooms.forEach((room) => {
-    //   console.log(room);
-    //   console.log(socket.rooms[room]);
-    // })
     return 'Hello world!';
   }
 }
