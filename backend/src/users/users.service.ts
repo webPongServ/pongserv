@@ -142,11 +142,14 @@ export class UsersService {
     const withPercent = startsWith + '%';
     return await this.dbmanagerUsersService.getUserList(withPercent);
   }
-  
-  async blockUser(nickName : string){
+
+  async blockUser(nickName: string) {
     console.log('blockUser', nickName);
-    const user = await this.dbmanagerUsersService.findUserIdByNickname(nickName);
-    if(user.length == 0){
+    const user = await this.dbmanagerUsersService.findUserIdByNickname(
+      nickName,
+    );
+    if (user.length == 0) {
       throw new BadRequestException('존재하지 않는 사용자입니다.');
     }
+  }
 }
