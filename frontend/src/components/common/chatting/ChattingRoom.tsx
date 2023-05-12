@@ -8,6 +8,7 @@ import MyMessage from "components/common/chatting/MyMessage";
 import OtherMessage from "components/common/chatting/OtherMessage";
 import InformMessage from "components/common/chatting/InformMessage";
 import { IRootState } from "components/common/store";
+import { ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 import { socket } from "socket";
@@ -139,19 +140,19 @@ const ChattingRoom = () => {
           </Box>
           <Box className="page-body chatting-box">
             <Box className="chatting-display overflow" ref={chattingRef}>
-              {chatting.map((value) => {
+              {chatting.map((value, index) => {
                 return (
                   <>
                     {value.user === null && (
-                      <InformMessage informChat={value} />
+                      <InformMessage informChat={value} index={index} />
                     )}
                     {value.user !== null &&
                       myDetail.nickname === value.user.nickname && (
-                        <MyMessage myChat={value} />
+                        <MyMessage myChat={value} index={index} />
                       )}
                     {value.user !== null &&
                       myDetail.nickname !== value.user.nickname && (
-                        <OtherMessage otherChat={value} />
+                        <OtherMessage otherChat={value} index={index} />
                       )}
                   </>
                 );
@@ -180,6 +181,7 @@ const ChattingRoom = () => {
             </Button>
             <Button
               className="small"
+              disabled={myDetail.role !== ChattingUserRoleType.owner}
               onClick={() => {
                 setRoomStatus("edit");
               }}
