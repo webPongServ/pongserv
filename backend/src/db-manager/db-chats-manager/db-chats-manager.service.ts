@@ -391,5 +391,23 @@ export class DbChatsManagerService {
   saveChtrmRstrInfo(rstrInfo: TbCh02DEntity) {
 	this.ch02dRp.save(rstrInfo);
   }
+
+  async isUserBannedInARoom(user: TbUa01MEntity, room: TbCh01LEntity) {
+	const bannedUserInfo = await this.ch02dRp.findOne({
+		where: {
+			ua01mEntity: {
+				id: user.id,
+			},
+			ch01lEntity: {
+				id: room.id,
+			},
+			chtRmRstrCd: '02',
+			vldTf: true,
+		}
+	});
+	if (bannedUserInfo === null)
+		return false;
+	return true;
+  }
   
 }

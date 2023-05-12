@@ -137,9 +137,8 @@ export class ChatsService {
 			2. 채팅방이 protected일 경우에 비밀번호 검증을 함
 			3. DM방일 경우에 유저가 해당 방의 user list에 속해있는지 검증을 함
 			4. 채팅방 인원이 꽉 찼는지 확인함
-			// TODO: user가 ban, kick 등의 제약이 걸려있는지 확인한다.
-			5. 조건이 맞을 경우에 chatrooms user list에 추가
-			6. 그 방의 유저 리스트 정보를 반환한다.
+			5. user가 ban(, kick) 등의 제약이 걸려있는지 확인한다.
+			6. 유저의 입장 정보를 저장하고 유저의 nickname을 반환한다.
 		*/
 		// 1
 		const targetRoom = await this.dbChatsManagerService.getLiveChtrmById(infoEntr.id);
@@ -165,24 +164,15 @@ export class ChatsService {
 			throw new ForbiddenException('chatroom user count is full!');
 		}
 		// 5
-		const userInTarget: TbCh02LEntity = 
-			await this.dbChatsManagerService.setUserToEnterRoom(user, targetRoom); //NOTE - save에서 ua01l에 대한 정보를 안 줄 수가 있음. 테스트를 해보고 안 주면 findOne으로 찾아서 다시 뽑아내게 만들어야 할 듯
+		if (await this.dbChatsManagerService.isUserBannedInARoom(user, targetRoom) === true) {
+			throw new ForbiddenException('You\'re banned in the chatroom!');
+		}
 		// 6
+		const userInTarget: TbCh02LEntity = 
+			await this.dbChatsManagerService.setUserToEnterRoom(user, targetRoom);
 		if (userInTarget === null)
 			throw new InternalServerErrorException('typeorm save error');
-		liveUserListAndCount[0].push(userInTarget);
-		++liveUserListAndCount[1];
-		let eachUserInfos: {
-			nickname: string,
-			chtRmAuth: string,
-		}[] = [];
-		for (const eachInChtrm of liveUserListAndCount[0]) {
-			eachUserInfos.push({
-				nickname: eachInChtrm.ua01mEntity.nickname,
-				chtRmAuth: eachInChtrm.chtRmAuth,
-			})
-		}
-		return [eachUserInfos, liveUserListAndCount[1]];
+		return user.nickname;
 	}
 
 	async editChatroomInfo(userId: string, infoEdit: ChatroomEditingDto) {
@@ -499,6 +489,6 @@ export class ChatsService {
 		// 4
 		userInChtrm.chtRmJoinTf = false;
 		this.dbChatsManagerService.saveChtrmUser(userInChtrm);
-		return ;
+		return user.nickname;
 	}
 }
