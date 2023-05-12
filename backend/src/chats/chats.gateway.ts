@@ -31,13 +31,16 @@ export class ChatsGateway {
   validateAccessToken(socket: Socket): string {
     try {
       const token = socket?.handshake?.headers?.authorization?.split(' ')[1];
+      if (!token)
+        throw new UnauthorizedException('No AccessToken');
       const secret = this.config.get('JWT_SECRET');
       const decoded = jwt.verify(token, secret);
       const userId = decoded['userId'];
       return userId;
     } catch (err) {
       console.log(err);
-      throw new UnauthorizedException('Not validated Access Token');
+      socket.emit('errorValidateAuth', 'Now validated Access Token');
+      return ;
     }
   }
 
@@ -47,6 +50,8 @@ export class ChatsGateway {
     @MessageBody() infoCrtn: ChatroomCreationDto
     ) {
     const userId = this.validateAccessToken(socket);
+    if (!userId)
+      return ;
     const newChtrmId = await this.chatsService.createChatroom(userId, infoCrtn)
     socket.join(newChtrmId);
     return { chtrmId: newChtrmId };
@@ -58,6 +63,8 @@ export class ChatsGateway {
     @MessageBody() infoEntr: ChatroomEntranceDto
     ) {
     const userId: string = this.validateAccessToken(socket);
+    if (!userId)
+      return ;
     let nickname: string = null;
     try {
       nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
@@ -80,6 +87,8 @@ export class ChatsGateway {
     @MessageBody() infoMsg: ChatroomRequestMessageDto
     ) {
     const userId: string = this.validateAccessToken(socket);
+    if (!userId)
+      return ;
     /*!SECTION
       1. user 정보를 가져온다.
       2. user가 chatroom에 있는지 확인한다.
@@ -123,6 +132,8 @@ export class ChatsGateway {
     @MessageBody() infoLeav: ChatroomLeavingDto,
     ) {
     const userId: string = this.validateAccessToken(socket);
+    if (!userId)
+      return ;
     console.log(infoLeav);
     const nickname = await this.chatsService.leaveChatroom(userId, infoLeav);
     socket.leave(infoLeav.id);
