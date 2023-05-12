@@ -1,14 +1,11 @@
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
-import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatsService } from './chats.service';
-import { BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
-import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
-import { WsJwtGuard } from 'src/auth/guard/ws.jwt.guard';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
@@ -20,9 +17,7 @@ import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
     origin: '*',
   },
 })
-export class ChatsGateway 
-  // implements OnGatewayConnection, OnGatewayDisconnect
-{
+export class ChatsGateway {
   constructor(
     private readonly chatsService: ChatsService,
 		private readonly dbChatsManagerService: DbChatsManagerService,
@@ -40,7 +35,8 @@ export class ChatsGateway
       const decoded = jwt.verify(token, secret);
       const userId = decoded['userId'];
       return userId;
-    } catch (e) {
+    } catch (err) {
+      console.log(err);
       throw new UnauthorizedException('Not validated Access Token');
     }
   }
@@ -48,38 +44,38 @@ export class ChatsGateway
   @SubscribeMessage('chatroomCreation')
   async createChatroom(
     @ConnectedSocket() socket: Socket, 
-    @MessageBody() infoCrtn: ChatroomCreationDto,) {
-      const userId = this.validateAccessToken(socket);
-      const newChtrmId = await this.chatsService.createChatroom(userId, infoCrtn)
-      socket.join(newChtrmId);
-      return { chtrmId: newChtrmId };
+    @MessageBody() infoCrtn: ChatroomCreationDto
+    ) {
+    const userId = this.validateAccessToken(socket);
+    const newChtrmId = await this.chatsService.createChatroom(userId, infoCrtn)
+    socket.join(newChtrmId);
+    return { chtrmId: newChtrmId };
   }
 
-  // @UseGuards(JwtAccessTokenGuard)
   @SubscribeMessage('chatroomEntrance')
   async enterChatroom(
-    // socket: Socket, payload: any, callback: (data: any) => void
-    // @CurrentUser() userId: string, 
     @ConnectedSocket() socket: Socket, 
-    @MessageBody() infoEntr: ChatroomEntranceDto,
+    @MessageBody() infoEntr: ChatroomEntranceDto
     ) {
     const userId: string = this.validateAccessToken(socket);
-    const userListInChtrm = await this.chatsService.setUserToEnter(userId, infoEntr);
-    if (userListInChtrm === null)
-      throw new BadRequestException();
-    
+    let nickname: string = null;
+    try {
+      nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
+      if (nickname === null)
+          throw new BadRequestException();
+    } catch (err) {
+      // TODO: err 받아서 errorChatroomEntrance event로 error message 보내기
+      socket.emit('errorChatroomFull', err.response.message);
+      // socket.emit('errorChatroomEntrance', err.response.message); // TODO: use this
+      return ;
+    }
     socket.join(infoEntr.id);
-    socket.to(infoEntr.id).emit('chatroomEntrance', 'Welcome', userId);
-    
-    // socket.emit('chatroom-entrance', 'hello');
-    return 'handsome';
+    socket.to(infoEntr.id).emit('chatroomWelcome', nickname);
+    return true;
   }
 
-  // chatroom-chatting
-  // @WsJwtGuard(JwtAccessTokenGuard)
   @SubscribeMessage('chatroomMessage')
   async sendMessage(
-    // @CurrentUser() userId: string, 
     @ConnectedSocket() socket: Socket, 
     @MessageBody() infoMsg: ChatroomRequestMessageDto
     ) {
@@ -121,7 +117,6 @@ export class ChatsGateway
     return true;
   }
 
-  // chatroom-leaving
   @SubscribeMessage('chatroomLeaving')
   async leaveChatroom(
     @ConnectedSocket() socket: Socket, 
@@ -129,10 +124,10 @@ export class ChatsGateway
     ) {
     const userId: string = this.validateAccessToken(socket);
     console.log(infoLeav);
-    await this.chatsService.leaveChatroom(userId, infoLeav);
+    const nickname = await this.chatsService.leaveChatroom(userId, infoLeav);
     socket.leave(infoLeav.id);
-    console.log('잘 나가짐');
-    return "잘 나가짐";
+    socket.to(infoLeav.id).emit('chatroomLeaving', nickname);
+    return true;
   }
 
   @SubscribeMessage('test')
