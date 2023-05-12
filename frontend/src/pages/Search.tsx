@@ -18,18 +18,18 @@ interface serverFriend {
 
 const Search = () => {
   const navigate = useNavigate();
-  const [value, setValue] = useState<string>("");
+  const [inputNickname, setInputNickname] = useState<string>("");
   const [searchedUsers, setSearchedUsers] = useState<UserDetail[]>([]);
 
   const handleValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target;
-      setValue(target.value);
+      setInputNickname(target.value);
     }
   };
 
   const getSearched = async () => {
-    const response = await UserService.getSearchedUser(value);
+    const response = await UserService.getSearchedUser(inputNickname);
 
     setSearchedUsers(
       response.data.map(
@@ -44,7 +44,7 @@ const Search = () => {
 
   useEffect(() => {
     getSearched();
-  }, [value]);
+  }, [inputNickname]);
 
   return (
     <Box id="Search" className="flex-container">
