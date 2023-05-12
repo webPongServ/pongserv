@@ -39,7 +39,7 @@ export class ChatsGateway {
       return userId;
     } catch (err) {
       console.log(err);
-      socket.emit('errorValidateAuth', 'Now validated Access Token');
+      socket.emit('errorValidateAuth', 'Not validated Access Token');
       return ;
     }
   }
@@ -65,20 +65,17 @@ export class ChatsGateway {
     const userId: string = this.validateAccessToken(socket);
     if (!userId)
       return ;
-    let nickname: string = null;
     try {
-      nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
-      if (nickname === null)
-          throw new BadRequestException();
+      const nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
+      socket.join(infoEntr.id);
+      socket.to(infoEntr.id).emit('chatroomWelcome', nickname);
+      return true;
     } catch (err) {
       // TODO: err 받아서 errorChatroomEntrance event로 error message 보내기
       socket.emit('errorChatroomFull', err.response.message);
       // socket.emit('errorChatroomEntrance', err.response.message); // TODO: use this
       return ;
     }
-    socket.join(infoEntr.id);
-    socket.to(infoEntr.id).emit('chatroomWelcome', nickname);
-    return true;
   }
 
   @SubscribeMessage('chatroomMessage')
@@ -89,6 +86,7 @@ export class ChatsGateway {
     const userId: string = this.validateAccessToken(socket);
     if (!userId)
       return ;
+    // TODO: to move in ChatsService
     /*!SECTION
       1. user 정보를 가져온다.
       2. user가 chatroom에 있는지 확인한다.
@@ -134,11 +132,15 @@ export class ChatsGateway {
     const userId: string = this.validateAccessToken(socket);
     if (!userId)
       return ;
-    console.log(infoLeav);
-    const nickname = await this.chatsService.leaveChatroom(userId, infoLeav);
-    socket.leave(infoLeav.id);
-    socket.to(infoLeav.id).emit('chatroomLeaving', nickname);
-    return true;
+    try {
+      const nickname = await this.chatsService.leaveChatroom(userId, infoLeav);
+      socket.leave(infoLeav.id);
+      socket.to(infoLeav.id).emit('chatroomLeaving', nickname);
+      return true;
+    } catch (err) {
+      console.log(err);
+      // socket.emit('errorChatroomLeaving', err.response.message); // TODO: use this
+    }
   }
 
   @SubscribeMessage('test')
