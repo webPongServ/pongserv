@@ -6,7 +6,6 @@ import RoomUsers from "components/common/chatting/RoomUsers";
 import RoomLeave from "components/common/chatting/RoomLeave";
 import MyMessage from "components/common/chatting/MyMessage";
 import OtherMessage from "components/common/chatting/OtherMessage";
-import { ChattingUserRoleType } from "constant";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
@@ -30,25 +29,7 @@ const ChattingRoom = () => {
   const chattingRef = useRef<HTMLDivElement>(null);
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
-  const [chatting, setChatting] = useState<ChatObject[]>([
-    {
-      user: {
-        nickname: "chanhyle",
-        imgURL: "../image.png",
-        role: ChattingUserRoleType.owner,
-      },
-      message:
-        "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
-    },
-    {
-      user: {
-        nickname: "mgo",
-        imgURL: "../image.png",
-        role: ChattingUserRoleType.admin,
-      },
-      message: "2",
-    },
-  ]);
+  const [chatting, setChatting] = useState<ChatObject[]>([]);
 
   const [chattingInput, setChattingInput] = useState<string>("");
 
@@ -57,23 +38,46 @@ const ChattingRoom = () => {
     setChattingInput(target.value);
   };
 
-  const handleAddChatting = (e: React.FormEvent) => {
+  const handleSubmitSend = (e: React.FormEvent) => {
     e.preventDefault();
-    socket.emit("chatroomMessage", {
-      id: currentChatting.id,
-      msg: chattingInput,
-    });
-    setChatting([
-      ...chatting,
+    socket.emit(
+      "chatroomMessage",
       {
-        user: myDetail,
-        message: chattingInput,
+        id: currentChatting.id,
+        msg: chattingInput,
       },
-    ]);
-    setChattingInput("");
+      () => {
+        setChatting([
+          ...chatting,
+          {
+            user: myDetail,
+            message: chattingInput,
+          },
+        ]);
+        setChattingInput("");
+      }
+    );
   };
 
-  const handleClickSend = () => {};
+  const handleClickSend = () => {
+    socket.emit(
+      "chatroomMessage",
+      {
+        id: currentChatting.id,
+        msg: chattingInput,
+      },
+      () => {
+        setChatting([
+          ...chatting,
+          {
+            user: myDetail,
+            message: chattingInput,
+          },
+        ]);
+        setChattingInput("");
+      }
+    );
+  };
 
   socket.on("chatroomMessage", (data) => {
     setChatting([
@@ -126,7 +130,7 @@ const ChattingRoom = () => {
               })}
             </Box>
             <Box className="chatting-input flex-container">
-              <form className="input" onSubmit={handleAddChatting}>
+              <form className="input" onSubmit={handleSubmitSend}>
                 <Input
                   value={chattingInput}
                   placeholder="채팅을 입력하세요."
