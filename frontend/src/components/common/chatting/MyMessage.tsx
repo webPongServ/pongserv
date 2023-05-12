@@ -12,11 +12,11 @@ const MyMessage = (props: MyMessageProps) => {
   return (
     <Box className="chatting">
       <Box className="my message">
+        <Box>나</Box>
         <Box className="balloon">{props.myChat.message}</Box>
       </Box>
       <Box className="profile flex-container">
         <img src={props.myChat.user!.imgURL} alt="chatting-profile" />
-        <Box>나</Box>
       </Box>
     </Box>
   );

@@ -17,9 +17,9 @@ const OtherMessage = (props: OtherMessageProps) => {
         to={`/profile/${props.otherChat.user!.nickname}`}
       >
         <img src={props.otherChat.user!.imgURL} alt="chatting-profile" />
-        <Box>{props.otherChat.user!.nickname}</Box>
       </Link>
       <Box className="other message">
+        <Box>{props.otherChat.user!.nickname}</Box>
         <Box className="balloon">{props.otherChat.message}</Box>
       </Box>
     </Box>
