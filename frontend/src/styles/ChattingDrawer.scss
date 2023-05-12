@@ -118,8 +118,6 @@ $ChattingDrawerWidth: 500px;
           .chatting {
             display: flex;
             margin-bottom: 5%;
-            // flex-direction: column;
-            // align-items: center;
 
             .profile {
               flex-direction: column;
@@ -163,6 +161,12 @@ $ChattingDrawerWidth: 500px;
             .my {
               justify-content: flex-end;
             }
+          }
+
+          .inform-message {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5%;
           }
         }
 
