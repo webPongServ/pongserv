@@ -94,15 +94,24 @@ const ChattingRoom = () => {
         message: data.msg,
       },
     ]);
-    setChattingInput("");
   });
 
-  socket.on("chatroomwelcome", (nickname) => {
+  socket.on("chatroomWelcome", (nickname) => {
     setChatting([
       ...chatting,
       {
         user: null,
         message: nickname + "님이 입장하셨습니다.",
+      },
+    ]);
+  });
+
+  socket.on("chatroomLeaving", (nickname) => {
+    setChatting([
+      ...chatting,
+      {
+        user: null,
+        message: nickname + "님이 퇴장하셨습니다.",
       },
     ]);
   });
@@ -153,6 +162,7 @@ const ChattingRoom = () => {
                 <Input
                   value={chattingInput}
                   placeholder="채팅을 입력하세요."
+                  slotProps={{ input: { maxLength: 1000 } }}
                   onChange={handleChattingInput}
                 ></Input>
               </form>
