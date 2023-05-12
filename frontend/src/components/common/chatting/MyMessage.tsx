@@ -6,11 +6,12 @@ import { Box } from "@mui/material";
 
 interface MyMessageProps {
   myChat: ChatObject;
+  index: number;
 }
 
 const MyMessage = (props: MyMessageProps) => {
   return (
-    <Box className="chatting">
+    <Box className="chatting" key={props.myChat.user!.nickname + props.index}>
       <Box className="my message">
         <Box>나</Box>
         <Box className="balloon">{props.myChat.message}</Box>

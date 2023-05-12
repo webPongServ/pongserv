@@ -7,11 +7,15 @@ import { Box } from "@mui/material";
 
 interface OtherMessageProps {
   otherChat: ChatObject;
+  index: number;
 }
 
 const OtherMessage = (props: OtherMessageProps) => {
   return (
-    <Box className="chatting">
+    <Box
+      className="chatting"
+      key={props.otherChat.user!.nickname + props.index}
+    >
       <Link
         className="profile flex-container"
         to={`/profile/${props.otherChat.user!.nickname}`}
