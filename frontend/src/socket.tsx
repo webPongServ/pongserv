@@ -9,3 +9,8 @@ export const socket = io(apiURL, {
     Authorization: `Bearer ${token}`,
   },
 });
+
+// error handling
+socket.on("errorChatroomFull", (data) => {
+  alert(data);
+});

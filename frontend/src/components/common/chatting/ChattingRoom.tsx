@@ -6,7 +6,9 @@ import RoomUsers from "components/common/chatting/RoomUsers";
 import RoomLeave from "components/common/chatting/RoomLeave";
 import MyMessage from "components/common/chatting/MyMessage";
 import OtherMessage from "components/common/chatting/OtherMessage";
+import InformMessage from "components/common/chatting/InformMessage";
 import { IRootState } from "components/common/store";
+import { ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 import { socket } from "socket";
@@ -15,7 +17,7 @@ import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
 
 export interface ChatObject {
-  user: ChattingUserDetail;
+  user: ChattingUserDetail | null;
   message: string;
 }
 
@@ -40,6 +42,7 @@ const ChattingRoom = () => {
 
   const handleSubmitSend = (e: React.FormEvent) => {
     e.preventDefault();
+    if (chattingInput === "") return;
     socket.emit(
       "chatroomMessage",
       {
@@ -60,6 +63,7 @@ const ChattingRoom = () => {
   };
 
   const handleClickSend = () => {
+    if (chattingInput === "") return;
     socket.emit(
       "chatroomMessage",
       {
@@ -91,7 +95,26 @@ const ChattingRoom = () => {
         message: data.msg,
       },
     ]);
-    setChattingInput("");
+  });
+
+  socket.on("chatroomWelcome", (nickname) => {
+    setChatting([
+      ...chatting,
+      {
+        user: null,
+        message: nickname + "님이 입장하셨습니다.",
+      },
+    ]);
+  });
+
+  socket.on("chatroomLeaving", (nickname) => {
+    setChatting([
+      ...chatting,
+      {
+        user: null,
+        message: nickname + "님이 퇴장하셨습니다.",
+      },
+    ]);
   });
 
   // const queryClient = useQueryClient();
@@ -106,7 +129,7 @@ const ChattingRoom = () => {
   useEffect(() => {
     if (chattingRef.current)
       chattingRef.current.scrollTop = chattingRef.current.scrollHeight;
-  }, [chatting]);
+  }, [chatting, roomStatus]);
 
   return (
     <Box id="page">
@@ -117,15 +140,21 @@ const ChattingRoom = () => {
           </Box>
           <Box className="page-body chatting-box">
             <Box className="chatting-display overflow" ref={chattingRef}>
-              {chatting.map((value) => {
+              {chatting.map((value, index) => {
                 return (
-                  <Box className="chatting">
-                    {myDetail.nickname === value.user.nickname ? (
-                      <MyMessage myChat={value} />
-                    ) : (
-                      <OtherMessage otherChat={value} />
+                  <>
+                    {value.user === null && (
+                      <InformMessage informChat={value} index={index} />
                     )}
-                  </Box>
+                    {value.user !== null &&
+                      myDetail.nickname === value.user.nickname && (
+                        <MyMessage myChat={value} index={index} />
+                      )}
+                    {value.user !== null &&
+                      myDetail.nickname !== value.user.nickname && (
+                        <OtherMessage otherChat={value} index={index} />
+                      )}
+                  </>
                 );
               })}
             </Box>
@@ -134,6 +163,7 @@ const ChattingRoom = () => {
                 <Input
                   value={chattingInput}
                   placeholder="채팅을 입력하세요."
+                  slotProps={{ input: { maxLength: 1000 } }}
                   onChange={handleChattingInput}
                 ></Input>
               </form>
@@ -151,6 +181,7 @@ const ChattingRoom = () => {
             </Button>
             <Button
               className="small"
+              disabled={myDetail.role !== ChattingUserRoleType.owner}
               onClick={() => {
                 setRoomStatus("edit");
               }}
