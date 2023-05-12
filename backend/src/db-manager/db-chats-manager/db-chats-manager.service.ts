@@ -106,6 +106,9 @@ export class DbChatsManagerService {
 			// TODO: Search TypeOrm find options In, Any, ArrayContainedBy
 			chtRmType: In(['01','02']),
 			chtRmTf: true,
+		},
+		order: {
+			lastDttm: "DESC",
 		}
 	});
 	return results;
@@ -156,8 +159,12 @@ export class DbChatsManagerService {
   async isUserListedInThisChatroom(user: TbUa01MEntity, room: TbCh01LEntity): Promise<boolean> {
 	const result = await this.ch02lRp.findOne({
 		where: {
-			ch01lEntity: room,
-			ua01mEntity: user,
+			ch01lEntity: {
+				id: room.id,
+			},
+			ua01mEntity: {
+				id: user.id,
+			},
 		}
 	})
 	if (result === null)
@@ -168,8 +175,12 @@ export class DbChatsManagerService {
   async setUserToEnterRoom(user: TbUa01MEntity, room: TbCh01LEntity) {
 	let userInChtrm = await this.ch02lRp.findOne({
 		where: {
-			ch01lEntity: room,
-			ua01mEntity: user,
+			ch01lEntity: {
+				id: room.id,
+			},
+			ua01mEntity: {
+				id: user.id,
+			},
 		}
 	});
 	if (userInChtrm === null) {
@@ -182,12 +193,15 @@ export class DbChatsManagerService {
 	}
 	const currCount = await this.ch02lRp.count({
 		where: {
-			ch01lEntity: room,
+			ch01lEntity: {
+				id: room.id,
+			},
 			chtRmJoinTf: true,
 		}
 	})
 	if (currCount === 0)
 		userInChtrm.chtRmAuth = '01';
+	userInChtrm.chtRmJoinTf = true;
 	userInChtrm.entryDttm = new Date();
 	userInChtrm.authChgDttm = new Date();
 	return (await this.ch02lRp.save(userInChtrm));
@@ -238,8 +252,12 @@ export class DbChatsManagerService {
 	// 1
 	let kickInfo = await this.ch02dRp.findOne({
 		where: {
-			ch01lEntity: room,
-			ua01mEntity: target,
+			ch01lEntity: {
+				id: room.id,
+			},
+			ua01mEntity: {
+				id: target.id,
+			},
 			chtRmRstrCd: '03', // KICK: 03
 		}
 	});
@@ -275,8 +293,12 @@ export class DbChatsManagerService {
 	// 1
 	let kickInfo = await this.ch02dRp.findOne({
 		where: {
-			ch01lEntity: room,
-			ua01mEntity: target,
+			ch01lEntity: {
+				id: room.id,
+			},
+			ua01mEntity: {
+				id: target.id,
+			},
 			chtRmRstrCd: '02', // BAN: 02
 		}
 	});
@@ -307,8 +329,12 @@ export class DbChatsManagerService {
   async setMuteUserInfo(target: TbUa01MEntity, room: TbCh01LEntity) {
 	let muteInfo = await this.ch02dRp.findOne({
 		where: {
-			ch01lEntity: room,
-			ua01mEntity: target,
+			ch01lEntity: {
+				id: room.id,
+			},
+			ua01mEntity: {
+				id: target.id,
+			},
 			chtRmRstrCd: '01', // MUTE: 01
 		}
 	})
@@ -336,7 +362,9 @@ export class DbChatsManagerService {
   async getBanListInARoom(room: TbCh01LEntity) {
 	const results = await this.ch02dRp.find({
 		where: {
-			ch01lEntity: room,
+			ch01lEntity: {
+				id: room.id,
+			},
 			chtRmRstrCd: '02',
 			vldTf: true,
 		}
@@ -347,8 +375,12 @@ export class DbChatsManagerService {
   async getBanInfoInAChtrm(user: TbUa01MEntity, room: TbCh01LEntity) {
 	const result = await this.ch02dRp.findOne({
 		where: {
-			ch01lEntity: room,
-			ua01mEntity: user,
+			ch01lEntity: {
+				id: room.id,
+			},
+			ua01mEntity: {
+				id: user.id,
+			},
 			chtRmRstrCd: '02',
 			vldTf: true,
 		}
