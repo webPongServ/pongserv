@@ -4,6 +4,7 @@
   row-gap: 1%;
 
   #input-box {
+    z-index: 1;
     width: 100%;
     height: 10%;
     column-gap: 1%;
@@ -14,6 +15,7 @@
   }
 
   #result-box {
+    z-index: 1;
     width: 50%;
     height: 60%;
   }

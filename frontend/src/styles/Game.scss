@@ -11,6 +11,7 @@ $paddle_height: 150px;
   row-gap: 5%;
 
   #game-box {
+    z-index: 1;
     width: 100%;
     overflow: auto;
     height: 80%;
@@ -80,6 +81,7 @@ $paddle_height: 150px;
   }
 
   #button-box {
+    z-index: 1;
     flex-direction: column;
     width: 100%;
     height: 10%;

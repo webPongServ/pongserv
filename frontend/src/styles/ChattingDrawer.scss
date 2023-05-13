@@ -1,6 +1,7 @@
 $ChattingDrawerWidth: 500px;
 
 #ChattingDrawer {
+  z-index: 0;
   width: $ChattingDrawerWidth;
   height: 100%;
   flex-shrink: 0;
