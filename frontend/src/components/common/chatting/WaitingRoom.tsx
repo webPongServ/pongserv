@@ -13,7 +13,7 @@ import "styles/global.scss";
 import { Box, Pagination } from "@mui/material";
 import { Button } from "@mui/joy";
 import SyncIcon from "@mui/icons-material/Sync";
-import LoadingCircle from "../../utils/LoadingCircle";
+import LoadingCircle from "components/utils/LoadingCircle";
 
 const WaitingRoom = () => {
   const dispatch = useDispatch();
