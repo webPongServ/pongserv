@@ -27,7 +27,7 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
   const [isError, setIsError] = useState<boolean>(true);
   const navigate = useNavigate();
 
-  const doneTyping = async () => {
+  const getNicknameDuplicate = async () => {
     const response = await UserService.getNicknameDup(newNickname);
     response.data.result === true ? setIsError(true) : setIsError(false);
   };
@@ -49,6 +49,7 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
 
     props.setModalStatus("closed");
     props.setIsNew(true);
+    setIsError(true);
     navigate(`/profile/${response.data.new}`);
   };
 
@@ -88,7 +89,7 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
                   defaultValue={myInfo.nickname}
                   maxLength={10}
                   handleFunction={handleNewNickname}
-                  handleDoneTyping={doneTyping}
+                  handleDoneTyping={getNicknameDuplicate}
                   isError={isError}
                 />
               </Box>
