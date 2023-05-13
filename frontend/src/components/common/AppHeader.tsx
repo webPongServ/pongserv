@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState, useRef } from "react";
 import { Route, Routes } from "react-router-dom";
+import qs from "query-string";
 import MainRoute from "components/common/MainRoute";
 import AppBar from "components/common/AppBar";
 import FriendDrawer from "components/common/FriendDrawer";
 import ChattingDrawer from "components/common/ChattingDrawer";
+import ErrorAlert from "components/utils/ErrorAlert";
 import { ChattingDrawerWidth } from "constant";
 import { useDispatch } from "react-redux";
 import instance from "API/api";
@@ -35,7 +37,9 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 
 export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
-
+  const paramsCode: string | undefined = qs.parse(window.location.search)
+    .error as string;
+  const divRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
   const loadMyData = async () => {
@@ -55,21 +59,33 @@ export default function AppHeader() {
     });
   };
 
-  // useEffect(() => {
-  loadMyData();
-  // }, []);
+  setTimeout(() => {
+    if (divRef.current) divRef.current.style.animationName = "slideup";
+  }, 5000);
+
+  useLayoutEffect(() => {
+    loadMyData();
+  }, []);
 
   return (
-    <Box id="AppHeader-container" className="flex-container">
-      <CssBaseline />
-      <AppBar open={open} setOpen={setOpen} />
-      <FriendDrawer />
-      <Main id="Main-box" open={open}>
-        <Routes>
-          <Route path="/*" element={<MainRoute />} />
-        </Routes>
-      </Main>
-      <ChattingDrawer open={open} setOpen={setOpen} />
-    </Box>
+    <>
+      {paramsCode === "invalid_user" ? (
+        <ErrorAlert
+          divRef={divRef}
+          errorMessage="찾으려는 사용자가 존재하지 않습니다!"
+        />
+      ) : null}
+      <Box id="AppHeader-container" className="flex-container">
+        <CssBaseline />
+        <AppBar open={open} setOpen={setOpen} />
+        <FriendDrawer />
+        <Main id="Main-box" open={open}>
+          <Routes>
+            <Route path="/*" element={<MainRoute />} />
+          </Routes>
+        </Main>
+        <ChattingDrawer open={open} setOpen={setOpen} />
+      </Box>
+    </>
   );
 }
