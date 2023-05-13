@@ -15,6 +15,8 @@ import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
 import { TbCh01LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-01-l.entity';
 import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
+import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
+import { ChatroomResponseMessageDto } from './dto/chatroom-response-message.dto';
 
 @Injectable()
 export class ChatsService {
@@ -201,11 +203,8 @@ export class ChatsService {
 	}
 
 	async getLiveUserListInARoom(userId: string, id: string) {
-		// NOTE: userID not used
 		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(id);
 		const userListAndCount = await this.dbChatsManagerService.getLiveUserListAndCountInARoom(chtrm);
-		// NOTE: 유저 몇명인지는 안 보내도 됨
-		// TODO: needed datas: nickname, img, authInRoom
 		let results: {
 			nickname: string,
 			imgPath: string,
@@ -220,6 +219,35 @@ export class ChatsService {
 			});
 		}
 		return results;
+	}
+
+	async processSendingMessage(userId: string, infoMsg: ChatroomRequestMessageDto) {
+		/*!SECTION
+		  1. user 정보를 가져온다.
+		  2. user가 chatroom에 있는지 확인한다.
+		  3. 그 유저를 block 한 사람이 있는지 확인한다. // TODO
+		  4. 같은 방에 있는 유저들에게 메시지를 보낸다.
+		*/
+		// 1
+		const user = await this.dbUsersManagerService.getUserByUserId(userId);
+		// 2
+		const chtrm = await this.dbChatsManagerService.getLiveChtrmById(infoMsg.id);
+		if (chtrm === null)
+		  throw new BadRequestException('Not existing chatroom');
+		const userInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(user, chtrm);
+		if (userInChtrm === null)
+		  throw new BadRequestException('Not existing in the chatroom');
+		// 3
+		
+		// 4
+		const toSendInChtrm: ChatroomResponseMessageDto = {
+		  chtrmId: chtrm.id,
+		  nickname: user.nickname,
+		  imgPath: user.imgPath,
+		  msg: infoMsg.msg,
+		  role: userInChtrm.chtRmAuth,
+		};
+		return toSendInChtrm;
 	}
 
 	async kickUser(userId: string, infoKick: ChatroomKickingDto) {
