@@ -32,8 +32,8 @@ const Login = () => {
     <>
       {paramsCode === "auth_failed" ? (
         <ErrorAlert
-          divRef={divRef}
           errorMessage="로그인 정보가 올바르지 않습니다!"
+          ref={divRef}
         />
       ) : null}
       <Box id="Login" className="flex-container">

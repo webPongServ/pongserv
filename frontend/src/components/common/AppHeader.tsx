@@ -71,8 +71,8 @@ export default function AppHeader() {
     <>
       {paramsCode === "invalid_user" ? (
         <ErrorAlert
-          divRef={divRef}
           errorMessage="찾으려는 사용자가 존재하지 않습니다!"
+          ref={divRef}
         />
       ) : null}
       <Box id="AppHeader-container" className="flex-container">
