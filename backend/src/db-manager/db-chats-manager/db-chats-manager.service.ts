@@ -436,5 +436,32 @@ export class DbChatsManagerService {
 		return false;
 	return true;
   }
-  
+
+  async isUserMutedInARoom(user: TbUa01MEntity, room: TbCh01LEntity) {
+	const mutedUserInfo = await this.ch02dRp.findOne({
+		where: {
+			ua01mEntity: {
+				id: user.id,
+			},
+			ch01lEntity: {
+				id: room.id,
+			},
+			chtRmRstrCd: '01',
+			vldTf: true,
+		}
+	});
+	if (mutedUserInfo === null) {
+		return false;
+	}
+	const crtnDttm = mutedUserInfo.rstrCrtnDttm;
+	const rstrTmMillis = mutedUserInfo.rstrTm * 1000;
+	const dueRstrDttmMillis = crtnDttm.getTime() + rstrTmMillis;
+	if (dueRstrDttmMillis < new Date().getTime()) {
+		mutedUserInfo.vldTf = false;
+		this.ch02dRp.save(mutedUserInfo);
+		return false;
+	}
+	return true;
+  }
+
 }

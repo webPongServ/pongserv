@@ -198,7 +198,7 @@ export class ChatsService {
 		targetRoom.chtRmPwd = infoEdit.pwd;
 		targetRoom.maxUserCnt = infoEdit.max;
 		await this.dbChatsManagerService.saveChatroom(targetRoom);
-		// 3 // TODO: to use websocket
+		// 3
 		return ;
 	}
 
@@ -225,8 +225,9 @@ export class ChatsService {
 		/*!SECTION
 		  1. user 정보를 가져온다.
 		  2. user가 chatroom에 있는지 확인한다.
-		  3. 그 유저를 block 한 사람이 있는지 확인한다. // TODO
-		  4. 같은 방에 있는 유저들에게 메시지를 보낸다.
+		  3. MUTE 된 상태인지 확인한다.
+		  4. 그 유저를 block 한 사람이 있는지 확인한다. // TODO
+		  5. 같은 방에 있는 유저들에게 메시지를 보낸다.
 		*/
 		// 1
 		const user = await this.dbUsersManagerService.getUserByUserId(userId);
@@ -238,7 +239,8 @@ export class ChatsService {
 		if (userInChtrm === null)
 		  throw new BadRequestException('Not existing in the chatroom');
 		// 3
-		
+		if (await this.dbChatsManagerService.isUserMutedInARoom(user, chtrm) === true)
+		  throw new BadRequestException('You\'re muted in this room!');
 		// 4
 		const toSendInChtrm: ChatroomResponseMessageDto = {
 		  chtrmId: chtrm.id,
@@ -465,8 +467,6 @@ export class ChatsService {
 				3-1. 권한이 owner일 경우에 참여자 중 한명의 권한을 owner로 설정한다.
 					3-1-1. admin이 있는 경우에 admin 중 한명으로 설정
 					3-1-2. admin이 없는 경우에 나머지 참여자 중 한명으로 설정
-					// TODO: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
-					// TODO: 기존 채팅방 인원이 나간 사실을 websocket을 이용해서 알려야 한다.
 				3-2. 나가는 유저의 권한을 normal로 바꾼다.
 			4. 채널 참여 여부를 false로 바꾸고 반환한다.
 		*/
