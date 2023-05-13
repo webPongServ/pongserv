@@ -22,7 +22,7 @@ body,
 }
 
 .overflow {
-  overflow: auto;
+  overflow: overlay;
 }
 
 .fixed-center {
@@ -242,7 +242,7 @@ body,
   animation-iteration-count: 1;
   animation-direction: alternate;
   animation-fill-mode: forwards;
-  z-index: 2;
+  z-index: 3;
 
   @keyframes slidedown {
     from {
