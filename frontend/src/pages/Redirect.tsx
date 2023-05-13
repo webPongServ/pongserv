@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import instance from "API/api";
 import qs from "query-string";
-import LoadingString from "components/common/utils/LoadingString";
+import LoadingString from "components/utils/LoadingString";
 import AuthService from "API/AuthService";
 import NewSessionModal from "components/login/NewSessionModal";
 import TwoFactorModal from "components/login/TwoFactorModal";

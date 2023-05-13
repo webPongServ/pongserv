@@ -1,12 +1,13 @@
 import { useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChattingRoomDetail } from "types/Detail";
 import ChattingService from "API/ChattingService";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
+import { socket } from "socket";
 
 import { Box } from "@mui/material";
 import { Button } from "@mui/joy";
@@ -30,12 +31,12 @@ const RoomLeave = (props: RoomLeaveProps) => {
   };
 
   const handleLeaveRoom = async () => {
-    const response = await ChattingService.postLeaving({
-      id: chattingRoom.id,
-    });
-    dispatch({
-      type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
-      payload: "",
+    socket.emit("chatroomLeaving", { id: chattingRoom.id }, (response: any) => {
+      console.log("chatroomLeaving : ", response);
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
+        payload: "",
+      });
     });
   };
 

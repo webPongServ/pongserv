@@ -3,14 +3,15 @@ import { useSelector, useDispatch } from "react-redux";
 import { ChattingRoomForm } from "types/Form";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { IRootState } from "components/common/store";
-import CustomInput from "components/common/utils/CustomInput";
-import CustomSlider from "components/common/utils/CustomSlider";
-import ChattingTypeSelect from "components/common/utils/ChattingTypeSelect";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomInput from "components/utils/CustomInput";
+import CustomSlider from "components/utils/CustomSlider";
+import ChattingTypeSelect from "components/utils/ChattingTypeSelect";
+import CustomIconButton from "components/utils/CustomIconButton";
 import ChattingService from "API/ChattingService";
-import { ChattingRoomType } from "constant";
+import { ChattingRoomType, ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
+import { socket } from "socket";
 
 import { Box } from "@mui/material";
 import { Button } from "@mui/joy";
@@ -74,24 +75,38 @@ const RoomCreator = () => {
       chattingRoomForm.password.length === 0
     )
       return alert("비밀번호를 입력해주세요!");
-    // API call
-    const response = await ChattingService.postNewChattingRoom({
-      name: chattingRoomForm.chatroomName,
-      type: chattingRoomForm.type,
-      max: chattingRoomForm.maxCount,
-      pwd: chattingRoomForm.password,
-    });
-    dispatch({
-      type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-      payload: {
-        id: response.data,
-        chatroomName: chattingRoomForm.chatroomName,
-        ownerNickname: myInfo.nickname,
+
+    socket.emit(
+      "chatroomCreation",
+      {
+        name: chattingRoomForm.chatroomName,
         type: chattingRoomForm.type,
-        maxCount: chattingRoomForm.maxCount,
-        currentCount: 1,
+        max: chattingRoomForm.maxCount,
+        pwd: chattingRoomForm.password,
       },
-    });
+      (response: { chtrmId: string }) => {
+        console.log("chatroomCreation : ", response);
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
+          payload: {
+            id: response.chtrmId,
+            chatroomName: chattingRoomForm.chatroomName,
+            ownerNickname: myInfo.nickname,
+            type: chattingRoomForm.type,
+            maxCount: chattingRoomForm.maxCount,
+            currentCount: 1,
+          },
+        });
+        dispatch({
+          type: CurrentChattingActionTypes.ADD_MYDETAIL,
+          payload: {
+            nickname: myInfo.nickname,
+            imgURL: myInfo.imgURL,
+            role: ChattingUserRoleType.owner,
+          },
+        });
+      }
+    );
   };
 
   const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {

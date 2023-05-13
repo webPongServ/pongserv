@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import "styles/Game.scss";
 
 import { Button } from "@mui/joy";

@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { IRootState } from "components/common/store";
 import GameBoard from "components/game/GameBoard";
-import SkeletonMyInfo from "components/common/utils/SkeletonMyInfo";
+import SkeletonMyInfo from "components/utils/SkeletonMyInfo";
 import "styles/global.scss";
 import "styles/Game.scss";
 

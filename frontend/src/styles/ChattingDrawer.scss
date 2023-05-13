@@ -65,6 +65,8 @@ $ChattingDrawerWidth: 500px;
       padding: 3%;
 
       .page-header {
+        display: flex;
+        align-items: center;
         height: 10%;
         font-size: 20px;
       }
@@ -111,7 +113,72 @@ $ChattingDrawerWidth: 500px;
 
         .chatting-display {
           height: 90%;
-          padding: 5%;
+          padding: 3%;
+
+          .chatting {
+            display: flex;
+            margin-bottom: 5%;
+            column-gap: 3%;
+
+            .profile {
+              width: 15%;
+              flex-direction: column;
+              color: black;
+              text-decoration: none;
+              justify-content: flex-start;
+              margin-top: 3%;
+
+              img {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                border-radius: 50%;
+                border: 0px solid #fff;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                  0 3px 6px rgba(0, 0, 0, 0.23);
+              }
+            }
+
+            .message {
+              display: flex;
+              align-items: center;
+              width: 85%;
+              word-break: break-all;
+
+              .balloon {
+                position: relative;
+                display: inline-block;
+                // width: 100%;
+                padding: 10px;
+                border-radius: 10px;
+                background-color: #eee;
+                color: #333;
+                font-size: 14px;
+              }
+            }
+
+            .other {
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: flex-start;
+              // width: 100%;
+            }
+
+            .my {
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-end;
+              align-items: flex-end;
+            }
+          }
+
+          .inform-message {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5%;
+          }
         }
 
         .chatting-input {

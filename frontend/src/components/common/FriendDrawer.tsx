@@ -3,10 +3,10 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { IRootState } from "components/common/store";
 import { UserDetail } from "types/Detail";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
-import CustomIconButton from "components/common/utils/CustomIconButton";
-import CustomProfileButton from "components/common/utils/CustomProfileButton";
-import LoadingCircle from "components/common/utils/LoadingCircle";
+import EmptyListMessage from "components/utils/EmptyListMessage";
+import CustomIconButton from "components/utils/CustomIconButton";
+import CustomProfileButton from "components/utils/CustomProfileButton";
+import LoadingCircle from "components/utils/LoadingCircle";
 import UserService from "API/UserService";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
@@ -98,7 +98,7 @@ const FriendDrawer = () => {
       <Box id="body" className="overflow">
         {friends === null && <LoadingCircle />}
         {friends !== null && friends.length === 0 && (
-          <EmptyListMessage message="친구인 사용자가 없습니다!" />
+          <EmptyListMessage message="친구를 추가해 보세요!" />
         )}
         {friends !== null && friends.length !== 0 && (
           <List>

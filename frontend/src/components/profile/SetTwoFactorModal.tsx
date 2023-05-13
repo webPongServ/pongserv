@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import AuthService from "API/AuthService";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";

@@ -3,7 +3,7 @@ import GameCard from "components/game/GameCard";
 import NormalGameModal from "components/game/NormalGameModal";
 import LadderGameModal from "components/game/LadderGameModal";
 import CreateGameModal from "components/game/CreateGameModal";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import EmptyListMessage from "components/utils/EmptyListMessage";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
 import "styles/global.scss";

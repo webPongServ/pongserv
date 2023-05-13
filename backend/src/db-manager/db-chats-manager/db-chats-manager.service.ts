@@ -107,6 +107,9 @@ export class DbChatsManagerService {
 			// TODO: Search TypeOrm find options In, Any, ArrayContainedBy
 			chtRmType: In(['01','02']),
 			chtRmTf: true,
+		},
+		order: {
+			lastDttm: "DESC",
 		}
 	});
 	return results;
@@ -167,7 +170,7 @@ export class DbChatsManagerService {
 			},
 			ua01mEntity: {
 				id: user.id,
-			}
+			},
 		}
 	})
 	if (result === null)
@@ -176,8 +179,17 @@ export class DbChatsManagerService {
   }
 
   async setUserToEnterRoom(user: TbUa01MEntity, room: TbCh01LEntity) {
-	let userInChtrm: TbCh02LEntity = null;
-	if (await this.isUserListedInThisChatroom(user, room) === false) {
+	let userInChtrm = await this.ch02lRp.findOne({
+		where: {
+			ch01lEntity: {
+				id: room.id,
+			},
+			ua01mEntity: {
+				id: user.id,
+			},
+		}
+	});
+	if (userInChtrm === null) {
 		userInChtrm = this.ch02lRp.create({
 			ch01lEntity: room,
 			ua01mEntity: user,
@@ -187,12 +199,15 @@ export class DbChatsManagerService {
 	}
 	const currCount = await this.ch02lRp.count({
 		where: {
-			ch01lEntity: room,
+			ch01lEntity: {
+				id: room.id,
+			},
 			chtRmJoinTf: true,
 		}
 	})
 	if (currCount === 0)
 		userInChtrm.chtRmAuth = '01';
+	userInChtrm.chtRmJoinTf = true;
 	userInChtrm.entryDttm = new Date();
 	userInChtrm.authChgDttm = new Date();
 	return (await this.ch02lRp.save(userInChtrm));
@@ -219,10 +234,10 @@ export class DbChatsManagerService {
 
   async getUserInfoInChatrm(user: TbUa01MEntity, room: TbCh01LEntity) {
 	const result = await this.ch02lRp.findOne({
-		relations: {
-			ua01mEntity: true,
-			ch01lEntity: true,
-		},
+		// relations: {
+		// 	ua01mEntity: true,
+		// 	ch01lEntity: true,
+		// },
 		where: {
 			ua01mEntity: {
 				id: user.id,
@@ -402,6 +417,24 @@ export class DbChatsManagerService {
 
   saveChtrmRstrInfo(rstrInfo: TbCh02DEntity) {
 	this.ch02dRp.save(rstrInfo);
+  }
+
+  async isUserBannedInARoom(user: TbUa01MEntity, room: TbCh01LEntity) {
+	const bannedUserInfo = await this.ch02dRp.findOne({
+		where: {
+			ua01mEntity: {
+				id: user.id,
+			},
+			ch01lEntity: {
+				id: room.id,
+			},
+			chtRmRstrCd: '02',
+			vldTf: true,
+		}
+	});
+	if (bannedUserInfo === null)
+		return false;
+	return true;
   }
   
 }

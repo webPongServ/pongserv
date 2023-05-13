@@ -7,6 +7,7 @@ import { ProfileDetail, UserDetail } from "types/Detail";
 import { ProfileStatusType } from "constant";
 
 import { Button } from "@mui/joy";
+import { Tooltip, Typography } from "@mui/material";
 
 interface OthersButtonsProps {
   profileDetail: ProfileDetail;
@@ -67,8 +68,6 @@ const OthersButtons = (props: OthersButtonsProps) => {
     });
   };
 
-  const handleBlockButton = () => {};
-
   return (
     <>
       <Button variant="solid" onClick={handleDMButton}>
@@ -83,10 +82,13 @@ const OthersButtons = (props: OthersButtonsProps) => {
           친구 추가
         </Button>
       )}
-
-      <Button variant="outlined" onClick={handleBlockButton}>
-        차단
-      </Button>
+      <Tooltip
+        title={<Typography>서비스 준비 중입니다.</Typography>}
+        placement="bottom-start"
+        followCursor
+      >
+        <Button variant="outlined">차단</Button>
+      </Tooltip>
     </>
   );
 };
