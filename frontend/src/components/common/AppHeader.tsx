@@ -5,7 +5,7 @@ import MainRoute from "components/common/MainRoute";
 import AppBar from "components/common/AppBar";
 import FriendDrawer from "components/common/FriendDrawer";
 import ChattingDrawer from "components/common/ChattingDrawer";
-import ErrorAlert from "components/utils/ErrorAlert";
+import ErrorNotification from "components/utils/ErrorNotification";
 import { ChattingDrawerWidth } from "constant";
 import { useDispatch } from "react-redux";
 import instance from "API/api";
@@ -70,7 +70,7 @@ export default function AppHeader() {
   return (
     <>
       {paramsCode === "invalid_user" ? (
-        <ErrorAlert
+        <ErrorNotification
           errorMessage="찾으려는 사용자가 존재하지 않습니다!"
           ref={divRef}
         />

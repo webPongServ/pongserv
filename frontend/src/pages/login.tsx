@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import ErrorAlert from "components/utils/ErrorAlert";
+import ErrorNotification from "components/utils/ErrorNotification";
 import instance from "API/api";
 import UserService from "API/UserService";
 // import { useNavigate } from "react-router-dom";
@@ -31,7 +31,7 @@ const Login = () => {
   return (
     <>
       {paramsCode === "auth_failed" ? (
-        <ErrorAlert
+        <ErrorNotification
           errorMessage="로그인 정보가 올바르지 않습니다!"
           ref={divRef}
         />

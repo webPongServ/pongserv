@@ -8,11 +8,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
 
-interface ErrorAlertProps {
+interface ErrorNotificationProps {
   errorMessage: string;
 }
 
-const ErrorAlert = (props: ErrorAlertProps, ref: any) => {
+const ErrorNotification = (props: ErrorNotificationProps, ref: any) => {
   return (
     <Box id="alert" ref={ref}>
       <Box className="container">
@@ -37,4 +37,4 @@ const ErrorAlert = (props: ErrorAlertProps, ref: any) => {
   );
 };
 
-export default forwardRef(ErrorAlert);
+export default forwardRef(ErrorNotification);
