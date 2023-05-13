@@ -1,4 +1,12 @@
-import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+import {
+  ConnectedSocket,
+  MessageBody,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatsService } from './chats.service';
@@ -20,10 +28,10 @@ import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 export class ChatsGateway {
   constructor(
     private readonly chatsService: ChatsService,
-		private readonly dbChatsManagerService: DbChatsManagerService,
-		private readonly dbUsersManagerService: DbUsersManagerService,
-    private readonly config: ConfigService
-    ) {}
+    private readonly dbChatsManagerService: DbChatsManagerService,
+    private readonly dbUsersManagerService: DbUsersManagerService,
+    private readonly config: ConfigService,
+  ) {}
 
   @WebSocketServer()
   server: Server;
@@ -31,8 +39,7 @@ export class ChatsGateway {
   validateAccessToken(socket: Socket): string {
     try {
       const token = socket?.handshake?.headers?.authorization?.split(' ')[1];
-      if (!token)
-        throw new UnauthorizedException('No AccessToken');
+      if (!token) throw new UnauthorizedException('No AccessToken');
       const secret = this.config.get('JWT_SECRET');
       const decoded = jwt.verify(token, secret);
       const userId = decoded['userId'];
@@ -40,31 +47,29 @@ export class ChatsGateway {
     } catch (err) {
       console.log(err);
       socket.emit('errorValidateAuth', 'Not validated Access Token');
-      return ;
+      return;
     }
   }
 
   @SubscribeMessage('chatroomCreation')
   async createChatroom(
-    @ConnectedSocket() socket: Socket, 
-    @MessageBody() infoCrtn: ChatroomCreationDto
-    ) {
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoCrtn: ChatroomCreationDto,
+  ) {
     const userId = this.validateAccessToken(socket);
-    if (!userId)
-      return ;
-    const newChtrmId = await this.chatsService.createChatroom(userId, infoCrtn)
+    if (!userId) return;
+    const newChtrmId = await this.chatsService.createChatroom(userId, infoCrtn);
     socket.join(newChtrmId);
     return { chtrmId: newChtrmId };
   }
 
   @SubscribeMessage('chatroomEntrance')
   async enterChatroom(
-    @ConnectedSocket() socket: Socket, 
-    @MessageBody() infoEntr: ChatroomEntranceDto
-    ) {
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoEntr: ChatroomEntranceDto,
+  ) {
     const userId: string = this.validateAccessToken(socket);
-    if (!userId)
-      return ;
+    if (!userId) return;
     try {
       const nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
       socket.join(infoEntr.id);
@@ -72,20 +77,22 @@ export class ChatsGateway {
       return true;
     } catch (err) {
       socket.emit('errorChatroomEntrance', err.response.message);
-      return ;
+      return;
     }
   }
 
   @SubscribeMessage('chatroomMessage')
   async sendMessage(
-    @ConnectedSocket() socket: Socket, 
-    @MessageBody() infoMsg: ChatroomRequestMessageDto
-    ) {
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoMsg: ChatroomRequestMessageDto,
+  ) {
     const userId: string = this.validateAccessToken(socket);
-    if (!userId)
-      return ;
+    if (!userId) return;
     try {
-      const toSendInChtrm = await this.chatsService.processSendingMessage(userId, infoMsg);
+      const toSendInChtrm = await this.chatsService.processSendingMessage(
+        userId,
+        infoMsg,
+      );
       socket.to(infoMsg.id).emit('chatroomMessage', toSendInChtrm);
       return true;
     } catch (err) {
@@ -96,12 +103,11 @@ export class ChatsGateway {
 
   @SubscribeMessage('chatroomLeaving')
   async leaveChatroom(
-    @ConnectedSocket() socket: Socket, 
+    @ConnectedSocket() socket: Socket,
     @MessageBody() infoLeav: ChatroomLeavingDto,
-    ) {
+  ) {
     const userId: string = this.validateAccessToken(socket);
-    if (!userId)
-      return ;
+    if (!userId) return;
     try {
       const nickname = await this.chatsService.leaveChatroom(userId, infoLeav);
       socket.leave(infoLeav.id);
@@ -115,10 +121,7 @@ export class ChatsGateway {
   }
 
   @SubscribeMessage('test')
-  testSocket(
-    @ConnectedSocket() socket: Socket, 
-    @MessageBody() msgBody: any
-    ) {
+  testSocket(@ConnectedSocket() socket: Socket, @MessageBody() msgBody: any) {
     // console.log(`socket: `);
     // console.log(socket);
     console.log(`socket.id: `);
