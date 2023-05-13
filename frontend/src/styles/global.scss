@@ -232,6 +232,50 @@ body,
   }
 }
 
+#alert {
+  position: fixed;
+  width: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+  animation-duration: 0.5s;
+  animation-name: slidedown;
+  animation-iteration-count: 1;
+  animation-direction: alternate;
+  animation-fill-mode: forwards;
+  z-index: 2;
+
+  @keyframes slidedown {
+    from {
+      margin-top: -10%;
+    }
+
+    to {
+      margin-top: 0%;
+    }
+  }
+
+  @keyframes slideup {
+    from {
+      margin-top: 0%;
+    }
+
+    to {
+      margin-top: -10%;
+    }
+  }
+
+  .container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    margin: 0 auto;
+
+    .warning {
+      margin: 0 1%;
+    }
+  }
+}
+
 .big-modal {
   width: 700px;
   height: 700px;
