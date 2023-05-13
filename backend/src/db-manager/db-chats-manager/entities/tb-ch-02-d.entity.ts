@@ -32,7 +32,7 @@ export class TbCh02DEntity {
   @JoinColumn({ name: 'USER_ID' })
   ua01mEntity: TbUa01MEntity;
 
-  // CHT_RM_RSTR_CD
+  // CHT_RM_RSTR_CD   // '01': Mute, '02': Ban, ('03': Kick)
   @Column({ name: 'CHT_RM_RSTR_CD', type: 'varchar', length: 2 })
   chtRmRstrCd: string;
 
