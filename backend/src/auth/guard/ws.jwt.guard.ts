@@ -1,27 +1,35 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { AuthGuard } from '@nestjs/passport';
-import { WsException } from '@nestjs/websockets';
-import * as jwt from 'jsonwebtoken';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Observable } from 'rxjs';
+import { Socket } from 'socket.io';
 
 @Injectable()
-export class WsJwtGuard extends AuthGuard('jwt-access') {
-  constructor(
-    private readonly config: ConfigService
-	) {
-		super();
-	}
-  canActivate(context: ExecutionContext) {
-    const client = context.switchToWs().getClient();
-    const token = client.handshake?.headers?.authorization?.split(' ')[1];
+export class WsJwtGuard implements CanActivate {
+  constructor(private jwtService: JwtService) {}
+
+  canActivate(
+    context: ExecutionContext,
+  ): boolean | Promise<boolean> | Observable<boolean> {
+    const client: Socket = context.switchToWs().getClient();
+    let token = client.handshake.query.token;
+
+    // token이 string 배열일 경우, 첫 번째 토큰을 사용
+    if (Array.isArray(token)) {
+      token = token[0];
+    }
 
     try {
-	  console.log()
-	  const secret = this.config.get('JWT_SECRET');
-      const decoded = jwt.verify(token, secret);
-      (context.switchToWs().getData() as any).user = decoded;
-    } catch (err) {
-      throw new WsException('Invalid credentials');
+      const payload = this.jwtService.verify(token);
+
+      // payload에 있는 정보를 client 객체에 할당
+      client.data = payload;
+    } catch (e) {
+      throw new UnauthorizedException({ message: 'Invalid token' });
     }
 
     return true;
