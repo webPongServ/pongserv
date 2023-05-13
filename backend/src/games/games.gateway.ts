@@ -1,11 +1,13 @@
 import { Logger } from '@nestjs/common';
 import {
+  ConnectedSocket,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
 } from '@nestjs/websockets';
+import { Socket } from 'socket.io';
 
 @WebSocketGateway({
   cors: {
@@ -21,18 +23,14 @@ export class GamesGateway
   constructor() {
     this.logger.log('GameGateway constructor');
   }
-  handleDisconnect(client: any) {
-    throw new Error('Method not implemented.');
+
+  handleConnection(@ConnectedSocket() socket: Socket) {
+    this.logger.log(`GameGateway handleConnection: ${socket.id}`);
+  }
+  handleDisconnect(@ConnectedSocket() socket: Socket) {
+    this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
   afterInit() {
     this.logger.log('GameGateway init');
-  }
-
-  handleConnection() {
-    this.logger.log('GameGateway connection');
-  }
-
-  handoleDisconnect() {
-    this.logger.log('GameGateway disconnect');
   }
 }
