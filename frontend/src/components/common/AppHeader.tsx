@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState, useRef } from "react";
 import { Route, Routes } from "react-router-dom";
+import io from "socket.io-client";
 import qs from "query-string";
 import MainRoute from "components/common/MainRoute";
 import AppBar from "components/common/AppBar";
@@ -8,9 +9,11 @@ import ChattingDrawer from "components/common/ChattingDrawer";
 import ErrorNotification from "components/utils/ErrorNotification";
 import { ChattingDrawerWidth } from "constant";
 import { useDispatch } from "react-redux";
+import { apiURL } from "API/api";
 import instance from "API/api";
 import UserService from "API/UserService";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
+import { SocketsActionTypes } from "types/redux/Sockets";
 import "styles/global.scss";
 
 import { Box, CssBaseline } from "@mui/material";
@@ -41,6 +44,28 @@ export default function AppHeader() {
     .error as string;
   const divRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
+
+  const token = localStorage.getItem("accessToken");
+
+  const chattingSocket = io(apiURL, {
+    extraHeaders: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  dispatch({
+    type: SocketsActionTypes.CHATTINGSOCKET_UPDATE,
+    payload: chattingSocket,
+  });
+
+  console.group("chatting socket : ", chattingSocket);
+
+  const alertMessage = (message: string) => {
+    alert(message);
+  };
+
+  // error handling
+  chattingSocket.on("errorChatroomFull", alertMessage);
 
   const loadMyData = async () => {
     const token = localStorage.getItem("accessToken");

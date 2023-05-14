@@ -11,7 +11,6 @@ import { IRootState } from "components/common/store";
 import { ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
-import { socket } from "socket";
 
 import { Box } from "@mui/material";
 import { Input, Button } from "@mui/joy";
@@ -28,6 +27,9 @@ const ChattingRoom = () => {
   const myDetail: ChattingUserDetail = useSelector(
     (state: IRootState) => state.currentChatting.myDetail!
   );
+  const chattingSocket: any = useSelector(
+    (state: IRootState) => state.sockets.chattingSocket!
+  );
   const chattingRef = useRef<HTMLDivElement>(null);
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
@@ -43,7 +45,7 @@ const ChattingRoom = () => {
   const handleSubmitSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (chattingInput === "") return;
-    socket.emit(
+    chattingSocket.emit(
       "chatroomMessage",
       {
         id: currentChatting.id,
@@ -64,7 +66,7 @@ const ChattingRoom = () => {
 
   const handleClickSend = () => {
     if (chattingInput === "") return;
-    socket.emit(
+    chattingSocket.emit(
       "chatroomMessage",
       {
         id: currentChatting.id,
@@ -83,21 +85,29 @@ const ChattingRoom = () => {
     );
   };
 
-  socket.on("chatroomMessage", (data) => {
-    setChatting([
-      ...chatting,
-      {
-        user: {
-          nickname: data.nickname,
-          imgURL: data.imgPath,
-          role: data.role,
+  chattingSocket.on(
+    "chatroomMessage",
+    (data: {
+      nickname: string;
+      imgPath: string;
+      role: string;
+      msg: string;
+    }) => {
+      setChatting([
+        ...chatting,
+        {
+          user: {
+            nickname: data.nickname,
+            imgURL: data.imgPath,
+            role: data.role,
+          },
+          message: data.msg,
         },
-        message: data.msg,
-      },
-    ]);
-  });
+      ]);
+    }
+  );
 
-  socket.on("chatroomWelcome", (nickname) => {
+  chattingSocket.on("chatroomWelcome", (nickname: string) => {
     setChatting([
       ...chatting,
       {
@@ -107,7 +117,7 @@ const ChattingRoom = () => {
     ]);
   });
 
-  socket.on("chatroomLeaving", (nickname) => {
+  chattingSocket.on("chatroomLeaving", (nickname: string) => {
     setChatting([
       ...chatting,
       {

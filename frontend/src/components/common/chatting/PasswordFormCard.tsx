@@ -4,10 +4,8 @@ import { IRootState } from "components/common/store";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChattingRoomDetail } from "types/Detail";
 import { ChattingUserRoleType } from "constant";
-import ChattingService from "API/ChattingService";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
-import { socket } from "socket";
 
 import Card from "@mui/joy/Card";
 import Box from "@mui/joy/Box";
@@ -23,6 +21,9 @@ interface PasswordFormCardProps {
 
 const PasswordFormCard = (props: PasswordFormCardProps) => {
   const myInfo = useSelector((state: IRootState) => state.myInfo);
+  const chattingSocket: any = useSelector(
+    (state: IRootState) => state.sockets.chattingSocket!
+  );
   const [password, setPassword] = useState<string>("");
   const dispatch = useDispatch();
 
@@ -36,7 +37,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
   const handleClickEnter = async () => {
     if (password.length === 0) return alert("비밀번호를 입력해주세요!");
 
-    socket.emit(
+    chattingSocket.emit(
       "chatroomEntrance",
       { id: props.room.id, pwd: password },
       (response: any) => {
@@ -68,7 +69,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
     e.preventDefault();
     if (password.length === 0) return alert("비밀번호를 입력해주세요!");
 
-    socket.emit(
+    chattingSocket.emit(
       "chatroomEntrance",
       { id: props.room.id, pwd: password },
       (response: any) => {

@@ -4,10 +4,8 @@ import { IRootState } from "components/common/store";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { ChattingRoomDetail } from "types/Detail";
-import ChattingService from "API/ChattingService";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
-import { socket } from "socket";
 
 import { Box } from "@mui/material";
 import { Button } from "@mui/joy";
@@ -21,6 +19,9 @@ const RoomLeave = (props: RoomLeaveProps) => {
   const chattingRoom: ChattingRoomDetail = useSelector(
     (state: IRootState) => state.currentChatting.chattingRoom!
   );
+  const chattingSocket: any = useSelector(
+    (state: IRootState) => state.sockets.chattingSocket!
+  );
   const divRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
@@ -31,13 +32,17 @@ const RoomLeave = (props: RoomLeaveProps) => {
   };
 
   const handleLeaveRoom = async () => {
-    socket.emit("chatroomLeaving", { id: chattingRoom.id }, (response: any) => {
-      console.log("chatroomLeaving : ", response);
-      dispatch({
-        type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
-        payload: "",
-      });
-    });
+    chattingSocket.emit(
+      "chatroomLeaving",
+      { id: chattingRoom.id },
+      (response: any) => {
+        console.log("chatroomLeaving : ", response);
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
+          payload: "",
+        });
+      }
+    );
   };
 
   useEffect(() => {
