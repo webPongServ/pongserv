@@ -45,7 +45,9 @@ const getBallRel = (ball_abs: DOMRect, board_abs: DOMRect): RelativeCoord => ({
 });
 
 const GameBoard = (props: GameBoardProps) => {
-  const gameSocket = useSelector((state: IRootState) => state.gameSocket);
+  const gameSocket = useSelector(
+    (state: IRootState) => state.sockets.gameSocket
+  );
   const [status, setStatus] = useState<string>("ready");
   const [score1, setScore1] = useState<number>(0);
   const [score2, setScore2] = useState<number>(0);

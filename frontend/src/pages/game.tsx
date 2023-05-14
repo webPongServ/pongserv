@@ -1,10 +1,14 @@
 import { useState } from "react";
+import io from "socket.io-client";
+import { apiURL } from "API/api";
 import GameCard from "components/game/GameCard";
 import NormalGameModal from "components/game/NormalGameModal";
 import LadderGameModal from "components/game/LadderGameModal";
 import CreateGameModal from "components/game/CreateGameModal";
 import EmptyListMessage from "components/utils/EmptyListMessage";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { SocketsActionTypes } from "types/redux/Sockets";
+
 import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/Game.scss";
@@ -13,12 +17,27 @@ import { Box, Pagination } from "@mui/material";
 import { Button } from "@mui/joy";
 
 const Game = () => {
-  const [roomStatus, setRoomStatus] = useState<string>("game");
-  const [selectedID, setSelectedID] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
   const gameRooms = useSelector(
     (state: IRootState) => state.gameRooms.gameRooms
   );
+  const [roomStatus, setRoomStatus] = useState<string>("game");
+  const [selectedID, setSelectedID] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const dispatch = useDispatch();
+
+  const token = localStorage.getItem("accessToken");
+  const gameSocket = io(apiURL, {
+    extraHeaders: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  dispatch({
+    type: SocketsActionTypes.GAMESOCKET_UPDATE,
+    payload: gameSocket,
+  });
+
+  console.log("game socket : ", gameSocket);
 
   return (
     <Box id="GameWaiting" className="flex-container">
