@@ -169,7 +169,7 @@ const GameBoard = (props: GameBoardProps) => {
   }
 
   useLayoutEffect(() => {
-    if (!gameSocket) window.location.href = "/game?error=invalid_user";
+    if (!gameSocket) window.location.href = "/game?error=wrong_game_access";
   }, []);
 
   useEffect(() => {

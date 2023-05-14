@@ -100,6 +100,12 @@ export default function AppHeader() {
           ref={divRef}
         />
       ) : null}
+      {paramsCode === "wrong_game_access" ? (
+        <ErrorNotification
+          errorMessage="잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요!"
+          ref={divRef}
+        />
+      ) : null}
       <Box id="AppHeader-container" className="flex-container">
         <CssBaseline />
         <AppBar open={open} setOpen={setOpen} />
