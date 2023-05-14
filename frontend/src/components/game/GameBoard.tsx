@@ -169,7 +169,11 @@ const GameBoard = (props: GameBoardProps) => {
   }
 
   useLayoutEffect(() => {
+<<<<<<< HEAD
     if (!gameSocket) window.location.href = "/game?error=wrong_game_access";
+=======
+    if (!gameSocket) window.location.href = "/game?error=wrong_access_game";
+>>>>>>> origin/frontend
   }, []);
 
   useEffect(() => {
