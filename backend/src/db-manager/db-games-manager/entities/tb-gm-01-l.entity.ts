@@ -50,17 +50,17 @@ export class TbGm01LEntity {
   trgtScr: number;
 
   // LV_DFCT
-  @Column({ name: 'LV_DFCT', type: 'integer' })
-  lvDfct: number;
+  @Column({ name: 'LV_DFCT', type: 'varchar', length: 2 })
+  lvDfct: string;
 
-  // BGRD_IMG_PAT
+  // GM_OWNER
   @Column({
-    name: 'BGRD_IMG_PAT',
+    name: 'GM_OWNER',
     type: 'varchar',
-    length: 200,
+    length: 20,
     nullable: true,
   })
-  bgrdImgPat: number;
+  owner: string;
 
   // DEL_TF
   @Column({ name: 'DEL_TF', type: 'boolean' })
