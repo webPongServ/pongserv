@@ -4,6 +4,7 @@ import { IRootState } from "components/common/store";
 import GameReady from "components/game/GameReady";
 // 난이도에 따라 paddle의 pixel const 조절하기(js) => constant에서 제거
 import { GameBoardConst } from "constant";
+import ErrorNotification from "components/utils/ErrorNotification";
 
 import { Box } from "@mui/material";
 
@@ -183,22 +184,20 @@ const GameBoard = (props: GameBoardProps) => {
     // 난이도에 따라 paddleRef의 height를 조절하기(css)
   }, []);
 
-  if (gameSocket)
-    gameSocket.on("gameStart", () => {
-      setStart(true);
-      const interval = setInterval(() => {
-        console.log(timer);
-        setTimer((prev: number) => prev - 1);
+  gameSocket!.on("gameStart", () => {
+    setStart(true);
 
-        if (timer < 0) {
-          clearInterval(interval);
-        }
-      }, 1000);
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 0) clearInterval(interval);
 
-      setTimeout(() => {
-        setIsWaiting(false);
-      }, 4000);
-    });
+        return prev - 1;
+      });
+    }, 1000);
+    setTimeout(() => {
+      setIsWaiting(false);
+    }, 4000);
+  });
 
   return isWaiting ? (
     <>
