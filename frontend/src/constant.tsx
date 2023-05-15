@@ -28,3 +28,14 @@ export const ChattingUserRoleType = {
   admin: "02",
   normal: "03",
 };
+
+export const GameRoomType = {
+  normal: "01",
+  ladder: "02",
+};
+
+export const GameDifficultyType = {
+  easy: "01",
+  normal: "02",
+  hard: "03",
+};

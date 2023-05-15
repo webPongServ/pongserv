@@ -6,6 +6,7 @@ import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import Tooltip from "@mui/material/Tooltip";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import { GameDifficultyType } from "constant";
 
 const GameDifficultyRadioGroup = (props: GameDifficultyRadioGroupProps) => {
   return (
@@ -48,9 +49,21 @@ const GameDifficultyRadioGroup = (props: GameDifficultyRadioGroupProps) => {
             defaultValue={props.defaultValue}
             onChange={props.handleFunction}
           >
-            <FormControlLabel value="easy" control={<Radio />} label="쉬움" />
-            <FormControlLabel value="normal" control={<Radio />} label="보통" />
-            <FormControlLabel value="hard" control={<Radio />} label="어려움" />
+            <FormControlLabel
+              value={GameDifficultyType.easy}
+              control={<Radio />}
+              label="쉬움"
+            />
+            <FormControlLabel
+              value={GameDifficultyType.normal}
+              control={<Radio />}
+              label="보통"
+            />
+            <FormControlLabel
+              value={GameDifficultyType.hard}
+              control={<Radio />}
+              label="어려움"
+            />
           </RadioGroup>
         </FormControl>
       </Box>
