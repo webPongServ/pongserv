@@ -1,5 +1,7 @@
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CustomIconButton from "components/utils/CustomIconButton";
+import { IRootState } from "components/common/store";
 import "styles/Game.scss";
 
 import { Button } from "@mui/joy";
@@ -15,11 +17,24 @@ interface NormalGameModalProps {
 }
 
 const NormalGameModal = (props: NormalGameModalProps) => {
+  const gameSocket = useSelector(
+    (state: IRootState) => state.sockets.gameSocket
+  );
   const navigate = useNavigate();
   return (
     <Modal
       open={props.roomStatus === "normal-game"}
-      onClose={() => props.setRoomStatus("game")}
+      onClose={() => {
+        gameSocket.emit(
+          "cancelEnterance",
+          {
+            roomId: props.selectedID,
+          },
+          () => {
+            props.setRoomStatus("game");
+          }
+        );
+      }}
     >
       <ModalDialog className="modal" variant="outlined">
         <Box id="inform" className="outframe">
@@ -28,7 +43,17 @@ const NormalGameModal = (props: NormalGameModalProps) => {
             <CustomIconButton
               class="right"
               icon={<CloseIcon />}
-              handleFunction={() => props.setRoomStatus("game")}
+              handleFunction={() => {
+                gameSocket.emit(
+                  "cancelEnterance",
+                  {
+                    roomId: props.selectedID,
+                  },
+                  () => {
+                    props.setRoomStatus("game");
+                  }
+                );
+              }}
             />
           </Box>
           <Box className="body flex-container">
@@ -38,6 +63,9 @@ const NormalGameModal = (props: NormalGameModalProps) => {
           <Box className="footer flex-container">
             <Button
               onClick={() => {
+                gameSocket.emit("gameRoomFulfilled", {
+                  roomId: props.selectedID,
+                });
                 navigate(`/game/${props.selectedID}`);
               }}
             >
