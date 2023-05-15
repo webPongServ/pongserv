@@ -6,6 +6,7 @@ import { TbGm03DEntity } from './entities/tb-gm-03-d.entity';
 import { TbGm04LEntity } from './entities/tb-gm-04-l.entity';
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm/repository/Repository';
+import { In } from 'typeorm';
 
 @Injectable()
 export class DbGamesManagerService {
@@ -16,12 +17,42 @@ export class DbGamesManagerService {
     @InjectRepository(TbGm03DEntity) private Gm03DRp: Repository<TbGm03DEntity>,
     @InjectRepository(TbGm04LEntity) private Gm04LRp: Repository<TbGm04LEntity>,
   ) {}
-}
 
-// constructor(
-//   @InjectRepository(TbUa01MEntity) private ua01mRp: Repository<TbUa01MEntity>,
-//   @InjectRepository(TbUa01LEntity) private ua01lRp: Repository<TbUa01LEntity>,
-//   @InjectRepository(TbUa02LEntity) private ua02lRp: Repository<TbUa02LEntity>,
-//   @InjectRepository(TbUa03MEntity) private ua03mRp: Repository<TbUa03MEntity>,
-//   @InjectRepository(TbUa03DEntity) private ua03dRp: Repository<TbUa03DEntity>,
-// ) {}
+  async createRoomList(type, roomName, difficulty, score) {
+    const room = await this.Gm01LRp.save({
+      gmRmNm: roomName,
+      gmType: type,
+      lvDfct: difficulty,
+      trgtScr: score,
+      delTf: false,
+      endType: '04',
+    });
+    return room;
+  }
+
+  async createRoomDetail(roomListEntity, userEntity, type) {
+    const room = await this.Gm01DRp.save({
+      gm01lEntity: roomListEntity,
+      gm01dUserEntity: userEntity,
+      getScr: 0,
+      gmRsltCd: type,
+      entryDttm: new Date(),
+      delTf: false,
+    });
+    return room;
+  }
+
+  async getRoomListByRoomId(roomId) {
+    const room = await this.Gm01LRp.findOne({
+      where: { id: roomId },
+    });
+    return room;
+  }
+
+  async getRoomList() {
+    const roomList = await this.Gm01LRp.find({
+      where: { delTf: false, endType: In(['04', '01']) },
+    });
+    return roomList;
+  }
+}
