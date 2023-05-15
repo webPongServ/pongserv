@@ -24,6 +24,7 @@ interface serverGameRoomDetail {
   trgtScr: number;
   lvDfct: string;
   owner: string;
+  ownerImage: string;
 }
 
 const Game = () => {
@@ -54,7 +55,11 @@ const Game = () => {
         (value: serverGameRoomDetail): GameRoomDetail => ({
           id: value.id,
           title: value.gmRmNm,
-          owner: value.owner,
+          owner: {
+            nickname: value.owner,
+            imgURL: value.ownerImage,
+            status: "login",
+          },
           maxScore: value.trgtScr,
           difficulty: value.lvDfct,
         })
@@ -106,7 +111,7 @@ const Game = () => {
       </Box>
       <Box className="pagination flex-container">
         <Pagination
-          count={Math.floor(gameRooms.length / 4) + 1}
+          count={Math.floor(gameRooms.length / 4)}
           variant="outlined"
           shape="rounded"
           onChange={(e, number) => {
