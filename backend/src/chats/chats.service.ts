@@ -502,7 +502,7 @@ export class ChatsService {
 			1. user가 chatroom에 있는지 확인한다.
 			2. target 유저가 chatroom에 있는지 확인한다.
 			3. target 유저의 현재 로그인 정보를 가져와서 게임 중인지 확인한다.
-				// NOTE: 저번 회의 때 Tb_UA02L 테이블에 현재 게임 여부에 대해 정보를 알 수 잇다.
+				// NOTE: 저번 회의 때 Tb_UA02L 테이블에 현재 게임 여부에 대해 정보를 알 수 있다.
 				// 하지만 저번에 사용여부에 대해서 이야기 했기 때문에 이번에 확인해봐야 겠다.
 			4. game 신청 user와 target 정보를 반환한다.
 				// 웹소켓을 통해서 target 유저에게 game request를 보내게 하면 될 듯

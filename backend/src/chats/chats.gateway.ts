@@ -10,7 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatsService } from './chats.service';
-import { UnauthorizedException } from '@nestjs/common';
+import { Logger, UnauthorizedException } from '@nestjs/common';
 import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
@@ -18,6 +18,7 @@ import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
+import { UsersService } from 'src/users/users.service';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -25,16 +26,16 @@ import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
     origin: '*',
   },
 })
-export class ChatsGateway {
+export class ChatsGateway
+ implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly chatsService: ChatsService,
-    private readonly dbChatsManagerService: DbChatsManagerService,
-    private readonly dbUsersManagerService: DbUsersManagerService,
-    private readonly config: ConfigService,
-  ) {}
-
+    private readonly usersService: UsersService,
+    private readonly config: ConfigService
+    ) {}
   @WebSocketServer()
   server: Server;
+  // private logger: Logger = new Logger('ChatsGateway');
 
   validateAccessToken(socket: Socket): string {
     try {
@@ -47,8 +48,61 @@ export class ChatsGateway {
     } catch (err) {
       console.log(err);
       socket.emit('errorValidateAuth', 'Not validated Access Token');
-      return;
+      return ;
     }
+    /*!SECTION
+      1. Friend user socket room에 등록 - Friend_userId
+      2. Block user socket room에 등록 - Block_userId
+      3. 자신의 userId로 등록된 socket room으로 알람 보내기
+    */
+    // 1
+    const friendList = await this.usersService.getFriendList(userId);
+    for (const eachFriend of friendList) {
+      const nameOfFriendRoom = `friends_of_${eachFriend.nickname}`;
+      socket.join(nameOfFriendRoom);
+    }
+    // 2
+
+    // 3
+    const myProfile = await this.usersService.getProfile(userId);
+    const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
+    socket.to(nameOfMyRoomForFriends).emit(`friendOn`, myProfile.nickname);
+  }
+
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log(`client: `)
+    console.log(client)
+  }
+
+  async handleConnection(
+    @ConnectedSocket() socket: Socket, ...args: any[]) {
+    const userId = this.validateAccessToken(socket);
+    if (!userId) {
+      socket.disconnect(true);
+      return ;
+    }
+    /*!SECTION
+      1. Friend user socket room에 등록 - Friend_userId
+      2. Block user socket room에 등록 - Block_userId
+      3. 자신의 userId로 등록된 socket room으로 알람 보내기
+    */
+    // 1
+    const friendList = await this.usersService.getFriendList(userId);
+    for (const eachFriend of friendList) {
+      const nameOfFriendRoom = `friends_of_${eachFriend.nickname}`;
+      socket.join(nameOfFriendRoom);
+    }
+    // 2
+
+    // 3
+    const myProfile = await this.usersService.getProfile(userId);
+    const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
+    socket.to(nameOfMyRoomForFriends).emit(`friendOn`, myProfile.nickname);
+  }
+
+  handleDisconnect(@ConnectedSocket() client: Socket) {
+    console.log(`client: `)
+    console.log(client)
   }
 
   @SubscribeMessage('chatroomCreation')
