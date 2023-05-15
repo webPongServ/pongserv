@@ -111,7 +111,7 @@ const Game = () => {
       </Box>
       <Box className="pagination flex-container">
         <Pagination
-          count={Math.floor(gameRooms.length / 4)}
+          count={Math.floor(gameRooms.length / 4) + 1}
           variant="outlined"
           shape="rounded"
           onChange={(e, number) => {
