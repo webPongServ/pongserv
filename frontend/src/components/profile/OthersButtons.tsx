@@ -1,15 +1,17 @@
 import { useSelector, useDispatch } from "react-redux";
 import { IRootState } from "components/common/store";
+import UserService from "API/UserService";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { FriendsActionTypes } from "types/redux/Friends";
 import { ProfileDetail, UserDetail } from "types/Detail";
+import { ProfileStatusType } from "constant";
 
 import { Button } from "@mui/joy";
+import { Tooltip, Typography } from "@mui/material";
 
 interface OthersButtonsProps {
-  isFriend: boolean;
-  setIsFriend: Function;
   profileDetail: ProfileDetail;
+  setProfileDetail: Function;
 }
 
 const OthersButtons = (props: OthersButtonsProps) => {
@@ -22,54 +24,71 @@ const OthersButtons = (props: OthersButtonsProps) => {
       type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
       payload: {
         id: "202304280001", // API를 통해 받아온 데이터
-        title: `[DM] ${props.profileDetail!.nickname}, ${myInfo.nickname}`,
-        owner: `${myInfo.nickname}`,
+        chatroomName: `[DM] ${props.profileDetail!.nickname}, ${
+          myInfo.nickname
+        }`,
+        ownerNickname: `${myInfo.nickname}`,
         type: "private",
-        max: 2,
-        current: 1,
-        createdAt: new Date(),
+        maxCount: 2,
+        currentCount: 1,
       },
     });
   };
 
-  const handleFriendAddButton = () => {
+  const handleFriendAddButton = async () => {
+    const response = await UserService.postFriend({
+      nickname: props.profileDetail!.nickname,
+    });
     dispatch({
       type: FriendsActionTypes.FRIENDS_ADD,
       payload: {
         nickname: props.profileDetail!.nickname,
         imgURL: props.profileDetail!.imgURL,
-        status: props.profileDetail!.status,
+        // login, logout인지 확인할 수 있는 것이 필요함
+        status: "login",
       },
     });
-    props.setIsFriend(!props.isFriend);
+    props.setProfileDetail({
+      ...props.profileDetail,
+      status: ProfileStatusType.friend,
+    });
   };
 
-  const handleFriendDeleteButton = () => {
+  const handleFriendDeleteButton = async () => {
+    const response = await UserService.postDeleteFriend({
+      nickname: props.profileDetail!.nickname,
+    });
     dispatch({
       type: FriendsActionTypes.FRIENDS_DELETE,
       payload: props.profileDetail!.nickname,
     });
-    props.setIsFriend(!props.isFriend);
+    props.setProfileDetail({
+      ...props.profileDetail,
+      status: ProfileStatusType.notFriend,
+    });
   };
-
-  const handleBlockButton = () => {};
 
   return (
     <>
       <Button variant="solid" onClick={handleDMButton}>
         DM
       </Button>
-      <Button
-        variant={props.isFriend ? "outlined" : "solid"}
-        onClick={
-          props.isFriend ? handleFriendDeleteButton : handleFriendAddButton
-        }
+      {props.profileDetail.status === ProfileStatusType.friend ? (
+        <Button variant="outlined" onClick={handleFriendDeleteButton}>
+          친구 삭제
+        </Button>
+      ) : (
+        <Button variant="solid" onClick={handleFriendAddButton}>
+          친구 추가
+        </Button>
+      )}
+      <Tooltip
+        title={<Typography>서비스 준비 중입니다.</Typography>}
+        placement="bottom-start"
+        followCursor
       >
-        {props.isFriend ? "친구 삭제" : "친구 추가"}
-      </Button>
-      <Button variant="outlined" onClick={handleBlockButton}>
-        차단
-      </Button>
+        <Button variant="outlined">차단</Button>
+      </Tooltip>
     </>
   );
 };

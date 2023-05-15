@@ -1,13 +1,13 @@
-export interface ChatRoomForm {
-  title: string;
-  max: number;
+export interface ChattingRoomForm {
+  chatroomName: string;
+  maxCount: number;
   type: string;
   password: string;
 }
 
-export interface ChatRoomEditForm {
-  title: string;
-  max: number;
+export interface ChattingRoomEditForm {
+  chatroomName: string;
+  maxCount: number;
   type: string;
 }
 

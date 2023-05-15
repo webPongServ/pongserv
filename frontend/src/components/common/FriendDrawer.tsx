@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { IRootState } from "components/common/store";
 import { UserDetail } from "types/Detail";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
-import CustomIconButton from "components/common/utils/CustomIconButton";
-import CustomProfileButton from "components/common/utils/CustomProfileButton";
-import LoadingCircle from "components/common/utils/LoadingCircle";
+import EmptyListMessage from "components/utils/EmptyListMessage";
+import CustomIconButton from "components/utils/CustomIconButton";
+import CustomProfileButton from "components/utils/CustomProfileButton";
+import LoadingCircle from "components/utils/LoadingCircle";
+import UserService from "API/UserService";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 
@@ -48,6 +49,11 @@ const openedMixin = (theme: Theme): CSSObject => ({
   overflowX: "hidden",
 });
 
+interface serverFriend {
+  nickname: string;
+  imageUrl: string;
+}
+
 const FriendDrawer = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -56,18 +62,25 @@ const FriendDrawer = () => {
     (state: IRootState) => state.friends.friends
   );
 
-  useEffect(() => {
+  const getFriends = async () => {
+    const response = await UserService.getFriend();
+
     // API 호출
     dispatch({
       type: FriendsActionTypes.FRIENDS_GET,
-      payload: [
-        { nickname: "chanhyle", imgURL: "../image.png", status: "login" },
-        { nickname: "seongtki", imgURL: "../image.png", status: "login" },
-        { nickname: "mgo", imgURL: "../image.png", status: "login" },
-        { nickname: "noname_12", imgURL: "../image.png", status: "logout" },
-      ],
+      payload: response.data.map(
+        (value: serverFriend): UserDetail => ({
+          nickname: value.nickname,
+          imgURL: value.imageUrl,
+          status: "login",
+        })
+      ),
     });
-  }, [dispatch]);
+  };
+
+  useEffect(() => {
+    getFriends();
+  }, []);
 
   return (
     <Drawer id="FriendDrawer" variant="permanent" open={true}>
@@ -85,7 +98,7 @@ const FriendDrawer = () => {
       <Box id="body" className="overflow">
         {friends === null && <LoadingCircle />}
         {friends !== null && friends.length === 0 && (
-          <EmptyListMessage message="친구인 사용자가 없습니다!" />
+          <EmptyListMessage message="친구를 추가해 보세요!" />
         )}
         {friends !== null && friends.length !== 0 && (
           <List>

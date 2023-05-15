@@ -1,7 +1,15 @@
-import { useState } from "react";
-import CustomProfileButton from "components/common/utils/CustomProfileButton";
-import { ChatUserDetail } from "types/Detail";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import CustomProfileButton from "components/utils/CustomProfileButton";
+import { ChattingUserDetail } from "types/Detail";
+import EmptyListMessage from "components/utils/EmptyListMessage";
+import {
+  CurrentChatting,
+  CurrentChattingActionTypes,
+} from "types/redux/CurrentChatting";
+import ChattingService from "API/ChattingService";
+import { IRootState } from "components/common/store";
+import { ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -12,18 +20,23 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 
 interface UserListProps {
-  myDetail: ChatUserDetail;
-  users: ChatUserDetail[];
-  bans: ChatUserDetail[];
-  setUsers: Function;
-  setBans: Function;
+  myDetail: ChattingUserDetail;
+}
+
+interface serverChattingUserDetail {
+  nickname: string;
+  imgPath: string;
+  authInChtrm: string;
 }
 
 const UserList = (props: UserListProps) => {
-  const [selectedUser, setSelectedUser] = useState<ChatUserDetail>({
+  const currentChatting: CurrentChatting = useSelector(
+    (state: IRootState) => state.currentChatting
+  );
+  const [selectedUser, setSelectedUser] = useState<ChattingUserDetail>({
     nickname: "",
     imgURL: "",
-    role: "normal",
+    role: ChattingUserRoleType.normal,
   });
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contextMenu, setContextMenu] = useState<{
@@ -31,6 +44,7 @@ const UserList = (props: UserListProps) => {
     mouseY: number;
   } | null>(null);
   const open = Boolean(anchorEl);
+  const dispatch = useDispatch();
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -44,12 +58,33 @@ const UserList = (props: UserListProps) => {
     setAnchorEl(null);
   };
 
-  return props.users.length === 0 ? (
+  const getUserList = async () => {
+    const response = await ChattingService.getUsersList(
+      currentChatting.chattingRoom!.id
+    );
+    console.log(response.data);
+    dispatch({
+      type: CurrentChattingActionTypes.GET_USERLIST,
+      payload: response.data.map(
+        (value: serverChattingUserDetail): ChattingUserDetail => ({
+          ...value,
+          imgURL: value.imgPath,
+          role: value.authInChtrm,
+        })
+      ),
+    });
+  };
+
+  useEffect(() => {
+    getUserList();
+  }, []);
+
+  return currentChatting.userList.length === 0 ? (
     <EmptyListMessage message="채팅 중인 사용자가 없습니다!" />
   ) : (
     <>
       <List>
-        {props.users.map((value, index) => (
+        {currentChatting.userList.map((value, index) => (
           <ListItem key={value.nickname + index} disablePadding>
             <CustomProfileButton
               class="login"
@@ -83,19 +118,25 @@ const UserList = (props: UserListProps) => {
           <MenuItem>내 계정</MenuItem>
         )}
         {!(selectedUser.nickname === props.myDetail.nickname) &&
-          props.myDetail.role === "normal" && <MenuItem>대결 신청</MenuItem>}
+          props.myDetail.role === ChattingUserRoleType.normal && (
+            <MenuItem>대결 신청</MenuItem>
+          )}
         {!(selectedUser.nickname === props.myDetail.nickname) &&
-          props.myDetail.role !== "normal" && (
+          props.myDetail.role !== ChattingUserRoleType.normal && (
             <Box>
               <MenuItem>채팅방 내보내기</MenuItem>
               <MenuItem
                 onClick={() => {
-                  props.setUsers(
-                    props.users.filter(
+                  dispatch({
+                    type: CurrentChattingActionTypes.DELETE_USERLIST,
+                    payload: currentChatting.userList.filter(
                       (value) => value.nickname !== selectedUser.nickname
-                    )
-                  );
-                  props.setBans([...props.bans, selectedUser]);
+                    ),
+                  });
+                  dispatch({
+                    type: CurrentChattingActionTypes.ADD_BANLIST,
+                    payload: selectedUser,
+                  });
                   setAnchorEl(null);
                 }}
               >

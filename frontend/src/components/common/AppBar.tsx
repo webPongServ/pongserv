@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ChattingDrawerWidth } from "constant";
 import { IRootState } from "components/common/store";
-import SkeletonMyInfo from "./utils/SkeletonMyInfo";
+import SkeletonMyInfo from "components/utils/SkeletonMyInfo";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 
@@ -45,9 +45,6 @@ const AppBar = (props: HandleOpen) => {
   return (
     <TopBar id="AppBar" position="fixed" open={props.open}>
       <Toolbar>
-        <Link id="logo" to="/game" className="fixed-center">
-          WebPongServ
-        </Link>
         {myInfo.nickname === "" ? (
           <SkeletonMyInfo />
         ) : (
@@ -60,6 +57,9 @@ const AppBar = (props: HandleOpen) => {
             {myInfo.nickname}
           </Link>
         )}
+        <Link id="logo" to="/game">
+          WebPongServ
+        </Link>
         <IconButton
           id="chat-button"
           edge="end"

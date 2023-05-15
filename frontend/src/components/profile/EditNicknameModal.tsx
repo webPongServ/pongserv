@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import CustomIconButton from "components/common/utils/CustomIconButton";
-import CustomOnKeyUpInput from "components/common/utils/CustomOnKeyUpInput";
+import CustomIconButton from "components/utils/CustomIconButton";
+import CustomOnKeyUpInput from "components/utils/CustomOnKeyUpInput";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { IRootState } from "components/common/store";
@@ -13,11 +13,12 @@ import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import UserService from "API/UsersService";
+import UserService from "API/UserService";
 
 interface EditNicknameModalProps {
   modalStatus: string;
   setModalStatus: Function;
+  setIsNew: Function;
 }
 
 const EditNicknameModal = (props: EditNicknameModalProps) => {
@@ -47,6 +48,7 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
     });
 
     props.setModalStatus("closed");
+    props.setIsNew(true);
     navigate(`/profile/${response.data.new}`);
   };
 
@@ -84,7 +86,7 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
                 <CustomOnKeyUpInput
                   placeholder="새 닉네임을 입력하세요."
                   defaultValue={myInfo.nickname}
-                  maxLength={8}
+                  maxLength={10}
                   handleFunction={handleNewNickname}
                   handleDoneTyping={doneTyping}
                   isError={isError}

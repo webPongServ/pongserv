@@ -10,4 +10,7 @@ export class ChatroomCreationDto {
 
     @ApiProperty({ type: String })
     pwd: string;
+
+    @ApiProperty({ type: Number })
+    max: number;
 }

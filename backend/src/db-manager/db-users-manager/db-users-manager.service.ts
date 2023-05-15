@@ -50,7 +50,9 @@ export class DbUsersManagerService {
     // console.log(`upper userMaster: `);
     // console.log(userMaster);
     // 1-1
+    let isMember = false;
     if (userMaster === null) {
+      isMember = true;
       userMaster = this.ua01mRp.create({
         userId: userId,
         nickname: userId,
@@ -63,7 +65,7 @@ export class DbUsersManagerService {
       // console.log(`userMaster after save: `);
       // console.log(userMaster);
     }
-    return userMaster;
+    return isMember;
   }
 
   async checkUserInDb(userId: string) {

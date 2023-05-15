@@ -11,6 +11,7 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
 @Module({
   imports: [
     HttpModule,
+    DbUsersManagerModule,
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
@@ -21,9 +22,9 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
         signOptions: { expiresIn: '1y' },
       }),
     }),
-    DbUsersManagerModule,
   ],
   controllers: [UsersController],
   providers: [UsersService, AuthService],
+  exports: [UsersService]
 })
 export class UsersModule {}

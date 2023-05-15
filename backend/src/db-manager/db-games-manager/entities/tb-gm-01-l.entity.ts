@@ -13,11 +13,11 @@ import { TbGm01DEntity } from './tb-gm-01-d.entity';
 @Entity({ name: 'TB_GM01L' })
 export class TbGm01LEntity {
   @PrimaryGeneratedColumn('uuid')
-  uuid: string;
+  id: string;
 
-  // GM_SRNO - YYYYMMDDNNNN
-  // @PrimaryColumn({ name: 'GM_SRNO', type: 'varchar', length: 12 })
-  // gmSrno: string;
+  // GM_NAME - 게임명
+  @Column({ name: 'GM_NAME', type: 'varchar', length: 50 })
+  gmRmNm: string;
 
   // GM_STRT_DTTM
   @Column({
@@ -50,12 +50,17 @@ export class TbGm01LEntity {
   trgtScr: number;
 
   // LV_DFCT
-  @Column({ name: 'LV_DFCT', type: 'integer' })
-  lvDfct: number;
+  @Column({ name: 'LV_DFCT', type: 'varchar', length: 2 })
+  lvDfct: string;
 
-  // BGRD_IMG_PAT
-  @Column({ name: 'BGRD_IMG_PAT', type: 'varchar', length: 200 })
-  bgrdImgPat: number;
+  // GM_OWNER
+  @Column({
+    name: 'GM_OWNER',
+    type: 'varchar',
+    length: 20,
+    nullable: true,
+  })
+  owner: string;
 
   // DEL_TF
   @Column({ name: 'DEL_TF', type: 'boolean' })

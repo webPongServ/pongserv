@@ -18,5 +18,6 @@ import { DbGamesManagerService } from './db-games-manager.service';
     ]),
   ],
   providers: [DbGamesManagerService],
+  exports: [DbGamesManagerService, TypeOrmModule],
 })
 export class DbGamesManagerModule {}

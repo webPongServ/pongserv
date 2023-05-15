@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { History } from "types/Profile";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import EmptyListMessage from "components/utils/EmptyListMessage";
 import "styles/global.scss";
 import "styles/Profile.scss";
 
@@ -96,12 +96,8 @@ const GameHistoryList = () => {
       ) : (
         historyList.map((value, index) => {
           return (
-            <Box className="flex-container">
-              <Card
-                className="history-card flex-container"
-                variant="outlined"
-                key={value.myId + index}
-              >
+            <Box className="flex-container" key={value.myId + index}>
+              <Card className="history-card flex-container" variant="outlined">
                 <Box className="result">
                   <Typography className={value.isWin ? "win" : "lose"}>
                     {value.isWin ? "승리" : "패배"}

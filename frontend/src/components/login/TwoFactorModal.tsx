@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { IRootState } from "components/common/store";
 import { LoginStatusActionTypes } from "types/redux/Login";
-import CustomIconButton from "components/common/utils/CustomIconButton";
+import CustomIconButton from "components/utils/CustomIconButton";
 import AuthService from "API/AuthService";
 import instance from "API/api";
 import "styles/Login.scss";

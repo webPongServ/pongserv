@@ -8,32 +8,35 @@ const ChattingService = {
   getChattingRooms: async () => await instance.get(chatsURL("rooms")),
   postNewChattingRoom: async (body: {
     name: string;
-    type: boolean;
+    type: string;
+    max: number;
     pwd: string;
   }) => await instance.post(chatsURL("creation"), body),
-  postEntrance: async (body: { uuid: string; pwd: string }) =>
-    await instance.post(chatsURL("creation"), body),
+  postEntrance: async (body: { id: string; pwd: string }) =>
+    await instance.post(chatsURL("entrance"), body),
+  postLeaving: async (body: { id: string }) =>
+    await instance.post(chatsURL("leaving"), body),
   patchChattingRoom: async (body: {
-    uuid: string;
+    id: string;
     name: string;
     type: string;
+    max: number;
     pwd: string;
   }) => await instance.patch(chatsURL("edit"), body),
-  getUsersList: async (uuid: string) =>
-    await instance.get(chatsURL(`users/${uuid}`)),
-  getBansList: async (uuid: string) =>
-    await instance.get(chatsURL(`bans/${uuid}`)),
-  patchKick: async (body: { uuid: string; userIdToKick: string }) =>
+  getUsersList: async (id: string) =>
+    await instance.get(chatsURL(`users/${id}`)),
+  getBansList: async (id: string) => await instance.get(chatsURL(`bans/${id}`)),
+  patchKick: async (body: { id: string; userIdToKick: string }) =>
     await instance.patch(chatsURL("kick"), body),
-  patchEmpower: async (body: { uuid: string; userIdToEmpower: string }) =>
+  patchEmpower: async (body: { id: string; userIdToEmpower: string }) =>
     await instance.patch(chatsURL("empowerment"), body),
-  putBan: async (body: { uuid: string; userIdToBan: string }) =>
+  putBan: async (body: { id: string; userIdToBan: string }) =>
     await instance.put(chatsURL("ban"), body),
-  putMute: async (body: { uuid: string; userIdToMute: string }) =>
+  putMute: async (body: { id: string; userIdToMute: string }) =>
     await instance.put(chatsURL("mute"), body),
-  postGameRequest: async (body: { uuid: string; userIdToGame: string }) =>
+  postGameRequest: async (body: { id: string; userIdToGame: string }) =>
     await instance.post(chatsURL("game-request"), body),
-  patchBanRemove: async (body: { uuid: string; userIdToBan: string }) =>
+  patchBanRemove: async (body: { id: string; userIdToBan: string }) =>
     await instance.patch(chatsURL("ban-removal"), body),
   postDM: async (body: { targetUserId: string }) =>
     await instance.post(chatsURL("dm"), body),

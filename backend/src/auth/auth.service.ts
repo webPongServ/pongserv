@@ -79,7 +79,7 @@ export class AuthService {
       await this.getIntraId(token42OAuth);
     // NOTE: TB_UA01M에 유저 자체가 있는지 검증하고 없으면 등록하는 로직 추가 (2023-05-08, mgo)
     // console.log(intraData);
-    const user = await this.dbmanagerUsersService.checkinUser(intraData);
+    const isMember = await this.dbmanagerUsersService.checkinUser(intraData);
     // console.log(`user: `);
     // console.log(user);
     // let user = await this.dbmanagerUsersService.getUserByUserId(intraData.intraId);
@@ -93,6 +93,7 @@ export class AuthService {
     const userId = intraData.intraId;
     const Payload = { userId };
     return {
+      isMember,
       accessToken: await this.jwtService.signAsync(Payload),
       OAuthData,
       userId,

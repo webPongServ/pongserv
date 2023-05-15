@@ -1,30 +1,41 @@
-import { useState } from "react";
-import { ChatUserDetail } from "types/Detail";
-import CustomProfileButton from "components/common/utils/CustomProfileButton";
-import EmptyListMessage from "components/common/utils/EmptyListMessage";
+import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { ChattingUserDetail } from "types/Detail";
+import {
+  CurrentChatting,
+  CurrentChattingActionTypes,
+} from "types/redux/CurrentChatting";
+import ChattingService from "API/ChattingService";
+import { IRootState } from "components/common/store";
+import CustomProfileButton from "components/utils/CustomProfileButton";
+import EmptyListMessage from "components/utils/EmptyListMessage";
+import { ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import Menu from "@mui/material/Menu";
-import MenuItem from "@mui/material/MenuItem";
+import { Box, List, ListItem, Menu, MenuItem } from "@mui/material";
 
 interface BanListProps {
-  bans: ChatUserDetail[];
-  users: ChatUserDetail[];
-  setUsers: Function;
-  setBans: Function;
-  myDetail: ChatUserDetail;
+  myDetail: ChattingUserDetail;
+}
+
+interface serverChattingUserDetail {
+  nickname: string;
+  imgPath: string;
+  authInChtrm: string;
 }
 
 const BanList = (props: BanListProps) => {
+  const currentChatting: CurrentChatting = useSelector(
+    (state: IRootState) => state.currentChatting
+  );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
     mouseY: number;
   } | null>(null);
   const open = Boolean(anchorEl);
+  const dispatch = useDispatch();
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
@@ -38,18 +49,32 @@ const BanList = (props: BanListProps) => {
     setAnchorEl(null);
   };
 
-  const [selectedUser, setSelectedUser] = useState<ChatUserDetail>({
+  const [selectedUser, setSelectedUser] = useState<ChattingUserDetail>({
     nickname: "",
     imgURL: "",
-    role: "normal",
+    role: ChattingUserRoleType.normal,
   });
 
-  return props.bans.length === 0 ? (
+  const getBansList = async () => {
+    const response = await ChattingService.getBansList(
+      currentChatting.chattingRoom!.id
+    );
+    dispatch({
+      type: CurrentChattingActionTypes.GET_BANLIST,
+      payload: response.data,
+    });
+  };
+
+  useEffect(() => {
+    getBansList();
+  }, []);
+
+  return currentChatting.banList.length === 0 ? (
     <EmptyListMessage message="차단한 사용자가 없습니다!" />
   ) : (
     <>
       <List>
-        {props.bans.map((value, index) => (
+        {currentChatting.banList.map((value, index) => (
           <ListItem key={value.nickname + index} disablePadding>
             <CustomProfileButton
               class="login"
@@ -79,19 +104,27 @@ const BanList = (props: BanListProps) => {
             : undefined
         }
       >
-        <MenuItem
-          onClick={() => {
-            props.setUsers([...props.users, selectedUser]);
-            props.setBans(
-              props.bans.filter(
-                (value) => value.nickname !== selectedUser.nickname
-              )
-            );
-            setAnchorEl(null);
-          }}
-        >
-          채팅방 차단 해제
-        </MenuItem>
+        {props.myDetail.role === ChattingUserRoleType.normal ? (
+          <Box>권한이 없습니다.</Box>
+        ) : (
+          <MenuItem
+            onClick={() => {
+              dispatch({
+                type: CurrentChattingActionTypes.DELETE_BANLIST,
+                payload: currentChatting.userList.filter(
+                  (value) => value.nickname !== selectedUser.nickname
+                ),
+              });
+              dispatch({
+                type: CurrentChattingActionTypes.ADD_USERLIST,
+                payload: selectedUser,
+              });
+              setAnchorEl(null);
+            }}
+          >
+            채팅방 차단 해제
+          </MenuItem>
+        )}
       </Menu>
     </>
   );

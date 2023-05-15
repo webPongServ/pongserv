@@ -65,6 +65,8 @@ $ChattingDrawerWidth: 500px;
       padding: 3%;
 
       .page-header {
+        display: flex;
+        align-items: center;
         height: 10%;
         font-size: 20px;
       }
@@ -111,7 +113,72 @@ $ChattingDrawerWidth: 500px;
 
         .chatting-display {
           height: 90%;
-          padding: 5%;
+          padding: 3%;
+
+          .chatting {
+            display: flex;
+            margin-bottom: 5%;
+            column-gap: 3%;
+
+            .profile {
+              width: 15%;
+              flex-direction: column;
+              color: black;
+              text-decoration: none;
+              justify-content: flex-start;
+              margin-top: 3%;
+
+              img {
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                border-radius: 50%;
+                border: 0px solid #fff;
+                box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16),
+                  0 3px 6px rgba(0, 0, 0, 0.23);
+              }
+            }
+
+            .message {
+              display: flex;
+              align-items: center;
+              width: 85%;
+              word-break: break-all;
+
+              .balloon {
+                position: relative;
+                display: inline-block;
+                // width: 100%;
+                padding: 10px;
+                border-radius: 10px;
+                background-color: #eee;
+                color: #333;
+                font-size: 14px;
+              }
+            }
+
+            .other {
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-start;
+              align-items: flex-start;
+              // width: 100%;
+            }
+
+            .my {
+              display: flex;
+              flex-direction: column;
+              justify-content: flex-end;
+              align-items: flex-end;
+            }
+          }
+
+          .inform-message {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 5%;
+          }
         }
 
         .chatting-input {
@@ -127,27 +194,29 @@ $ChattingDrawerWidth: 500px;
 
     #card {
       // height: 110px;
+
       height: 18%;
       cursor: pointer;
+      justify-content: space-around;
       margin-bottom: 2%;
       &:hover {
         border: 3px solid skyblue;
       }
 
       .title {
-        // height: 70px;
-        height: 60%;
+        // height: 50%;
+        // width: 50%;
         font-size: 20px;
         margin-bottom: 0.5px;
+        word-break: break-all;
       }
 
       .content {
-        // height: 40px;
-        height: 40%;
+        // height: 30%;
         display: flex;
         align-items: center;
-        font-size: 15px;
-        column-gap: 2%;
+        font-size: 12px;
+        column-gap: 3%;
         padding-bottom: 1%;
 
         svg {
@@ -155,38 +224,36 @@ $ChattingDrawerWidth: 500px;
           height: 20px;
           margin-right: 5px;
         }
+
+        .divider {
+          color: lightgray;
+        }
       }
     }
 
     #password-form {
-      // height: 110px;
-      height: 15%;
-      margin-bottom: 15px;
+      height: 18%;
+      flex-direction: row;
+      justify-content: space-around;
+      margin-bottom: 2%;
       background-color: #aaaaaa;
 
-      .title {
-        // height: 20px;
-        height: 20%;
-        margin-bottom: 10px;
-      }
-
       .content {
-        // height: 90px;
-        height: 80%;
         column-gap: 3%;
+        width: 100%;
 
         .input {
-          width: 60%;
+          width: 50%;
         }
 
         .submit {
-          font-size: 15px;
+          font-size: 13px;
         }
 
         .cancel {
           background-color: white;
           color: blue;
-          font-size: 15px;
+          font-size: 13px;
         }
       }
     }

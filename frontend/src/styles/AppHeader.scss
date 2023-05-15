@@ -11,6 +11,8 @@
     font-size: 25px;
     color: #ffffff;
     text-decoration: none;
+    margin: auto;
+    transform: translateX(-40%);
   }
 
   #my-profile {
@@ -18,6 +20,7 @@
     color: #ffffff;
     text-decoration: none;
     margin-right: 10px;
+    margin-left: 2%;
 
     img {
       width: 40px;
@@ -35,16 +38,24 @@
     color: #ffffff;
   }
 
-  .skeleton-img {
-    width: 35px;
-    height: 35px;
-    margin-right: 5px;
+  #skeleton-my-profile {
+    margin-left: 2%;
+
+    .skeleton-img {
+      width: 35px;
+      height: 35px;
+      margin-right: 5px;
+    }
+
+    .skeleton-nickname {
+      height: 30px;
+      width: 100px;
+      border-radius: 5px;
+    }
   }
 
-  .skeleton-nickname {
-    height: 30px;
-    width: 80px;
-    border-radius: 5px;
+  .disabled {
+    color: cornflowerblue;
   }
 }
 

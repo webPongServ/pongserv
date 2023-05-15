@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import UserList from "components/common/chatting/UserList";
 import BanList from "components/common/chatting/BanList";
-import CustomIconButton from "components/common/utils/CustomIconButton";
-import { ChatUserDetail } from "types/Detail";
+import CustomIconButton from "components/utils/CustomIconButton";
+import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
+import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -11,22 +13,18 @@ import Select from "@mui/joy/Select";
 import Option from "@mui/joy/Option";
 import CloseIcon from "@mui/icons-material/Close";
 
-type RoomUsersProps = {
-  myDetail: ChatUserDetail;
+interface RoomUsersProps {
+  myDetail: ChattingUserDetail;
   setRoomStatus: Function;
-};
+}
 
 const RoomUsers = (props: RoomUsersProps) => {
-  const [users, setUsers] = useState<ChatUserDetail[]>([
-    { nickname: "chanhyle", role: "owner", imgURL: "../image.png" },
-    { nickname: "susong", role: "admin", imgURL: "../image.png" },
-    { nickname: "mgo", role: "normal", imgURL: "../image.png" },
-    { nickname: "noname_12", role: "normal", imgURL: "../image.png" },
-    { nickname: "seongtki", role: "admin", imgURL: "../image.png" },
-  ]);
-  const [bans, setBans] = useState<ChatUserDetail[]>([]);
+  const currentChatting: ChattingRoomDetail | null = useSelector(
+    (state: IRootState) => state.currentChatting.chattingRoom
+  );
   const [selected, setSelected] = useState<string>("users");
   const divRef = useRef<HTMLDivElement>(null);
+  const dispatch = useDispatch();
 
   const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape" || event.key === "Esc") {
@@ -36,7 +34,7 @@ const RoomUsers = (props: RoomUsersProps) => {
 
   useEffect(() => {
     if (divRef.current) divRef.current.focus();
-  }, []);
+  }, [selected]);
 
   return (
     <Box id="modal" ref={divRef} onKeyDown={pressESC} tabIndex={0}>
@@ -52,18 +50,7 @@ const RoomUsers = (props: RoomUsersProps) => {
       </Box>
       <Box className="modal-body flex-container">
         <Box>
-          <Select
-            defaultValue={selected}
-            // onChange={(e) => {
-            //   if (e) {
-            //     const target: HTMLInputElement = e.target as HTMLInputElement;
-            //     props.setPartyForm({
-            //       ...props.partyForm,
-            //       category: target.outerText,
-            //     });
-            //   }
-            // }}
-          >
+          <Select defaultValue={selected}>
             <Option
               value="users"
               onClick={() => {
@@ -84,21 +71,9 @@ const RoomUsers = (props: RoomUsersProps) => {
         </Box>
         <Box className="users-box overflow">
           {selected === "users" ? (
-            <UserList
-              users={users}
-              bans={bans}
-              setUsers={setUsers}
-              setBans={setBans}
-              myDetail={props.myDetail}
-            />
+            <UserList myDetail={props.myDetail} />
           ) : (
-            <BanList
-              bans={bans}
-              users={users}
-              setUsers={setUsers}
-              setBans={setBans}
-              myDetail={props.myDetail}
-            />
+            <BanList myDetail={props.myDetail} />
           )}
         </Box>
       </Box>

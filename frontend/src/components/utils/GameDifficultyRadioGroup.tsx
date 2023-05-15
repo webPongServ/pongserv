@@ -19,9 +19,7 @@ const GameDifficultyRadioGroup = (props: GameDifficultyRadioGroupProps) => {
         {props.name}
         <Tooltip
           title={
-            <Typography sx={{ fontSize: "15px" }}>
-              난이도가 어려워질수록 막대 길이가 짧아집니다.
-            </Typography>
+            <Typography>난이도가 어려울수록 막대가 짧아집니다.</Typography>
           }
           placement="bottom-start"
           followCursor

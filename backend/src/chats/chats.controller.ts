@@ -33,7 +33,16 @@ export class ChatsController {
     console.log(`[${userId}: `, `POST /chats/dm]`);
     console.log(`ChatroomDmReqDto: `);
     console.log(infoDmReq);
-    return (await this.chatsService.takeDmRequest(userId, infoDmReq));
+    try {
+      const result = await this.chatsService.takeDmRequest(userId, infoDmReq);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -46,7 +55,17 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Get('rooms')
   async getChatroomsForAUser(@CurrentUser() userId: any) {
-    return (await this.chatsService.getChatroomsForAUser(userId));
+    console.log(`[${userId}: `, `GET /chats/rooms]`);
+    try {
+      const result = await this.chatsService.getChatroomsForAUser(userId);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -62,7 +81,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Post('entrance')
   async setUserToEnter(@CurrentUser() userId: string, @Body() infoEntr: ChatroomEntranceDto) {
-    return (await this.chatsService.setUserToEnter(userId, infoEntr));
+    console.log(`[${userId}: `, `POST /chats/entrance]`);
+    console.log(`ChatroomEntranceDto: `);
+    console.log(infoEntr);
+    try {
+      const result = await this.chatsService.setUserToEnter(userId, infoEntr);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -75,7 +106,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Post('creation')
   async createChatroom(@CurrentUser() userId: string, @Body() infoCrtn: ChatroomCreationDto) {
-    return (await this.chatsService.createChatroom(userId, infoCrtn));
+    console.log(`[${userId}: `, `POST /chats/creation]`);
+    console.log(`ChatroomCreationDto: `);
+    console.log(infoCrtn);
+    try {
+      const result = await this.chatsService.createChatroom(userId, infoCrtn);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -91,7 +134,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Patch('edit')
   async editChatroomInfo(@CurrentUser() userId: string, @Body() infoEdit: ChatroomEditingDto) {
-    return (await this.chatsService.editChatroomInfo(userId, infoEdit));
+    console.log(`[${userId}: `, `PATCH /chats/edit]`);
+    console.log(`ChatroomEditingDto: `);
+    console.log(infoEdit);
+    try {
+      const result = await this.chatsService.editChatroomInfo(userId, infoEdit);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -112,7 +167,17 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Get('users/:uuid')
   async getChatUsers(@CurrentUser() userId: string, @Param('uuid') uuid: string) {
-    return (await this.chatsService.getLiveUserListInARoom(userId, uuid));
+    console.log(`[${userId}: `, `GET /chats/users/${uuid}]`);
+    try {
+      const result = await this.chatsService.getLiveUserListInARoom(userId, uuid);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -128,7 +193,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Patch('kick')
   async kickUser(@CurrentUser() userId: string, @Body() infoKick: ChatroomKickingDto) {
-    return (await this.chatsService.kickUser(userId, infoKick));
+    console.log(`[${userId}: `, `PATCH /chats/kick]`);
+    console.log(`ChatroomKickingDto: `);
+    console.log(infoKick);
+    try {
+      const result = await this.chatsService.kickUser(userId, infoKick);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -144,7 +221,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Put('ban')
   async banUser(@CurrentUser() userId: string, @Body() infoBan: ChatroomBanDto) {
-    return (await this.chatsService.banUser(userId, infoBan));
+    console.log(`[${userId}: `, `PUT /chats/ban]`);
+    console.log(`ChatroomBanDto: `);
+    console.log(infoBan);
+    try {
+      const result = await this.chatsService.banUser(userId, infoBan);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -160,7 +249,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Put('mute')
   async muteUser(@CurrentUser() userId: string, @Body() infoMute: ChatroomMuteDto) {
-    return (await this.chatsService.muteUser(userId, infoMute));
+    console.log(`[${userId}: `, `PUT /chats/mute]`);
+    console.log(`ChatroomMuteDto: `);
+    console.log(infoMute);
+    try {
+      const result = await this.chatsService.muteUser(userId, infoMute);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -176,7 +277,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Patch('empowerment')
   async empowerUser(@CurrentUser() userId: string, @Body() infoEmpwr: ChatroomEmpowermentDto) {
-    return (await this.chatsService.empowerUser(userId, infoEmpwr));
+    console.log(`[${userId}: `, `PATCH /chats/empowerment]`);
+    console.log(`ChatroomEmpowermentDto: `);
+    console.log(infoEmpwr);
+    try {
+      const result = await this.chatsService.empowerUser(userId, infoEmpwr);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -188,7 +301,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Post('game-request')
   async takeGameRequest(@CurrentUser() userId: string, @Body() infoGameReq: ChatroomGameRequestDto) {
-    return (await this.chatsService.takeGameRequest(userId, infoGameReq));
+    console.log(`[${userId}: `, `POST /chats/game-request]`);
+    console.log(`ChatroomGameRequestDto: `);
+    console.log(infoGameReq);
+    try {
+      const result = await this.chatsService.takeGameRequest(userId, infoGameReq);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -205,7 +330,17 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Get('bans/:uuid')
   async getBanListInARoom(@CurrentUser() userId: string, @Param('uuid') uuid: string) {
-    return (await this.chatsService.getBanListInARoom(userId, uuid));
+    console.log(`[${userId}: `, `GET /chats/bans/${uuid}]`);
+    try {
+      const result = await this.chatsService.getBanListInARoom(userId, uuid);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -217,7 +352,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Patch('ban-removal')
   async removeBan(@CurrentUser() userId: string, @Body() infoBanRmv: ChatroomBanRemovalDto) {
-    return (await this.chatsService.removeBan(userId, infoBanRmv));
+    console.log(`[${userId}: `, `PATCH /chats/ban-removal]`);
+    console.log(`ChatroomBanRemovalDto: `);
+    console.log(infoBanRmv);
+    try {
+      const result = await this.chatsService.removeBan(userId, infoBanRmv);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({
@@ -230,7 +377,19 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Post('leaving')
   async leaveChatroom(@CurrentUser() userId: string, @Body() infoLeav: ChatroomLeavingDto) {
-    return (await this.chatsService.leaveChatroom(userId, infoLeav));
+    console.log(`[${userId}: `, `POST /chats/leaving]`);
+    console.log(`ChatroomLeavingDto: `);
+    console.log(infoLeav);
+    try {
+      const result = await this.chatsService.leaveChatroom(userId, infoLeav);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
 }

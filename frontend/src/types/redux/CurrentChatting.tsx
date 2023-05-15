@@ -1,24 +1,18 @@
-import { ChatUserDetail, ChatRoomDetail } from "types/Detail";
-import { ChatRoomEditForm } from "types/Form";
+import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
+import { ChattingRoomEditForm } from "types/Form";
 
 export interface CurrentChatting {
   status: string;
-  chatRoom: ChatRoomDetail;
-  userList: ChatUserDetail[];
-  banList: ChatUserDetail[];
+  myDetail: ChattingUserDetail | null;
+  chattingRoom: ChattingRoomDetail | null;
+  userList: ChattingUserDetail[];
+  banList: ChattingUserDetail[];
 }
 
 const INITIAL_CURRENTCHATTING: CurrentChatting = {
   status: "waiting",
-  chatRoom: {
-    id: "",
-    title: "",
-    owner: "",
-    type: "",
-    max: 0,
-    current: 0,
-    createdAt: new Date("1970-01-01"),
-  },
+  myDetail: null,
+  chattingRoom: null,
   userList: [],
   banList: [],
 };
@@ -28,13 +22,15 @@ export enum CurrentChattingActionTypes {
   UPDATE_STATUS_CREATING = "UPDATE_STATUS_CREATING",
   UPDATE_STATUS_CHATTING = "UPDATE_STATUS_CHATTING",
   EDIT_CHATTINGROOM = "EDIT_CHATTINGROOM",
+  EDIT_CHATTING = "EDIT_CHATTING",
   GET_USERLIST = "GET_USERLIST",
   ADD_USERLIST = "ADD_USERLIST",
   DELETE_USERLIST = "DELETE_USERLIST",
   GET_BANLIST = "GET_BANLIST",
   ADD_BANLIST = "ADD_BANLIST",
   DELETE_BANLIST = "DELETE_BANLIST",
-  EDIT_CHATTING = "EDIT_CHATTING",
+  ADD_MYDETAIL = "ADD_MYDETAIL",
+  DELETE_MYDETAIL = "DELETE_MYDETAIL",
 }
 
 export interface CurrentChatting_UpdateStatusWaitingAction {
@@ -48,19 +44,66 @@ export interface CurrentChatting_UpdateStatusCreatingAction {
 
 export interface CurrentChatting_UpdateStatusChattingAction {
   type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING;
-  payload: ChatRoomDetail;
+  payload: ChattingRoomDetail;
 }
 
 export interface CurrentChatting_EditChattingRoomAction {
   type: CurrentChattingActionTypes.EDIT_CHATTINGROOM;
-  payload: ChatRoomEditForm;
+  payload: ChattingRoomEditForm;
+}
+
+export interface CurrentChatting_GetUserListAction {
+  type: CurrentChattingActionTypes.GET_USERLIST;
+  payload: ChattingUserDetail[];
+}
+
+export interface CurrentChatting_AddUserListAction {
+  type: CurrentChattingActionTypes.ADD_USERLIST;
+  payload: ChattingUserDetail;
+}
+
+export interface CurrentChatting_DeleteUserListAction {
+  type: CurrentChattingActionTypes.DELETE_USERLIST;
+  payload: string;
+}
+export interface CurrentChatting_GetBanListAction {
+  type: CurrentChattingActionTypes.GET_BANLIST;
+  payload: ChattingUserDetail[];
+}
+
+export interface CurrentChatting_AddBanListAction {
+  type: CurrentChattingActionTypes.ADD_BANLIST;
+  payload: ChattingUserDetail;
+}
+
+export interface CurrentChatting_DeleteBanListAction {
+  type: CurrentChattingActionTypes.DELETE_BANLIST;
+  payload: string;
+}
+
+export interface CurrentChatting_AddMyDetail {
+  type: CurrentChattingActionTypes.ADD_MYDETAIL;
+  payload: ChattingUserDetail;
+}
+
+export interface CurrentChatting_DeleteMyDetail {
+  type: CurrentChattingActionTypes.DELETE_MYDETAIL;
+  payload: string;
 }
 
 type CurrentChattingAction =
   | CurrentChatting_UpdateStatusWaitingAction
   | CurrentChatting_UpdateStatusChattingAction
   | CurrentChatting_UpdateStatusCreatingAction
-  | CurrentChatting_EditChattingRoomAction;
+  | CurrentChatting_EditChattingRoomAction
+  | CurrentChatting_GetUserListAction
+  | CurrentChatting_AddUserListAction
+  | CurrentChatting_DeleteUserListAction
+  | CurrentChatting_GetBanListAction
+  | CurrentChatting_AddBanListAction
+  | CurrentChatting_DeleteBanListAction
+  | CurrentChatting_AddMyDetail
+  | CurrentChatting_DeleteMyDetail;
 
 export const CurrentChattingReducer = (
   state = INITIAL_CURRENTCHATTING,
@@ -78,18 +121,63 @@ export const CurrentChattingReducer = (
       return {
         ...state,
         status: "chatting",
-        chatRoom: action.payload,
+        chattingRoom: action.payload,
       };
     case CurrentChattingActionTypes.EDIT_CHATTINGROOM:
       return {
         ...state,
-        chatRoom: {
-          ...state.chatRoom,
-          title: action.payload.title,
+        chattingRoom: {
+          ...state.chattingRoom!,
+          chatroomName: action.payload.chatroomName,
           type: action.payload.type,
-          max: action.payload.max,
+          maxCount: action.payload.maxCount,
         },
       };
+    case CurrentChattingActionTypes.GET_USERLIST:
+      return {
+        ...state,
+        userList: action.payload,
+      };
+    case CurrentChattingActionTypes.ADD_USERLIST:
+      return {
+        ...state,
+        userList: [...state.userList, action.payload],
+      };
+    case CurrentChattingActionTypes.DELETE_USERLIST:
+      return {
+        ...state,
+        userList: state.userList.filter(
+          (value) => value.nickname !== action.payload
+        ),
+      };
+    case CurrentChattingActionTypes.GET_BANLIST:
+      return {
+        ...state,
+        banList: action.payload,
+      };
+    case CurrentChattingActionTypes.ADD_BANLIST:
+      return {
+        ...state,
+        banList: [...state.banList, action.payload],
+      };
+    case CurrentChattingActionTypes.DELETE_BANLIST:
+      return {
+        ...state,
+        banList: state.banList.filter(
+          (value) => value.nickname !== action.payload
+        ),
+      };
+    case CurrentChattingActionTypes.ADD_MYDETAIL:
+      return {
+        ...state,
+        myDetail: action.payload,
+      };
+    case CurrentChattingActionTypes.DELETE_MYDETAIL:
+      return {
+        ...state,
+        myDetail: null,
+      };
+
     default:
       return state;
   }
