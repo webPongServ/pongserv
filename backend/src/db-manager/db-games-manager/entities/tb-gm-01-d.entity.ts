@@ -41,7 +41,7 @@ export class TbGm01DEntity {
   gmRsltCd: string;
 
   // RSLT_LLVL
-  @Column({ name: 'RSLT_LLVL', type: 'integer' })
+  @Column({ name: 'RSLT_LLVL', type: 'integer', nullable: true })
   rsltLlvl: number;
 
   // ENTRY_DTTM
@@ -53,7 +53,12 @@ export class TbGm01DEntity {
   entryDttm: Date;
 
   // EXIT_DTTM
-  @Column({ name: 'EXIT_DTTM', type: 'timestamp with time zone', precision: 0 })
+  @Column({
+    name: 'EXIT_DTTM',
+    type: 'timestamp with time zone',
+    precision: 0,
+    nullable: true,
+  })
   exitDttm: Date;
 
   // DEL_TF

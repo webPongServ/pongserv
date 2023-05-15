@@ -6,7 +6,6 @@ import { TbUa02LEntity } from './entities/tb-ua-02-l.entity';
 import { TbUa03MEntity } from './entities/tb-ua-03-m.entity';
 import { TbUa03DEntity } from './entities/tb-ua-03-d.entity';
 import { DbUsersManagerService } from './db-users-manager.service';
-import { Repository } from 'typeorm';
 
 @Module({
   imports: [

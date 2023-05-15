@@ -24,8 +24,7 @@ export class GamesController {
   @ApiOperation({ summary: '게임방 리스트' })
   @Get('/normal/rooms')
   getAllGames() {
-    return 'Hello World! it is getAllGames()';
-    throw new HttpException('Forbidden', HttpStatus.FORBIDDEN);
+    return this.gamesService.getRoomList();
   }
 
   @ApiResponse({

@@ -1,3 +1,5 @@
+import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-manager.module';
+import { DbGamesManagerModule } from './../db-manager/db-games-manager/db-games-manager.module';
 import { HttpService, HttpModule } from '@nestjs/axios';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GamesService } from './games.service';
@@ -10,6 +12,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 @Module({
   imports: [
     ConfigModule,
+    DbGamesManagerModule,
+    DbUsersManagerModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

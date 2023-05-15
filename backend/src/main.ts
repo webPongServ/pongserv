@@ -6,6 +6,7 @@ import { join } from 'path';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 import * as serveStatic from 'serve-static';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -52,6 +53,8 @@ async function bootstrap() {
   const publicPath = join(__dirname, '..', 'images');
   app.use('/images', serveStatic(publicPath, { index: false }));
   app.use(express.json({ limit: '10mb' }));
+  // 글로벌하게, , dto에 정의된 타입인지 확인해준다.
+  app.useGlobalPipes(new ValidationPipe());
   await app.listen(3000);
 }
 bootstrap();
