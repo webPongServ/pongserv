@@ -4,7 +4,6 @@ export interface GameCardProps {
   owner: string;
   maxScore: number;
   difficulty: string;
-  createdAt: Date;
   setRoomStatus: Function;
   setSelectedID: Function;
 }

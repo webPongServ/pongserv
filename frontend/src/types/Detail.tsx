@@ -25,7 +25,6 @@ export interface GameRoomDetail {
   owner: string;
   maxScore: number;
   difficulty: string;
-  createdAt: Date;
 }
 
 export interface ProfileDetail {
