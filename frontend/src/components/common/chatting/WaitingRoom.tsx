@@ -72,7 +72,9 @@ const WaitingRoom = () => {
             <Box className="pagination flex-container">
               <Pagination
                 count={Math.ceil(
-                  chattingRoomList === null ? 1 : chattingRoomList.length / 5
+                  chattingRoomList === null
+                    ? 1
+                    : Math.floor(chattingRoomList.length / 5) + 1
                 )}
                 variant="outlined"
                 shape="rounded"
