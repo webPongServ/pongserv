@@ -51,6 +51,8 @@ const GameBoard = (props: GameBoardProps) => {
     (state: IRootState) => state.sockets.gameSocket
   );
   const [isWaiting, setIsWaiting] = useState<boolean>(true);
+  const [start, setStart] = useState<boolean>(false);
+  const [timer, setTimer] = useState<number>(3);
 
   const [status, setStatus] = useState<string>("ready");
   const [score1, setScore1] = useState<number>(0);
@@ -181,16 +183,31 @@ const GameBoard = (props: GameBoardProps) => {
     // 난이도에 따라 paddleRef의 height를 조절하기(css)
   }, []);
 
-  gameSocket.on("someoneEnter", () => {
-    setIsWaiting(false);
+  gameSocket.on("gameStart", () => {
+    setStart(true);
+    const interval = setInterval(() => {
+      console.log(timer);
+      setTimer((prev: number) => prev - 1);
+
+      if (timer < 0) {
+        clearInterval(interval);
+      }
+    }, 1000);
+
+    setTimeout(() => {
+      setIsWaiting(false);
+    }, 4000);
   });
 
   return isWaiting ? (
-    <GameReady
-      type="일반 게임"
-      content="상대를 기다리는 중"
-      funnyImg="funny3.gif"
-    />
+    <>
+      <GameReady
+        type="일반 게임"
+        content="상대를 기다리는 중"
+        funnyImg="funny3.gif"
+      />
+      {start ? <div>{timer}</div> : null}
+    </>
   ) : (
     <Box
       id={props.id}
