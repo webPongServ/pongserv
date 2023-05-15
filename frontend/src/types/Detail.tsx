@@ -22,7 +22,7 @@ export interface ChattingUserDetail {
 export interface GameRoomDetail {
   id: string;
   title: string;
-  owner: string;
+  owner: UserDetail;
   maxScore: number;
   difficulty: string;
 }
