@@ -6,9 +6,10 @@ import { DbChatsManagerModule } from 'src/db-manager/db-chats-manager/db-chats-m
 import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-manager.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [DbChatsManagerModule, DbUsersManagerModule],
+  imports: [DbChatsManagerModule, DbUsersManagerModule, UsersModule],
   providers: [ChatsService, ChatsGateway, DbChatsManagerService, DbUsersManagerService],
   controllers: [ChatsController],
 })

@@ -25,5 +25,6 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
   ],
   controllers: [UsersController],
   providers: [UsersService, AuthService],
+  exports: [UsersService]
 })
 export class UsersModule {}
