@@ -18,7 +18,7 @@ export class DbGamesManagerService {
     @InjectRepository(TbGm04LEntity) private Gm04LRp: Repository<TbGm04LEntity>,
   ) {}
 
-  async createRoomList(type, roomName, difficulty, score) {
+  async createRoomList(type, roomName, difficulty, score, userId) {
     const room = await this.Gm01LRp.save({
       gmRmNm: roomName,
       gmType: type,
@@ -26,6 +26,7 @@ export class DbGamesManagerService {
       trgtScr: score,
       delTf: false,
       endType: '04',
+      owner: userId,
     });
     return room;
   }
@@ -52,7 +53,9 @@ export class DbGamesManagerService {
   async getRoomList() {
     const roomList = await this.Gm01LRp.find({
       where: { delTf: false, endType: In(['04', '01']) },
+      select: ['id', 'gmRmNm', 'gmType', 'lvDfct', 'trgtScr', 'owner'],
     });
+    console.log(roomList);
     return roomList;
   }
 }

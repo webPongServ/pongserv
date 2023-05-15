@@ -19,6 +19,7 @@ export class GamesService {
       roomName,
       difficulty,
       score,
+      userId,
     );
     return room;
   }

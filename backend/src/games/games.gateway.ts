@@ -9,8 +9,9 @@ import {
   OnGatewayInit,
   SubscribeMessage,
   WebSocketGateway,
+  WebSocketServer,
 } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { GamesService } from './games.service';
 import { roomOption } from './dto/roomOption.dto';
@@ -25,6 +26,9 @@ import { subscribe } from 'diagnostics_channel';
 export class GamesGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
+  @WebSocketServer()
+  server: Server;
+
   private logger = new Logger('GameGateway');
   private gameQueue = new GameQueue();
 
@@ -58,22 +62,19 @@ export class GamesGateway
     }
   }
   // Event handlers
+  afterInit() {
+    this.logger.log('GameGateway init is Successful!');
+    this.logger.log('length of gameQueue is ' + this.gameQueue.length);
+  }
   handleConnection(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
-
     this.logger.log(
-      `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}, ${socket}`,
+      `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
     );
   }
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
-    this.logger.log(
-      `GameGateway handleDisconnect: ${socket.id} intraId : ${socket.data}`,
-    );
-  }
-  afterInit() {
-    this.logger.log('GameGateway init is Successful!');
-    this.logger.log('length of gameQueue is ' + this.gameQueue.length);
+    this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 
   // Event listeners
