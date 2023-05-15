@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
+import GameReady from "components/game/GameReady";
+// 난이도에 따라 paddle의 pixel const 조절하기(js) => constant에서 제거
 import { GameBoardConst } from "constant";
 
 import { Box } from "@mui/material";
@@ -48,6 +50,8 @@ const GameBoard = (props: GameBoardProps) => {
   const gameSocket = useSelector(
     (state: IRootState) => state.sockets.gameSocket
   );
+  const [isWaiting, setIsWaiting] = useState<boolean>(true);
+
   const [status, setStatus] = useState<string>("ready");
   const [score1, setScore1] = useState<number>(0);
   const [score2, setScore2] = useState<number>(0);
@@ -174,9 +178,20 @@ const GameBoard = (props: GameBoardProps) => {
 
   useEffect(() => {
     if (divRef.current !== null) divRef.current.focus();
+    // 난이도에 따라 paddleRef의 height를 조절하기(css)
   }, []);
 
-  return (
+  gameSocket.on("someoneEnter", () => {
+    setIsWaiting(false);
+  });
+
+  return isWaiting ? (
+    <GameReady
+      type="일반 게임"
+      content="상대를 기다리는 중"
+      funnyImg="funny3.gif"
+    />
+  ) : (
     <Box
       id={props.id}
       className="flex-container"
