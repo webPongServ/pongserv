@@ -24,7 +24,7 @@ export class roomOption {
     example: '1',
     required: true,
   })
-  difficulty: number;
+  difficulty: string;
 
   @IsNotEmpty()
   @ApiProperty({
