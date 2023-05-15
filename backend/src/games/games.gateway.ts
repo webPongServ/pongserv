@@ -112,19 +112,41 @@ export class GamesGateway
   }
 
   @SubscribeMessage('enterGameRoom')
-  entranceGameRoom(
+  async entranceGameRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: EnterOption,
   ) {
     const userId = socket.data;
-    this.GamesService.enterRoom(userId, message);
-    socket.join(message.roomId);
+    const inRoom = await this.server.in(message.roomId).fetchSockets();
+    if (inRoom.length == 1) socket.join(message.roomId);
+    else {
+      return 'NO';
+    }
+    await this.GamesService.enterRoom(userId, message);
     // socket.to(message.roomId).emit('gameStart');
-    this.server.to(message.roomId).emit('gameStart');
+    console.log(socket.id);
     console.log(userId, 'joined', message.roomId);
-    return true;
+    return 'OK';
+  }
+
+  @SubscribeMessage('cancelEnterance')
+  cancelEnterance(@ConnectedSocket() socket: Socket, @MessageBody() message) {
+    const userId = socket.data;
+    console.log(userId, 'cancel', message.roomId);
+    socket.leave(message.roomId);
+    return 'OK';
+  }
+
+  @SubscribeMessage('gameRoomFulfilled')
+  async gameStart(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message: any,
+  ) {
+    this.server.to(message.roomId).emit('gameStart');
+    return 'OK';
   }
   // Game Data 요청 받고 보내기
+
   @SubscribeMessage('inGameReq')
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     const roomId = message.roomId;

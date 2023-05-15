@@ -77,8 +77,8 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log(`client: `);
-    console.log(client);
+    // console.log(`client: `);
+    // console.log(client);
   }
 
   @SubscribeMessage('chatroomCreation')
