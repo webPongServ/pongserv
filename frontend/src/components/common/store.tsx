@@ -11,6 +11,7 @@ const rootReducer = combineReducers({
   myInfo: MyInfoReducer,
   friends: FriendsReducer,
   currentChatting: CurrentChattingReducer,
+  // currentGame: CurrentGameReducer,
   gameRooms: GameRoomsReducer,
   sockets: SocketsReducer,
 });
