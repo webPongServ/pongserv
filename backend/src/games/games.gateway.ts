@@ -74,6 +74,9 @@ export class GamesGateway
   }
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
+    Array.from(socket.rooms).forEach((room) => {
+      socket.to(room).emit('gameDisconnected');
+    });
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 
@@ -116,7 +119,10 @@ export class GamesGateway
     const userId = socket.data;
     this.GamesService.enterRoom(userId, message);
     socket.join(message.roomId);
+    // socket.to(message.roomId).emit('gameStart');
+    this.server.to(message.roomId).emit('gameStart');
     console.log(userId, 'joined', message.roomId);
+    return true;
   }
   // Game Data 요청 받고 보내기
   @SubscribeMessage('inGameReq')
