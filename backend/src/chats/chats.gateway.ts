@@ -26,13 +26,12 @@ import { UsersService } from 'src/users/users.service';
     origin: '*',
   },
 })
-export class ChatsGateway
- implements OnGatewayConnection, OnGatewayDisconnect {
+export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly usersService: UsersService,
-    private readonly config: ConfigService
-    ) {}
+    private readonly config: ConfigService,
+  ) {}
   @WebSocketServer()
   server: Server;
   // private logger: Logger = new Logger('ChatsGateway');
@@ -48,16 +47,15 @@ export class ChatsGateway
     } catch (err) {
       console.log(err);
       socket.emit('errorValidateAuth', 'Not validated Access Token');
-      return ;
+      return;
     }
   }
-  
-  async handleConnection(
-    @ConnectedSocket() socket: Socket, ...args: any[]) {
+
+  async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
       socket.disconnect(true);
-      return ;
+      return;
     }
     /*!SECTION
       1. Friend user socket room에 등록 - Friend_userId
@@ -79,8 +77,8 @@ export class ChatsGateway
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
-    console.log(`client: `)
-    console.log(client)
+    console.log(`client: `);
+    console.log(client);
   }
 
   @SubscribeMessage('chatroomCreation')
