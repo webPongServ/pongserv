@@ -1,3 +1,4 @@
+import { TbUa01MEntity } from 'src/db-manager/db-users-manager/entities/tb-ua-01-m.entity';
 import { InjectRepository, TypeOrmModule } from '@nestjs/typeorm';
 import { TbGm01LEntity } from './entities/tb-gm-01-l.entity';
 import { TbGm01DEntity } from './entities/tb-gm-01-d.entity';
@@ -16,6 +17,7 @@ export class DbGamesManagerService {
     @InjectRepository(TbGm02SEntity) private Gm02SRp: Repository<TbGm02SEntity>,
     @InjectRepository(TbGm03DEntity) private Gm03DRp: Repository<TbGm03DEntity>,
     @InjectRepository(TbGm04LEntity) private Gm04LRp: Repository<TbGm04LEntity>,
+    @InjectRepository(TbUa01MEntity) private Ua01MRp: Repository<TbUa01MEntity>,
   ) {}
 
   async createRoomList(type, roomName, difficulty, score, userId) {
@@ -52,10 +54,19 @@ export class DbGamesManagerService {
 
   async getRoomList() {
     const roomList = await this.Gm01LRp.find({
-      where: { delTf: false, endType: In(['04', '01']) },
+      where: { delTf: false, endType: '04' },
       select: ['id', 'gmRmNm', 'gmType', 'lvDfct', 'trgtScr', 'owner'],
     });
-    console.log(roomList);
-    return roomList;
+
+    const updatedRoomList = await Promise.all(
+      roomList.map(async (room) => {
+        const ownerImage = await this.Ua01MRp.findOne({
+          where: { userId: room.owner },
+          select: ['imgPath'],
+        });
+        return { ...room, ownerImage: ownerImage ? ownerImage.imgPath : null };
+      }),
+    );
+    return updatedRoomList;
   }
 }
