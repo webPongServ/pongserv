@@ -183,21 +183,22 @@ const GameBoard = (props: GameBoardProps) => {
     // 난이도에 따라 paddleRef의 height를 조절하기(css)
   }, []);
 
-  gameSocket.on("gameStart", () => {
-    setStart(true);
-    const interval = setInterval(() => {
-      console.log(timer);
-      setTimer((prev: number) => prev - 1);
+  if (gameSocket)
+    gameSocket.on("gameStart", () => {
+      setStart(true);
+      const interval = setInterval(() => {
+        console.log(timer);
+        setTimer((prev: number) => prev - 1);
 
-      if (timer < 0) {
-        clearInterval(interval);
-      }
-    }, 1000);
+        if (timer < 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
 
-    setTimeout(() => {
-      setIsWaiting(false);
-    }, 4000);
-  });
+      setTimeout(() => {
+        setIsWaiting(false);
+      }, 4000);
+    });
 
   return isWaiting ? (
     <>
