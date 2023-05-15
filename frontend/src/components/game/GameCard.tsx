@@ -1,4 +1,7 @@
+import { useSelector } from "react-redux";
 import { GameCardProps } from "types/Game";
+import { IRootState } from "components/common/store";
+import { GameRoomType, GameDifficultyType } from "constant";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -9,6 +12,10 @@ import Typography from "@mui/joy/Typography";
 import { Box } from "@mui/system";
 
 const GameCard = (props: GameCardProps) => {
+  const gameSocket = useSelector(
+    (state: IRootState) => state.sockets.gameSocket
+  );
+
   const userNickname = (nickname: string, imgURL: string) => {
     return (
       <Box className="user flex-container">
@@ -23,8 +30,14 @@ const GameCard = (props: GameCardProps) => {
       className="game-card"
       variant="outlined"
       onClick={() => {
-        props.setRoomStatus("normal-game");
-        props.setSelectedID(props.id);
+        gameSocket.emit(
+          "enterGameRoom",
+          { roomId: props.id, type: GameRoomType.normal },
+          () => {
+            props.setRoomStatus("normal-game");
+            props.setSelectedID(props.id);
+          }
+        );
       }}
     >
       <Box className="flex-container">
@@ -40,9 +53,9 @@ const GameCard = (props: GameCardProps) => {
         <Box>점수 : {props.maxScore}</Box>
         <Box>|</Box>
         <Box>
-          난이도 : {props.difficulty === "easy" && "쉬움"}
-          {props.difficulty === "normal" && "보통"}
-          {props.difficulty === "hard" && "어려움"}
+          난이도 : {props.difficulty === GameDifficultyType.easy && "쉬움"}
+          {props.difficulty === GameDifficultyType.normal && "보통"}
+          {props.difficulty === GameDifficultyType.hard && "어려움"}
         </Box>
       </CardOverflow>
     </Card>

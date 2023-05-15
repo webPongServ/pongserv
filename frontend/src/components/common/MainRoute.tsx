@@ -2,7 +2,6 @@ import { Routes, Route } from "react-router-dom";
 import Profile from "pages/Profile";
 import Search from "pages/Search";
 import Game from "pages/game";
-import GameRoom from "components/game/GameRoom";
 import GameReady from "components/game/GameReady";
 
 const MainRoute = (): JSX.Element => {
@@ -11,9 +10,8 @@ const MainRoute = (): JSX.Element => {
       <Route path="/profile/:nickname" element={<Profile />} />
       <Route path="/search" element={<Search />} />
       <Route path="/game" element={<Game />} />
-      <Route path="/game/normal" element={<GameRoom />} />
       <Route
-        path="/game/ladder"
+        path="/game-ladder"
         element={
           <GameReady
             type="래더 게임"

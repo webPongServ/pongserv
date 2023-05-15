@@ -1,18 +1,13 @@
 import { useRef } from "react";
+import ErrorNotification from "components/utils/ErrorNotification";
 import instance from "API/api";
 import UserService from "API/UserService";
 // import { useNavigate } from "react-router-dom";
 import qs from "query-string";
 import "styles/Login.scss";
 
-import WarningIcon from "@mui/icons-material/Warning";
-import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/joy/IconButton";
-import Typography from "@mui/joy/Typography";
-
 import { Box } from "@mui/material";
 import Button from "@mui/joy/Button";
-import Alert from "@mui/joy/Alert";
 
 const Login = () => {
   const paramsCode: string | undefined = qs.parse(window.location.search)
@@ -29,31 +24,17 @@ const Login = () => {
     window.location.href = `${response.data}`;
   };
 
+  setTimeout(() => {
+    if (divRef.current) divRef.current.style.animationName = "slideup";
+  }, 5000);
+
   return (
     <>
       {paramsCode === "auth_failed" ? (
-        <Box id="auth-inform" ref={divRef}>
-          <Box className="container">
-            <Alert
-              startDecorator={<WarningIcon className="warning" />}
-              color="danger"
-              endDecorator={
-                <IconButton
-                  color="danger"
-                  onClick={() => {
-                    divRef.current!.style.animationName = "slideup";
-                  }}
-                >
-                  <CloseIcon />
-                </IconButton>
-              }
-            >
-              <Typography color="danger">
-                로그인 정보가 올바르지 않습니다!
-              </Typography>
-            </Alert>
-          </Box>
-        </Box>
+        <ErrorNotification
+          errorMessage="로그인 정보가 올바르지 않습니다!"
+          ref={divRef}
+        />
       ) : null}
       <Box id="Login" className="flex-container">
         <Box>

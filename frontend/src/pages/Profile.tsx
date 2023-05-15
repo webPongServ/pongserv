@@ -52,8 +52,7 @@ const Profile = () => {
         });
       setIsNew(false);
     } catch {
-      alert("유저가 존재하지 않습니다! 홈 화면으로 돌아갑니다.");
-      navigate("/game");
+      window.location.href = "/game?error=invalid_user";
     }
   };
 

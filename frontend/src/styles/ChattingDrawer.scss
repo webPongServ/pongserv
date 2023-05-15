@@ -10,6 +10,7 @@ $ChattingDrawerWidth: 500px;
   }
 
   #header {
+    z-index: 0;
     height: 5%;
     font-size: 20px;
 
@@ -19,6 +20,7 @@ $ChattingDrawerWidth: 500px;
   }
 
   #body {
+    z-index: 0;
     height: 90%;
     padding: 3%;
 

@@ -7,17 +7,19 @@ import CustomInput from "components/utils/CustomInput";
 import CustomSlider from "components/utils/CustomSlider";
 import ChattingTypeSelect from "components/utils/ChattingTypeSelect";
 import CustomIconButton from "components/utils/CustomIconButton";
-import ChattingService from "API/ChattingService";
 import { ChattingRoomType, ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
-import { socket } from "socket";
 
 import { Box } from "@mui/material";
 import { Button } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
 
 const RoomCreator = () => {
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
+  const chattingSocket: any = useSelector(
+    (state: IRootState) => state.sockets.chattingSocket!
+  );
   const [isPublic, setIsPublic] = useState<boolean>(true);
   const [chattingRoomForm, setChattingRoomForm] = useState<ChattingRoomForm>({
     chatroomName: "",
@@ -26,7 +28,6 @@ const RoomCreator = () => {
     password: "",
   });
   const divRef = useRef<HTMLDivElement>(null);
-  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const dispatch = useDispatch();
 
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +77,7 @@ const RoomCreator = () => {
     )
       return alert("비밀번호를 입력해주세요!");
 
-    socket.emit(
+    chattingSocket.emit(
       "chatroomCreation",
       {
         name: chattingRoomForm.chatroomName,

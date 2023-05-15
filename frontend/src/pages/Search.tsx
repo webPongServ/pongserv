@@ -42,10 +42,6 @@ const Search = () => {
     );
   };
 
-  useEffect(() => {
-    getSearched();
-  }, [inputNickname]);
-
   return (
     <Box id="Search" className="flex-container">
       <Box id="input-box" className="flex-container">
@@ -55,15 +51,13 @@ const Search = () => {
           placeholder="유저 이름을 입력하세요."
           maxLength={10}
           handleFunction={handleValue}
-          handleDoneTyping={() => {}}
+          handleDoneTyping={getSearched}
           isError={false}
         />
       </Box>
       <List id="result-box" className="overflow">
         {searchedUsers.length === 0 ? (
-          <Box className="flex-container" style={{}}>
-            검색 결과가 없습니다.
-          </Box>
+          <Box className="flex-container">검색 결과가 없습니다.</Box>
         ) : (
           searchedUsers.map((value, index) => (
             <ListItem key={value.nickname + index} disablePadding>

@@ -27,6 +27,13 @@ const GameReady = (props: ComponentInfo) => {
       >
         대기실로 나가기
       </Button>
+      <Button
+        onClick={() => {
+          navigate("/game/123");
+        }}
+      >
+        게임 입장(임시)
+      </Button>
     </Box>
   );
 };

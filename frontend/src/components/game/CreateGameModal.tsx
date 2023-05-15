@@ -5,12 +5,15 @@ import CustomSlider from "components/utils/CustomSlider";
 import GameDifficultyRadioGroup from "components/utils/GameDifficultyRadioGroup";
 import { GameRoomForm } from "types/Form";
 import CustomIconButton from "components/utils/CustomIconButton";
+import { useSelector } from "react-redux";
 import "styles/global.scss";
 import "styles/Game.scss";
 
 import { Box } from "@mui/material";
 import { Button, Modal, ModalDialog } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
+import { IRootState } from "components/common/store";
+import { GameDifficultyType, GameRoomType } from "constant";
 
 interface CreateGameModalProps {
   roomStatus: string;
@@ -18,12 +21,14 @@ interface CreateGameModalProps {
 }
 
 const CreateGameModal = (props: CreateGameModalProps) => {
+  const gameSocket = useSelector(
+    (state: IRootState) => state.sockets.gameSocket
+  );
   const navigate = useNavigate();
-  const [roomID, setRoomID] = useState<string>("203404250001");
   const [gameRoomForm, setGameRoomForm] = useState<GameRoomForm>({
     title: "",
     maxScore: 5,
-    difficulty: "easy",
+    difficulty: GameDifficultyType.normal,
   });
 
   const handleTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -85,12 +90,29 @@ const CreateGameModal = (props: CreateGameModalProps) => {
             />
             <GameDifficultyRadioGroup
               name="난이도"
-              defaultValue="normal"
+              defaultValue={GameDifficultyType.easy}
               handleFunction={handleDifficulty}
             />
           </Box>
           <Box className="footer flex-container">
-            <Button onClick={() => navigate(`/game/${roomID}`)}>생성</Button>
+            <Button
+              onClick={() => {
+                gameSocket.emit(
+                  "createGameRoom",
+                  {
+                    roomName: gameRoomForm.title,
+                    score: gameRoomForm.maxScore,
+                    difficulty: gameRoomForm.difficulty,
+                    type: GameRoomType.normal,
+                  },
+                  (uuid: string) => {
+                    navigate(`/game/${uuid}`);
+                  }
+                );
+              }}
+            >
+              생성
+            </Button>
           </Box>
         </Box>
       </ModalDialog>
