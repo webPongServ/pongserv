@@ -38,7 +38,7 @@ export class DbGamesManagerService {
   async createRoomDetail(roomListEntity, userEntity, type) {
     const room = await this.Gm01DRp.save({
       gm01lEntity: roomListEntity,
-      gm01dUserEntity: userEntity,
+      ua01mEntity: userEntity,
       getScr: 0,
       lossScr: 0,
       gmRsltCd: type ? type : '01',
@@ -112,9 +112,16 @@ export class DbGamesManagerService {
       where: { id: roomId },
     });
 
-    console.log(user, room);
+    console.log(user, room, opponentId);
     const targetColumn = await this.Gm01DRp.findOne({
-      where: { gm01lEntity: room, ua01mEntity: user },
+      where: {
+        gm01lEntity: {
+          id: room.id,
+        },
+        ua01mEntity: {
+          id: user.id,
+        },
+      },
     });
 
     console.log('UpdateOpponent', targetColumn);

@@ -39,7 +39,7 @@ export class GamesService {
     const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
       roomId,
     );
-    this.createGameDetail(roomListEntity, userId, type);
+    await this.createGameDetail(roomListEntity, userId, type);
   }
 
   async getRoomList() {
