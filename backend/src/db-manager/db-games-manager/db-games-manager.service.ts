@@ -69,4 +69,20 @@ export class DbGamesManagerService {
     );
     return updatedRoomList;
   }
+
+  async endGameList(roomListEntity) {
+    const room = await this.Gm01LRp.save({
+      ...roomListEntity,
+      endType: '02',
+    });
+    return room;
+  }
+
+  async startGameList(roomListEntity) {
+    const room = await this.Gm01LRp.save({
+      ...roomListEntity,
+      endType: '01',
+    });
+    return room;
+  }
 }
