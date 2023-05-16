@@ -12,6 +12,7 @@ export class GamesService {
     private readonly configService: ConfigService,
   ) {}
 
+  // GameRoom 생성한다.
   async createGameRoom(userId, message: roomOption) {
     const { type, roomName, difficulty, score } = message;
     const room = await this.DbGamesManagerService.createRoomList(
@@ -34,11 +35,11 @@ export class GamesService {
     return true;
   }
 
-  async enterRoom(userId, message) {
+  async enterRoom(userId, roomId, type) {
     const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
-      message.roomId,
+      roomId,
     );
-    this.createGameDetail(roomListEntity, userId, message.type);
+    this.createGameDetail(roomListEntity, userId, type);
   }
 
   async getRoomList() {
@@ -50,13 +51,30 @@ export class GamesService {
     const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
       roomId,
     );
-    await this.DbGamesManagerService.endGameList(roomListEntity);
+    const room = await this.DbGamesManagerService.endGameList(roomListEntity);
+    await this.DbGamesManagerService.endGameDetail(room.id);
   }
 
-  async startGame(roomId) {
+  async updateOpponent(opponent, roomId) {
+    const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
+      roomId,
+    );
+    const owner = roomListEntity.owner;
+    // Room ID 를 기준으로, 각각 상대편으로 등록한다.
+    await this.DbGamesManagerService.updateOpponent(roomId, opponent, owner);
+    await this.DbGamesManagerService.updateOpponent(roomId, owner, opponent);
+  }
+
+  async startGame(userId, roomId) {
     const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
       roomId,
     );
     await this.DbGamesManagerService.startGameList(roomListEntity);
+  }
+
+  async getUserStatic(userId) {
+    const user = await this.DbUsersManagerService.getUserByUserId(userId);
+    const userStatic = await this.DbGamesManagerService.getUserStatic(user);
+    return userStatic;
   }
 }
