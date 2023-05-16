@@ -299,7 +299,7 @@ const GameBoard = (props: GameBoardProps) => {
               paddleRef.current!.style.top = data.data + "px";
             else paddle2Ref.current!.style.top = data.data + "px";
           } else {
-            if (data.role === "owner") {
+            if (data.role === "guest") {
               ballRef.current!.style.left = data.data.left;
               ballRef.current!.style.right = data.data.right;
               ballRef.current!.style.top = data.data.top;
