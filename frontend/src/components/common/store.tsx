@@ -4,6 +4,7 @@ import { FriendsReducer } from "types/redux/Friends";
 import { CurrentChattingReducer } from "types/redux/CurrentChatting";
 import { GameRoomsReducer } from "types/redux/GameRooms";
 import { LoginStatusReducer } from "types/redux/Login";
+import { CurrentGameReducer } from "types/redux/CurrentGame";
 import { SocketsReducer } from "types/redux/Sockets";
 
 const rootReducer = combineReducers({
@@ -11,7 +12,7 @@ const rootReducer = combineReducers({
   myInfo: MyInfoReducer,
   friends: FriendsReducer,
   currentChatting: CurrentChattingReducer,
-  // currentGame: CurrentGameReducer,
+  currentGame: CurrentGameReducer,
   gameRooms: GameRoomsReducer,
   sockets: SocketsReducer,
 });
