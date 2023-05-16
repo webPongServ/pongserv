@@ -7,7 +7,6 @@ import { GameBoardConst } from "constant";
 import SuccessNotification from "components/utils/SuccessNotification";
 
 import { Box } from "@mui/material";
-import { stat } from "fs";
 
 interface GameBoardProps {
   id: string;
@@ -81,38 +80,38 @@ const GameBoard = (props: GameBoardProps) => {
   let dxd: number = quadrant[random][0];
   let dyd: number = quadrant[random][1];
 
-  if (status === "ready")
-    setTimeout(() => {
-      setStatus("play");
-      requestAnimationFrame(() => {
-        dx = 10;
-        dy = 10;
-        dxd = quadrant[random][0];
-        dyd = quadrant[random][1];
-        moveBall(dx, dy, dxd, dyd);
-      });
-    }, 3000);
-
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    paddle1_abs = paddleRef.current!.getBoundingClientRect();
-    paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
-    board_abs = boardRef.current!.getBoundingClientRect();
-    ball_abs = ballRef.current!.getBoundingClientRect();
-    paddle1_rel = getPaddleRel(paddle1_abs, board_abs);
-    paddle2_rel = getPaddleRel(paddle2_abs, board_abs);
-    ball_rel = getBallRel(ball_abs, board_abs);
-    selected_abs = selectedPaddleRef === paddleRef ? paddle1_abs : paddle2_abs;
-    selected_rel = selectedPaddleRef === paddleRef ? paddle1_rel : paddle2_rel;
-    const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
+    if (
+      paddleRef.current ||
+      paddle2Ref.current ||
+      boardRef.current ||
+      ballRef.current
+    ) {
+      paddle1_abs = paddleRef.current!.getBoundingClientRect();
+      paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
+      board_abs = boardRef.current!.getBoundingClientRect();
+      ball_abs = ballRef.current!.getBoundingClientRect();
+      paddle1_rel = getPaddleRel(paddle1_abs, board_abs);
+      paddle2_rel = getPaddleRel(paddle2_abs, board_abs);
+      ball_rel = getBallRel(ball_abs, board_abs);
+      selected_abs =
+        selectedPaddleRef === paddleRef ? paddle1_abs : paddle2_abs;
+      selected_rel =
+        selectedPaddleRef === paddleRef ? paddle1_rel : paddle2_rel;
+      const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
 
-    if (status === "play") {
       if (event.key === "ArrowUp") {
         selectedPaddleRef!.current!.style.top =
           Math.max(0, selected_rel.top - GameBoardConst.MOVE_PIXEL) + "px";
         selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
         gameSocket.emit(
           "inGameReq",
-          { roomId: currentGame.id, data: selected_rel.top, role: role },
+          {
+            roomId: currentGame.id,
+            data: Math.max(0, selected_rel.top - GameBoardConst.MOVE_PIXEL),
+            role: role,
+            type: "paddle",
+          },
           (data: any) => {
             console.log(data);
           }
@@ -127,7 +126,15 @@ const GameBoard = (props: GameBoardProps) => {
         selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
         gameSocket.emit(
           "inGameReq",
-          { roomId: currentGame.id, data: selected_rel.top, role: role },
+          {
+            roomId: currentGame.id,
+            data: Math.min(
+              GameBoardConst.GAMEBOARD_HEIGHT - GameBoardConst.PADDLE_HEIGHT,
+              selected_rel.top + GameBoardConst.MOVE_PIXEL
+            ),
+            role: role,
+            type: "paddle",
+          },
           (data: any) => {
             console.log(data);
           }
@@ -137,59 +144,109 @@ const GameBoard = (props: GameBoardProps) => {
   };
 
   function moveBall(dx: number, dy: number, dxd: number, dyd: number) {
-    paddle1_abs = paddleRef.current!.getBoundingClientRect();
-    paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
-    board_abs = boardRef.current!.getBoundingClientRect();
-    ball_abs = ballRef.current!.getBoundingClientRect();
-    paddle1_rel = getPaddleRel(paddle1_abs, board_abs);
-    paddle2_rel = getPaddleRel(paddle2_abs, board_abs);
-    ball_rel = getBallRel(ball_abs, board_abs);
+    if (
+      paddleRef.current ||
+      paddle2Ref.current ||
+      boardRef.current ||
+      ballRef.current
+    ) {
+      paddle1_abs = paddleRef.current!.getBoundingClientRect();
+      paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
+      board_abs = boardRef.current!.getBoundingClientRect();
+      ball_abs = ballRef.current!.getBoundingClientRect();
+      paddle1_rel = getPaddleRel(paddle1_abs, board_abs);
+      paddle2_rel = getPaddleRel(paddle2_abs, board_abs);
+      ball_rel = getBallRel(ball_abs, board_abs);
+      const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
 
-    if (ball_rel.top <= 0) dyd = 1;
-    if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
-    if (
-      ball_rel.left <= paddle1_rel.right &&
-      ball_rel.top >= paddle1_rel.top &&
-      ball_rel.bottom <= paddle1_rel.bottom
-    ) {
-      // why 10?
-      if (ball_rel.left <= 10) {
-        setScore2((prev) => score2 + 1);
-        setStatus("ready");
+      if (ball_rel.top <= 0) dyd = 1;
+      if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
+      if (
+        ball_rel.left <= paddle1_rel.right &&
+        ball_rel.top >= paddle1_rel.top &&
+        ball_rel.bottom <= paddle1_rel.bottom
+      ) {
+        // why 10?
+        if (ball_rel.left <= 10) {
+          setScore2((prev) => prev + 1);
+          ballRef.current!.style.top = "285px";
+          ballRef.current!.style.left = "485px";
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              dx = 10;
+              dy = 10;
+              dxd = quadrant[random][0];
+              dyd = quadrant[random][1];
+              moveBall(dx, dy, dxd, dyd);
+            });
+          }, 3000);
+          return;
+        } else dxd = 1;
+      }
+      if (
+        ball_rel.right >= paddle2_rel.left &&
+        ball_rel.top >= paddle2_rel.top &&
+        ball_rel.bottom <= paddle2_rel.bottom
+      ) {
+        if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
+          setScore1((prev) => prev + 1);
+          ballRef.current!.style.top = "285px";
+          ballRef.current!.style.left = "485px";
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              dx = 10;
+              dy = 10;
+              dxd = quadrant[random][0];
+              dyd = quadrant[random][1];
+              moveBall(dx, dy, dxd, dyd);
+            });
+          }, 3000);
+          return;
+        } else dxd = 0;
+      }
+      if (
+        ball_abs.left <= board_abs.left ||
+        ball_abs.right >= board_abs.right
+      ) {
+        if (ball_abs.left <= board_abs.left) setScore2((prev) => prev + 1);
+        else setScore1((prev) => prev + 1);
         ballRef.current!.style.top = "285px";
         ballRef.current!.style.left = "485px";
+        setTimeout(() => {
+          requestAnimationFrame(() => {
+            dx = 10;
+            dy = 10;
+            dxd = quadrant[random][0];
+            dyd = quadrant[random][1];
+            moveBall(dx, dy, dxd, dyd);
+          });
+        }, 3000);
         return;
-      } else dxd = 1;
+      }
+      ballRef.current!.style.top =
+        ball_abs.top - board_abs.top + dy * (dyd === 0 ? -1 : 0) + "px";
+      ballRef.current!.style.left =
+        ball_abs.left - board_abs.left + dx * (dxd === 0 ? -1 : 0) + "px";
+      // ball_abs = ballRef.current!.getBoundingClientRect();
+      gameSocket.emit(
+        "inGameReq",
+        {
+          roomId: currentGame.id,
+          data: {
+            top: ballRef.current!.style.top,
+            left: ballRef.current!.style.left,
+          },
+          role: role,
+          type: "ball",
+        },
+        (data: any) => {
+          console.log(data);
+        }
+      );
+      requestAnimationFrame(() => {
+        moveBall(dx, dy, dxd, dyd);
+      });
     }
-    if (
-      ball_rel.right >= paddle2_rel.left &&
-      ball_rel.top >= paddle2_rel.top &&
-      ball_rel.bottom <= paddle2_rel.bottom
-    ) {
-      if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
-        setScore1((prev) => score1 + 1);
-        setStatus("ready");
-        ballRef.current!.style.top = "285px";
-        ballRef.current!.style.left = "485px";
-        return;
-      } else dxd = 0;
-    }
-    if (ball_abs.left <= board_abs.left || ball_abs.right >= board_abs.right) {
-      if (ball_abs.left <= board_abs.left) setScore2((prev) => score2 + 1);
-      else setScore1((prev) => score1 + 1);
-      setStatus("ready");
-      ballRef.current!.style.top = "285px";
-      ballRef.current!.style.left = "485px";
-      return;
-    }
-    ballRef.current!.style.top =
-      ball_abs.top - board_abs.top + dy * (dyd === 0 ? -1 : 0) + "px";
-    ballRef.current!.style.left =
-      ball_abs.left - board_abs.left + dx * (dxd === 0 ? -1 : 0) + "px";
-    // ball_abs = ballRef.current!.getBoundingClientRect();
-    requestAnimationFrame(() => {
-      moveBall(dx, dy, dxd, dyd);
-    });
   }
 
   const socketGameStart = () => {
@@ -207,6 +264,11 @@ const GameBoard = (props: GameBoardProps) => {
     setTimeout(() => {
       setIsWaiting(false);
       if (notiRef.current) notiRef.current.style.animationName = "slideup";
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          moveBall(dx, dy, dxd, dyd);
+        });
+      }, 3000);
     }, 4000);
   };
 
@@ -229,10 +291,17 @@ const GameBoard = (props: GameBoardProps) => {
       gameSocket.on("roomGuest", socketRoomGuest);
       gameSocket.on(
         "inGameRes",
-        (data: { roomId: string; data: string; role: string }) => {
-          if (data.role === "owner")
-            paddleRef.current!.style.top = data.data + "px";
-          else paddle2Ref.current!.style.top = data.data + "px";
+        (data: { roomId: string; data: any; role: string; type: string }) => {
+          if (data.type === "paddle") {
+            if (data.role === "owner")
+              paddleRef.current!.style.top = data.data + "px";
+            else paddle2Ref.current!.style.top = data.data + "px";
+          } else {
+            if (data.role === "owner") {
+              ballRef.current!.style.left = data.data.left;
+              ballRef.current!.style.top = data.data.top;
+            }
+          }
         }
       );
     }
