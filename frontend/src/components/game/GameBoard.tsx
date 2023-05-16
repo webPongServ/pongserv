@@ -81,6 +81,18 @@ const GameBoard = (props: GameBoardProps) => {
   let dxd: number = quadrant[random][0];
   let dyd: number = quadrant[random][1];
 
+  if (status === "ready")
+    setTimeout(() => {
+      setStatus("play");
+      requestAnimationFrame(() => {
+        dx = 10;
+        dy = 10;
+        dxd = quadrant[random][0];
+        dyd = quadrant[random][1];
+        moveBall(dx, dy, dxd, dyd);
+      });
+    }, 3000);
+
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
     paddle1_abs = paddleRef.current!.getBoundingClientRect();
     paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
@@ -93,18 +105,7 @@ const GameBoard = (props: GameBoardProps) => {
     selected_rel = selectedPaddleRef === paddleRef ? paddle1_rel : paddle2_rel;
     const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
 
-    if (status === "ready") {
-      setTimeout(() => {
-        setStatus("play");
-        requestAnimationFrame(() => {
-          dx = 10;
-          dy = 10;
-          dxd = quadrant[random][0];
-          dyd = quadrant[random][1];
-          moveBall(dx, dy, dxd, dyd);
-        });
-      }, 3000);
-    } else if (status === "play") {
+    if (status === "play") {
       if (event.key === "ArrowUp") {
         selectedPaddleRef!.current!.style.top =
           Math.max(0, selected_rel.top - GameBoardConst.MOVE_PIXEL) + "px";
@@ -229,7 +230,6 @@ const GameBoard = (props: GameBoardProps) => {
       gameSocket.on(
         "inGameRes",
         (data: { roomId: string; data: string; role: string }) => {
-          console.log(data);
           if (data.role === "owner")
             paddleRef.current!.style.top = data.data + "px";
           else paddle2Ref.current!.style.top = data.data + "px";
@@ -273,9 +273,6 @@ const GameBoard = (props: GameBoardProps) => {
             <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
             <h1 className="player_1_score">{score1}</h1>
             <h1 className="player_2_score">{score2}</h1>
-            {status === "ready" ? (
-              <h1 className="message">Press Enter to Play Pong</h1>
-            ) : null}
           </Box>
         </Box>
       )}
