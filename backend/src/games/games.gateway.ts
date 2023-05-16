@@ -170,9 +170,9 @@ export class GamesGateway
   @SubscribeMessage('inGameReq')
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     const roomId = message.roomId;
-    const data = Math.floor(message.data);
+    // {user : owner, data : 350}
     console.log('in game req', message);
-    socket.to(roomId).emit('inGameRes', data);
+    socket.to(roomId).emit('inGameRes', message);
     return 'OK';
   }
 
