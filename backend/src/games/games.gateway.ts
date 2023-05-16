@@ -63,18 +63,29 @@ export class GamesGateway
   }
   // Event handlers
   afterInit() {
-    this.logger.log('GameGateway init is Successful!');
-    this.logger.log('length of gameQueue is ' + this.gameQueue.length);
+    this.logger.log('GameGateway initialized');
   }
   handleConnection(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
     this.logger.log(
       `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
     );
+    socket.on('disconnecting', (reason) => {
+      for (const room of socket.rooms) {
+        if (room !== socket.id) {
+          console.log('ROOMS is', room, reason);
+          socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
+          this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
+          // this.GamesService.endGame(room);
+        }
+      }
+    });
   }
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
+    console.log('CONSOLE LOG ROOMs', socket.rooms);
     Array.from(socket.rooms).forEach((room) => {
+      console.log('ROOM!!', room);
       socket.to(room).emit('gameDisconnected');
     });
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
@@ -142,7 +153,12 @@ export class GamesGateway
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: any,
   ) {
+    socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
+    socket.emit('roomGuest');
     this.server.to(message.roomId).emit('gameStart');
+    console.log(socket.rooms);
+    console.log((await this.server.in(message.roomId).fetchSockets()).length);
+    this.GamesService.startGame(message.roomId);
     return 'OK';
   }
   // Game Data 요청 받고 보내기
@@ -151,7 +167,16 @@ export class GamesGateway
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     const roomId = message.roomId;
     const data = message.data;
+    console.log('in game req', message);
     socket.to(roomId).emit('inGameRes', data);
+    return 'OK';
+  }
+
+  @SubscribeMessage('scoreUpdate')
+  scoreUpdate(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
+    const roomId = message.roomId;
+    const score = message.score;
+    socket.to(roomId).emit('scoreUpdate', score);
   }
 
   @SubscribeMessage('leaveGameRoom')
