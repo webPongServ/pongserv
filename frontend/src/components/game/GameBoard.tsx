@@ -7,7 +7,6 @@ import { GameBoardConst } from "constant";
 import SuccessNotification from "components/utils/SuccessNotification";
 
 import { Box } from "@mui/material";
-import { stat } from "fs";
 
 interface GameBoardProps {
   id: string;
@@ -111,6 +110,7 @@ const GameBoard = (props: GameBoardProps) => {
             roomId: currentGame.id,
             data: Math.max(0, selected_rel.top - GameBoardConst.MOVE_PIXEL),
             role: role,
+            type: "paddle",
           },
           (data: any) => {
             console.log(data);
@@ -133,6 +133,7 @@ const GameBoard = (props: GameBoardProps) => {
               selected_rel.top + GameBoardConst.MOVE_PIXEL
             ),
             role: role,
+            type: "paddle",
           },
           (data: any) => {
             console.log(data);
@@ -156,6 +157,20 @@ const GameBoard = (props: GameBoardProps) => {
       paddle1_rel = getPaddleRel(paddle1_abs, board_abs);
       paddle2_rel = getPaddleRel(paddle2_abs, board_abs);
       ball_rel = getBallRel(ball_abs, board_abs);
+      const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
+
+      gameSocket.emit(
+        "inGameReq",
+        {
+          roomId: currentGame.id,
+          data: ball_rel,
+          role: role,
+          type: "ball",
+        },
+        (data: any) => {
+          console.log(data);
+        }
+      );
 
       if (ball_rel.top <= 0) dyd = 1;
       if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
@@ -274,10 +289,17 @@ const GameBoard = (props: GameBoardProps) => {
       gameSocket.on("roomGuest", socketRoomGuest);
       gameSocket.on(
         "inGameRes",
-        (data: { roomId: string; data: string; role: string }) => {
-          if (data.role === "owner")
-            paddleRef.current!.style.top = data.data + "px";
-          else paddle2Ref.current!.style.top = data.data + "px";
+        (data: { roomId: string; data: any; role: string; type: string }) => {
+          if (data.type === "paddle") {
+            if (data.role === "owner")
+              paddleRef.current!.style.top = data.data + "px";
+            else paddle2Ref.current!.style.top = data.data + "px";
+          } else {
+            ballRef.current!.style.left = data.data.left;
+            ballRef.current!.style.right = data.data.right;
+            ballRef.current!.style.top = data.data.top;
+            ballRef.current!.style.bottom = data.data.bottom;
+          }
         }
       );
     }
