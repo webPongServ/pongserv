@@ -24,6 +24,7 @@ import { TbCh01LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-01
 import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
 import { ChatroomResponseMessageDto } from './dto/chatroom-response-message.dto';
+import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
 
 @Injectable()
 export class ChatsService {
@@ -655,5 +656,21 @@ export class ChatsService {
     userInChtrm.chtRmJoinTf = false;
     this.dbChatsManagerService.saveChtrmUser(userInChtrm);
     return user.nickname;
+  }
+
+  async putBlockUserInChats(userId: string, infoBlck: BlockingUserInChatsDto)
+  {
+	/*!SECTION
+		1. requester user 정보를 가져온다.
+		2. target user를 찾아서 가져온다.
+		3. boolToBlock 정보에 따라서 TB_CH04L에 등록한다.
+	*/
+	// 1
+	const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+	// 2
+	const target = await this.dbUsersManagerService.getUserByNickname(infoBlck.nickname);
+	// 3
+	await this.dbChatsManagerService.setBlockingData(requester, target, infoBlck.boolToBlock);
+	return ;
   }
 }

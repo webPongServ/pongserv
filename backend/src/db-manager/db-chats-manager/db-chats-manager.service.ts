@@ -474,4 +474,38 @@ export class DbChatsManagerService {
     }
     return true;
   }
+
+  async setBlockingData(
+    requester: TbUa01MEntity, 
+    target: TbUa01MEntity, 
+    toBlock: boolean
+    )
+  {
+    let blockingData = await this.ch04lRp.findOne({
+      where: {
+        ua01mEntity: {
+          id: requester.id,
+        },
+        ua01mEntityAsBlock: {
+          id: target.id,
+        },
+      }
+    });
+    if (blockingData === null)
+    {
+      blockingData = this.ch04lRp.create({
+        ua01mEntity: requester,
+        ua01mEntityAsBlock: target,
+        stCd: '01', // 등록
+        rsstDttm: new Date(),
+      });
+    }
+    if (toBlock === true)
+      blockingData.stCd = '01';
+    else
+      blockingData.stCd = '02';
+    this.ch04lRp.save(blockingData);
+    return ;
+  }
+
 }

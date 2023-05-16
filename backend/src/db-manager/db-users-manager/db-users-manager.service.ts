@@ -33,6 +33,15 @@ export class DbUsersManagerService {
     return user;
   }
 
+  async getUserByNickname(nickname: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        nickname: nickname,
+      },
+    });
+    return user;
+  }
+
   // TODO: move to UsersModule
   async checkinUser(intraData: { intraId: string; intraImagePath: string }) {
     /*!SECTION
