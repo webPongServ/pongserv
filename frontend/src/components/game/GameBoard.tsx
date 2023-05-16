@@ -234,9 +234,7 @@ const GameBoard = (props: GameBoardProps) => {
           roomId: currentGame.id,
           data: {
             top: ballRef.current!.style.top,
-            bottom: ballRef.current!.style.top,
             left: ballRef.current!.style.left,
-            right: ballRef.current!.style.left,
           },
           role: role,
           type: "ball",
@@ -299,12 +297,8 @@ const GameBoard = (props: GameBoardProps) => {
               paddleRef.current!.style.top = data.data + "px";
             else paddle2Ref.current!.style.top = data.data + "px";
           } else {
-            if (data.role === "guest") {
-              ballRef.current!.style.left = data.data.left;
-              ballRef.current!.style.right = data.data.right;
-              ballRef.current!.style.top = data.data.top;
-              ballRef.current!.style.bottom = data.data.bottom;
-            }
+            ballRef.current!.style.left = data.data.left;
+            ballRef.current!.style.top = data.data.top;
           }
         }
       );
