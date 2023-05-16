@@ -4,7 +4,7 @@ import { IRootState } from "components/common/store";
 import GameReady from "components/game/GameReady";
 // 난이도에 따라 paddle의 pixel const 조절하기(js) => constant에서 제거
 import { GameBoardConst } from "constant";
-import ErrorNotification from "components/utils/ErrorNotification";
+import SuccessNotification from "components/utils/SuccessNotification";
 
 import { Box } from "@mui/material";
 
@@ -51,10 +51,12 @@ const GameBoard = (props: GameBoardProps) => {
   const gameSocket = useSelector(
     (state: IRootState) => state.sockets.gameSocket
   );
+  const currentGame = useSelector((state: IRootState) => state.currentGame);
+  const notiRef = useRef<HTMLDivElement>(null);
   const [isWaiting, setIsWaiting] = useState<boolean>(true);
-  const [start, setStart] = useState<boolean>(false);
   const [timer, setTimer] = useState<number>(3);
-
+  const [selectedPaddleRef, setSelectedPaddleRef] =
+    useState<React.RefObject<HTMLDivElement> | null>(null);
   const [status, setStatus] = useState<string>("ready");
   const [score1, setScore1] = useState<number>(0);
   const [score2, setScore2] = useState<number>(0);
@@ -64,8 +66,15 @@ const GameBoard = (props: GameBoardProps) => {
   const paddleRef = useRef<HTMLDivElement>(null);
   const paddle2Ref = useRef<HTMLDivElement>(null);
   const ballRef = useRef<HTMLDivElement>(null);
-  let paddle1_abs, paddle2_abs, board_abs, ball_abs: DOMRect;
-  let paddle1_rel, paddle2_rel, ball_rel: RelativeCoord;
+  let paddle1_abs: DOMRect,
+    paddle2_abs: DOMRect,
+    board_abs: DOMRect,
+    ball_abs: DOMRect,
+    selected_abs: DOMRect;
+  let paddle1_rel: RelativeCoord,
+    paddle2_rel: RelativeCoord,
+    ball_rel: RelativeCoord,
+    selected_rel: RelativeCoord;
   let dx: number = 10;
   let dy: number = 10;
   let dxd: number = quadrant[random][0];
@@ -79,6 +88,8 @@ const GameBoard = (props: GameBoardProps) => {
     paddle1_rel = getPaddleRel(paddle1_abs, board_abs);
     paddle2_rel = getPaddleRel(paddle2_abs, board_abs);
     ball_rel = getBallRel(ball_abs, board_abs);
+    selected_abs = selectedPaddleRef === paddleRef ? paddle1_abs : paddle2_abs;
+    selected_rel = selectedPaddleRef === paddleRef ? paddle1_rel : paddle2_rel;
 
     if (event.key === "Enter") {
       setStatus("play");
@@ -90,31 +101,32 @@ const GameBoard = (props: GameBoardProps) => {
         moveBall(dx, dy, dxd, dyd);
       });
     } else if (status === "play") {
-      if (event.key === "w" || event.key === "ㅈ") {
-        paddleRef.current!.style.top =
-          Math.max(0, paddle1_rel.top - GameBoardConst.MOVE_PIXEL) + "px";
-        paddle1_abs = paddleRef.current!.getBoundingClientRect();
-      }
-      if (event.key === "s" || event.key === "ㄴ") {
-        paddleRef.current!.style.top =
-          Math.min(
-            GameBoardConst.GAMEBOARD_HEIGHT - GameBoardConst.PADDLE_HEIGHT,
-            paddle1_rel.top + GameBoardConst.MOVE_PIXEL
-          ) + "px";
-        paddle1_abs = paddleRef.current!.getBoundingClientRect();
-      }
       if (event.key === "ArrowUp") {
-        paddle2Ref.current!.style.top =
-          Math.max(0, paddle2_rel.top - GameBoardConst.MOVE_PIXEL) + "px";
-        paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
+        selectedPaddleRef!.current!.style.top =
+          Math.max(0, selected_rel.top - GameBoardConst.MOVE_PIXEL) + "px";
+        selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
+        gameSocket.emit(
+          "inGameReq",
+          { roomId: currentGame.id, data: selected_rel.top },
+          (data: any) => {
+            console.log(data);
+          }
+        );
       }
       if (event.key === "ArrowDown") {
-        paddle2Ref.current!.style.top =
+        selectedPaddleRef!.current!.style.top =
           Math.min(
             GameBoardConst.GAMEBOARD_HEIGHT - GameBoardConst.PADDLE_HEIGHT,
-            paddle2_rel.top + GameBoardConst.MOVE_PIXEL
+            selected_rel.top + GameBoardConst.MOVE_PIXEL
           ) + "px";
-        paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
+        selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
+        gameSocket.emit(
+          "inGameReq",
+          { roomId: currentGame.id, data: selected_rel.top },
+          (data: any) => {
+            console.log(data);
+          }
+        );
       }
     }
   };
@@ -175,58 +187,86 @@ const GameBoard = (props: GameBoardProps) => {
     });
   }
 
-  useLayoutEffect(() => {
-    if (!gameSocket) window.location.href = "/game?error=wrong_game_access";
-  }, []);
+  const socketGameStart = () => {
+    if (notiRef.current) notiRef.current.style.animationName = "slidedown";
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 0) {
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    setTimeout(() => {
+      setIsWaiting(false);
+      if (notiRef.current) notiRef.current.style.animationName = "slideup";
+    }, 4000);
+  };
+
+  const socketRoomOwner = () => {
+    setSelectedPaddleRef(paddleRef);
+  };
+
+  const socketRoomGuest = () => {
+    setSelectedPaddleRef(paddle2Ref);
+  };
 
   useEffect(() => {
     if (divRef.current !== null) divRef.current.focus();
     // 난이도에 따라 paddleRef의 height를 조절하기(css)
+    if (gameSocket) {
+      gameSocket.on("gameStart", socketGameStart);
+
+      gameSocket.on("roomOwner", socketRoomOwner);
+
+      gameSocket.on("roomGuest", socketRoomGuest);
+    }
+    return () => {
+      gameSocket.off("gameStart", socketGameStart);
+      gameSocket.off("roomOwner", socketRoomOwner);
+      gameSocket.off("roomGuest", socketRoomGuest);
+    };
   }, []);
 
-  gameSocket!.on("gameStart", () => {
-    setStart(true);
+  useLayoutEffect(() => {
+    if (!gameSocket) window.location.href = "/game?error=wrong_game_access";
+  }, []);
 
-    const interval = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 0) clearInterval(interval);
-
-        return prev - 1;
-      });
-    }, 1000);
-    setTimeout(() => {
-      setIsWaiting(false);
-    }, 4000);
-  });
-
-  return isWaiting ? (
+  return (
     <>
-      <GameReady
-        type="일반 게임"
-        content="상대를 기다리는 중"
-        funnyImg="funny3.gif"
+      <SuccessNotification
+        successMessage={`${timer}초 후에 게임이 시작됩니다.`}
+        ref={notiRef}
       />
-      {start ? <div>{timer}</div> : null}
+      {isWaiting ? (
+        <GameReady
+          type="일반 게임"
+          content="상대를 기다리는 중"
+          funnyImg="funny3.gif"
+        />
+      ) : (
+        <Box
+          id={props.id}
+          className="flex-container"
+          onKeyDown={pressKey}
+          tabIndex={0}
+          ref={divRef}
+        >
+          <Box className="board" ref={boardRef}>
+            <Box className="ball" ref={ballRef}></Box>
+            <Box className="paddle_1 paddle" ref={paddleRef}></Box>
+            <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
+            <h1 className="player_1_score">{score1}</h1>
+            <h1 className="player_2_score">{score2}</h1>
+            {status === "ready" ? (
+              <h1 className="message">Press Enter to Play Pong</h1>
+            ) : null}
+          </Box>
+        </Box>
+      )}
     </>
-  ) : (
-    <Box
-      id={props.id}
-      className="flex-container"
-      onKeyDown={pressKey}
-      tabIndex={0}
-      ref={divRef}
-    >
-      <Box className="board" ref={boardRef}>
-        <Box className="ball" ref={ballRef}></Box>
-        <Box className="paddle_1 paddle" ref={paddleRef}></Box>
-        <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
-        <h1 className="player_1_score">{score1}</h1>
-        <h1 className="player_2_score">{score2}</h1>
-        {status === "ready" ? (
-          <h1 className="message">Press Enter to Play Pong</h1>
-        ) : null}
-      </Box>
-    </Box>
   );
 };
 

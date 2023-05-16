@@ -1,19 +1,20 @@
 import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CustomInput from "components/utils/CustomInput";
 import CustomSlider from "components/utils/CustomSlider";
 import GameDifficultyRadioGroup from "components/utils/GameDifficultyRadioGroup";
 import { GameRoomForm } from "types/Form";
 import CustomIconButton from "components/utils/CustomIconButton";
-import { useSelector } from "react-redux";
+import { CurrentGameActionTypes } from "types/redux/CurrentGame";
+import { IRootState } from "components/common/store";
+import { GameDifficultyType, GameRoomType } from "constant";
 import "styles/global.scss";
 import "styles/Game.scss";
 
 import { Box } from "@mui/material";
 import { Button, Modal, ModalDialog } from "@mui/joy";
 import CloseIcon from "@mui/icons-material/Close";
-import { IRootState } from "components/common/store";
-import { GameDifficultyType, GameRoomType } from "constant";
 
 interface CreateGameModalProps {
   roomStatus: string;
@@ -25,6 +26,7 @@ const CreateGameModal = (props: CreateGameModalProps) => {
     (state: IRootState) => state.sockets.gameSocket
   );
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [gameRoomForm, setGameRoomForm] = useState<GameRoomForm>({
     title: "",
     maxScore: 5,
@@ -106,6 +108,10 @@ const CreateGameModal = (props: CreateGameModalProps) => {
                     type: GameRoomType.normal,
                   },
                   (uuid: string) => {
+                    dispatch({
+                      type: CurrentGameActionTypes.UPDATE_GAMEID,
+                      payload: uuid,
+                    });
                     navigate(`/game/${uuid}`);
                   }
                 );

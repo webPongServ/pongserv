@@ -42,7 +42,7 @@ export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
   const paramsCode: string | undefined = qs.parse(window.location.search)
     .error as string;
-  const divRef = useRef<HTMLDivElement>(null);
+  const notiRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch();
 
   const token = localStorage.getItem("accessToken");
@@ -85,7 +85,7 @@ export default function AppHeader() {
   };
 
   setTimeout(() => {
-    if (divRef.current) divRef.current.style.animationName = "slideup";
+    if (notiRef.current) notiRef.current.style.animationName = "slideup";
   }, 5000);
 
   useLayoutEffect(() => {
@@ -97,13 +97,13 @@ export default function AppHeader() {
       {paramsCode === "invalid_user" ? (
         <ErrorNotification
           errorMessage="찾으려는 사용자가 존재하지 않습니다!"
-          ref={divRef}
+          ref={notiRef}
         />
       ) : null}
       {paramsCode === "wrong_game_access" ? (
         <ErrorNotification
           errorMessage="잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요!"
-          ref={divRef}
+          ref={notiRef}
         />
       ) : null}
       <Box id="AppHeader-container" className="flex-container">

@@ -3,25 +3,25 @@ import "styles/global.scss";
 
 import { Box } from "@mui/material";
 import Alert from "@mui/joy/Alert";
-import WarningIcon from "@mui/icons-material/Warning";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CloseIcon from "@mui/icons-material/Close";
 import IconButton from "@mui/joy/IconButton";
 import Typography from "@mui/joy/Typography";
 
-interface ErrorNotificationProps {
-  errorMessage: string;
+interface SuccessNotificationProps {
+  successMessage: string;
 }
 
-const ErrorNotification = (props: ErrorNotificationProps, ref: any) => {
+const SuccessNotification = (props: SuccessNotificationProps, ref: any) => {
   return (
-    <Box id="error" ref={ref}>
+    <Box id="success" ref={ref}>
       <Box className="container">
         <Alert
-          startDecorator={<WarningIcon className="warning" />}
-          color="danger"
+          startDecorator={<CheckCircleIcon className="check" />}
+          color="success"
           endDecorator={
             <IconButton
-              color="danger"
+              color="success"
               onClick={() => {
                 ref.current!.style.animationName = "slideup";
               }}
@@ -30,11 +30,11 @@ const ErrorNotification = (props: ErrorNotificationProps, ref: any) => {
             </IconButton>
           }
         >
-          <Typography color="danger">{props.errorMessage}</Typography>
+          <Typography color="success">{props.successMessage}</Typography>
         </Alert>
       </Box>
     </Box>
   );
 };
 
-export default forwardRef(ErrorNotification);
+export default forwardRef(SuccessNotification);
