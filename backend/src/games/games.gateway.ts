@@ -63,18 +63,29 @@ export class GamesGateway
   }
   // Event handlers
   afterInit() {
-    this.logger.log('GameGateway init is Successful!');
-    this.logger.log('length of gameQueue is ' + this.gameQueue.length);
+    this.logger.log('GameGateway initialized');
   }
   handleConnection(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
     this.logger.log(
       `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
     );
+    socket.on('disconnecting', (reason) => {
+      for (const room of socket.rooms) {
+        if (room !== socket.id) {
+          console.log('ROOMS is', room, reason);
+          socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
+          this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
+          this.GamesService.endGame(room);
+        }
+      }
+    });
   }
   handleDisconnect(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
+    console.log('CONSOLE LOG ROOMs', socket.rooms);
     Array.from(socket.rooms).forEach((room) => {
+      console.log('ROOM!!', room);
       socket.to(room).emit('gameDisconnected');
     });
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
@@ -120,6 +131,7 @@ export class GamesGateway
     const inRoom = await this.server.in(message.roomId).fetchSockets();
     if (inRoom.length == 1) socket.join(message.roomId);
     else {
+      socket.emit('exception', '방이 꽉 차서 들어가실 수 없습니다.');
       return 'NO';
     }
     await this.GamesService.enterRoom(userId, message);
@@ -130,10 +142,13 @@ export class GamesGateway
   }
 
   @SubscribeMessage('cancelEnterance')
-  cancelEnterance(@ConnectedSocket() socket: Socket, @MessageBody() message) {
+  async cancelEnterance(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message,
+  ) {
     const userId = socket.data;
     console.log(userId, 'cancel', message.roomId);
-    socket.leave(message.roomId);
+    await socket.leave(message.roomId);
     return 'OK';
   }
 
@@ -142,7 +157,12 @@ export class GamesGateway
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: any,
   ) {
+    socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
+    socket.emit('roomGuest');
     this.server.to(message.roomId).emit('gameStart');
+    console.log(socket.rooms);
+    console.log((await this.server.in(message.roomId).fetchSockets()).length);
+    this.GamesService.startGame(message.roomId);
     return 'OK';
   }
   // Game Data 요청 받고 보내기
@@ -150,8 +170,17 @@ export class GamesGateway
   @SubscribeMessage('inGameReq')
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     const roomId = message.roomId;
-    const data = message.data;
+    const data = Math.floor(message.data);
+    console.log('in game req', message);
     socket.to(roomId).emit('inGameRes', data);
+    return 'OK';
+  }
+
+  @SubscribeMessage('scoreUpdate')
+  scoreUpdate(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
+    const roomId = message.roomId;
+    const score = message.score;
+    socket.to(roomId).emit('scoreUpdate', score);
   }
 
   @SubscribeMessage('leaveGameRoom')

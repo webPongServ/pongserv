@@ -7,6 +7,7 @@ import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/exceptions/http-exception.filter';
 import * as serveStatic from 'serve-static';
 import { ValidationPipe } from '@nestjs/common';
+import { IoAdapter } from '@nestjs/platform-socket.io';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -55,6 +56,7 @@ async function bootstrap() {
   app.use(express.json({ limit: '10mb' }));
   // 글로벌하게, , dto에 정의된 타입인지 확인해준다.
   app.useGlobalPipes(new ValidationPipe());
+  app.useWebSocketAdapter(new IoAdapter(app));
   await app.listen(3000);
 }
 bootstrap();

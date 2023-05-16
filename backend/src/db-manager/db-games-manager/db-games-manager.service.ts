@@ -8,6 +8,7 @@ import { TbGm04LEntity } from './entities/tb-gm-04-l.entity';
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm/repository/Repository';
 import { In } from 'typeorm';
+import { networkInterfaces } from 'os';
 
 @Injectable()
 export class DbGamesManagerService {
@@ -68,5 +69,28 @@ export class DbGamesManagerService {
       }),
     );
     return updatedRoomList;
+  }
+
+  async endGameList(roomListEntity) {
+    const room = await this.Gm01LRp.save({
+      ...roomListEntity,
+      endType: '02',
+    });
+    return room;
+  }
+
+  async startGameList(roomListEntity) {
+    const room = await this.Gm01LRp.save({
+      ...roomListEntity,
+      endType: '01',
+    });
+    return room;
+  }
+  async endGameDetail(roomId) {
+    const room = await this.Gm01DRp.update(
+      { gm01lEntity: roomId },
+      { entryDttm: Date() },
+    );
+    return room;
   }
 }

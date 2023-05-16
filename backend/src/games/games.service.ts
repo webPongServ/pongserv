@@ -45,4 +45,18 @@ export class GamesService {
     const roomList = await this.DbGamesManagerService.getRoomList();
     return roomList;
   }
+
+  async endGame(roomId) {
+    const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
+      roomId,
+    );
+    await this.DbGamesManagerService.endGameList(roomListEntity);
+  }
+
+  async startGame(roomId) {
+    const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
+      roomId,
+    );
+    await this.DbGamesManagerService.startGameList(roomListEntity);
+  }
 }
