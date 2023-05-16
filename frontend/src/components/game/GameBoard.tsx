@@ -228,26 +228,27 @@ const GameBoard = (props: GameBoardProps) => {
       ballRef.current!.style.left =
         ball_abs.left - board_abs.left + dx * (dxd === 0 ? -1 : 0) + "px";
       // ball_abs = ballRef.current!.getBoundingClientRect();
-        gameSocket.emit(
-          "inGameReq",
-          {
-            roomId: currentGame.id,
-            data: {
-              top: ballRef.current!.style.top,
-              bottom: ballRef.current!.style.top,
-              left: ballRef.current!.style.left,
-              right: ballRef.current!.style.left,
-            },
-            role: role,
-            type: "ball",
+      gameSocket.emit(
+        "inGameReq",
+        {
+          roomId: currentGame.id,
+          data: {
+            top: ballRef.current!.style.top,
+            bottom: ballRef.current!.style.top,
+            left: ballRef.current!.style.left,
+            right: ballRef.current!.style.left,
           },
-          (data: any) => {
-            console.log(data);
-          }
-        );
+          role: role,
+          type: "ball",
+        },
+        (data: any) => {
+          console.log(data);
+        }
+      );
       requestAnimationFrame(() => {
         moveBall(dx, dy, dxd, dyd);
       });
+    }
   }
 
   const socketGameStart = () => {
