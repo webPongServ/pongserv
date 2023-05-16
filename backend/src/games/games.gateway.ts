@@ -76,7 +76,7 @@ export class GamesGateway
           console.log('ROOMS is', room, reason);
           socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
           this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
-          // this.GamesService.endGame(room);
+          this.GamesService.endGame(room);
         }
       }
     });
@@ -131,6 +131,7 @@ export class GamesGateway
     const inRoom = await this.server.in(message.roomId).fetchSockets();
     if (inRoom.length == 1) socket.join(message.roomId);
     else {
+      socket.emit('exception', '방이 꽉 차서 들어가실 수 없습니다.');
       return 'NO';
     }
     await this.GamesService.enterRoom(userId, message);
@@ -141,10 +142,13 @@ export class GamesGateway
   }
 
   @SubscribeMessage('cancelEnterance')
-  cancelEnterance(@ConnectedSocket() socket: Socket, @MessageBody() message) {
+  async cancelEnterance(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() message,
+  ) {
     const userId = socket.data;
     console.log(userId, 'cancel', message.roomId);
-    socket.leave(message.roomId);
+    await socket.leave(message.roomId);
     return 'OK';
   }
 
@@ -166,7 +170,7 @@ export class GamesGateway
   @SubscribeMessage('inGameReq')
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     const roomId = message.roomId;
-    const data = message.data;
+    const data = Math.floor(message.data);
     console.log('in game req', message);
     socket.to(roomId).emit('inGameRes', data);
     return 'OK';
