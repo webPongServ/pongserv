@@ -11,8 +11,6 @@ import { Server, Socket } from 'socket.io';
 import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
 import { ChatsService } from './chats.service';
 import { Logger, UnauthorizedException } from '@nestjs/common';
-import { DbChatsManagerService } from 'src/db-manager/db-chats-manager/db-chats-manager.service';
-import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
@@ -70,7 +68,11 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       socket.join(nameOfFriendRoom);
     }
     // 2
-
+    const blockingNickList = await this.chatsService.getBlockedUserNicknameList(userId);
+    for (const eachNick of blockingNickList) {
+      const nameOfBlockingRoom = `blocking_${eachNick}`;
+      socket.join(nameOfBlockingRoom);
+    }
     // 3
     const myProfile = await this.usersService.getProfile(userId);
     const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;

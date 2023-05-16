@@ -508,4 +508,21 @@ export class DbChatsManagerService {
     return ;
   }
 
+  async getBlockingUserInChatsList(user: TbUa01MEntity)
+  {
+    const results = await this.ch04lRp.find({
+      relations: {
+        ua01mEntityAsBlock: true
+      },
+      where: {
+        ua01mEntity: {
+          id: user.id
+        },
+        stCd: '01',
+        delTf: false,
+      }
+    })
+    return results;
+  }
+
 }
