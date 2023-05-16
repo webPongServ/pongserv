@@ -228,7 +228,6 @@ const GameBoard = (props: GameBoardProps) => {
       ballRef.current!.style.left =
         ball_abs.left - board_abs.left + dx * (dxd === 0 ? -1 : 0) + "px";
       // ball_abs = ballRef.current!.getBoundingClientRect();
-      if (role === "owner")
         gameSocket.emit(
           "inGameReq",
           {
@@ -249,7 +248,6 @@ const GameBoard = (props: GameBoardProps) => {
       requestAnimationFrame(() => {
         moveBall(dx, dy, dxd, dyd);
       });
-    }
   }
 
   const socketGameStart = () => {
