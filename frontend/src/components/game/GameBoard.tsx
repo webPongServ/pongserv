@@ -228,23 +228,24 @@ const GameBoard = (props: GameBoardProps) => {
       ballRef.current!.style.left =
         ball_abs.left - board_abs.left + dx * (dxd === 0 ? -1 : 0) + "px";
       // ball_abs = ballRef.current!.getBoundingClientRect();
-      gameSocket.emit(
-        "inGameReq",
-        {
-          roomId: currentGame.id,
-          data: {
-            top: ballRef.current!.style.top,
-            bottom: ballRef.current!.style.top,
-            left: ballRef.current!.style.left,
-            right: ballRef.current!.style.left,
+      if (role === "owner")
+        gameSocket.emit(
+          "inGameReq",
+          {
+            roomId: currentGame.id,
+            data: {
+              top: ballRef.current!.style.top,
+              bottom: ballRef.current!.style.top,
+              left: ballRef.current!.style.left,
+              right: ballRef.current!.style.left,
+            },
+            role: role,
+            type: "ball",
           },
-          role: role,
-          type: "ball",
-        },
-        (data: any) => {
-          console.log(data);
-        }
-      );
+          (data: any) => {
+            console.log(data);
+          }
+        );
       requestAnimationFrame(() => {
         moveBall(dx, dy, dxd, dyd);
       });
@@ -299,7 +300,7 @@ const GameBoard = (props: GameBoardProps) => {
               paddleRef.current!.style.top = data.data + "px";
             else paddle2Ref.current!.style.top = data.data + "px";
           } else {
-            if (data.role === "guest") {
+            if (data.role === "owner") {
               ballRef.current!.style.left = data.data.left;
               ballRef.current!.style.right = data.data.right;
               ballRef.current!.style.top = data.data.top;
