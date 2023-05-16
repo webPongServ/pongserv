@@ -90,6 +90,7 @@ const GameBoard = (props: GameBoardProps) => {
     ball_rel = getBallRel(ball_abs, board_abs);
     selected_abs = selectedPaddleRef === paddleRef ? paddle1_abs : paddle2_abs;
     selected_rel = selectedPaddleRef === paddleRef ? paddle1_rel : paddle2_rel;
+    const status: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
 
     if (event.key === "Enter") {
       setStatus("play");
@@ -107,7 +108,7 @@ const GameBoard = (props: GameBoardProps) => {
         selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
         gameSocket.emit(
           "inGameReq",
-          { roomId: currentGame.id, data: selected_rel.top },
+          { roomId: currentGame.id, data: selected_rel.top, user: status },
           (data: any) => {
             console.log(data);
           }
@@ -222,6 +223,13 @@ const GameBoard = (props: GameBoardProps) => {
       gameSocket.on("roomOwner", socketRoomOwner);
 
       gameSocket.on("roomGuest", socketRoomGuest);
+      gameSocket.on(
+        "inGameRes",
+        (data: { roomId: string; data: string; user: string }) => {
+          if (status === "owner") paddleRef.current!.style.top = data + "px";
+          else paddle2Ref.current!.style.top = data + "px";
+        }
+      );
     }
     return () => {
       gameSocket.off("gameStart", socketGameStart);
