@@ -93,15 +93,17 @@ const GameBoard = (props: GameBoardProps) => {
     selected_rel = selectedPaddleRef === paddleRef ? paddle1_rel : paddle2_rel;
     const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
 
-    if (event.key === "Enter") {
-      setStatus("play");
-      requestAnimationFrame(() => {
-        dx = 10;
-        dy = 10;
-        dxd = quadrant[random][0];
-        dyd = quadrant[random][1];
-        moveBall(dx, dy, dxd, dyd);
-      });
+    if (status === "ready") {
+      setTimeout(() => {
+        setStatus("play");
+        requestAnimationFrame(() => {
+          dx = 10;
+          dy = 10;
+          dxd = quadrant[random][0];
+          dyd = quadrant[random][1];
+          moveBall(dx, dy, dxd, dyd);
+        });
+      }, 3000);
     } else if (status === "play") {
       if (event.key === "ArrowUp") {
         selectedPaddleRef!.current!.style.top =
