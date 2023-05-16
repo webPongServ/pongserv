@@ -19,9 +19,10 @@ export class TbGm02SEntity {
   @PrimaryGeneratedColumn({ name: 'ID', type: 'bigint' })
   id: number;
 
+  // REVIEW - 이거 OneToOne 인 것 같은데?
   // USER_ID
   // @PrimaryColumn({ name: 'USER_ID', type: 'varchar', length: 8 })
-  @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.userId, {
+  @ManyToOne(() => TbUa01MEntity, (ua01m) => ua01m.userId, { 
     nullable: false,
     onUpdate: 'CASCADE',
     onDelete: 'RESTRICT',

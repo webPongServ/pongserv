@@ -50,6 +50,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  // TODO - to combine with front-end
   async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
@@ -59,7 +60,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     /*!SECTION
       1. Friend user socket room에 등록 - Friend_userId
       2. Block user socket room에 등록 - Block_userId
-      3. 자신의 userId로 등록된 socket room으로 알람 보내기
+      3. 해당 유저 전용 friends socket room으로 로그인 알람 보내기
     */
     // 1
     const friendList = await this.usersService.getFriendList(userId);
@@ -79,9 +80,20 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogin`, myProfile.nickname);
   }
 
-  handleDisconnect(@ConnectedSocket() client: Socket) {
-    // console.log(`client: `);
-    // console.log(client);
+  // TODO - to combine with front-end
+  async handleDisconnect(@ConnectedSocket() socket: Socket) {
+    const userId = this.validateAccessToken(socket);
+    if (!userId) {
+      return;
+    }
+    /*!SECTION
+      1. 해당 유저 전용 friends socket room으로 로그아웃 알람 보내기
+    */
+    // 1
+    const myProfile = await this.usersService.getProfile(userId);
+    const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
+    socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogout`, myProfile.nickname);
+    
   }
 
   @SubscribeMessage('chatroomCreation')
@@ -153,6 +165,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  // TODO - to combine with front-end
   @SubscribeMessage('putBlockingUserInChats')
   async putBlockingUserInChats(
     @ConnectedSocket() socket: Socket,
