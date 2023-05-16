@@ -297,8 +297,10 @@ const GameBoard = (props: GameBoardProps) => {
               paddleRef.current!.style.top = data.data + "px";
             else paddle2Ref.current!.style.top = data.data + "px";
           } else {
-            ballRef.current!.style.left = data.data.left;
-            ballRef.current!.style.top = data.data.top;
+            if (data.role === "owner") {
+              ballRef.current!.style.left = data.data.left;
+              ballRef.current!.style.top = data.data.top;
+            }
           }
         }
       );
