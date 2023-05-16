@@ -19,6 +19,7 @@ import * as jwt from 'jsonwebtoken';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 import { UsersService } from 'src/users/users.service';
+import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -73,7 +74,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // 3
     const myProfile = await this.usersService.getProfile(userId);
     const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
-    socket.to(nameOfMyRoomForFriends).emit(`friendOn`, myProfile.nickname);
+    socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogin`, myProfile.nickname);
   }
 
   handleDisconnect(@ConnectedSocket() client: Socket) {
@@ -147,6 +148,24 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (err) {
       console.log(err);
       socket.emit('errorChatroomLeaving', err.response.message);
+    }
+  }
+
+  @SubscribeMessage('putBlockingUserInChats')
+  async putBlockingUserInChats(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoBlck: BlockingUserInChatsDto,
+  ) {
+    const userId: string = this.validateAccessToken(socket);
+    if (!userId) return;
+    try {
+      await this.chatsService.putBlockUserInChats(userId, infoBlck);
+      const nameOfblockingSocketRoom = `blocking_${infoBlck.nickname}`;
+      socket.join(nameOfblockingSocketRoom);
+      return true;
+    } catch (err) {
+      console.log(err);
+      socket.emit('errorPutBlockingUserInChats', err.response.message);
     }
   }
 
