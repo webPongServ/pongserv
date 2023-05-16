@@ -107,7 +107,11 @@ const GameBoard = (props: GameBoardProps) => {
         selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
         gameSocket.emit(
           "inGameReq",
-          { roomId: currentGame.id, data: selected_rel.top, role: role },
+          {
+            roomId: currentGame.id,
+            data: Math.max(0, selected_rel.top - GameBoardConst.MOVE_PIXEL),
+            role: role,
+          },
           (data: any) => {
             console.log(data);
           }
@@ -122,7 +126,14 @@ const GameBoard = (props: GameBoardProps) => {
         selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
         gameSocket.emit(
           "inGameReq",
-          { roomId: currentGame.id, data: selected_rel.top, role: role },
+          {
+            roomId: currentGame.id,
+            data: Math.min(
+              GameBoardConst.GAMEBOARD_HEIGHT - GameBoardConst.PADDLE_HEIGHT,
+              selected_rel.top + GameBoardConst.MOVE_PIXEL
+            ),
+            role: role,
+          },
           (data: any) => {
             console.log(data);
           }
