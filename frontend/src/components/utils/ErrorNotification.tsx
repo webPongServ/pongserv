@@ -14,7 +14,7 @@ interface ErrorNotificationProps {
 
 const ErrorNotification = (props: ErrorNotificationProps, ref: any) => {
   return (
-    <Box id="alert" ref={ref}>
+    <Box id="error" ref={ref}>
       <Box className="container">
         <Alert
           startDecorator={<WarningIcon className="warning" />}
