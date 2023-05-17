@@ -58,8 +58,6 @@ export default function AppHeader() {
     payload: chattingSocket,
   });
 
-  console.group("chatting socket : ", chattingSocket);
-
   const alertMessage = (message: string) => {
     alert(message);
   };
