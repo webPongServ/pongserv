@@ -11,11 +11,12 @@ import Modal from "@mui/joy/Modal";
 import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { GameRoomDetail } from "types/Detail";
 
 interface NormalGameModalProps {
   roomStatus: string;
   setRoomStatus: Function;
-  selectedID: string;
+  selectedRoom: GameRoomDetail | null;
 }
 
 const NormalGameModal = (props: NormalGameModalProps) => {
@@ -24,21 +25,34 @@ const NormalGameModal = (props: NormalGameModalProps) => {
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const handleClose = () => {
+    gameSocket.emit(
+      "cancelEnterance",
+      {
+        roomId: props.selectedRoom!.id,
+      },
+      () => {
+        dispatch({ type: CurrentGameActionTypes.DELETE_GAMEROOM, payload: "" });
+        props.setRoomStatus("game");
+      }
+    );
+  };
+
+  const handleEnterGameRoom = () => {
+    dispatch({
+      type: CurrentGameActionTypes.UPDATE_GAMEROOM,
+      payload: props.selectedRoom,
+    });
+    gameSocket.emit("gameRoomFulfilled", {
+      roomId: props.selectedRoom!.id,
+      type: GameRoomType.normal,
+    });
+    navigate(`/game/${props.selectedRoom!.id}`);
+  };
+
   return (
-    <Modal
-      open={props.roomStatus === "normal-game"}
-      onClose={() => {
-        gameSocket.emit(
-          "cancelEnterance",
-          {
-            roomId: props.selectedID,
-          },
-          () => {
-            props.setRoomStatus("game");
-          }
-        );
-      }}
-    >
+    <Modal open={props.roomStatus === "normal-game"} onClose={handleClose}>
       <ModalDialog className="modal" variant="outlined">
         <Box id="inform" className="outframe">
           <Box className="header flex-container">
@@ -46,17 +60,7 @@ const NormalGameModal = (props: NormalGameModalProps) => {
             <CustomIconButton
               class="right"
               icon={<CloseIcon />}
-              handleFunction={() => {
-                gameSocket.emit(
-                  "cancelEnterance",
-                  {
-                    roomId: props.selectedID,
-                  },
-                  () => {
-                    props.setRoomStatus("game");
-                  }
-                );
-              }}
+              handleFunction={handleClose}
             />
           </Box>
           <Box className="body flex-container">
@@ -64,21 +68,7 @@ const NormalGameModal = (props: NormalGameModalProps) => {
             <b>입장하시겠습니까?</b>
           </Box>
           <Box className="footer flex-container">
-            <Button
-              onClick={() => {
-                dispatch({
-                  type: CurrentGameActionTypes.UPDATE_GAMEID,
-                  payload: props.selectedID,
-                });
-                gameSocket.emit("gameRoomFulfilled", {
-                  roomId: props.selectedID,
-                  type: GameRoomType.normal,
-                });
-                navigate(`/game/${props.selectedID}`);
-              }}
-            >
-              입장
-            </Button>
+            <Button onClick={handleEnterGameRoom}>입장</Button>
           </Box>
         </Box>
       </ModalDialog>
