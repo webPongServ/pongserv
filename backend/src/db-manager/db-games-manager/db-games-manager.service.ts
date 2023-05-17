@@ -57,7 +57,7 @@ export class DbGamesManagerService {
 
   async getRoomList() {
     const roomList = await this.Gm01LRp.find({
-      where: { delTf: false, endType: '04' },
+      where: { delTf: false, endType: '04', gmType: '01' },
       select: ['id', 'gmRmNm', 'gmType', 'lvDfct', 'trgtScr', 'owner'],
     });
 
@@ -93,7 +93,7 @@ export class DbGamesManagerService {
   async endGameDetail(roomId) {
     const room = await this.Gm01DRp.update(
       { gm01lEntity: roomId },
-      { entryDttm: Date() },
+      { exitDttm: Date() },
     );
     return room;
   }
@@ -138,8 +138,7 @@ export class DbGamesManagerService {
     room.opUserId = opponentId;
     await this.Gm01LRp.save(room);
   }
-
-  async SaveDodgeGame(roomListEntity, userId, result, myScore, opScore) {
+  async SaveGame(roomListEntity, userId, result, myScore, opScore) {
     const room = await this.Gm01DRp.findOne({
       where: {
         gm01lEntity: {
