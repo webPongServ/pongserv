@@ -41,7 +41,7 @@ export class DbGamesManagerService {
       ua01mEntity: userEntity,
       getScr: 0,
       lossScr: 0,
-      gmRsltCd: type ? type : '01',
+      gmRsltCd: '00',
       entryDttm: new Date(),
       delTf: false,
     });
@@ -77,6 +77,7 @@ export class DbGamesManagerService {
     const room = await this.Gm01LRp.save({
       ...roomListEntity,
       endType: '02',
+      gmEndDttm: new Date(),
     });
     return room;
   }
@@ -85,6 +86,7 @@ export class DbGamesManagerService {
     const room = await this.Gm01LRp.save({
       ...roomListEntity,
       endType: '01',
+      gmStrtDttm: new Date(),
     });
     return room;
   }
@@ -112,7 +114,7 @@ export class DbGamesManagerService {
       where: { id: roomId },
     });
 
-    console.log(user, room, opponentId);
+    // console.log(user, room, opponentId);
     const targetColumn = await this.Gm01DRp.findOne({
       where: {
         gm01lEntity: {
@@ -124,8 +126,35 @@ export class DbGamesManagerService {
       },
     });
 
-    console.log('UpdateOpponent', targetColumn);
+    // console.log('UpdateOpponent', targetColumn);
     targetColumn.opUserId = opponentId;
     await this.Gm01DRp.save(targetColumn);
+  }
+
+  async updateOpponentList(roomId, opponentId) {
+    const room = await this.Gm01LRp.findOne({
+      where: { id: roomId },
+    });
+    room.opUserId = opponentId;
+    await this.Gm01LRp.save(room);
+  }
+
+  async SaveDodgeGame(roomListEntity, userId, result, myScore, opScore) {
+    const room = await this.Gm01DRp.findOne({
+      where: {
+        gm01lEntity: {
+          id: roomListEntity.id,
+        },
+        ua01mEntity: {
+          userId: userId,
+        },
+      },
+    });
+    room.gmRsltCd = result;
+    room.getScr = myScore;
+    room.lossScr = opScore;
+    room.exitDttm = new Date();
+    console.log(room);
+    await this.Gm01DRp.save(room);
   }
 }
