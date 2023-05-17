@@ -19,6 +19,7 @@ import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 import { UsersService } from 'src/users/users.service';
 import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
 import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
+import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -59,10 +60,6 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!userId) {
       socket.disconnect(true);
       return;
-    } else {
-      this.userIdToSocketIdMap.set(userId, socket.id);
-      console.log(`In handleConnection -> this.userIdToSocketIdMap: `)
-      console.log(this.userIdToSocketIdMap)
     }
     /*!SECTION
       0. intraId-socketId map에 상태 저장
@@ -70,6 +67,10 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       2. Block user socket room에 등록 - Block_userId
       3. 해당 유저 전용 friends socket room으로 로그인 알람 보내기
     */
+    // 0
+    this.userIdToSocketIdMap.set(userId, socket.id);
+    console.log(`In handleConnection -> this.userIdToSocketIdMap: `)
+    console.log(this.userIdToSocketIdMap)
     // 1
     const friendList = await this.usersService.getFriendList(userId);
     for (const eachFriend of friendList) {
@@ -110,7 +111,6 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(socket.rooms)
 
     // 3
-    // REVIEW - map에서 제거, 확인해봐야함 - checked
     console.log(`In handleDisconnect before delete -> this.userIdToSocketIdMap: `)
     console.log(this.userIdToSocketIdMap)
     const entry = Array.from(this.userIdToSocketIdMap.entries()).find(([, socketId]) => socketId === socket.id);
@@ -229,6 +229,28 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (err) {
       console.log(err);
       socket.emit('errorChatroomKick', err.response.message);
+    }
+  }
+
+  // TODO - to combine with front-end
+  @SubscribeMessage('chatroomMute')
+  async muteChatroomUser(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoMute: ChatroomMuteDto
+  ) {
+    const userId: string = this.validateAccessToken(socket);
+    if (!userId) return;
+    try {
+      const targetUserId = await this.chatsService.muteUser(userId, infoMute);
+      // target user의 socket에 muted 정보 emit
+      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      if (targetSocketId) {
+        this.server.to(targetSocketId).emit('chatroomBeingMuted', { chtrmId: infoMute.id });
+      }
+      return true;
+    } catch (err) {
+      console.log(err);
+      socket.emit('errorChatroomMute', err.response.message);
     }
   }
 
