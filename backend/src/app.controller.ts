@@ -12,8 +12,8 @@ export class AppController {
   @ApiBearerAuth('accessToken')
   @Get()
   getHello(@CurrentUser() userId: any): string {
-    console.log(`userId in /`)
-    console.log(userId);
+    // console.log(`userId in /`)
+    // console.log(userId);
     return this.appService.getHello();
   }
 }

@@ -61,7 +61,7 @@ export class AuthController {
   @ApiInternalServerErrorResponse({ description: '토큰 발급 실패' })
   @Post('code')
   async issueToken(@Body() codeBody: Code42OAuthData, @Res() res: Response) {
-    console.log(codeBody);
+    // console.log(codeBody);
     const resultToken = await this.authService.processAuthorization(
       codeBody.code,
     );
@@ -70,7 +70,7 @@ export class AuthController {
     const intraId = resultToken.userId;
     const intraImagePath = resultToken.imgPath;
     const isMember = resultToken.isMember;
-    console.log(accessToken);
+    // console.log(accessToken);
     if (OAuthData == true) {
       res.json({ OAuthData, intraId, intraImagePath });
     } else {
@@ -109,7 +109,7 @@ export class AuthController {
   @ApiResponse({ status: 200, description: '2차인증 활성화 성공' })
   @Post('activate2fa')
   async activateOtp(@CurrentUser() userId: string, @Body() otpData: otpData) {
-    console.log('2Fa Activate', userId);
+    // console.log('2Fa Activate', userId);
     return this.authService.activate2fa(userId, otpData.sixDigit);
   }
 }
