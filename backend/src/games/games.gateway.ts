@@ -27,6 +27,7 @@ export class GamesGateway
   @WebSocketServer()
   server: Server;
 
+  private GameSocketId = new Map<string, string>();
   private logger = new Logger('GameGateway');
   private gameQueue = new GameQueue();
 
@@ -65,6 +66,10 @@ export class GamesGateway
   }
   handleConnection(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
+    if (typeof socket.data === 'string') {
+      this.GameSocketId.set(socket.data, socket.id);
+    }
+    console.log('Game Socket ID is ', this.GameSocketId);
     this.logger.log(
       `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
     );
@@ -80,11 +85,18 @@ export class GamesGateway
           socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
           this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
           this.GamesService.endGame(room);
+          this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
+          if (this.gameQueue.removeAndCheckExistence(room))
+            console.log('GameQueue에서 방 삭제 성공');
         }
       }
     });
   }
   handleDisconnect(@ConnectedSocket() socket: Socket) {
+    if (typeof socket.data === 'string') {
+      this.GameSocketId.delete(socket.data);
+    }
+    console.log('[Deletion]Game Socket ID is ', this.GameSocketId);
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 
@@ -162,9 +174,10 @@ export class GamesGateway
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: any,
   ) {
-    socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
-    socket.emit('roomGuest');
-    this.server.to(message.roomId).emit('gameStart');
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    await socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
+    await socket.emit('roomGuest');
+    await this.server.to(message.roomId).emit('gameStart');
     console.log(
       socket.rooms,
       (await this.server.in(message.roomId).fetchSockets()).length,
@@ -181,9 +194,12 @@ export class GamesGateway
 
   @SubscribeMessage('inGameReq')
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
-    const roomId = message.roomId;
+    const roomId = message.roomId
+      ? message.roomId
+      : this.getRoomIdFromSocket(socket);
     // {user : owner, data : 350}
-    // console.log('in game req', message.data);
+    // if (message.type != 'ball')
+    // console.log(socket.data, '\n\n', message, '\n\n', roomId);
     socket.to(roomId).emit('inGameRes', message);
     return 'OK';
   }
@@ -225,27 +241,38 @@ export class GamesGateway
       1-2. 래더 대기열이 있다면, 해당 방에 join 후 대기열 삭제
     2. socket을 통해 프론트에 방이 만들어졌음을 알린다(roomCreated)
     */
+    console.log('Now Queue is : ', this.gameQueue);
     const userId = socket.data;
     if (this.gameQueue.isEmpty()) {
       const message: roomOption = {
-        roomName: 'LADDER_GAME',
+        roomName: 'LADDER_GAME_' + socket.data,
         difficulty: '02',
         score: 5,
         type: '02', // 래더는 02로 설정,
       };
       const roomList = await this.GamesService.createGameRoom(userId, message);
       await this.GamesService.createGameDetail(roomList, userId, message.type);
-      socket.join(roomList.id);
+      await socket.join(roomList.id);
       this.gameQueue.enqueue(roomList.id);
       this.logger.log('Ladder Game Room Created', roomList.id);
-      return roomList.id;
+      return { roomId: roomList.id, action: 'create' };
     } else {
       const roomId = this.gameQueue.dequeue();
       socket.join(roomId);
       this.logger.log('Ladder Game Room Joined', roomId);
-      this.gameStart(socket, { roomId: roomId, type: '02' });
-      return roomId;
+      // await this.gameStart(socket, { roomId: roomId, type: '02' });
+      return { roomId: roomId, action: 'join' };
     }
     return 'OK';
+  }
+
+  // 내부 함수
+  private getRoomIdFromSocket(socket: Socket): string {
+    for (const room of socket.rooms) {
+      if (room !== socket.id) {
+        return room;
+      }
+    }
+    return null; // 방이 없는 경우 null 반환
   }
 }
