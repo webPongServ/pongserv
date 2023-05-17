@@ -5,5 +5,5 @@ export class ChatroomMuteDto {
     id: string;
 
 	@ApiProperty({ type: String })
-    userIdToMute: string;
+    nicknameToMute: string;
 }

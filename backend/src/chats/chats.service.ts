@@ -317,8 +317,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoKick.userIdToKick,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoKick.nicknameToKick,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -409,8 +409,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoBan.userIdToMute,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoBan.nicknameToMute,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -455,8 +455,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoEmpwr.userIdToEmpower,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoEmpwr.nicknameToEmpower,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -500,8 +500,8 @@ export class ChatsService {
     if (requesterInChtrm.chtRmJoinTf === false)
       throw new UnauthorizedException('You are not in the chatroom.');
     // 2
-    const target = await this.dbUsersManagerService.getUserByUserId(
-      infoGameReq.userIdToGame,
+    const target = await this.dbUsersManagerService.getUserByNickname(
+      infoGameReq.nicknameToGame,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       target,
@@ -557,8 +557,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const target = await this.dbUsersManagerService.getUserByUserId(
-      infoBanRmv.userIdToFree,
+    const target = await this.dbUsersManagerService.getUserByNickname(
+      infoBanRmv.nicknameToFree,
     );
     const banInfoOfTarget = await this.dbChatsManagerService.getBanInfoInAChtrm(
       target,
@@ -570,7 +570,7 @@ export class ChatsService {
     // 3
     banInfoOfTarget.vldTf = false;
     this.dbChatsManagerService.saveChtrmRstrInfo(banInfoOfTarget);
-    return;
+    return ;
   }
 
   async leaveChatroom(userId: string, infoLeav: ChatroomLeavingDto) {
