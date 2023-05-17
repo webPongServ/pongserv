@@ -25,37 +25,44 @@ const GameCard = (props: GameCardProps) => {
     );
   };
 
+  const handleOpenEnterModal = () => {
+    gameSocket.emit(
+      "enterGameRoom",
+      { roomId: props.gameDetail.id, type: GameRoomType.normal },
+      (response: string) => {
+        if (response === "NO") return;
+        props.setRoomStatus("normal-game");
+        props.setSelectedRoom(props.gameDetail);
+      }
+    );
+  };
+
   return (
     <Card
       className="game-card"
       variant="outlined"
-      onClick={() => {
-        gameSocket.emit(
-          "enterGameRoom",
-          { roomId: props.id, type: GameRoomType.normal },
-          () => {
-            props.setRoomStatus("normal-game");
-            props.setSelectedID(props.id);
-          }
-        );
-      }}
+      onClick={handleOpenEnterModal}
     >
       <Box className="flex-container">
         <Box className="preview flex-container">
-          {userNickname(props.owner.nickname, props.owner.imgURL)}
+          {userNickname(
+            props.gameDetail.owner.nickname,
+            props.gameDetail.owner.imgURL
+          )}
           <img className="vs" src="../swords.png" alt="sword_img" />
           {userNickname("ㅤ", "../question.png")}
         </Box>
       </Box>
-      <Box className="title flex-container">{props.title}</Box>
+      <Box className="title flex-container">{props.gameDetail.title}</Box>
       <Divider />
       <CardOverflow className="card-overflow flex-container" variant="soft">
-        <Box>점수 : {props.maxScore}</Box>
+        <Box>점수 : {props.gameDetail.maxScore}</Box>
         <Box>|</Box>
         <Box>
-          난이도 : {props.difficulty === GameDifficultyType.easy && "쉬움"}
-          {props.difficulty === GameDifficultyType.normal && "보통"}
-          {props.difficulty === GameDifficultyType.hard && "어려움"}
+          난이도 :{" "}
+          {props.gameDetail.difficulty === GameDifficultyType.easy && "쉬움"}
+          {props.gameDetail.difficulty === GameDifficultyType.normal && "보통"}
+          {props.gameDetail.difficulty === GameDifficultyType.hard && "어려움"}
         </Box>
       </CardOverflow>
     </Card>

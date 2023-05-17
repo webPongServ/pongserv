@@ -1,11 +1,7 @@
-import { UserDetail } from "types/Detail";
+import { GameRoomDetail } from "types/Detail";
 
 export interface GameCardProps {
-  id: string;
-  title: string;
-  owner: UserDetail;
-  maxScore: number;
-  difficulty: string;
+  gameDetail: GameRoomDetail;
   setRoomStatus: Function;
-  setSelectedID: Function;
+  setSelectedRoom: Function;
 }

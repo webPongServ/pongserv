@@ -17,10 +17,16 @@ export const ChattingRoomType = {
   private: "03",
 };
 
-export const ProfileStatusType = {
+export const ProfileFriendType = {
   self: "00",
   friend: "01",
   notFriend: "02",
+};
+
+export const FriendStatusType = {
+  login: "01",
+  inGame: "02",
+  logout: "03",
 };
 
 export const ChattingUserRoleType = {

@@ -4,7 +4,7 @@ import UserService from "API/UserService";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { FriendsActionTypes } from "types/redux/Friends";
 import { ProfileDetail, UserDetail } from "types/Detail";
-import { ProfileStatusType } from "constant";
+import { ProfileFriendType } from "constant";
 
 import { Button } from "@mui/joy";
 import { Tooltip, Typography } from "@mui/material";
@@ -45,12 +45,12 @@ const OthersButtons = (props: OthersButtonsProps) => {
         nickname: props.profileDetail!.nickname,
         imgURL: props.profileDetail!.imgURL,
         // login, logout인지 확인할 수 있는 것이 필요함
-        status: "login",
+        status: response.data.isCurrStatus,
       },
     });
     props.setProfileDetail({
       ...props.profileDetail,
-      status: ProfileStatusType.friend,
+      status: ProfileFriendType.friend,
     });
   };
 
@@ -64,7 +64,7 @@ const OthersButtons = (props: OthersButtonsProps) => {
     });
     props.setProfileDetail({
       ...props.profileDetail,
-      status: ProfileStatusType.notFriend,
+      status: ProfileFriendType.notFriend,
     });
   };
 
@@ -73,7 +73,7 @@ const OthersButtons = (props: OthersButtonsProps) => {
       <Button variant="solid" onClick={handleDMButton}>
         DM
       </Button>
-      {props.profileDetail.status === ProfileStatusType.friend ? (
+      {props.profileDetail.status === ProfileFriendType.friend ? (
         <Button variant="outlined" onClick={handleFriendDeleteButton}>
           친구 삭제
         </Button>
