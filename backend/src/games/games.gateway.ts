@@ -127,11 +127,16 @@ export class GamesGateway
     */
     const userId = socket.data;
     const inRoom = await this.server.in(message.roomId).fetchSockets();
-    if (inRoom.length == 1) socket.join(message.roomId);
+    if (inRoom.length == 1 && inRoom[0].data == userId) {
+      socket.emit('exception', '방장은 게임에 참여할 수 없습니다.');
+      this.logger.log('방장은 자신의 게임에 참여할 수 없습니다.');
+      return 'NO';
+    } else if (inRoom.length == 1) socket.join(message.roomId);
     else {
       socket.emit('exception', '방이 꽉 차서 들어가실 수 없습니다.');
       return 'NO';
     }
+
     this.logger.log(userId, 'joined', message.roomId);
     return 'OK';
   }
@@ -173,16 +178,19 @@ export class GamesGateway
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     const roomId = message.roomId;
     // {user : owner, data : 350}
-    console.log('in game req', message.data);
+    // console.log('in game req', message.data);
     socket.to(roomId).emit('inGameRes', message);
     return 'OK';
   }
 
-  @SubscribeMessage('scoreUpdate')
+  @SubscribeMessage('dodge')
   scoreUpdate(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
+    // 필요한 데이터 roodId, Score(양쪽 다), userId
     const roomId = message.roomId;
-    const score = message.score;
-    socket.to(roomId).emit('scoreUpdate', score);
+    const myScore = message.myScore;
+    const opScore = message.opScore;
+    const userId = socket.data;
+    this.GamesService.dodgeGame(userId, roomId, myScore, opScore);
   }
 
   @SubscribeMessage('leaveGameRoom')
