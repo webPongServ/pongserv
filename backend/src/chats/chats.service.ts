@@ -24,6 +24,7 @@ import { TbCh01LEntity } from 'src/db-manager/db-chats-manager/entities/tb-ch-01
 import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
 import { ChatroomResponseMessageDto } from './dto/chatroom-response-message.dto';
+import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
 
 @Injectable()
 export class ChatsService {
@@ -102,16 +103,10 @@ export class ChatsService {
 				uuid, name, owner, type, current, max
 		*/
     // 1
-    console.log('userId in ChatsService.getChatroomsForAUser(): ');
-    console.log(userId);
     const user: TbUa01MEntity =
       await this.dbUsersManagerService.getUserByUserId(userId);
-    console.log(`user in ChatsService.getChatroomsForAUser(): `);
-    console.log(user);
     const dmChtrms: TbCh01LEntity[] =
       await this.dbChatsManagerService.getDMChatroomsForUser(user);
-    console.log(`dmChtrms in ChatsService.getChatroomsForAUser(): `);
-    console.log(dmChtrms);
     // 2
     const pblAndprtChtrms: TbCh01LEntity[] =
       await this.dbChatsManagerService.getPublicAndProtectedChatrooms();
@@ -125,27 +120,17 @@ export class ChatsService {
       currentCount: number;
       maxCount: number;
     }[] = [];
-    console.log(`combinedChtrms in ChatsService.getChatroomsForAUser(): `);
-    console.log(combinedChtrms);
     for (const eachChtrm of combinedChtrms) {
-      console.log(`eachChtrm in ChatsService.getChatroomsForAUser(): `);
-      console.log(eachChtrm);
       const currUserListAndCount =
         await this.dbChatsManagerService.getCurrUserListAndCount(eachChtrm);
       if (currUserListAndCount[1] === 0) continue;
       let owner: TbCh02LEntity;
-      console.log(
-        `currUserListAndCount in ChatsService.getChatroomsForAUser(): `,
-      );
-      console.log(currUserListAndCount);
       for (const eachUserInChtrm of currUserListAndCount[0]) {
         if (eachUserInChtrm.chtRmAuth === '01') {
           owner = eachUserInChtrm;
           break;
         }
       }
-      console.log(`owner in ChatsService.getChatroomsForAUser(): `);
-      console.log(owner);
       results.push({
         id: eachChtrm.id,
         chatroomName: eachChtrm.chtRmNm,
@@ -155,8 +140,6 @@ export class ChatsService {
         maxCount: eachChtrm.maxUserCnt,
       });
     }
-    console.log(`results: `);
-    console.log(results);
     return results;
   }
 
@@ -356,7 +339,7 @@ export class ChatsService {
       targetInChtrm,
     );
     // 4
-    return targetUser.nickname;
+    return targetUser.userId;
   }
 
   async banUser(userId: string, infoBan: ChatroomBanDto) {
@@ -655,5 +638,32 @@ export class ChatsService {
     userInChtrm.chtRmJoinTf = false;
     this.dbChatsManagerService.saveChtrmUser(userInChtrm);
     return user.nickname;
+  }
+
+  async putBlockUserInChats(userId: string, infoBlck: BlockingUserInChatsDto)
+  {
+	/*!SECTION
+		1. requester user 정보를 가져온다.
+		2. target user를 찾아서 가져온다.
+		3. boolToBlock 정보에 따라서 TB_CH04L에 등록한다.
+	*/
+	// 1
+	const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+	// 2
+	const target = await this.dbUsersManagerService.getUserByNickname(infoBlck.nickname);
+	// 3
+	await this.dbChatsManagerService.setBlockingData(requester, target, infoBlck.boolToBlock);
+	return ;
+  }
+
+  async getBlockedUserNicknameList(userId: string)
+  {
+	const user = await this.dbUsersManagerService.getUserByUserId(userId);
+	const blockingDataList = await this.dbChatsManagerService.getBlockingUserInChatsList(user);
+	let blockedUserNicknameList: string[] = [];
+	for (const each of blockingDataList) {
+		blockedUserNicknameList.push(each.ua01mEntityAsBlock.nickname);
+	}
+	return (blockedUserNicknameList);
   }
 }

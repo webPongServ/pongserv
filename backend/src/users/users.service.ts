@@ -109,7 +109,18 @@ export class UsersService {
       friendUserId,
     );
     const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
-    return await this.dbmanagerUsersService.makeFriend(myEntity, friendEntity);
+    const resultOfMade = await this.dbmanagerUsersService.makeFriend(myEntity, friendEntity);
+    if (resultOfMade.result === "Success") {
+      const frndCurrLogin = await this.dbmanagerUsersService.getCurrLoginData(friendEntity);
+      if (frndCurrLogin) {
+        if (frndCurrLogin.stsCd === '02')
+          return ({ isCurrStatus: '02' }); // game
+        else
+          return ({ isCurrStatus: '01' }); // login
+      } else {
+        return ({ isCurrStatus: '03' }) // logout
+      }
+    }
   }
 
   async deleteFriend(intraId: string, friendNickname: string) {
@@ -131,9 +142,32 @@ export class UsersService {
     return await this.dbmanagerUsersService.getFriendProfile(intraId, friendId);
   }
 
-  async getFriendList(intraId: string) {
-    const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
-    return await this.dbmanagerUsersService.getFriendList(myEntity);
+  async getFriendList(userId: string) {
+    /*!SECTION
+      제공해야하는 데이터: nickname, imgPath, isCurrLogin
+      1. friend list 가져오기
+      2. 각 친구별로 현재 로그인 상태 가져오기
+    */
+    let results: {
+      nickname: string,
+      imageUrl: string,
+      isCurrLogin: boolean,
+    }[] = [];
+    // 1
+    const myEntity = await this.dbmanagerUsersService.getMasterEntity(userId);
+    const friendDatas = await this.dbmanagerUsersService.getFriendList(myEntity);
+    // 2
+    for (const eachFriendData of friendDatas) {
+      const currLogin = await this.dbmanagerUsersService.getCurrLoginData(eachFriendData.ua01mEntityAsFr);
+      const eachToPush = {
+        nickname: eachFriendData.ua01mEntityAsFr.nickname,
+        imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
+        isCurrLogin: !!currLogin, // NOTE: It will be true if currLogin exists, false otherwise.
+         // TODO: isCurrStatus 로 바꿔서 login, gaming, logout 상태 표시하도록 변경
+      }
+      results.push(eachToPush);
+    }
+    return results;
   }
 
   async getUserList(startsWith: string) {

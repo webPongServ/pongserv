@@ -56,7 +56,7 @@ export class TbUa01LEntity {
   })
   logoutDttm: Date;
 
-  // STS_CD   // NOTE: 상태코드 '01': 일반상태, '02': 채팅상태, '03': 게임상태
+  // STS_CD   // NOTE: 상태코드 '01': 일반상태, '02': 게임상태
   @Column({ name: 'STTS_CD', type: 'varchar', length: 2, nullable: true })
   stsCd: string;
 

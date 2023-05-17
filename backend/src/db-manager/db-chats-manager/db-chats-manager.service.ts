@@ -129,25 +129,6 @@ export class DbChatsManagerService {
         chtRmJoinTf: true,
       },
     });
-    // const [result, totalCount] = await this.ch02lRp.findAndCount({
-    // 	where: (qb: SelectQueryBuilder<TbCh02LEntity>) => {
-    // 	  qb.where('ch02l.ch01lEntity.uuid = :chtRmId', { chtRmId: uuid });
-    // 	  qb.andWhere('ch02l.chtRmJoinTf = true');
-    // 	},
-    // 	relations: ['ua01mEntity'],
-    // 	order: { ua01mEntity: 'ASC' },
-    // 	skip: page * rpp,
-    // 	take: rpp,
-    //   });
-
-    console.log(
-      'chatroom in DbChatsManagerService.getCurrUserListAndCount(): ',
-    );
-    console.log(chatroom);
-    console.log(
-      'currUserListAndCount in DbChatsManagerService.getCurrUserListAndCount(): ',
-    );
-    console.log(currUserListAndCount);
     return currUserListAndCount;
   }
 
@@ -474,4 +455,55 @@ export class DbChatsManagerService {
     }
     return true;
   }
+
+  async setBlockingData(
+    requester: TbUa01MEntity, 
+    target: TbUa01MEntity, 
+    toBlock: boolean
+    )
+  {
+    let blockingData = await this.ch04lRp.findOne({
+      where: {
+        ua01mEntity: {
+          id: requester.id,
+        },
+        ua01mEntityAsBlock: {
+          id: target.id,
+        },
+      }
+    });
+    if (blockingData === null)
+    {
+      blockingData = this.ch04lRp.create({
+        ua01mEntity: requester,
+        ua01mEntityAsBlock: target,
+        stCd: '01', // 등록
+        rsstDttm: new Date(),
+      });
+    }
+    if (toBlock === true)
+      blockingData.stCd = '01';
+    else
+      blockingData.stCd = '02';
+    this.ch04lRp.save(blockingData);
+    return ;
+  }
+
+  async getBlockingUserInChatsList(user: TbUa01MEntity)
+  {
+    const results = await this.ch04lRp.find({
+      relations: {
+        ua01mEntityAsBlock: true
+      },
+      where: {
+        ua01mEntity: {
+          id: user.id
+        },
+        stCd: '01',
+        delTf: false,
+      }
+    })
+    return results;
+  }
+
 }

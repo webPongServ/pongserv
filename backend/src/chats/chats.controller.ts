@@ -15,6 +15,7 @@ import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
 import { AccessTokenStrategy } from 'src/auth/strategy/jwt.access.strategy';
 import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
+import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
 
 @ApiTags('chats')
 @Controller('chats')
@@ -382,6 +383,31 @@ export class ChatsController {
     console.log(infoLeav);
     try {
       const result = await this.chatsService.leaveChatroom(userId, infoLeav);
+      // console.log(`result: `);
+      // console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: '특정 유저 채팅 차단',
+    type: String, // 성공시 Chatroom_id string 반환
+  })
+  @ApiOperation({ summary: '특정 유저를 채팅창에서 ' })
+  @UseGuards(JwtAccessTokenGuard)
+  @ApiBearerAuth('accessToken')
+  @Put('blocking-user')
+  async putBlockUserInChats(@CurrentUser() userId: string, @Body() infoBlck: BlockingUserInChatsDto) {
+    console.log(`[${userId}: `, `POST /chats/blocking-user]`);
+    console.log(`BlockingUserInChatsDto: `);
+    console.log(infoBlck);
+    try {
+      const result = await this.chatsService.putBlockUserInChats(userId, infoBlck);
       // console.log(`result: `);
       // console.log(result);
       return result;
