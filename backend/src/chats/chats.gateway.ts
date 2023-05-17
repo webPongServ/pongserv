@@ -20,6 +20,7 @@ import { UsersService } from 'src/users/users.service';
 import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
 import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
+import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -240,12 +241,40 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomMute]`);
+    console.log(`ChatroomMuteDto: `);
+    console.log(infoMute);
     try {
       const targetUserId = await this.chatsService.muteUser(userId, infoMute);
       // target user의 socket에 muted 정보 emit
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       if (targetSocketId) {
         this.server.to(targetSocketId).emit('chatroomBeingMuted', { chtrmId: infoMute.id });
+      }
+      return true;
+    } catch (err) {
+      console.log(err);
+      socket.emit('errorChatroomMute', err.response.message);
+    }
+  }
+
+  // TODO - to combine with front-end
+  @SubscribeMessage('chatroomRegisterBan')
+  async banChatroomUser(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoBan: ChatroomBanDto
+  ) {
+    const userId: string = this.validateAccessToken(socket);
+    if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomRegisterBan]`);
+    console.log(`ChatroomBanDto: `);
+    console.log(infoBan);
+    try {
+      const targetUserId = await this.chatsService.banUser(userId, infoBan);
+      // target user의 socket에 baned 정보 emit
+      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      if (targetSocketId) {
+        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
       }
       return true;
     } catch (err) {

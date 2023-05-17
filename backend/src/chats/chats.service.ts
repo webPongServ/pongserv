@@ -365,8 +365,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoBan.userIdToBan,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoBan.nicknameToBan
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -384,7 +384,7 @@ export class ChatsService {
       targetInChtrm,
     );
     // 4
-    return targetUser.nickname;
+    return targetUser.userId;
   }
 
   async muteUser(userId: string, infoBan: ChatroomMuteDto) {
