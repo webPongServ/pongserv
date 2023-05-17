@@ -237,19 +237,11 @@ export class GamesGateway
       await this.GamesService.createGameDetail(roomList, userId, message.type);
       socket.join(roomList.id);
       this.gameQueue.enqueue(roomList.id);
-      // socket.broadcast.emit(
-      //   'roomCreated',
-      //   message.roomName,
-      //   message.difficulty,
-      //   message.score,
-      //   roomList.id, // Room의 이름
-      // );
       this.logger.log('Ladder Game Room Created', roomList.id);
       return roomList.id;
     } else {
       const roomId = this.gameQueue.dequeue();
       socket.join(roomId);
-      // socket.broadcast.emit('roomCreated', 'LADDER_GAME', '02', 5, roomId);
       this.logger.log('Ladder Game Room Joined', roomId);
       this.gameStart(socket, { roomId: roomId, type: '02' });
       return roomId;
