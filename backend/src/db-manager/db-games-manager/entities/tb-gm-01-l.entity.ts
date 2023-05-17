@@ -62,6 +62,10 @@ export class TbGm01LEntity {
   })
   owner: string;
 
+  // opUserId
+  @Column({ name: 'OP_USER_ID', type: 'varchar', length: 10, nullable: true })
+  opUserId: string;
+
   // DEL_TF
   @Column({ name: 'DEL_TF', type: 'boolean' })
   delTf: boolean;

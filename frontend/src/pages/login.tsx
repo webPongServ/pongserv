@@ -12,7 +12,7 @@ import Button from "@mui/joy/Button";
 const Login = () => {
   const paramsCode: string | undefined = qs.parse(window.location.search)
     .error as string;
-  const divRef = useRef<HTMLDivElement>(null);
+  const notiRef = useRef<HTMLDivElement>(null);
 
   const handleLogin = async () => {
     // 왜 redirect? 그냥 호출하면 42 intra 서버로부터 CORS 에러가 발생
@@ -25,7 +25,7 @@ const Login = () => {
   };
 
   setTimeout(() => {
-    if (divRef.current) divRef.current.style.animationName = "slideup";
+    if (notiRef.current) notiRef.current.style.animationName = "slideup";
   }, 5000);
 
   return (
@@ -33,7 +33,7 @@ const Login = () => {
       {paramsCode === "auth_failed" ? (
         <ErrorNotification
           errorMessage="로그인 정보가 올바르지 않습니다!"
-          ref={divRef}
+          ref={notiRef}
         />
       ) : null}
       <Box id="Login" className="flex-container">

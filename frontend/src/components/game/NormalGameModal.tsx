@@ -1,7 +1,9 @@
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { IRootState } from "components/common/store";
+import { CurrentGameActionTypes } from "types/redux/CurrentGame";
+import { GameRoomType } from "constant";
 import "styles/Game.scss";
 
 import { Button } from "@mui/joy";
@@ -20,6 +22,7 @@ const NormalGameModal = (props: NormalGameModalProps) => {
   const gameSocket = useSelector(
     (state: IRootState) => state.sockets.gameSocket
   );
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   return (
     <Modal
@@ -63,8 +66,13 @@ const NormalGameModal = (props: NormalGameModalProps) => {
           <Box className="footer flex-container">
             <Button
               onClick={() => {
+                dispatch({
+                  type: CurrentGameActionTypes.UPDATE_GAMEID,
+                  payload: props.selectedID,
+                });
                 gameSocket.emit("gameRoomFulfilled", {
                   roomId: props.selectedID,
+                  type: GameRoomType.normal,
                 });
                 navigate(`/game/${props.selectedID}`);
               }}

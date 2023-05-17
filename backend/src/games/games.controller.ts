@@ -29,16 +29,16 @@ export class GamesController {
 
   @ApiResponse({
     status: 200,
-    description: '게임방 입장해주는 API',
+    description: '게임 전적 가져오기 성공',
   })
   @ApiResponse({
     status: 403,
-    description: '게임방 입장 실패',
+    description: '게임 전적 가져오기 실패',
   })
   @ApiOperation({ summary: '일반 게임 입장' })
-  @Post('/normal/entrance/:gameroom_id')
-  entryGame(@Param('gameroom_id') gameroom_id: string) {
-    return 'Hello World! it is entryGame()';
+  @Post('/static')
+  entryGame(@Param('userId') userId: string) {
+    return this.gamesService.getUserStatic(userId);
   }
 
   @ApiResponse({
