@@ -15,7 +15,6 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { GamesService } from './games.service';
 import { roomOption } from './dto/roomOption.dto';
-import { throwIfEmpty } from 'rxjs';
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -70,6 +69,12 @@ export class GamesGateway
       `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
     );
     socket.on('disconnecting', (reason) => {
+      /*
+      1. 만약에 방에 들어와있는 소켓이 끊긴다면
+      2. 그 방 안에 있는 인원들에게 endGame보낸다.
+      3. 그 방에 있는 인원들을 전부 나가게 한다.
+      4. 그 방을 삭제한다.(조건 04로 변경)
+      */
       for (const room of socket.rooms) {
         if (room !== socket.id) {
           socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
@@ -205,8 +210,50 @@ export class GamesGateway
     const roomId = message.roomId;
     const myScore = message.myScore;
     const opScore = message.opScore;
+    this.logger.log('finishgame DATA', userId, roomId, myScore, opScore);
     this.server.socketsLeave(roomId);
+    this.GamesService.finishGame(userId, roomId, myScore, opScore);
     this.GamesService.endGame(roomId);
+    return 'OK';
+  }
+
+  @SubscribeMessage('ladderGame')
+  async createLadderRoom(@ConnectedSocket() socket: Socket) {
+    /*
+    1. 래더 대기열이 있는지 확인한다.
+      1-1. 래더 대기열이 비어있다면, 새로운 방을 만들고 대기열 추가
+      1-2. 래더 대기열이 있다면, 해당 방에 join 후 대기열 삭제
+    2. socket을 통해 프론트에 방이 만들어졌음을 알린다(roomCreated)
+    */
+    const userId = socket.data;
+    if (this.gameQueue.isEmpty()) {
+      const message: roomOption = {
+        roomName: 'LADDER_GAME',
+        difficulty: '02',
+        score: 5,
+        type: '02', // 래더는 02로 설정,
+      };
+      const roomList = await this.GamesService.createGameRoom(userId, message);
+      await this.GamesService.createGameDetail(roomList, userId, message.type);
+      socket.join(roomList.id);
+      this.gameQueue.enqueue(roomList.id);
+      // socket.broadcast.emit(
+      //   'roomCreated',
+      //   message.roomName,
+      //   message.difficulty,
+      //   message.score,
+      //   roomList.id, // Room의 이름
+      // );
+      this.logger.log('Ladder Game Room Created', roomList.id);
+      return roomList.id;
+    } else {
+      const roomId = this.gameQueue.dequeue();
+      socket.join(roomId);
+      // socket.broadcast.emit('roomCreated', 'LADDER_GAME', '02', 5, roomId);
+      this.logger.log('Ladder Game Room Joined', roomId);
+      this.gameStart(socket, { roomId: roomId, type: '02' });
+      return roomId;
+    }
     return 'OK';
   }
 }
