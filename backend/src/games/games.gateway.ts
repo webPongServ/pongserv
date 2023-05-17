@@ -15,6 +15,7 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { GamesService } from './games.service';
 import { roomOption } from './dto/roomOption.dto';
+import { throwIfEmpty } from 'rxjs';
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -71,7 +72,6 @@ export class GamesGateway
     socket.on('disconnecting', (reason) => {
       for (const room of socket.rooms) {
         if (room !== socket.id) {
-          console.log('ROOMS is', room, reason);
           socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
           this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
           this.GamesService.endGame(room);
@@ -185,20 +185,28 @@ export class GamesGateway
 
   @SubscribeMessage('dodge')
   scoreUpdate(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
+    this.logger.log('Dodge Game Score Update', message);
+    // console.log('Dodge Game Score Update', message);
     // 필요한 데이터 roodId, Score(양쪽 다), userId
     const roomId = message.roomId;
     const myScore = message.myScore;
     const opScore = message.opScore;
     const userId = socket.data;
     this.GamesService.dodgeGame(userId, roomId, myScore, opScore);
+    return 'OK';
   }
 
-  @SubscribeMessage('leaveGameRoom')
+  @SubscribeMessage('finishGame')
   leaveGameRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: any,
   ) {
     const userId = socket.data;
-    console.log('leaveGameRoom');
+    const roomId = message.roomId;
+    const myScore = message.myScore;
+    const opScore = message.opScore;
+    this.server.socketsLeave(roomId);
+    this.GamesService.endGame(roomId);
+    return 'OK';
   }
 }
