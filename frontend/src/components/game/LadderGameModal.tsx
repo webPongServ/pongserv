@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { IRootState } from "components/common/store";
 import { CurrentGameActionTypes } from "types/redux/CurrentGame";
-import { GameDifficultyType } from "constant";
+import { GameDifficultyType, GameRoomType } from "constant";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -48,19 +48,22 @@ const LadderGameModal = (props: LadderGameModalProps) => {
             <Button
               onClick={() => {
                 gameSocket.emit("ladderGame", (data: any) => {
-                  console.log(data);
                   dispatch({
                     type: CurrentGameActionTypes.UPDATE_GAMEROOM,
                     payload: {
-                      currentGame: {
-                        id: data.roomId,
-                        title: "ladder game",
-                        owner: myInfo.nickname,
-                        maxScore: 5,
-                        difficulty: GameDifficultyType.normal,
-                      },
+                      id: data.roomId,
+                      title: "ladder game",
+                      owner: myInfo.nickname,
+                      maxScore: 5,
+                      difficulty: GameDifficultyType.normal,
                     },
                   });
+                  if (data.action === "join") {
+                    gameSocket.emit("gameRoomFulfilled", {
+                      roomId: data.roomId,
+                      type: GameRoomType.normal,
+                    });
+                  }
                   navigate(`/game/${data.roomId}`);
                 });
               }}
