@@ -52,6 +52,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
 interface serverFriend {
   nickname: string;
   imageUrl: string;
+  isCurrLogin: boolean;
 }
 
 const FriendDrawer = () => {
@@ -75,7 +76,7 @@ const FriendDrawer = () => {
         (value: serverFriend): UserDetail => ({
           nickname: value.nickname,
           imgURL: value.imageUrl,
-          status: "login",
+          status: value.isCurrLogin ? "login" : "logout",
         })
       ),
     });
@@ -88,12 +89,21 @@ const FriendDrawer = () => {
     });
   };
 
+  const socketFriendStatusLogout = (nickname: string) => {
+    dispatch({
+      type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
+      payload: { nickname: nickname, status: "logout" },
+    });
+  };
+
   useEffect(() => {
     getFriends();
     chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
+    chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
 
     return () => {
       chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
+      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
     };
   }, []);
 
