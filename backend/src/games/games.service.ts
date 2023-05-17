@@ -1,7 +1,7 @@
 import { DbUsersManagerService } from './../db-manager/db-users-manager/db-users-manager.service';
 import { roomOption } from './dto/roomOption.dto';
 import { HttpService } from '@nestjs/axios';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DbGamesManagerService } from 'src/db-manager/db-games-manager/db-games-manager.service';
 @Injectable()
@@ -51,8 +51,7 @@ export class GamesService {
     const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
       roomId,
     );
-    const room = await this.DbGamesManagerService.endGameList(roomListEntity);
-    // await this.DbGamesManagerService.endGameDetail(room.id);
+    await this.DbGamesManagerService.endGameList(roomListEntity);
   }
 
   async updateOpponent(opponent, roomId) {
@@ -93,7 +92,7 @@ export class GamesService {
 
     console.log('Dodge Game opUserId', opUserId, 'userId', userId, '\n\n\n');
     // console.log(roomListEntity);
-    await this.DbGamesManagerService.SaveDodgeGame(
+    await this.DbGamesManagerService.SaveGame(
       roomListEntity,
       userId,
       '01',
@@ -101,12 +100,29 @@ export class GamesService {
       opScore,
     );
     // 나간사람 결과 저장
-    await this.DbGamesManagerService.SaveDodgeGame(
+    await this.DbGamesManagerService.SaveGame(
       roomListEntity,
       opUserId,
       '02',
       opScore,
       myScore,
+    );
+  }
+
+  async finishGame(userId, roomId, myScore, opScore) {
+    // 나의 점수를 알아서 DB에 저장한다.
+    const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
+      roomId,
+    );
+    //내가 이겼는지 졌는지 확인하기
+    const winStatus = myScore > opScore ? '01' : '02';
+    // 결과 저장
+    await this.DbGamesManagerService.SaveGame(
+      roomListEntity,
+      userId,
+      winStatus,
+      myScore,
+      opScore,
     );
   }
 }
