@@ -131,9 +131,17 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const userId = this.validateAccessToken(socket);
     if (!userId) return;
-    const newChtrmId = await this.chatsService.createChatroom(userId, infoCrtn);
-    socket.join(newChtrmId);
-    return { chtrmId: newChtrmId };
+    console.log(`[${userId}: `, `socket emit - chatroomCreation]`);
+    console.log(`ChatroomCreationDto: `);
+    console.log(infoCrtn);
+    try {
+      const newChtrmId = await this.chatsService.createChatroom(userId, infoCrtn);
+      socket.join(newChtrmId);
+      return { chtrmId: newChtrmId };
+    } catch (err) {
+      socket.emit('errorChatroomEntrance', err.response.message);
+      return;
+    }
   }
 
   @SubscribeMessage('chatroomEntrance')
@@ -143,6 +151,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomEntrance]`);
+    console.log(`ChatroomEntranceDto: `);
+    console.log(infoEntr);
     try {
       const nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
       socket.join(infoEntr.id);
@@ -161,6 +172,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomMessage]`);
+    console.log(`ChatroomRequestMessageDto: `);
+    console.log(infoMsg);
     try {
       const toSendInChtrm = await this.chatsService.processSendingMessage(
         userId,
@@ -181,6 +195,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomLeaving]`);
+    console.log(`ChatroomLeavingDto: `);
+    console.log(infoLeav);
     try {
       const nickname = await this.chatsService.leaveChatroom(userId, infoLeav);
       socket.leave(infoLeav.id);
@@ -201,6 +218,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - putBlockingUserInChats]`);
+    console.log(`BlockingUserInChatsDto: `);
+    console.log(infoBlck);
     try {
       await this.chatsService.putBlockUserInChats(userId, infoBlck);
       const nameOfblockingSocketRoom = `blocking_${infoBlck.nickname}`;
@@ -220,6 +240,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomKick]`);
+    console.log(`ChatroomKickingDto: `);
+    console.log(infoKick);
     try {
       const targetUserId = await this.chatsService.kickUser(userId, infoKick);
       // target user의 socket에 kicked 정보 emit
