@@ -163,9 +163,18 @@ export class UsersController {
   @ApiOperation({ summary: '친구목록 가져오기' })
   @UseGuards(JwtAccessTokenGuard)
   @Get('/friend')
-  async getFriendList(@CurrentUser() user: string) {
-    console.log('In getFriendList', user);
-    return await this.UsersService.getFriendList(user);
+  async getFriendList(@CurrentUser() userId: string) {
+    console.log(`[${userId}: `, `GET /users/friend]`);
+    try {
+      const result = await this.UsersService.getFriendList(userId);
+      console.log(`result: `);
+      console.log(result);
+      return result;
+    } catch (excpt) {
+      console.log(`excpt: `);
+      console.log(excpt);
+      throw excpt;
+    }
   }
 
   @ApiResponse({

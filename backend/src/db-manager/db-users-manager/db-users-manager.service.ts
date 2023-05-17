@@ -379,7 +379,9 @@ export class DbUsersManagerService {
   async getCurrLoginData(user: TbUa01MEntity) {
     const result = await this.ua01lRp.findOne({
       where: {
-        ua01mEntity: user,
+        ua01mEntity: {
+          id: user.id,
+        },
         loginTf: true,
       },
     });
@@ -387,9 +389,8 @@ export class DbUsersManagerService {
   }
 
   async getFriendList(myEntity: TbUa01MEntity) {
-    const friendList = await this.ua02lRp.findAndCount({
+    const friendDatas = await this.ua02lRp.find({
       relations: {
-        ua01mEntity: true,
         ua01mEntityAsFr: true,
       },
       where: {
@@ -397,18 +398,21 @@ export class DbUsersManagerService {
           id: myEntity.id,
         },
         stCd: '01',
+        delTf: false,
       },
     });
-    if (!friendList) throw new BadRequestException('No Friend available');
-    const friendData = friendList[0].map((friend) => {
-      return {
-        nickname: friend.ua01mEntityAsFr.nickname,
-        imageUrl: friend.ua01mEntityAsFr.imgPath,
-      };
-    });
-    if (friendData) return friendData;
-    else throw new BadRequestException('No Friend available');
+    return (friendDatas);
+    // const friendList = friendsData.map((friend) => {
+    //   return {
+    //     userId: friend.ua01mEntityAsFr.userId,
+    //     nickname: friend.ua01mEntityAsFr.nickname,
+    //     imageUrl: friend.ua01mEntityAsFr.imgPath,
+    //   };
+    // });
+    // if (friendList) return friendList;
+    // else throw new BadRequestException('No Friend available'); // REVIEW: Is no friend error?
   }
+
   async getUserList(startswith: string) {
     const users = await this.ua01mRp.find({
       where: {
