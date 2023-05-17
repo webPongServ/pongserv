@@ -327,15 +327,15 @@ const GameBoard = (props: GameBoardProps) => {
       ball_rel.left = ball_rel.left + dx * (dxd === 0 ? -1 : 1);
       ballRef.current!.style.right = ball_rel.left + 15 + "px";
       ball_rel.right = ball_rel.left + 15;
-      gameSocket.emit("inGameReq", {
-        roomId: currentGame.currentGame!.id,
-        data: {
-          top: ball_rel.top,
-          left: ball_rel.left,
-        },
-        role: role,
-        type: "ball",
-      });
+      // gameSocket.emit("inGameReq", {
+      //   roomId: currentGame.currentGame!.id,
+      //   data: {
+      //     top: ball_rel.top,
+      //     left: ball_rel.left,
+      //   },
+      //   role: role,
+      //   type: "ball",
+      // });
       requestAnimationFrame(() => {
         moveBall(dx, dy, dxd, dyd);
       });
