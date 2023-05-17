@@ -22,6 +22,7 @@ import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
+import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -307,7 +308,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end - 이건 기존 REST API를 그대로 써도 됨
+  // TODO - to combine with front-end - 이건 기존 REST API를 그대로 써도 될 듯
   @SubscribeMessage('chatroomRemovalBan')
   async removalChatroomBan(
     @ConnectedSocket() socket: Socket,
@@ -320,6 +321,31 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(infoBanRmv);
     try {
       await this.chatsService.removeBan(userId, infoBanRmv);
+      return true;
+    } catch (err) {
+      console.log(err);
+      socket.emit('errorChatroomMute', err.response.message);
+    }
+  }
+
+  // TODO - to combine with front-end
+  @SubscribeMessage('chatroomEmpowerment')
+  async empowerChatroomUser(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoEmpwr: ChatroomEmpowermentDto
+  ) {
+    const userId: string = this.validateAccessToken(socket);
+    if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomEmpowerment]`);
+    console.log(`ChatroomEmpowermentDto: `);
+    console.log(infoEmpwr);
+    try {
+      const targetUserId = await this.chatsService.empowerUser(userId, infoEmpwr);
+      // target user의 socket에 empowered 정보 emit
+      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      if (targetSocketId) {
+        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id });
+      }
       return true;
     } catch (err) {
       console.log(err);
