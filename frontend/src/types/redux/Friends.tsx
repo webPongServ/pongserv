@@ -12,6 +12,7 @@ export enum FriendsActionTypes {
   FRIENDS_GET = "FRIENDS_GET",
   FRIENDS_ADD = "FRIENDS_ADD",
   FRIENDS_DELETE = "FRIENDS_DELETE",
+  FRIENDS_UPDATE_STATUS = "FRIENDS_UPDATE_STATUS",
 }
 
 export interface FriendsGetAction {
@@ -28,7 +29,19 @@ export interface FriendsDeleteAction {
   payload: string;
 }
 
-type FriendsAction = FriendsGetAction | FriendsAddAction | FriendsDeleteAction;
+export interface FriendsUpdateStatusAction {
+  type: FriendsActionTypes.FRIENDS_UPDATE_STATUS;
+  payload: {
+    nickname: string;
+    status: string;
+  };
+}
+
+type FriendsAction =
+  | FriendsGetAction
+  | FriendsAddAction
+  | FriendsDeleteAction
+  | FriendsUpdateStatusAction;
 
 export const FriendsReducer = (
   state = INITIAL_FRIENDS,
@@ -39,15 +52,21 @@ export const FriendsReducer = (
       return { friends: action.payload }; // { friends : [] }를 리턴해야 함
     case FriendsActionTypes.FRIENDS_ADD:
       return {
-        ...state,
         friends: [...state.friends!, action.payload],
       };
     case FriendsActionTypes.FRIENDS_DELETE:
       return {
-        ...state,
         friends: state.friends!.filter(
           (friend) => friend.nickname !== action.payload
         ),
+      };
+    case FriendsActionTypes.FRIENDS_UPDATE_STATUS:
+      return {
+        friends: state.friends!.map((value) => {
+          if (value.nickname === action.payload.nickname)
+            return { ...value, status: action.payload.status };
+          return value;
+        }),
       };
     default:
       return state;
