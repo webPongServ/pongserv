@@ -32,17 +32,20 @@ export class TbGm01DEntity {
   @JoinColumn({ name: 'USER_ID' })
   ua01mEntity: TbUa01MEntity;
 
+  @Column({ name: 'OP_USER_ID', type: 'varchar', length: 10, nullable: true })
+  opUserId: string;
+
   // GET_SCR
   @Column({ name: 'GET_SCR', type: 'integer' })
   getScr: number;
 
+  // LOSS_SCR
+  @Column({ name: 'LOSS_SCR', type: 'integer' })
+  lossScr: number;
+
   // GM_RSLT_CD
   @Column({ name: 'GM_RSLT_CD', type: 'varchar', length: 2 })
   gmRsltCd: string;
-
-  // RSLT_LLVL
-  @Column({ name: 'RSLT_LLVL', type: 'integer', nullable: true })
-  rsltLlvl: number;
 
   // ENTRY_DTTM
   @Column({

@@ -285,9 +285,7 @@ const GameBoard = (props: GameBoardProps) => {
     // 난이도에 따라 paddleRef의 height를 조절하기(css)
     if (gameSocket) {
       gameSocket.on("gameStart", socketGameStart);
-
       gameSocket.on("roomOwner", socketRoomOwner);
-
       gameSocket.on("roomGuest", socketRoomGuest);
       gameSocket.on(
         "inGameRes",
@@ -316,36 +314,34 @@ const GameBoard = (props: GameBoardProps) => {
     if (!gameSocket) window.location.href = "/game?error=wrong_game_access";
   }, []);
 
-  return (
+  return isWaiting ? (
     <>
       <SuccessNotification
         successMessage={`${timer}초 후에 게임이 시작됩니다.`}
         ref={notiRef}
       />
-      {isWaiting ? (
-        <GameReady
-          type="일반 게임"
-          content="상대를 기다리는 중"
-          funnyImg="funny3.gif"
-        />
-      ) : (
-        <Box
-          id={props.id}
-          className="flex-container"
-          onKeyDown={pressKey}
-          tabIndex={0}
-          ref={divRef}
-        >
-          <Box className="board" ref={boardRef}>
-            <Box className="ball" ref={ballRef}></Box>
-            <Box className="paddle_1 paddle" ref={paddleRef}></Box>
-            <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
-            <h1 className="player_1_score">{score1}</h1>
-            <h1 className="player_2_score">{score2}</h1>
-          </Box>
-        </Box>
-      )}
+      <GameReady
+        type="일반 게임"
+        content="상대를 기다리는 중"
+        funnyImg="funny3.gif"
+      />
     </>
+  ) : (
+    <Box
+      id={props.id}
+      className="flex-container"
+      onKeyDown={pressKey}
+      tabIndex={0}
+      ref={divRef}
+    >
+      <Box className="board" ref={boardRef}>
+        <Box className="ball" ref={ballRef}></Box>
+        <Box className="paddle_1 paddle" ref={paddleRef}></Box>
+        <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
+        <h1 className="player_1_score">{score1}</h1>
+        <h1 className="player_2_score">{score2}</h1>
+      </Box>
+    </Box>
   );
 };
 

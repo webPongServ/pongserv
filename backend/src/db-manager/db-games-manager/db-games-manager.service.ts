@@ -34,12 +34,14 @@ export class DbGamesManagerService {
     return room;
   }
 
+  // Loss Score를 만들어서 바로 가져올 수 있도록
   async createRoomDetail(roomListEntity, userEntity, type) {
     const room = await this.Gm01DRp.save({
       gm01lEntity: roomListEntity,
-      gm01dUserEntity: userEntity,
+      ua01mEntity: userEntity,
       getScr: 0,
-      gmRsltCd: type,
+      lossScr: 0,
+      gmRsltCd: type ? type : '01',
       entryDttm: new Date(),
       delTf: false,
     });
@@ -92,5 +94,38 @@ export class DbGamesManagerService {
       { entryDttm: Date() },
     );
     return room;
+  }
+
+  async getUserStatic(userEntity) {
+    const user = await this.Gm01DRp.find({
+      where: { ua01mEntity: userEntity },
+      select: ['gmRsltCd', 'getScr', 'lossScr'], // opUserId
+    });
+    return user;
+  }
+
+  async updateOpponent(roomId, userId, opponentId) {
+    const user = await this.Ua01MRp.findOne({
+      where: { userId: userId },
+    });
+    const room = await this.Gm01LRp.findOne({
+      where: { id: roomId },
+    });
+
+    console.log(user, room, opponentId);
+    const targetColumn = await this.Gm01DRp.findOne({
+      where: {
+        gm01lEntity: {
+          id: room.id,
+        },
+        ua01mEntity: {
+          id: user.id,
+        },
+      },
+    });
+
+    console.log('UpdateOpponent', targetColumn);
+    targetColumn.opUserId = opponentId;
+    await this.Gm01DRp.save(targetColumn);
   }
 }

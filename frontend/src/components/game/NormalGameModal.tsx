@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { IRootState } from "components/common/store";
 import { CurrentGameActionTypes } from "types/redux/CurrentGame";
+import { GameRoomType } from "constant";
 import "styles/Game.scss";
 
 import { Button } from "@mui/joy";
@@ -71,6 +72,7 @@ const NormalGameModal = (props: NormalGameModalProps) => {
                 });
                 gameSocket.emit("gameRoomFulfilled", {
                   roomId: props.selectedID,
+                  type: GameRoomType.normal,
                 });
                 navigate(`/game/${props.selectedID}`);
               }}
