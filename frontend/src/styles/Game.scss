@@ -128,16 +128,51 @@ $paddle_height: 150px;
       border: solid $border_size white;
       border-radius: 14px;
       margin: auto auto;
-    }
 
-    .ball {
-      height: 15px;
-      width: 15px;
-      border-radius: 50%;
-      position: absolute;
-      top: $board_height * 0.5 - 15px;
-      left: $board_width * 0.5 - 15px;
-      background-color: white;
+      .ball {
+        height: 15px;
+        width: 15px;
+        border-radius: 50%;
+        position: absolute;
+        top: 300px;
+        left: 500px;
+        background-color: white;
+      }
+
+      .paddle {
+        height: $paddle_height;
+        width: $paddle_width;
+        border-radius: 5%;
+        position: absolute;
+        background-color: white;
+      }
+
+      // absolute이기 때문에
+      .paddle_1 {
+        top: $board_height * 0.1;
+        left: $board_width * 0.03;
+      }
+
+      .paddle_2 {
+        top: $board_height - $board_height * 0.3;
+        left: $board_width - $board_width * 0.03 - $paddle_width;
+      }
+
+      .player_1_score {
+        height: 50px;
+        width: 50px;
+        position: absolute;
+        left: $board_width * 0.3;
+        top: $board_height * 0.2;
+      }
+
+      .player_2_score {
+        height: 50px;
+        width: 50px;
+        position: absolute;
+        left: $board_width * 0.7;
+        top: $board_height * 0.2;
+      }
     }
 
     // .ball_effect {
@@ -146,40 +181,6 @@ $paddle_height: 150px;
     //   border-radius: 100px;
     //   animation: spinBall 0.1s linear infinite;
     // }
-
-    .paddle {
-      height: $paddle_height;
-      width: $paddle_width;
-      border-radius: 5%;
-      position: absolute;
-      background-color: white;
-    }
-
-    .paddle_1 {
-      top: $board_height * 0.1;
-      left: $board_width * 0.03;
-    }
-
-    .paddle_2 {
-      top: $board_height - $board_height * 0.3;
-      left: $board_width - $board_width * 0.03 - $paddle_width;
-    }
-
-    .player_1_score {
-      height: 50px;
-      width: 50px;
-      position: absolute;
-      left: $board_width * 0.3;
-      top: $board_height * 0.2;
-    }
-
-    .player_2_score {
-      height: 50px;
-      width: 50px;
-      position: absolute;
-      left: $board_width * 0.7;
-      top: $board_height * 0.2;
-    }
 
     .message {
       position: absolute;

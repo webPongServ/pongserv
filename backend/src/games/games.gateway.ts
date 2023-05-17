@@ -15,8 +15,6 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { GamesService } from './games.service';
 import { roomOption } from './dto/roomOption.dto';
-import { Console } from 'console';
-import { subscribe } from 'diagnostics_channel';
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -82,12 +80,6 @@ export class GamesGateway
     });
   }
   handleDisconnect(@ConnectedSocket() socket: Socket) {
-    this.validateAccessToken(socket);
-    console.log('CONSOLE LOG ROOMs', socket.rooms);
-    Array.from(socket.rooms).forEach((room) => {
-      console.log('ROOM!!', room);
-      socket.to(room).emit('gameDisconnected');
-    });
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 
@@ -127,6 +119,12 @@ export class GamesGateway
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: EnterOption,
   ) {
+    /*
+    1. 소켓을 통해서 들어가는 인원이 누구인지 확인한다.
+    2. 방상태를 확인해서 1명만 있는지 확인하고, 만약 아니라면 EXCEPTION을 보낸다.
+    3. 1명이라면 방에 들어가는 로직을 만든다.(시작은 아님! 들어가기만!)
+      - Detail은 여기에서 만들지 않는다. (Detail은 게임 시작할 때 만들어짐)
+    */
     const userId = socket.data;
     const inRoom = await this.server.in(message.roomId).fetchSockets();
     if (inRoom.length == 1) socket.join(message.roomId);
@@ -134,10 +132,7 @@ export class GamesGateway
       socket.emit('exception', '방이 꽉 차서 들어가실 수 없습니다.');
       return 'NO';
     }
-    await this.GamesService.enterRoom(userId, message);
-    // socket.to(message.roomId).emit('gameStart');
-    console.log(socket.id);
-    console.log(userId, 'joined', message.roomId);
+    this.logger.log(userId, 'joined', message.roomId);
     return 'OK';
   }
 
@@ -160,9 +155,16 @@ export class GamesGateway
     socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
     socket.emit('roomGuest');
     this.server.to(message.roomId).emit('gameStart');
-    console.log(socket.rooms);
-    console.log((await this.server.in(message.roomId).fetchSockets()).length);
-    this.GamesService.startGame(message.roomId);
+    console.log(
+      socket.rooms,
+      (await this.server.in(message.roomId).fetchSockets()).length,
+    );
+    const userId = socket.data;
+    const roomId = message.roomId;
+    const type = message.type;
+    await this.GamesService.enterRoom(userId, roomId, type);
+    await this.GamesService.updateOpponent(userId, roomId);
+    await this.GamesService.startGame(userId, roomId);
     return 'OK';
   }
   // Game Data 요청 받고 보내기
@@ -171,7 +173,7 @@ export class GamesGateway
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
     const roomId = message.roomId;
     // {user : owner, data : 350}
-    console.log('in game req', message);
+    console.log('in game req', message.data);
     socket.to(roomId).emit('inGameRes', message);
     return 'OK';
   }

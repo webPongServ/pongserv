@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { FriendDrawerWidth } from "constant";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -15,7 +16,6 @@ import { Box, List, ListItem } from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
 import { styled, Theme, CSSObject } from "@mui/material/styles";
 import SearchIcon from "@mui/icons-material/Search";
-import { useEffect } from "react";
 import { FriendsActionTypes } from "types/redux/Friends";
 
 const Drawer = styled(MuiDrawer, {
@@ -52,9 +52,13 @@ const openedMixin = (theme: Theme): CSSObject => ({
 interface serverFriend {
   nickname: string;
   imageUrl: string;
+  isCurrLogin: boolean;
 }
 
 const FriendDrawer = () => {
+  const chattingSocket = useSelector(
+    (state: IRootState) => state.sockets.chattingSocket
+  );
   const navigate = useNavigate();
   const dispatch = useDispatch();
   // 받아 오기
@@ -72,14 +76,35 @@ const FriendDrawer = () => {
         (value: serverFriend): UserDetail => ({
           nickname: value.nickname,
           imgURL: value.imageUrl,
-          status: "login",
+          status: value.isCurrLogin ? "login" : "logout",
         })
       ),
     });
   };
 
+  const socketFriendStatusLogin = (nickname: string) => {
+    dispatch({
+      type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
+      payload: { nickname: nickname, status: "login" },
+    });
+  };
+
+  const socketFriendStatusLogout = (nickname: string) => {
+    dispatch({
+      type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
+      payload: { nickname: nickname, status: "logout" },
+    });
+  };
+
   useEffect(() => {
     getFriends();
+    chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
+    chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+
+    return () => {
+      chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
+      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+    };
   }, []);
 
   return (

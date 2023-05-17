@@ -7,7 +7,6 @@ import { GameBoardConst } from "constant";
 import SuccessNotification from "components/utils/SuccessNotification";
 
 import { Box } from "@mui/material";
-import { stat } from "fs";
 
 interface GameBoardProps {
   id: string;
@@ -23,31 +22,6 @@ interface RelativeCoord {
 const quadrant = [[], [1, 0], [0, 0], [0, 1], [1, 1]];
 const random = 4;
 
-const getPaddleRel = (
-  paddle_abs: DOMRect,
-  board_abs: DOMRect
-): RelativeCoord => ({
-  left: paddle_abs.left - board_abs.left - GameBoardConst.GAMEBOARD_BORDER,
-  right:
-    paddle_abs.left -
-    board_abs.left -
-    GameBoardConst.GAMEBOARD_BORDER +
-    GameBoardConst.PADDLE_WIDTH,
-  top: paddle_abs.top - board_abs.top - GameBoardConst.GAMEBOARD_BORDER,
-  bottom:
-    paddle_abs.top -
-    board_abs.top -
-    GameBoardConst.GAMEBOARD_BORDER +
-    GameBoardConst.PADDLE_HEIGHT,
-});
-
-const getBallRel = (ball_abs: DOMRect, board_abs: DOMRect): RelativeCoord => ({
-  left: ball_abs.left - board_abs.left,
-  right: ball_abs.left - board_abs.left + GameBoardConst.BALL_DIAMETER,
-  top: ball_abs.top - board_abs.top,
-  bottom: ball_abs.top - board_abs.top + GameBoardConst.BALL_DIAMETER,
-});
-
 const GameBoard = (props: GameBoardProps) => {
   const gameSocket = useSelector(
     (state: IRootState) => state.sockets.gameSocket
@@ -58,7 +32,9 @@ const GameBoard = (props: GameBoardProps) => {
   const [timer, setTimer] = useState<number>(3);
   const [selectedPaddleRef, setSelectedPaddleRef] =
     useState<React.RefObject<HTMLDivElement> | null>(null);
-  const [status, setStatus] = useState<string>("ready");
+  const [selectedPaddle, setSelectedPaddle] = useState<RelativeCoord | null>(
+    null
+  );
   const [score1, setScore1] = useState<number>(0);
   const [score2, setScore2] = useState<number>(0);
 
@@ -67,47 +43,52 @@ const GameBoard = (props: GameBoardProps) => {
   const paddleRef = useRef<HTMLDivElement>(null);
   const paddle2Ref = useRef<HTMLDivElement>(null);
   const ballRef = useRef<HTMLDivElement>(null);
-  let paddle1_abs: DOMRect,
-    paddle2_abs: DOMRect,
-    board_abs: DOMRect,
-    ball_abs: DOMRect,
-    selected_abs: DOMRect;
-  let paddle1_rel: RelativeCoord,
-    paddle2_rel: RelativeCoord,
-    ball_rel: RelativeCoord,
-    selected_rel: RelativeCoord;
-  let dx: number = 10;
-  let dy: number = 10;
+  let paddle1_rel: RelativeCoord = {
+      top: 60,
+      bottom: 60 + GameBoardConst.PADDLE_HEIGHT,
+      left: 30,
+      right: 30 + GameBoardConst.PADDLE_WIDTH,
+    },
+    paddle2_rel: RelativeCoord = {
+      top: 420,
+      bottom: 420 + GameBoardConst.PADDLE_HEIGHT,
+      left: 950,
+      right: 950 + GameBoardConst.PADDLE_WIDTH,
+    },
+    ball_rel: RelativeCoord = {
+      top: 300,
+      bottom: 300 + GameBoardConst.BALL_DIAMETER,
+      left: 500,
+      right: 500 + GameBoardConst.BALL_DIAMETER,
+    };
+  let dx: number = 5;
+  let dy: number = 5;
   let dxd: number = quadrant[random][0];
   let dyd: number = quadrant[random][1];
 
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (
-      paddleRef.current ||
-      paddle2Ref.current ||
-      boardRef.current ||
-      ballRef.current
-    ) {
-      paddle1_abs = paddleRef.current!.getBoundingClientRect();
-      paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
-      board_abs = boardRef.current!.getBoundingClientRect();
-      ball_abs = ballRef.current!.getBoundingClientRect();
-      paddle1_rel = getPaddleRel(paddle1_abs, board_abs);
-      paddle2_rel = getPaddleRel(paddle2_abs, board_abs);
-      ball_rel = getBallRel(ball_abs, board_abs);
-      selected_abs =
-        selectedPaddleRef === paddleRef ? paddle1_abs : paddle2_abs;
-      selected_rel =
-        selectedPaddleRef === paddleRef ? paddle1_rel : paddle2_rel;
+    if (paddleRef.current || paddle2Ref.current) {
       const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
 
       if (event.key === "ArrowUp") {
         selectedPaddleRef!.current!.style.top =
-          Math.max(0, selected_rel.top - GameBoardConst.MOVE_PIXEL) + "px";
-        selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
+          Math.max(0, selectedPaddle!.top - GameBoardConst.MOVE_PIXEL) + "px";
+        selectedPaddle!.top = Math.max(
+          0,
+          selectedPaddle!.top - GameBoardConst.MOVE_PIXEL
+        );
+        selectedPaddleRef!.current!.style.bottom =
+          selectedPaddle!.top + 150 + "px";
+        selectedPaddle!.bottom = selectedPaddle!.top + 150;
+
         gameSocket.emit(
           "inGameReq",
-          { roomId: currentGame.id, data: selected_rel.top, role: role },
+          {
+            roomId: currentGame.id,
+            data: { top: selectedPaddle!.top, bottom: selectedPaddle!.bottom },
+            role: role,
+            type: "paddle",
+          },
           (data: any) => {
             console.log(data);
           }
@@ -117,12 +98,23 @@ const GameBoard = (props: GameBoardProps) => {
         selectedPaddleRef!.current!.style.top =
           Math.min(
             GameBoardConst.GAMEBOARD_HEIGHT - GameBoardConst.PADDLE_HEIGHT,
-            selected_rel.top + GameBoardConst.MOVE_PIXEL
+            selectedPaddle!.top + GameBoardConst.MOVE_PIXEL
           ) + "px";
-        selected_abs = selectedPaddleRef!.current!.getBoundingClientRect();
+        selectedPaddle!.top = Math.min(
+          GameBoardConst.GAMEBOARD_HEIGHT - GameBoardConst.PADDLE_HEIGHT,
+          selectedPaddle!.top + GameBoardConst.MOVE_PIXEL
+        );
+        selectedPaddleRef!.current!.style.bottom =
+          selectedPaddle!.top + 150 + "px";
+        selectedPaddle!.bottom = selectedPaddle!.top + 150;
         gameSocket.emit(
           "inGameReq",
-          { roomId: currentGame.id, data: selected_rel.top, role: role },
+          {
+            roomId: currentGame.id,
+            data: { top: selectedPaddle!.top, bottom: selectedPaddle!.bottom },
+            role: role,
+            type: "paddle",
+          },
           (data: any) => {
             console.log(data);
           }
@@ -132,19 +124,8 @@ const GameBoard = (props: GameBoardProps) => {
   };
 
   function moveBall(dx: number, dy: number, dxd: number, dyd: number) {
-    if (
-      paddleRef.current ||
-      paddle2Ref.current ||
-      boardRef.current ||
-      ballRef.current
-    ) {
-      paddle1_abs = paddleRef.current!.getBoundingClientRect();
-      paddle2_abs = paddle2Ref.current!.getBoundingClientRect();
-      board_abs = boardRef.current!.getBoundingClientRect();
-      ball_abs = ballRef.current!.getBoundingClientRect();
-      paddle1_rel = getPaddleRel(paddle1_abs, board_abs);
-      paddle2_rel = getPaddleRel(paddle2_abs, board_abs);
-      ball_rel = getBallRel(ball_abs, board_abs);
+    if (ballRef.current) {
+      const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
 
       if (ball_rel.top <= 0) dyd = 1;
       if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
@@ -156,12 +137,18 @@ const GameBoard = (props: GameBoardProps) => {
         // why 10?
         if (ball_rel.left <= 10) {
           setScore2((prev) => prev + 1);
-          ballRef.current!.style.top = "285px";
-          ballRef.current!.style.left = "485px";
+          ballRef.current!.style.top = "300px";
+          ballRef.current!.style.bottom = "315px";
+          ballRef.current!.style.left = "500px";
+          ballRef.current!.style.right = "515px";
+          ball_rel.top = 300;
+          ball_rel.bottom = 315;
+          ball_rel.left = 500;
+          ball_rel.right = 515;
           setTimeout(() => {
             requestAnimationFrame(() => {
-              dx = 10;
-              dy = 10;
+              dx = 5;
+              dy = 5;
               dxd = quadrant[random][0];
               dyd = quadrant[random][1];
               moveBall(dx, dy, dxd, dyd);
@@ -177,12 +164,18 @@ const GameBoard = (props: GameBoardProps) => {
       ) {
         if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
           setScore1((prev) => prev + 1);
-          ballRef.current!.style.top = "285px";
-          ballRef.current!.style.left = "485px";
+          ballRef.current!.style.top = "300px";
+          ballRef.current!.style.bottom = "315px";
+          ballRef.current!.style.left = "500px";
+          ballRef.current!.style.right = "515px";
+          ball_rel.top = 300;
+          ball_rel.bottom = 315;
+          ball_rel.left = 500;
+          ball_rel.right = 515;
           setTimeout(() => {
             requestAnimationFrame(() => {
-              dx = 10;
-              dy = 10;
+              dx = 5;
+              dy = 5;
               dxd = quadrant[random][0];
               dyd = quadrant[random][1];
               moveBall(dx, dy, dxd, dyd);
@@ -191,18 +184,21 @@ const GameBoard = (props: GameBoardProps) => {
           return;
         } else dxd = 0;
       }
-      if (
-        ball_abs.left <= board_abs.left ||
-        ball_abs.right >= board_abs.right
-      ) {
-        if (ball_abs.left <= board_abs.left) setScore2((prev) => prev + 1);
+      if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
+        if (ball_rel.left <= 0) setScore2((prev) => prev + 1);
         else setScore1((prev) => prev + 1);
-        ballRef.current!.style.top = "285px";
-        ballRef.current!.style.left = "485px";
+        ballRef.current!.style.top = "300px";
+        ballRef.current!.style.bottom = "315px";
+        ballRef.current!.style.left = "500px";
+        ballRef.current!.style.right = "515px";
+        ball_rel.top = 300;
+        ball_rel.bottom = 315;
+        ball_rel.left = 500;
+        ball_rel.right = 515;
         setTimeout(() => {
           requestAnimationFrame(() => {
-            dx = 10;
-            dy = 10;
+            dx = 5;
+            dy = 5;
             dxd = quadrant[random][0];
             dyd = quadrant[random][1];
             moveBall(dx, dy, dxd, dyd);
@@ -210,11 +206,32 @@ const GameBoard = (props: GameBoardProps) => {
         }, 3000);
         return;
       }
+
       ballRef.current!.style.top =
-        ball_abs.top - board_abs.top + dy * (dyd === 0 ? -1 : 0) + "px";
+        ball_rel.top + dy * (dyd === 0 ? -1 : 1) + "px";
+      ball_rel.top = ball_rel.top + dy * (dyd === 0 ? -1 : 1);
+      ballRef.current!.style.bottom = ball_rel.top + 15 + "px";
+      ball_rel.bottom = ball_rel.top + 15;
       ballRef.current!.style.left =
-        ball_abs.left - board_abs.left + dx * (dxd === 0 ? -1 : 0) + "px";
-      // ball_abs = ballRef.current!.getBoundingClientRect();
+        ball_rel.left + dx * (dxd === 0 ? -1 : 1) + "px";
+      ball_rel.left = ball_rel.left + dx * (dxd === 0 ? -1 : 1);
+      ballRef.current!.style.right = ball_rel.left + 15 + "px";
+      ball_rel.right = ball_rel.left + 15;
+      gameSocket.emit(
+        "inGameReq",
+        {
+          roomId: currentGame.id,
+          data: {
+            top: ball_rel.top,
+            left: ball_rel.left,
+          },
+          role: role,
+          type: "ball",
+        },
+        (data: any) => {
+          console.log(data);
+        }
+      );
       requestAnimationFrame(() => {
         moveBall(dx, dy, dxd, dyd);
       });
@@ -246,10 +263,12 @@ const GameBoard = (props: GameBoardProps) => {
 
   const socketRoomOwner = () => {
     setSelectedPaddleRef(paddleRef);
+    setSelectedPaddle(paddle1_rel);
   };
 
   const socketRoomGuest = () => {
     setSelectedPaddleRef(paddle2Ref);
+    setSelectedPaddle(paddle2_rel);
   };
 
   useEffect(() => {
@@ -257,16 +276,31 @@ const GameBoard = (props: GameBoardProps) => {
     // 난이도에 따라 paddleRef의 height를 조절하기(css)
     if (gameSocket) {
       gameSocket.on("gameStart", socketGameStart);
-
       gameSocket.on("roomOwner", socketRoomOwner);
-
       gameSocket.on("roomGuest", socketRoomGuest);
       gameSocket.on(
         "inGameRes",
-        (data: { roomId: string; data: string; role: string }) => {
-          if (data.role === "owner")
-            paddleRef.current!.style.top = data.data + "px";
-          else paddle2Ref.current!.style.top = data.data + "px";
+        (data: { roomId: string; data: any; role: string; type: string }) => {
+          if (data.type === "paddle") {
+            if (data.role === "owner") {
+              paddleRef.current!.style.top = data.data.top + "px";
+              paddle1_rel.top = data.data.top;
+              paddleRef.current!.style.bottom = data.data.bottom + "px";
+              paddle1_rel.bottom = data.data.bottom;
+            } else {
+              paddle2Ref.current!.style.top = data.data.top + "px";
+              paddle2_rel.top = data.data.top;
+              paddle2Ref.current!.style.bottom = data.data.bottom + "px";
+              paddle2_rel.bottom = data.data.bottom;
+            }
+          } else {
+            // if (data.role === "owner") {
+            //   ballRef.current!.style.left = data.data.left + "px";
+            //   ball_rel.left = data.data.left;
+            //   ballRef.current!.style.top = data.data.top + "px";
+            //   ball_rel.top = data.data.top;
+            // }
+          }
         }
       );
     }
@@ -281,36 +315,34 @@ const GameBoard = (props: GameBoardProps) => {
     if (!gameSocket) window.location.href = "/game?error=wrong_game_access";
   }, []);
 
-  return (
+  return isWaiting ? (
     <>
       <SuccessNotification
         successMessage={`${timer}초 후에 게임이 시작됩니다.`}
         ref={notiRef}
       />
-      {isWaiting ? (
-        <GameReady
-          type="일반 게임"
-          content="상대를 기다리는 중"
-          funnyImg="funny3.gif"
-        />
-      ) : (
-        <Box
-          id={props.id}
-          className="flex-container"
-          onKeyDown={pressKey}
-          tabIndex={0}
-          ref={divRef}
-        >
-          <Box className="board" ref={boardRef}>
-            <Box className="ball" ref={ballRef}></Box>
-            <Box className="paddle_1 paddle" ref={paddleRef}></Box>
-            <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
-            <h1 className="player_1_score">{score1}</h1>
-            <h1 className="player_2_score">{score2}</h1>
-          </Box>
-        </Box>
-      )}
+      <GameReady
+        type="일반 게임"
+        content="상대를 기다리는 중"
+        funnyImg="funny3.gif"
+      />
     </>
+  ) : (
+    <Box
+      id={props.id}
+      className="flex-container"
+      onKeyDown={pressKey}
+      tabIndex={0}
+      ref={divRef}
+    >
+      <Box className="board" ref={boardRef}>
+        <Box className="ball" ref={ballRef}></Box>
+        <Box className="paddle_1 paddle" ref={paddleRef}></Box>
+        <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
+        <h1 className="player_1_score">{score1}</h1>
+        <h1 className="player_2_score">{score2}</h1>
+      </Box>
+    </Box>
   );
 };
 
