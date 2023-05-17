@@ -24,7 +24,7 @@ interface RelativeCoord {
 
 const quadrant = [[], [1, 0], [0, 0], [0, 1], [1, 1]];
 // let random = (Math.floor(Math.random() * 10) % 4) + 1;
-let random = 4;
+let random = 2;
 
 const setDifficulty = (difficulty: string): number => {
   if (difficulty === GameDifficultyType.easy) return 3;
@@ -172,6 +172,7 @@ const GameBoard = (props: GameBoardProps) => {
                 opScore: selectedPaddleRef === paddleRef ? score2 : score1,
               },
               () => {
+                random = 2;
                 dispatch({
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
@@ -226,11 +227,13 @@ const GameBoard = (props: GameBoardProps) => {
                 opScore: selectedPaddleRef === paddleRef ? score2 : score1,
               },
               () => {
+                random = 2;
                 dispatch({
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
                 });
-                navigate("/game");
+                // 결과 페이지로 navigate => 10초간 보여주고 redirect, 버튼 누르면 redirect(초기화)
+                window.location.href = "/game";
               }
             );
             return;
@@ -288,11 +291,12 @@ const GameBoard = (props: GameBoardProps) => {
               opScore: selectedPaddleRef === paddleRef ? score2 : score1,
             },
             () => {
+              random = 2;
               dispatch({
                 type: CurrentGameActionTypes.DELETE_GAMEROOM,
                 payload: "",
               });
-              navigate("/game");
+              window.location.href = "/game";
             }
           );
           return;
@@ -420,7 +424,7 @@ const GameBoard = (props: GameBoardProps) => {
             type: CurrentGameActionTypes.DELETE_GAMEROOM,
             payload: "",
           });
-          navigate("/game");
+          window.location.href = "/game";
         }
       );
     };

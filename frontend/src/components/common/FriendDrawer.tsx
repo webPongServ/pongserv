@@ -84,7 +84,6 @@ const FriendDrawer = () => {
   };
 
   const socketFriendStatusLogin = (nickname: string) => {
-    console.log("frined login", nickname);
     dispatch({
       type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
       payload: { nickname: nickname, status: "login" },
@@ -92,7 +91,6 @@ const FriendDrawer = () => {
   };
 
   const socketFriendStatusLogout = (nickname: string) => {
-    console.log("frined logout", nickname);
     dispatch({
       type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
       payload: { nickname: nickname, status: "logout" },
