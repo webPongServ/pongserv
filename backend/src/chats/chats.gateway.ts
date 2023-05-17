@@ -21,6 +21,7 @@ import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
 import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomBanDto } from './dto/chatroom-ban.dto';
+import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -260,7 +261,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   // TODO - to combine with front-end
   @SubscribeMessage('chatroomRegisterBan')
-  async banChatroomUser(
+  async registerChatroomBan(
     @ConnectedSocket() socket: Socket,
     @MessageBody() infoBan: ChatroomBanDto
   ) {
@@ -276,6 +277,26 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (targetSocketId) {
         this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
       }
+      return true;
+    } catch (err) {
+      console.log(err);
+      socket.emit('errorChatroomMute', err.response.message);
+    }
+  }
+
+  // TODO - to combine with front-end - 이건 기존 REST API를 그대로 써도 됨
+  @SubscribeMessage('chatroomRemovalBan')
+  async removalChatroomBan(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoBanRmv: ChatroomBanRemovalDto
+  ) {
+    const userId: string = this.validateAccessToken(socket);
+    if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomRemovalBan]`);
+    console.log(`ChatroomBanRemovalDto: `);
+    console.log(infoBanRmv);
+    try {
+      await this.chatsService.removeBan(userId, infoBanRmv);
       return true;
     } catch (err) {
       console.log(err);
