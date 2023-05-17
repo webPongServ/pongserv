@@ -52,7 +52,7 @@ export class GamesService {
       roomId,
     );
     const room = await this.DbGamesManagerService.endGameList(roomListEntity);
-    await this.DbGamesManagerService.endGameDetail(room.id);
+    // await this.DbGamesManagerService.endGameDetail(room.id);
   }
 
   async updateOpponent(opponent, roomId) {
@@ -63,6 +63,7 @@ export class GamesService {
     // Room ID 를 기준으로, 각각 상대편으로 등록한다.
     await this.DbGamesManagerService.updateOpponent(roomId, opponent, owner);
     await this.DbGamesManagerService.updateOpponent(roomId, owner, opponent);
+    await this.DbGamesManagerService.updateOpponentList(roomId, opponent);
   }
 
   async startGame(userId, roomId) {
@@ -76,5 +77,36 @@ export class GamesService {
     const user = await this.DbUsersManagerService.getUserByUserId(userId);
     const userStatic = await this.DbGamesManagerService.getUserStatic(user);
     return userStatic;
+  }
+
+  async dodgeGame(userId, roomId, myScore, opScore) {
+    // 나의 점수와 상대 점수를 알아서 DB에 저장한다.
+    const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
+      roomId,
+    );
+    // 승리자 결과 저장
+    // List 를 주고,
+    const opUserId =
+      roomListEntity.owner == userId
+        ? roomListEntity.opUserId
+        : roomListEntity.owner;
+
+    console.log('Dodge Game opUserId', opUserId, 'userId', userId, '\n\n\n');
+    // console.log(roomListEntity);
+    await this.DbGamesManagerService.SaveDodgeGame(
+      roomListEntity,
+      userId,
+      '01',
+      myScore,
+      opScore,
+    );
+    // 나간사람 결과 저장
+    await this.DbGamesManagerService.SaveDodgeGame(
+      roomListEntity,
+      opUserId,
+      '02',
+      opScore,
+      myScore,
+    );
   }
 }
