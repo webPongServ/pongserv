@@ -15,4 +15,7 @@ export default class GameQueue {
   get length() {
     return this.queue.length;
   }
+  isEmpty() {
+    return this.queue.length === 0;
+  }
 }
