@@ -1,6 +1,6 @@
 import { GameRoomDetail } from "types/Detail";
 
-interface CurrentGame {
+export interface CurrentGame {
   currentGame: GameRoomDetail | null;
   score1: number;
   score2: number;

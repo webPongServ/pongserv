@@ -48,6 +48,8 @@ const GameBoard = (props: GameBoardProps) => {
   const [selectedPaddle, setSelectedPaddle] = useState<RelativeCoord | null>(
     null
   );
+  let score1: number = 0;
+  let score2: number = 0;
 
   const divRef = useRef<HTMLDivElement>(null);
   const boardRef = useRef<HTMLDivElement>(null);
@@ -134,145 +136,21 @@ const GameBoard = (props: GameBoardProps) => {
     }
   };
 
-  useEffect(() => {
-    const moveBall = (dx: number, dy: number, dxd: number, dyd: number) => {
-      if (ballRef.current) {
-        const role: string =
-          selectedPaddleRef === paddleRef ? "owner" : "guest";
+  // useEffect(() => {
+  const moveBall = (dx: number, dy: number, dxd: number, dyd: number) => {
+    if (ballRef.current) {
+      const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
 
-        if (ball_rel.top <= 0) dyd = 1;
-        if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
-        if (
-          ball_rel.left <= paddle1_rel.right &&
-          ball_rel.top >= paddle1_rel.top &&
-          ball_rel.bottom <= paddle1_rel.bottom
-        ) {
-          // why 10?
-          if (ball_rel.left <= 10) {
-            dispatch({
-              type: CurrentGameActionTypes.INCREMENT_SCORE,
-              payload: "score2",
-            });
-            ballRef.current!.style.top = "300px";
-            ballRef.current!.style.bottom = "315px";
-            ballRef.current!.style.left = "500px";
-            ballRef.current!.style.right = "515px";
-            ball_rel.top = 300;
-            ball_rel.bottom = 315;
-            ball_rel.left = 500;
-            ball_rel.right = 515;
-            if (currentGame.score2 === currentGame.currentGame!.maxScore) {
-              gameSocket.emit(
-                "finishGame",
-                {
-                  roomId: currentGame.currentGame!.id,
-                  myScore:
-                    selectedPaddleRef === paddleRef
-                      ? currentGame.score1
-                      : currentGame.score2,
-                  opScore:
-                    selectedPaddleRef === paddleRef
-                      ? currentGame.score2
-                      : currentGame.score1,
-                },
-                () => {
-                  dispatch({
-                    type: CurrentGameActionTypes.DELETE_GAMEROOM,
-                    payload: "",
-                  });
-                  navigate("/game");
-                }
-              );
-              return;
-            }
-            setTimeout(() => {
-              requestAnimationFrame(() => {
-                dx = currentGame.currentGame
-                  ? setDifficulty(currentGame.currentGame.difficulty)
-                  : 5;
-                dy = currentGame.currentGame
-                  ? setDifficulty(currentGame.currentGame.difficulty)
-                  : 5;
-                // random = (Math.floor(Math.random() * 10) % 4) + 1;
-                dxd = quadrant[random][0];
-                dyd = quadrant[random][1];
-                moveBall(dx, dy, dxd, dyd);
-              });
-            }, 3000);
-            return;
-          } else dxd = 1;
-        }
-        if (
-          ball_rel.right >= paddle2_rel.left &&
-          ball_rel.top >= paddle2_rel.top &&
-          ball_rel.bottom <= paddle2_rel.bottom
-        ) {
-          if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
-            dispatch({
-              type: CurrentGameActionTypes.INCREMENT_SCORE,
-              payload: "score1",
-            });
-            ballRef.current!.style.top = "300px";
-            ballRef.current!.style.bottom = "315px";
-            ballRef.current!.style.left = "500px";
-            ballRef.current!.style.right = "515px";
-            ball_rel.top = 300;
-            ball_rel.bottom = 315;
-            ball_rel.left = 500;
-            ball_rel.right = 515;
-            if (currentGame.score1 === currentGame.currentGame!.maxScore) {
-              gameSocket.emit(
-                "finishGame",
-                {
-                  roomId: currentGame.currentGame!.id,
-                  myScore:
-                    selectedPaddleRef === paddleRef
-                      ? currentGame.score1
-                      : currentGame.score2,
-                  opScore:
-                    selectedPaddleRef === paddleRef
-                      ? currentGame.score2
-                      : currentGame.score1,
-                },
-                () => {
-                  dispatch({
-                    type: CurrentGameActionTypes.DELETE_GAMEROOM,
-                    payload: "",
-                  });
-                  navigate("/game");
-                }
-              );
-              return;
-            }
-            setTimeout(() => {
-              requestAnimationFrame(() => {
-                dx = currentGame.currentGame
-                  ? setDifficulty(currentGame.currentGame.difficulty)
-                  : 5;
-                dy = currentGame.currentGame
-                  ? setDifficulty(currentGame.currentGame.difficulty)
-                  : 5;
-                // random = (Math.floor(Math.random() * 10) % 4) + 1;
-                dxd = quadrant[random][0];
-                dyd = quadrant[random][1];
-                moveBall(dx, dy, dxd, dyd);
-              });
-            }, 3000);
-            return;
-          } else dxd = 0;
-        }
-        if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
-          if (ball_rel.left <= 0) {
-            dispatch({
-              type: CurrentGameActionTypes.INCREMENT_SCORE,
-              payload: "score2",
-            });
-          } else {
-            dispatch({
-              type: CurrentGameActionTypes.INCREMENT_SCORE,
-              payload: "score1",
-            });
-          }
+      if (ball_rel.top <= 0) dyd = 1;
+      if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
+      if (
+        ball_rel.left <= paddle1_rel.right &&
+        ball_rel.top >= paddle1_rel.top &&
+        ball_rel.bottom <= paddle1_rel.bottom
+      ) {
+        // why 10?
+        if (ball_rel.left <= 10) {
+          score2 = score2 + 1;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
           ballRef.current!.style.left = "500px";
@@ -281,24 +159,13 @@ const GameBoard = (props: GameBoardProps) => {
           ball_rel.bottom = 315;
           ball_rel.left = 500;
           ball_rel.right = 515;
-          console.log(123);
-          console.log(currentGame.score1, currentGame.score2);
-          if (
-            currentGame.score1 === currentGame.currentGame!.maxScore ||
-            currentGame.score2 === currentGame.currentGame!.maxScore
-          ) {
+          if (score2 === currentGame.currentGame!.maxScore) {
             gameSocket.emit(
               "finishGame",
               {
                 roomId: currentGame.currentGame!.id,
-                myScore:
-                  selectedPaddleRef === paddleRef
-                    ? currentGame.score1
-                    : currentGame.score2,
-                opScore:
-                  selectedPaddleRef === paddleRef
-                    ? currentGame.score2
-                    : currentGame.score1,
+                myScore: selectedPaddleRef === paddleRef ? score1 : score2,
+                opScore: selectedPaddleRef === paddleRef ? score2 : score1,
               },
               () => {
                 dispatch({
@@ -325,61 +192,162 @@ const GameBoard = (props: GameBoardProps) => {
             });
           }, 3000);
           return;
-        }
-
-        ballRef.current!.style.top =
-          ball_rel.top + dy * (dyd === 0 ? -1 : 1) + "px";
-        ball_rel.top = ball_rel.top + dy * (dyd === 0 ? -1 : 1);
-        ballRef.current!.style.bottom = ball_rel.top + 15 + "px";
-        ball_rel.bottom = ball_rel.top + 15;
-        ballRef.current!.style.left =
-          ball_rel.left + dx * (dxd === 0 ? -1 : 1) + "px";
-        ball_rel.left = ball_rel.left + dx * (dxd === 0 ? -1 : 1);
-        ballRef.current!.style.right = ball_rel.left + 15 + "px";
-        ball_rel.right = ball_rel.left + 15;
-        gameSocket.emit("inGameReq", {
-          roomId: currentGame.currentGame!.id,
-          data: {
-            top: ball_rel.top,
-            left: ball_rel.left,
-          },
-          role: role,
-          type: "ball",
-        });
-        requestAnimationFrame(() => {
-          moveBall(dx, dy, dxd, dyd);
-        });
+        } else dxd = 1;
       }
-    };
-
-    const socketGameStart = () => {
-      if (notiRef.current) notiRef.current.style.animationName = "slidedown";
-      const interval = setInterval(() => {
-        setTimer((prev) => {
-          if (prev <= 1) {
-            if (notiRef.current)
-              notiRef.current.style.animationName = "slideup";
-            clearInterval(interval);
-            return 0;
+      if (
+        ball_rel.right >= paddle2_rel.left &&
+        ball_rel.top >= paddle2_rel.top &&
+        ball_rel.bottom <= paddle2_rel.bottom
+      ) {
+        if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
+          score1 = score1 + 1;
+          ballRef.current!.style.top = "300px";
+          ballRef.current!.style.bottom = "315px";
+          ballRef.current!.style.left = "500px";
+          ballRef.current!.style.right = "515px";
+          ball_rel.top = 300;
+          ball_rel.bottom = 315;
+          ball_rel.left = 500;
+          ball_rel.right = 515;
+          if (score1 === currentGame.currentGame!.maxScore) {
+            gameSocket.emit(
+              "finishGame",
+              {
+                roomId: currentGame.currentGame!.id,
+                myScore: selectedPaddleRef === paddleRef ? score1 : score2,
+                opScore: selectedPaddleRef === paddleRef ? score2 : score1,
+              },
+              () => {
+                dispatch({
+                  type: CurrentGameActionTypes.DELETE_GAMEROOM,
+                  payload: "",
+                });
+                navigate("/game");
+              }
+            );
+            return;
           }
-          return prev - 1;
-        });
-      }, 1000);
-
-      setTimeout(() => {
-        setIsWaiting(false);
+          setTimeout(() => {
+            requestAnimationFrame(() => {
+              dx = currentGame.currentGame
+                ? setDifficulty(currentGame.currentGame.difficulty)
+                : 5;
+              dy = currentGame.currentGame
+                ? setDifficulty(currentGame.currentGame.difficulty)
+                : 5;
+              // random = (Math.floor(Math.random() * 10) % 4) + 1;
+              dxd = quadrant[random][0];
+              dyd = quadrant[random][1];
+              moveBall(dx, dy, dxd, dyd);
+            });
+          }, 3000);
+          return;
+        } else dxd = 0;
+      }
+      if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
+        if (ball_rel.left <= 0) {
+          score2 = score2 + 1;
+        } else {
+          score1 = score1 + 1;
+        }
+        ballRef.current!.style.top = "300px";
+        ballRef.current!.style.bottom = "315px";
+        ballRef.current!.style.left = "500px";
+        ballRef.current!.style.right = "515px";
+        ball_rel.top = 300;
+        ball_rel.bottom = 315;
+        ball_rel.left = 500;
+        ball_rel.right = 515;
+        if (
+          score1 === currentGame.currentGame!.maxScore ||
+          score2 === currentGame.currentGame!.maxScore
+        ) {
+          gameSocket.emit(
+            "finishGame",
+            {
+              roomId: currentGame.currentGame!.id,
+              myScore: selectedPaddleRef === paddleRef ? score1 : score2,
+              opScore: selectedPaddleRef === paddleRef ? score2 : score1,
+            },
+            () => {
+              dispatch({
+                type: CurrentGameActionTypes.DELETE_GAMEROOM,
+                payload: "",
+              });
+              navigate("/game");
+            }
+          );
+          return;
+        }
         setTimeout(() => {
           requestAnimationFrame(() => {
+            dx = currentGame.currentGame
+              ? setDifficulty(currentGame.currentGame.difficulty)
+              : 5;
+            dy = currentGame.currentGame
+              ? setDifficulty(currentGame.currentGame.difficulty)
+              : 5;
+            // random = (Math.floor(Math.random() * 10) % 4) + 1;
+            dxd = quadrant[random][0];
+            dyd = quadrant[random][1];
             moveBall(dx, dy, dxd, dyd);
           });
         }, 3000);
-      }, 4000);
-    };
+        return;
+      }
 
-    if (gameSocket) gameSocket.on("gameStart", socketGameStart);
+      ballRef.current!.style.top =
+        ball_rel.top + dy * (dyd === 0 ? -1 : 1) + "px";
+      ball_rel.top = ball_rel.top + dy * (dyd === 0 ? -1 : 1);
+      ballRef.current!.style.bottom = ball_rel.top + 15 + "px";
+      ball_rel.bottom = ball_rel.top + 15;
+      ballRef.current!.style.left =
+        ball_rel.left + dx * (dxd === 0 ? -1 : 1) + "px";
+      ball_rel.left = ball_rel.left + dx * (dxd === 0 ? -1 : 1);
+      ballRef.current!.style.right = ball_rel.left + 15 + "px";
+      ball_rel.right = ball_rel.left + 15;
+      gameSocket.emit("inGameReq", {
+        roomId: currentGame.currentGame!.id,
+        data: {
+          top: ball_rel.top,
+          left: ball_rel.left,
+        },
+        role: role,
+        type: "ball",
+      });
+      requestAnimationFrame(() => {
+        moveBall(dx, dy, dxd, dyd);
+      });
+    }
+  };
 
-    return () => gameSocket.off("gameStart", socketGameStart);
-  }, [currentGame]);
+  const socketGameStart = () => {
+    if (notiRef.current) notiRef.current.style.animationName = "slidedown";
+    const interval = setInterval(() => {
+      setTimer((prev) => {
+        if (prev <= 1) {
+          if (notiRef.current) notiRef.current.style.animationName = "slideup";
+          clearInterval(interval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    setTimeout(() => {
+      setIsWaiting(false);
+      setTimeout(() => {
+        requestAnimationFrame(() => {
+          moveBall(dx, dy, dxd, dyd);
+        });
+      }, 3000);
+    }, 4000);
+  };
+
+  // if (gameSocket) gameSocket.on("gameStart", socketGameStart);
+
+  // return () => gameSocket.off("gameStart", socketGameStart);
+  // }, [currentGame]);
 
   const socketRoomOwner = () => {
     setSelectedPaddleRef(paddleRef);
@@ -454,11 +422,13 @@ const GameBoard = (props: GameBoardProps) => {
     if (divRef.current !== null) divRef.current.focus();
     // 난이도에 따라 paddleRef의 height를 조절하기(css)
     if (gameSocket) {
+      gameSocket.on("gameStart", socketGameStart);
       gameSocket.on("roomOwner", socketRoomOwner);
       gameSocket.on("roomGuest", socketRoomGuest);
       gameSocket.on("inGameRes", socketInGameRes);
     }
     return () => {
+      gameSocket.off("gameStart", socketGameStart);
       gameSocket.off("roomOwner", socketRoomOwner);
       gameSocket.off("roomGuest", socketRoomGuest);
       gameSocket.off("inGameRes", socketInGameRes);
