@@ -18,6 +18,7 @@ import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
 import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 import { UsersService } from 'src/users/users.service';
 import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
+import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -34,6 +35,8 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
   // private logger: Logger = new Logger('ChatsGateway');
+
+  private userIdToSocketIdMap = new Map<string, string>();
 
   validateAccessToken(socket: Socket): string {
     try {
@@ -56,8 +59,13 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!userId) {
       socket.disconnect(true);
       return;
+    } else {
+      this.userIdToSocketIdMap.set(userId, socket.id);
+      console.log(`In handleConnection -> this.userIdToSocketIdMap: `)
+      console.log(this.userIdToSocketIdMap)
     }
     /*!SECTION
+      0. intraId-socketId map에 상태 저장
       1. Friend user socket room에 등록 - Friend_userId
       2. Block user socket room에 등록 - Block_userId
       3. 해당 유저 전용 friends socket room으로 로그인 알람 보내기
@@ -88,11 +96,29 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     /*!SECTION
       1. 해당 유저 전용 friends socket room으로 로그아웃 알람 보내기
+      2. chatroom에 참여하고 있는 상태였다면, 나가도록 처리하기
+        2-1. 유저가 참여하고 있는 채팅방 id 찾기
+      3. intraId-socketId map에 상태 제거
     */
     // 1
     const myProfile = await this.usersService.getProfile(userId);
     const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogout`, myProfile.nickname);
+
+    // 2
+    console.log(`socket.rooms: `)
+    console.log(socket.rooms)
+
+    // 3
+    // REVIEW - map에서 제거, 확인해봐야함 - checked
+    console.log(`In handleDisconnect before delete -> this.userIdToSocketIdMap: `)
+    console.log(this.userIdToSocketIdMap)
+    const entry = Array.from(this.userIdToSocketIdMap.entries()).find(([, socketId]) => socketId === socket.id);
+    if (entry) {
+      this.userIdToSocketIdMap.delete(entry[0]);
+    }
+    console.log(`In handleDisconnect after delete -> this.userIdToSocketIdMap: `)
+    console.log(this.userIdToSocketIdMap)
     
   }
 
@@ -181,6 +207,28 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (err) {
       console.log(err);
       socket.emit('errorPutBlockingUserInChats', err.response.message);
+    }
+  }
+
+  // TODO - to combine with front-end
+  @SubscribeMessage('chatroomKick')
+  async kickChatroomUser(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoKick: ChatroomKickingDto,
+  ) {
+    const userId: string = this.validateAccessToken(socket);
+    if (!userId) return;
+    try {
+      const targetUserId = await this.chatsService.kickUser(userId, infoKick);
+      // target user의 socket에 kicked 정보 emit
+      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      if (targetSocketId) {
+        this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
+      }
+      return true;
+    } catch (err) {
+      console.log(err);
+      socket.emit('errorChatroomKick', err.response.message);
     }
   }
 

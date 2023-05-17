@@ -103,16 +103,10 @@ export class ChatsService {
 				uuid, name, owner, type, current, max
 		*/
     // 1
-    console.log('userId in ChatsService.getChatroomsForAUser(): ');
-    console.log(userId);
     const user: TbUa01MEntity =
       await this.dbUsersManagerService.getUserByUserId(userId);
-    console.log(`user in ChatsService.getChatroomsForAUser(): `);
-    console.log(user);
     const dmChtrms: TbCh01LEntity[] =
       await this.dbChatsManagerService.getDMChatroomsForUser(user);
-    console.log(`dmChtrms in ChatsService.getChatroomsForAUser(): `);
-    console.log(dmChtrms);
     // 2
     const pblAndprtChtrms: TbCh01LEntity[] =
       await this.dbChatsManagerService.getPublicAndProtectedChatrooms();
@@ -126,27 +120,17 @@ export class ChatsService {
       currentCount: number;
       maxCount: number;
     }[] = [];
-    console.log(`combinedChtrms in ChatsService.getChatroomsForAUser(): `);
-    console.log(combinedChtrms);
     for (const eachChtrm of combinedChtrms) {
-      console.log(`eachChtrm in ChatsService.getChatroomsForAUser(): `);
-      console.log(eachChtrm);
       const currUserListAndCount =
         await this.dbChatsManagerService.getCurrUserListAndCount(eachChtrm);
       if (currUserListAndCount[1] === 0) continue;
       let owner: TbCh02LEntity;
-      console.log(
-        `currUserListAndCount in ChatsService.getChatroomsForAUser(): `,
-      );
-      console.log(currUserListAndCount);
       for (const eachUserInChtrm of currUserListAndCount[0]) {
         if (eachUserInChtrm.chtRmAuth === '01') {
           owner = eachUserInChtrm;
           break;
         }
       }
-      console.log(`owner in ChatsService.getChatroomsForAUser(): `);
-      console.log(owner);
       results.push({
         id: eachChtrm.id,
         chatroomName: eachChtrm.chtRmNm,
@@ -156,8 +140,6 @@ export class ChatsService {
         maxCount: eachChtrm.maxUserCnt,
       });
     }
-    console.log(`results: `);
-    console.log(results);
     return results;
   }
 
@@ -357,7 +339,7 @@ export class ChatsService {
       targetInChtrm,
     );
     // 4
-    return targetUser.nickname;
+    return targetUser.userId;
   }
 
   async banUser(userId: string, infoBan: ChatroomBanDto) {
