@@ -1,5 +1,9 @@
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CustomIconButton from "components/utils/CustomIconButton";
+import { IRootState } from "components/common/store";
+import { CurrentGameActionTypes } from "types/redux/CurrentGame";
+import { GameDifficultyType } from "constant";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -15,7 +19,12 @@ interface LadderGameModalProps {
 }
 
 const LadderGameModal = (props: LadderGameModalProps) => {
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
+  const gameSocket = useSelector(
+    (state: IRootState) => state.sockets.gameSocket
+  );
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   return (
     <Modal
       open={props.roomStatus === "ladder-game"}
@@ -38,7 +47,22 @@ const LadderGameModal = (props: LadderGameModalProps) => {
           <Box className="footer flex-container">
             <Button
               onClick={() => {
-                navigate(`/game/ladder`);
+                gameSocket.emit("ladderGame", (data: any) => {
+                  console.log(data);
+                  dispatch({
+                    type: CurrentGameActionTypes.UPDATE_GAMEROOM,
+                    payload: {
+                      currentGame: {
+                        id: data.roomId,
+                        title: "ladder game",
+                        owner: myInfo.nickname,
+                        maxScore: 5,
+                        difficulty: GameDifficultyType.normal,
+                      },
+                    },
+                  });
+                  navigate(`/game/${data.roomId}`);
+                });
               }}
             >
               시작
