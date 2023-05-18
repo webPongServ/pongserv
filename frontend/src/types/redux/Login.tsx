@@ -4,6 +4,7 @@ export enum LoginStatusActionTypes {
   STATUS_MAIN = "STATUS_MAIN",
   STATUS_TWOFACTOR = "STATUS_TWOFACTOR",
   STATUS_NEWSESSION = "STATUS_NEWSESSION",
+  STATUS_GAME = "STATUS_GAME",
 }
 
 export interface LoginStatusMainAction {
@@ -16,11 +17,15 @@ export interface LoginStatusTwoFactorAction {
 export interface LoginStatusNewSessionAction {
   type: LoginStatusActionTypes.STATUS_NEWSESSION;
 }
+export interface LoginStatusGameAction {
+  type: LoginStatusActionTypes.STATUS_GAME;
+}
 
 type LoginStatusAction =
   | LoginStatusMainAction
   | LoginStatusTwoFactorAction
-  | LoginStatusNewSessionAction;
+  | LoginStatusNewSessionAction
+  | LoginStatusGameAction;
 
 export const LoginStatusReducer = (
   state = INITIAL_LOGINSTATUS,
@@ -33,6 +38,8 @@ export const LoginStatusReducer = (
       return "two-factor";
     case LoginStatusActionTypes.STATUS_NEWSESSION:
       return "new-session";
+    case LoginStatusActionTypes.STATUS_GAME:
+      return "game";
     default:
       return state;
   }

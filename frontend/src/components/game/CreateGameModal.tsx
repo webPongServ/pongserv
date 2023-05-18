@@ -93,13 +93,15 @@ const CreateGameModal = (props: CreateGameModalProps) => {
             />
             <GameDifficultyRadioGroup
               name="난이도"
-              defaultValue={GameDifficultyType.easy}
+              defaultValue={GameDifficultyType.normal}
               handleFunction={handleDifficulty}
             />
           </Box>
           <Box className="footer flex-container">
             <Button
               onClick={() => {
+                if (gameRoomForm.title === "")
+                  return alert("제목을 입력해주세요!");
                 gameSocket.emit(
                   "createGameRoom",
                   {
