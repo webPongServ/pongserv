@@ -99,13 +99,18 @@ export class DbGamesManagerService {
   }
 
   async getUserStatic(userEntity) {
+    // 개인 프로필을 누르면 나오는 정보들 모두 돌려준다.
+    // console.log(userEntity);
     const users = await this.Gm01DRp.find({
+      relations: {
+        gm01lEntity: true,
+      },
       where: {
         ua01mEntity: {
           userId: userEntity.userId,
         },
       },
-      select: ['opUserId', 'gmRsltCd', 'getScr', 'lossScr'],
+      select: ['gm01lEntity', 'opUserId', 'gmRsltCd', 'getScr', 'lossScr'],
     });
 
     // opUserId가 null인 요소를 제외합니다.
@@ -127,7 +132,22 @@ export class DbGamesManagerService {
         };
       }),
     );
-    return updateUsers;
+    const win = updateUsers.filter((item) => item.gmRsltCd === '01').length;
+    const lose = updateUsers.filter((item) => item.gmRsltCd === '02').length;
+    const ladderWin = updateUsers.filter(
+      (item) => item.gmRsltCd === '01' && item.gm01lEntity.gmType === '02',
+    ).length;
+    const ladderLose = updateUsers.filter(
+      (item) => item.gmRsltCd === '02' && item.gm01lEntity.gmType === '02',
+    ).length;
+    const staticData = {
+      win: win,
+      lose: lose,
+      total: win + lose,
+      ladder: 1000 + (ladderWin - ladderLose) * 10,
+    };
+
+    return [staticData, updateUsers];
   }
 
   async updateOpponent(roomId, userId, opponentId) {
