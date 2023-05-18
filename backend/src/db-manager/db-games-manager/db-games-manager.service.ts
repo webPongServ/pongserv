@@ -99,6 +99,8 @@ export class DbGamesManagerService {
   }
 
   async getUserStatic(userEntity) {
+    // 개인 프로필을 누르면 나오는 정보들 모두 돌려준다.
+    // console.log(userEntity);
     const users = await this.Gm01DRp.find({
       where: {
         ua01mEntity: {
@@ -112,6 +114,7 @@ export class DbGamesManagerService {
     const filteredUsers = users.filter((user) => user.opUserId !== null);
     const userId = userEntity.userId;
     const userImgPath = userEntity.imgPath;
+    // console.log(users);
     // filteredUsers 배열의 각 요소에 대해, Ua01MRp에서 opUserId를 이용해 imgPath를 찾는 Promise를 생성합니다.
     const updateUsers = await Promise.all(
       filteredUsers.map(async (user) => {
@@ -127,6 +130,9 @@ export class DbGamesManagerService {
         };
       }),
     );
+    // console.log(updateUsers);
+    // 여기까지가 아래에 있는 세부 게임 결과
+
     return updateUsers;
   }
 

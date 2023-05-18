@@ -72,8 +72,13 @@ export class GamesService {
     await this.DbGamesManagerService.startGameList(roomListEntity);
   }
 
-  async getUserStatic(userId) {
+  async getUserStatic(nickname) {
+    const userId = await this.DbUsersManagerService.findUserIdByNickname(
+      nickname,
+    );
+    console.log(userId, '\n\n');
     const user = await this.DbUsersManagerService.getUserByUserId(userId);
+    console.log(user, userId);
     const userStatic = await this.DbGamesManagerService.getUserStatic(user);
     return userStatic;
   }
