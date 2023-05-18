@@ -6,7 +6,7 @@ services:
     ports:
       - "3000:3000"
     depends_on:
-      - db
+      - pong_db
     networks:
       - total_network
   frontend:
@@ -14,15 +14,15 @@ services:
     build: ./frontend
     ports:
       - "3001:3001"
-  db:
-    container_name: db
+  pong_db:
+    container_name: pong_db
     image: postgres
     environment:
       POSTGRE_USER : postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: pongserv
     ports:
-      - "5433:5432"
+      - "5432:5432"
     networks:
       - total_network 
     volumes:
