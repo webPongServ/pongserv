@@ -164,7 +164,11 @@ const GameBoard = (props: GameBoardProps) => {
           ball_rel.bottom = 315;
           ball_rel.left = 500;
           ball_rel.right = 515;
-          if (currentGame.score2 === currentGame.currentGame!.maxScore) {
+          if (score2 === currentGame.currentGame!.maxScore) {
+            console.log(
+              "selectedPaddleRef === paddleRef",
+              selectedPaddleRef === paddleRef ? "owner" : "guest"
+            );
             gameSocket.emit(
               "finishGame",
               {
@@ -219,7 +223,11 @@ const GameBoard = (props: GameBoardProps) => {
           ball_rel.bottom = 315;
           ball_rel.left = 500;
           ball_rel.right = 515;
-          if (currentGame.score1 === currentGame.currentGame!.maxScore) {
+          if (score1 === currentGame.currentGame!.maxScore) {
+            console.log(
+              "selectedPaddleRef === paddleRef",
+              selectedPaddleRef === paddleRef ? "owner" : "guest"
+            );
             gameSocket.emit(
               "finishGame",
               {
@@ -284,6 +292,10 @@ const GameBoard = (props: GameBoardProps) => {
           score1 === currentGame.currentGame!.maxScore ||
           score2 === currentGame.currentGame!.maxScore
         ) {
+          console.log(
+            "selectedPaddleRef === paddleRef",
+            selectedPaddleRef === paddleRef ? "owner" : "guest"
+          );
           gameSocket.emit(
             "finishGame",
             {
@@ -328,15 +340,17 @@ const GameBoard = (props: GameBoardProps) => {
       ball_rel.left = ball_rel.left + dx * (dxd === 0 ? -1 : 1);
       ballRef.current!.style.right = ball_rel.left + 15 + "px";
       ball_rel.right = ball_rel.left + 15;
-      // gameSocket.emit("inGameReq", {
-      //   roomId: currentGame.currentGame!.id,
-      //   data: {
-      //     top: ball_rel.top,
-      //     left: ball_rel.left,
-      //   },
-      //   role: role,
-      //   type: "ball",
-      // });
+      gameSocket.emit("inGameReq", {
+        roomId: currentGame.currentGame!.id,
+        data: {
+          top: ball_rel.top,
+          bottom: ball_rel.bottom,
+          left: ball_rel.left,
+          right: ball_rel.right,
+        },
+        role: role,
+        type: "ball",
+      });
       requestAnimationFrame(() => {
         moveBall(dx, dy, dxd, dyd);
       });
@@ -398,12 +412,14 @@ const GameBoard = (props: GameBoardProps) => {
         paddle2_rel.bottom = data.data.bottom;
       }
     } else {
-      // if (data.role === "owner") {
-      //   ballRef.current!.style.left = data.data.left + "px";
-      //   ball_rel.left = data.data.left;
-      //   ballRef.current!.style.top = data.data.top + "px";
-      //   ball_rel.top = data.data.top;
-      // }
+      ballRef.current!.style.left = data.data.left + "px";
+      ball_rel.left = data.data.left;
+      ballRef.current!.style.right = data.data.right + "px";
+      ball_rel.right = data.data.right;
+      ballRef.current!.style.top = data.data.top + "px";
+      ball_rel.top = data.data.top;
+      ballRef.current!.style.bottom = data.data.bottom + "px";
+      ball_rel.bottom = data.data.bottom;
     }
   };
 
