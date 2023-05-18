@@ -85,48 +85,6 @@ const ChattingRoom = () => {
     );
   };
 
-  chattingSocket.on(
-    "chatroomMessage",
-    (data: {
-      nickname: string;
-      imgPath: string;
-      role: string;
-      msg: string;
-    }) => {
-      setChatting([
-        ...chatting,
-        {
-          user: {
-            nickname: data.nickname,
-            imgURL: data.imgPath,
-            role: data.role,
-          },
-          message: data.msg,
-        },
-      ]);
-    }
-  );
-
-  chattingSocket.on("chatroomWelcome", (nickname: string) => {
-    setChatting([
-      ...chatting,
-      {
-        user: null,
-        message: nickname + "님이 입장하셨습니다.",
-      },
-    ]);
-  });
-
-  chattingSocket.on("chatroomLeaving", (nickname: string) => {
-    setChatting([
-      ...chatting,
-      {
-        user: null,
-        message: nickname + "님이 퇴장하셨습니다.",
-      },
-    ]);
-  });
-
   // const queryClient = useQueryClient();
 
   // useEffect(() => {
@@ -139,6 +97,50 @@ const ChattingRoom = () => {
   useEffect(() => {
     if (chattingRef.current)
       chattingRef.current.scrollTop = chattingRef.current.scrollHeight;
+
+    if (chattingSocket) {
+      chattingSocket.on(
+        "chatroomMessage",
+        (data: {
+          nickname: string;
+          imgPath: string;
+          role: string;
+          msg: string;
+        }) => {
+          setChatting([
+            ...chatting,
+            {
+              user: {
+                nickname: data.nickname,
+                imgURL: data.imgPath,
+                role: data.role,
+              },
+              message: data.msg,
+            },
+          ]);
+        }
+      );
+
+      chattingSocket.on("chatroomWelcome", (nickname: string) => {
+        setChatting([
+          ...chatting,
+          {
+            user: null,
+            message: nickname + "님이 입장하셨습니다.",
+          },
+        ]);
+      });
+
+      chattingSocket.on("chatroomLeaving", (nickname: string) => {
+        setChatting([
+          ...chatting,
+          {
+            user: null,
+            message: nickname + "님이 퇴장하셨습니다.",
+          },
+        ]);
+      });
+    }
   }, [chatting, roomStatus]);
 
   return (

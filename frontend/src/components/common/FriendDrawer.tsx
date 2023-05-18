@@ -99,12 +99,14 @@ const FriendDrawer = () => {
 
   useEffect(() => {
     getFriends();
-    chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
-    chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+    if (chattingSocket) {
+      chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
+      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+    }
 
     return () => {
       chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
-      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+      chattingSocket.off("friendStatusLogout", socketFriendStatusLogout);
     };
   }, []);
 
