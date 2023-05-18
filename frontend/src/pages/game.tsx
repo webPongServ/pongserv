@@ -63,19 +63,14 @@ const Game = () => {
     const response = await GameService.getGameRooms();
     console.log(response.data);
     setGameRooms(
-      response.data.map(
-        (value: serverGameRoomDetail): GameRoomDetail => ({
-          id: value.id,
-          title: value.gmRmNm,
-          owner: {
-            nickname: value.owner,
-            imgURL: value.ownerImage,
-            status: "login",
-          },
-          maxScore: value.trgtScr,
-          difficulty: value.lvDfct,
-        })
-      )
+      response.data.map((value: serverGameRoomDetail): any => ({
+        id: value.id,
+        title: value.gmRmNm,
+        owner: value.owner,
+        maxScore: value.trgtScr,
+        difficulty: value.lvDfct,
+        ownerImage: value.ownerImage,
+      }))
     );
   };
 
@@ -126,6 +121,7 @@ const Game = () => {
                     id: value.id,
                     title: value.title,
                     owner: value.owner,
+                    ownerImage: value.ownerImage,
                     maxScore: value.maxScore,
                     difficulty: value.difficulty,
                   }}

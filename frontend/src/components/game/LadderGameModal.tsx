@@ -54,7 +54,8 @@ const LadderGameModal = (props: LadderGameModalProps) => {
                       payload: {
                         id: data.roomId,
                         title: "ladder game",
-                        owner: myInfo,
+                        owner: myInfo.nickname,
+                        ownerImage: myInfo.imgURL,
                         maxScore: 5,
                         difficulty: GameDifficultyType.hard,
                       },
@@ -65,11 +66,8 @@ const LadderGameModal = (props: LadderGameModalProps) => {
                       payload: {
                         id: data.roomId,
                         title: "ladder game",
-                        owner: {
-                          nickname: data.owner,
-                          imgURL: "",
-                          status: "",
-                        },
+                        owner: data.owner,
+                        ownerImage: "",
                         maxScore: 5,
                         difficulty: GameDifficultyType.hard,
                       },

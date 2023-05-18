@@ -88,9 +88,7 @@ const GameBoard = (props: GameBoardProps) => {
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (paddleRef.current || paddle2Ref.current) {
       const role: string =
-        currentGame.currentGame!.owner.nickname === myInfo.nickname
-          ? "owner"
-          : "guest";
+        currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
 
       if (event.key === "ArrowUp") {
         selectedPaddleRef!.current!.style.top =
@@ -145,9 +143,7 @@ const GameBoard = (props: GameBoardProps) => {
   const moveBall = (dx: number, dy: number, dxd: number, dyd: number) => {
     if (ballRef.current) {
       const role: string =
-        currentGame.currentGame!.owner.nickname === myInfo.nickname
-          ? "owner"
-          : "guest";
+        currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
 
       if (ball_rel.top <= 0) dyd = 1;
       if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
@@ -159,9 +155,9 @@ const GameBoard = (props: GameBoardProps) => {
         // why 10?
         if (ball_rel.left <= 10) {
           console.log(
-            currentGame.currentGame!.owner.nickname,
+            currentGame.currentGame!.owner,
             myInfo.nickname,
-            currentGame.currentGame!.owner.nickname === myInfo.nickname
+            currentGame.currentGame!.owner === myInfo.nickname
               ? "owner"
               : "guest"
           );
@@ -221,9 +217,9 @@ const GameBoard = (props: GameBoardProps) => {
       ) {
         if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
           console.log(
-            currentGame.currentGame!.owner.nickname,
+            currentGame.currentGame!.owner,
             myInfo.nickname,
-            currentGame.currentGame!.owner.nickname === myInfo.nickname
+            currentGame.currentGame!.owner === myInfo.nickname
               ? "owner"
               : "guest"
           );
@@ -279,11 +275,9 @@ const GameBoard = (props: GameBoardProps) => {
       }
       if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
         console.log(
-          currentGame.currentGame!.owner.nickname,
+          currentGame.currentGame!.owner,
           myInfo.nickname,
-          currentGame.currentGame!.owner.nickname === myInfo.nickname
-            ? "owner"
-            : "guest"
+          currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
         );
         ballRef.current!.style.top = "300px";
         ballRef.current!.style.bottom = "315px";
@@ -371,7 +365,7 @@ const GameBoard = (props: GameBoardProps) => {
         requestAnimationFrame(() => {
           moveBall(dx, dy, dxd, dyd);
         });
-      }, 50);
+      }, 25);
     }
   };
 
