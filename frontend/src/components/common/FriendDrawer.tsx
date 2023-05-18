@@ -53,7 +53,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
 interface serverFriend {
   nickname: string;
   imageUrl: string;
-  isCurrStatus: boolean;
+  currStat: string;
 }
 
 const FriendDrawer = () => {
@@ -77,7 +77,7 @@ const FriendDrawer = () => {
         (value: serverFriend): UserDetail => ({
           nickname: value.nickname,
           imgURL: value.imageUrl,
-          status: value.isCurrStatus ? "login" : "logout",
+          status: value.currStat,
         })
       ),
     });
@@ -86,14 +86,14 @@ const FriendDrawer = () => {
   const socketFriendStatusLogin = (nickname: string) => {
     dispatch({
       type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
-      payload: { nickname: nickname, status: "login" },
+      payload: { nickname: nickname, status: FriendStatusType.login },
     });
   };
 
   const socketFriendStatusLogout = (nickname: string) => {
     dispatch({
       type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
-      payload: { nickname: nickname, status: "logout" },
+      payload: { nickname: nickname, status: FriendStatusType.logout },
     });
   };
 

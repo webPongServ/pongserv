@@ -55,13 +55,13 @@ const LadderGameModal = (props: LadderGameModalProps) => {
                       title: "ladder game",
                       owner: myInfo.nickname,
                       maxScore: 5,
-                      difficulty: GameDifficultyType.normal,
+                      difficulty: GameDifficultyType.hard,
                     },
                   });
                   if (data.action === "join") {
                     gameSocket.emit("gameRoomFulfilled", {
                       roomId: data.roomId,
-                      type: GameRoomType.normal,
+                      type: GameRoomType.ladder,
                     });
                   }
                   navigate(`/game/${data.roomId}`);
