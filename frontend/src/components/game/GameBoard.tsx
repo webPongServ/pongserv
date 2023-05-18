@@ -151,10 +151,6 @@ const GameBoard = (props: GameBoardProps) => {
       ) {
         // why 10?
         if (ball_rel.left <= 10) {
-          dispatch({
-            type: CurrentGameActionTypes.INCREMENT_SCORE,
-            payload: "score2",
-          });
           score2++;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
@@ -164,11 +160,15 @@ const GameBoard = (props: GameBoardProps) => {
           ball_rel.bottom = 315;
           ball_rel.left = 500;
           ball_rel.right = 515;
+          dispatch({
+            type: CurrentGameActionTypes.INCREMENT_SCORE,
+            payload: "score2",
+          });
+          console.log(
+            "selectedPaddleRef === paddleRef",
+            selectedPaddleRef === paddleRef ? "owner" : "guest"
+          );
           if (score2 === currentGame.currentGame!.maxScore) {
-            console.log(
-              "selectedPaddleRef === paddleRef",
-              selectedPaddleRef === paddleRef ? "owner" : "guest"
-            );
             gameSocket.emit(
               "finishGame",
               {
@@ -210,10 +210,6 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.bottom <= paddle2_rel.bottom
       ) {
         if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
-          dispatch({
-            type: CurrentGameActionTypes.INCREMENT_SCORE,
-            payload: "score1",
-          });
           score1++;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
@@ -223,11 +219,15 @@ const GameBoard = (props: GameBoardProps) => {
           ball_rel.bottom = 315;
           ball_rel.left = 500;
           ball_rel.right = 515;
+          dispatch({
+            type: CurrentGameActionTypes.INCREMENT_SCORE,
+            payload: "score1",
+          });
+          console.log(
+            "selectedPaddleRef === paddleRef",
+            selectedPaddleRef === paddleRef ? "owner" : "guest"
+          );
           if (score1 === currentGame.currentGame!.maxScore) {
-            console.log(
-              "selectedPaddleRef === paddleRef",
-              selectedPaddleRef === paddleRef ? "owner" : "guest"
-            );
             gameSocket.emit(
               "finishGame",
               {
@@ -265,21 +265,6 @@ const GameBoard = (props: GameBoardProps) => {
         } else dxd = 0;
       }
       if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
-        if (ball_rel.left <= 0) {
-          dispatch({
-            type: CurrentGameActionTypes.INCREMENT_SCORE,
-            payload: "score2",
-          });
-          score2++;
-          random = 2;
-        } else {
-          dispatch({
-            type: CurrentGameActionTypes.INCREMENT_SCORE,
-            payload: "score1",
-          });
-          score1++;
-          random = 4;
-        }
         ballRef.current!.style.top = "300px";
         ballRef.current!.style.bottom = "315px";
         ballRef.current!.style.left = "500px";
@@ -288,14 +273,29 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.bottom = 315;
         ball_rel.left = 500;
         ball_rel.right = 515;
+        if (ball_rel.left <= 0) {
+          score2++;
+          dispatch({
+            type: CurrentGameActionTypes.INCREMENT_SCORE,
+            payload: "score2",
+          });
+          random = 2;
+        } else {
+          score1++;
+          dispatch({
+            type: CurrentGameActionTypes.INCREMENT_SCORE,
+            payload: "score1",
+          });
+          random = 4;
+        }
+        console.log(
+          "selectedPaddleRef === paddleRef",
+          selectedPaddleRef === paddleRef ? "owner" : "guest"
+        );
         if (
           score1 === currentGame.currentGame!.maxScore ||
           score2 === currentGame.currentGame!.maxScore
         ) {
-          console.log(
-            "selectedPaddleRef === paddleRef",
-            selectedPaddleRef === paddleRef ? "owner" : "guest"
-          );
           gameSocket.emit(
             "finishGame",
             {
