@@ -489,7 +489,7 @@ export class DbChatsManagerService {
     return ;
   }
 
-  async getBlockingUserInChatsList(user: TbUa01MEntity)
+  async getListForThisUserToBlock(user: TbUa01MEntity)
   {
     const results = await this.ch04lRp.find({
       relations: {

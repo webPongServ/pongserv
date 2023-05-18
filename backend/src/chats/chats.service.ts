@@ -656,14 +656,14 @@ export class ChatsService {
 	return ;
   }
 
-  async getBlockedUserNicknameList(userId: string)
+  async getUserIdsForThisUserToBlock(userId: string)
   {
 	const user = await this.dbUsersManagerService.getUserByUserId(userId);
-	const blockingDataList = await this.dbChatsManagerService.getBlockingUserInChatsList(user);
-	let blockedUserNicknameList: string[] = [];
-	for (const each of blockingDataList) {
-		blockedUserNicknameList.push(each.ua01mEntityAsBlock.nickname);
+	const blockingList = await this.dbChatsManagerService.getListForThisUserToBlock(user);
+	let retUserIdsBlocked: string[] = [];
+	for (const each of blockingList) {
+		retUserIdsBlocked.push(each.ua01mEntityAsBlock.userId);
 	}
-	return (blockedUserNicknameList);
+	return (retUserIdsBlocked);
   }
 }

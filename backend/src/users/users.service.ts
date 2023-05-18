@@ -176,6 +176,16 @@ export class UsersService {
     return results;
   }
 
+  async getFriendUserIds(userId: string) {
+    const user = await this.dbmanagerUsersService.getUserByUserId(userId);
+    const friendDatas = await this.dbmanagerUsersService.getFriendList(user);
+    let retFrndUserIds: string[] = [];
+    for (const eachData of friendDatas) {
+      retFrndUserIds.push(eachData.ua01mEntityAsFr.userId);
+    }
+    return (retFrndUserIds);
+  }
+
   async getUserList(startsWith: string) {
     console.log(startsWith);
     if (startsWith.length === 0) return [];

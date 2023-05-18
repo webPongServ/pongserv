@@ -78,20 +78,20 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`In handleConnection -> this.userIdToSocketIdMap: `)
     console.log(this.userIdToSocketIdMap)
     // 3
-    const friendList = await this.usersService.getFriendList(userId);
-    for (const eachFriend of friendList) {
-      const nameOfFriendRoom = `friends_of_${eachFriend.nickname}`;
+    const frndUserIds = await this.usersService.getFriendUserIds(userId);
+    for (const eachUserId of frndUserIds) {
+      const nameOfFriendRoom = `friends_of_${eachUserId}`;
       socket.join(nameOfFriendRoom);
     }
     // 4
-    const blockingNickList = await this.chatsService.getBlockedUserNicknameList(userId);
-    for (const eachNick of blockingNickList) {
-      const nameOfBlockingRoom = `blocking_${eachNick}`;
+    const blockingUserIds = await this.chatsService.getUserIdsForThisUserToBlock(userId);
+    for (const eachUserId of blockingUserIds) {
+      const nameOfBlockingRoom = `blocking_${eachUserId}`;
       socket.join(nameOfBlockingRoom);
     }
     // 5
+    const nameOfMyRoomForFriends = `friends_of_${userId}`;
     const myProfile = await this.usersService.getProfile(userId);
-    const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogin`, myProfile.nickname);
 
 
@@ -135,8 +135,8 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       3. logout 진행 (logout 상태로 업데이트)
     */
     // 1
+    const nameOfMyRoomForFriends = `friends_of_${userId}`;
     const myProfile = await this.usersService.getProfile(userId);
-    const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogout`, myProfile.nickname);
 
     // 2
