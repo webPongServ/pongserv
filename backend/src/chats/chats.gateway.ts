@@ -90,6 +90,33 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const myProfile = await this.usersService.getProfile(userId);
     const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogin`, myProfile.nickname);
+
+    console.log(`socket.rooms in connecting: `)
+    console.log(socket.rooms)
+
+    socket.on("disconnect", (reason) => {
+      // ...
+      console.log(`socket disconnect`);
+      console.log(socket.rooms); // Set { ... }
+    });
+
+    socket.on("disconnecting", (reason) => {
+      console.log(`socket disconnecting`);
+      console.log(socket.rooms); // Set { ... }
+
+      for (const eachRoom of socket.rooms) {
+        if (eachRoom.startsWith("chatroom_")) {
+          let parts = eachRoom.split("chatroom_");
+          let chtrmId: string = null;
+          if(parts.length > 1)
+              chtrmId = parts[1];
+          const infoLeav: ChatroomLeavingDto = {
+            id: chtrmId,
+          };
+          this.leaveChatroom(socket,infoLeav); // await 어케 적용시키지..?
+        }
+      }
+    });
   }
 
   // TODO - to combine with front-end
@@ -110,7 +137,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogout`, myProfile.nickname);
 
     // 2
-    console.log(`socket.rooms: `)
+    console.log(`socket.rooms in disconnecting: `)
     console.log(socket.rooms)
 
     // 3
