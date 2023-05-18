@@ -7,6 +7,7 @@ import GameReady from "components/game/GameReady";
 import { GameBoardConst } from "constant";
 import SuccessNotification from "components/utils/SuccessNotification";
 import { CurrentGameActionTypes } from "types/redux/CurrentGame";
+import { LoginStatusActionTypes } from "types/redux/Login";
 import { GameDifficultyType } from "constant";
 
 import { Box } from "@mui/material";
@@ -29,7 +30,7 @@ let random = 2;
 const setDifficulty = (difficulty: string): number => {
   if (difficulty === GameDifficultyType.easy) return 3;
   else if (difficulty === GameDifficultyType.normal) return 5;
-  else if (difficulty === GameDifficultyType.hard) return 10;
+  else if (difficulty === GameDifficultyType.hard) return 7;
   return 5;
 };
 
@@ -357,6 +358,9 @@ const GameBoard = (props: GameBoardProps) => {
 
     setTimeout(() => {
       setIsWaiting(false);
+      dispatch({
+        type: LoginStatusActionTypes.STATUS_GAME,
+      });
       setTimeout(() => {
         requestAnimationFrame(() => {
           moveBall(dx, dy, dxd, dyd);
@@ -455,19 +459,7 @@ const GameBoard = (props: GameBoardProps) => {
     if (!gameSocket) window.location.href = "/game?error=wrong_game_access";
   }, []);
 
-  return isWaiting ? (
-    <>
-      <SuccessNotification
-        successMessage={`${timer}초 후에 게임이 시작됩니다.`}
-        ref={notiRef}
-      />
-      <GameReady
-        type="일반 게임"
-        content="상대를 기다리는 중"
-        funnyImg="funny3.gif"
-      />
-    </>
-  ) : (
+  return (
     <Box
       id={props.id}
       className="flex-container"
@@ -475,13 +467,27 @@ const GameBoard = (props: GameBoardProps) => {
       tabIndex={0}
       ref={divRef}
     >
-      <Box className="board" ref={boardRef}>
-        <Box className="ball" ref={ballRef}></Box>
-        <Box className="paddle_1 paddle" ref={paddleRef}></Box>
-        <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
-        <h1 className="player_1_score">{currentGame!.score1}</h1>
-        <h1 className="player_2_score">{currentGame!.score2}</h1>
-      </Box>
+      {isWaiting ? (
+        <>
+          <SuccessNotification
+            successMessage={`${timer}초 후에 게임이 시작됩니다.`}
+            ref={notiRef}
+          />
+          <GameReady
+            type="일반 게임"
+            content="상대를 기다리는 중"
+            funnyImg="funny3.gif"
+          />
+        </>
+      ) : (
+        <Box className="board" ref={boardRef}>
+          <Box className="ball" ref={ballRef}></Box>
+          <Box className="paddle_1 paddle" ref={paddleRef}></Box>
+          <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
+          <h1 className="player_1_score">{currentGame!.score1}</h1>
+          <h1 className="player_2_score">{currentGame!.score2}</h1>
+        </Box>
+      )}
     </Box>
   );
 };
