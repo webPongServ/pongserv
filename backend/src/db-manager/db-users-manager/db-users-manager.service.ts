@@ -432,15 +432,14 @@ export class DbUsersManagerService {
     return result;
   }
 
-  addLoginData(user: TbUa01MEntity) {
+  async addLoginData(user: TbUa01MEntity) {
     const newLoginData: TbUa01LEntity = this.ua01lRp.create({
       ua01mEntity: user,
       connDttm: new Date(),
       stsCd: '01',
       loginTf: true,
     });
-    this.ua01lRp.save(newLoginData);
-    return ;
+    return (await this.ua01lRp.save(newLoginData));
   }
 
   async setLoginFinsh(user: TbUa01MEntity) {
@@ -456,7 +455,6 @@ export class DbUsersManagerService {
       throw new NotFoundException(`not existed login data when logout`);
     currLoginData.logoutDttm = new Date();
     currLoginData.loginTf = false;
-    this.ua01lRp.save(currLoginData);
-    return ;
+    return (await this.ua01lRp.save(currLoginData));
   }
 }

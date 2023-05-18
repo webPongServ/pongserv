@@ -213,7 +213,9 @@ export class UsersService {
     if (!user)
       throw new NotFoundException(`The user not existed.`);
     // 2
-    this.dbmanagerUsersService.addLoginData(user);
+    const loginData = await this.dbmanagerUsersService.addLoginData(user);
+    console.log(`loginData: `);
+    console.log(loginData);
     return ;
   }
 
@@ -226,7 +228,9 @@ export class UsersService {
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
     if (!user)
       throw new NotFoundException(`The user not existed.`);
-    await this.dbmanagerUsersService.setLoginFinsh(user);
+    const logoutData = await this.dbmanagerUsersService.setLoginFinsh(user);
+    console.log(`logoutData: `);
+    console.log(logoutData);
     return ;
   }
 }

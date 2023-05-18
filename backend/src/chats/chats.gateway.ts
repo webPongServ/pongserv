@@ -71,7 +71,14 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       4. Block user socket room에 등록 - Block_userId
       5. 해당 유저 전용 friends socket room으로 로그인 알람 보내기
     */
+    if (this.userIdToSocketIdMap.get(userId)) {
+      socket.emit(`errorAlreadyLogin`, `This connection will be disconnected.`);
+      console.log(`socket.emit(errorAlreadyLogin, This connection will be disconnected.);`)
+      socket.disconnect();
+      return ;
+    }
     // 1
+    console.log(`process login`);
     this.usersService.processLogin(userId);
     // 2
     this.userIdToSocketIdMap.set(userId, socket.id);
@@ -97,38 +104,45 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // handleDisconnecting
     socket.on("disconnecting", (reason) => {
-      /*!SECTION
-        1. chatroom에 참여하고 있는 상태였다면, 나가도록 처리하기
-          1-1. 유저가 참여하고 있는 채팅방 id 찾기
-          1-2. 해당 채팅방에 대한 leaveChatroom 실행
-      */
-      console.log(`socket disconnecting`);
-      console.log(socket.rooms); // Set { ... }
-
-      // 1
-      for (const eachRoom of socket.rooms) {
-        // 1-1
-        if (eachRoom.startsWith("chatroom_")) {
-          let parts = eachRoom.split("chatroom_");
-          let chtrmId: string = null;
-          if(parts.length > 1)
-              chtrmId = parts[1];
-          const infoLeav: ChatroomLeavingDto = {
-            id: chtrmId,
-          };
-        // 1-2
-          this.leaveChatroom(socket,infoLeav); // await 어케 적용시키지..?
-        }
-      }
+      this.handleDisconnecting(socket);
     });
   }
 
-  // TODO - to combine with front-end
-  async handleDisconnect(@ConnectedSocket() socket: Socket) {
+  async handleDisconnecting(@ConnectedSocket() socket: Socket) {
+    console.log(`handleDisconnecting!!!`);
     const userId = this.validateAccessToken(socket);
     if (!userId) {
       return;
     }
+    /*!SECTION
+        1. chatroom에 참여하고 있는 상태였다면, 나가도록 처리하기
+          1-1. 유저가 참여하고 있는 채팅방 id 찾기
+          1-2. 해당 채팅방에 대한 leaveChatroom 실행
+    */
+    const entry = Array.from(this.userIdToSocketIdMap.entries()).find(([, socketId]) => socketId === socket.id);
+    if (!entry) {
+      return ;
+    }
+
+    console.log(`socket disconnecting`);
+    console.log(socket.rooms); // Set { ... }
+
+    // 1
+    for (const eachRoom of socket.rooms) {
+      // 1-1
+      if (eachRoom.startsWith("chatroom_")) {
+        let parts = eachRoom.split("chatroom_");
+        let chtrmId: string = null;
+        if(parts.length > 1)
+            chtrmId = parts[1];
+        const infoLeav: ChatroomLeavingDto = {
+          id: chtrmId,
+        };
+      // 1-2
+        this.leaveChatroom(socket,infoLeav); // await 어케 적용시키지..?
+      }
+    }
+
     /*!SECTION
       1. 해당 유저 전용 friends socket room으로 로그아웃 알람 보내기
       2. intraId-socketId map에 상태 제거
@@ -140,21 +154,25 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogout`, myProfile.nickname);
 
     // 2
-    console.log(`socket.rooms in disconnecting: `)
-    console.log(socket.rooms)
-
-    // 2
     console.log(`In handleDisconnect before delete -> this.userIdToSocketIdMap: `)
     console.log(this.userIdToSocketIdMap)
-    const entry = Array.from(this.userIdToSocketIdMap.entries()).find(([, socketId]) => socketId === socket.id);
-    if (entry) {
-      this.userIdToSocketIdMap.delete(entry[0]);
-    }
+    this.userIdToSocketIdMap.delete(entry[0]);
     console.log(`In handleDisconnect after delete -> this.userIdToSocketIdMap: `)
     console.log(this.userIdToSocketIdMap)
-
+    
     // 3
+    console.log(`process logout`);
     this.usersService.processLogout(userId);
+
+  }
+
+  // TODO - to combine with front-end
+  async handleDisconnect(@ConnectedSocket() socket: Socket) {
+    console.log(`handleDisconnect`);
+    // const userId = this.validateAccessToken(socket);
+    // if (!userId) {
+    //   return;
+    // }
   }
 
   @SubscribeMessage('chatroomCreation')
