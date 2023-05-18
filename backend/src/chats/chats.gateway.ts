@@ -65,12 +65,14 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     /*!SECTION
+      0. 기존에 이미 connection을 통해 관리하고 있는 socket id가 있다면 이후에 다른데서 연결 시도하는 socket 차단
       1. Login 진행 (정보 DB에 저장)
       2. intraId-socketId map에 상태 저장
       3. Friend user socket room에 등록 - Friend_userId
       4. Block user socket room에 등록 - Block_userId
       5. 해당 유저 전용 friends socket room으로 로그인 알람 보내기
     */
+    // 0
     if (this.userIdToSocketIdMap.get(userId)) {
       socket.emit(`errorAlreadyLogin`, `This connection will be disconnected.`);
       console.log(`socket.emit(errorAlreadyLogin, This connection will be disconnected.);`)
@@ -208,8 +210,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(infoEntr);
     try {
       const nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
-      socket.join(infoEntr.id);
-      socket.to(infoEntr.id).emit('chatroomWelcome', nickname);
+      const nameOfChtrmSocketRoom = `chatroom_${infoEntr.id}`;
+      socket.join(nameOfChtrmSocketRoom);
+      socket.to(nameOfChtrmSocketRoom).emit('chatroomWelcome', nickname);
       return true;
     } catch (err) {
       socket.emit('errorChatroomEntrance', err.response.message);
