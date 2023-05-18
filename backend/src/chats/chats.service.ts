@@ -317,8 +317,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoKick.userIdToKick,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoKick.nicknameToKick,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -365,8 +365,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoBan.userIdToBan,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoBan.nicknameToBan
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -384,7 +384,7 @@ export class ChatsService {
       targetInChtrm,
     );
     // 4
-    return targetUser.nickname;
+    return targetUser.userId;
   }
 
   async muteUser(userId: string, infoBan: ChatroomMuteDto) {
@@ -409,8 +409,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoBan.userIdToMute,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoBan.nicknameToMute,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -427,7 +427,7 @@ export class ChatsService {
     // 3
     await this.dbChatsManagerService.setMuteUserInfo(targetUser, chtrm);
     // 4
-    return targetUser.nickname;
+    return targetUser.userId;
   }
 
   async empowerUser(userId: string, infoEmpwr: ChatroomEmpowermentDto) {
@@ -455,8 +455,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoEmpwr.userIdToEmpower,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoEmpwr.nicknameToEmpower,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -500,8 +500,8 @@ export class ChatsService {
     if (requesterInChtrm.chtRmJoinTf === false)
       throw new UnauthorizedException('You are not in the chatroom.');
     // 2
-    const target = await this.dbUsersManagerService.getUserByUserId(
-      infoGameReq.userIdToGame,
+    const target = await this.dbUsersManagerService.getUserByNickname(
+      infoGameReq.nicknameToGame,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       target,
@@ -557,8 +557,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const target = await this.dbUsersManagerService.getUserByUserId(
-      infoBanRmv.userIdToFree,
+    const target = await this.dbUsersManagerService.getUserByNickname(
+      infoBanRmv.nicknameToFree,
     );
     const banInfoOfTarget = await this.dbChatsManagerService.getBanInfoInAChtrm(
       target,
@@ -570,7 +570,7 @@ export class ChatsService {
     // 3
     banInfoOfTarget.vldTf = false;
     this.dbChatsManagerService.saveChtrmRstrInfo(banInfoOfTarget);
-    return;
+    return ;
   }
 
   async leaveChatroom(userId: string, infoLeav: ChatroomLeavingDto) {
@@ -656,14 +656,14 @@ export class ChatsService {
 	return ;
   }
 
-  async getBlockedUserNicknameList(userId: string)
+  async getUserIdsForThisUserToBlock(userId: string)
   {
 	const user = await this.dbUsersManagerService.getUserByUserId(userId);
-	const blockingDataList = await this.dbChatsManagerService.getBlockingUserInChatsList(user);
-	let blockedUserNicknameList: string[] = [];
-	for (const each of blockingDataList) {
-		blockedUserNicknameList.push(each.ua01mEntityAsBlock.nickname);
+	const blockingList = await this.dbChatsManagerService.getListForThisUserToBlock(user);
+	let retUserIdsBlocked: string[] = [];
+	for (const each of blockingList) {
+		retUserIdsBlocked.push(each.ua01mEntityAsBlock.userId);
 	}
-	return (blockedUserNicknameList);
+	return (retUserIdsBlocked);
   }
 }

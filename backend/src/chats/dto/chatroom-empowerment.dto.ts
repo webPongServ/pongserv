@@ -5,5 +5,5 @@ export class ChatroomEmpowermentDto {
     id: string;
 
 	@ApiProperty({ type: String })
-    userIdToEmpower: string;
+    nicknameToEmpower: string;
 }
