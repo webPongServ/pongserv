@@ -102,19 +102,21 @@ export class DbGamesManagerService {
     // 개인 프로필을 누르면 나오는 정보들 모두 돌려준다.
     // console.log(userEntity);
     const users = await this.Gm01DRp.find({
+      relations: {
+        gm01lEntity: true,
+      },
       where: {
         ua01mEntity: {
           userId: userEntity.userId,
         },
       },
-      select: ['opUserId', 'gmRsltCd', 'getScr', 'lossScr'],
+      select: ['gm01lEntity', 'opUserId', 'gmRsltCd', 'getScr', 'lossScr'],
     });
 
     // opUserId가 null인 요소를 제외합니다.
     const filteredUsers = users.filter((user) => user.opUserId !== null);
     const userId = userEntity.userId;
     const userImgPath = userEntity.imgPath;
-    // console.log(users);
     // filteredUsers 배열의 각 요소에 대해, Ua01MRp에서 opUserId를 이용해 imgPath를 찾는 Promise를 생성합니다.
     const updateUsers = await Promise.all(
       filteredUsers.map(async (user) => {
@@ -130,10 +132,22 @@ export class DbGamesManagerService {
         };
       }),
     );
-    // console.log(updateUsers);
-    // 여기까지가 아래에 있는 세부 게임 결과
+    const win = updateUsers.filter((item) => item.gmRsltCd === '01').length;
+    const lose = updateUsers.filter((item) => item.gmRsltCd === '02').length;
+    const ladderWin = updateUsers.filter(
+      (item) => item.gmRsltCd === '01' && item.gm01lEntity.gmType === '02',
+    ).length;
+    const ladderLose = updateUsers.filter(
+      (item) => item.gmRsltCd === '02' && item.gm01lEntity.gmType === '02',
+    ).length;
+    const staticData = {
+      win: win,
+      lose: lose,
+      total: win + lose,
+      ladder: 1000 + (ladderWin - ladderLose) * 10,
+    };
 
-    return updateUsers;
+    return [staticData, updateUsers];
   }
 
   async updateOpponent(roomId, userId, opponentId) {
