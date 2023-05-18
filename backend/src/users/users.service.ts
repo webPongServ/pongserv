@@ -151,7 +151,7 @@ export class UsersService {
     let results: {
       nickname: string,
       imageUrl: string,
-      isCurrLogin: boolean,
+      currStat: string,
     }[] = [];
     // 1
     const myEntity = await this.dbmanagerUsersService.getMasterEntity(userId);
@@ -159,10 +159,15 @@ export class UsersService {
     // 2
     for (const eachFriendData of friendDatas) {
       const currLogin = await this.dbmanagerUsersService.getCurrLoginData(eachFriendData.ua01mEntityAsFr);
+      let statusCode: string = null;
+      if (currLogin)
+        statusCode = currLogin.stsCd;
+      else
+        statusCode = '03';
       const eachToPush = {
         nickname: eachFriendData.ua01mEntityAsFr.nickname,
         imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
-        isCurrLogin: !!currLogin, // NOTE: It will be true if currLogin exists, false otherwise.
+        currStat: statusCode, // NOTE: It will be true if currLogin exists, false otherwise.
          // TODO: isCurrStatus 로 바꿔서 login, gaming, logout 상태 표시하도록 변경
       }
       results.push(eachToPush);
