@@ -41,7 +41,7 @@ export class DbGamesManagerService {
       ua01mEntity: userEntity,
       getScr: 0,
       lossScr: 0,
-      gmRsltCd: type ? type : '01',
+      gmRsltCd: '00',
       entryDttm: new Date(),
       delTf: false,
     });
@@ -57,7 +57,7 @@ export class DbGamesManagerService {
 
   async getRoomList() {
     const roomList = await this.Gm01LRp.find({
-      where: { delTf: false, endType: '04' },
+      where: { delTf: false, endType: '04', gmType: '01' },
       select: ['id', 'gmRmNm', 'gmType', 'lvDfct', 'trgtScr', 'owner'],
     });
 
@@ -77,6 +77,7 @@ export class DbGamesManagerService {
     const room = await this.Gm01LRp.save({
       ...roomListEntity,
       endType: '02',
+      gmEndDttm: new Date(),
     });
     return room;
   }
@@ -85,23 +86,48 @@ export class DbGamesManagerService {
     const room = await this.Gm01LRp.save({
       ...roomListEntity,
       endType: '01',
+      gmStrtDttm: new Date(),
     });
     return room;
   }
   async endGameDetail(roomId) {
     const room = await this.Gm01DRp.update(
       { gm01lEntity: roomId },
-      { entryDttm: Date() },
+      { exitDttm: Date() },
     );
     return room;
   }
 
   async getUserStatic(userEntity) {
-    const user = await this.Gm01DRp.find({
-      where: { ua01mEntity: userEntity },
-      select: ['gmRsltCd', 'getScr', 'lossScr'], // opUserId
+    const users = await this.Gm01DRp.find({
+      where: {
+        ua01mEntity: {
+          userId: userEntity.userId,
+        },
+      },
+      select: ['opUserId', 'gmRsltCd', 'getScr', 'lossScr'],
     });
-    return user;
+
+    // opUserId가 null인 요소를 제외합니다.
+    const filteredUsers = users.filter((user) => user.opUserId !== null);
+    const userId = userEntity.userId;
+    const userImgPath = userEntity.imgPath;
+    // filteredUsers 배열의 각 요소에 대해, Ua01MRp에서 opUserId를 이용해 imgPath를 찾는 Promise를 생성합니다.
+    const updateUsers = await Promise.all(
+      filteredUsers.map(async (user) => {
+        const ua01m = await this.Ua01MRp.findOne({
+          where: { userId: user.opUserId },
+          select: ['imgPath'],
+        });
+        return {
+          userId,
+          userImgPath,
+          imgPath: ua01m ? ua01m.imgPath : null,
+          ...user,
+        };
+      }),
+    );
+    return updateUsers;
   }
 
   async updateOpponent(roomId, userId, opponentId) {
@@ -112,7 +138,7 @@ export class DbGamesManagerService {
       where: { id: roomId },
     });
 
-    console.log(user, room, opponentId);
+    // console.log(user, room, opponentId);
     const targetColumn = await this.Gm01DRp.findOne({
       where: {
         gm01lEntity: {
@@ -124,8 +150,34 @@ export class DbGamesManagerService {
       },
     });
 
-    console.log('UpdateOpponent', targetColumn);
+    // console.log('UpdateOpponent', targetColumn);
     targetColumn.opUserId = opponentId;
     await this.Gm01DRp.save(targetColumn);
+  }
+
+  async updateOpponentList(roomId, opponentId) {
+    const room = await this.Gm01LRp.findOne({
+      where: { id: roomId },
+    });
+    room.opUserId = opponentId;
+    await this.Gm01LRp.save(room);
+  }
+  async SaveGame(roomListEntity, userId, result, myScore, opScore) {
+    const room = await this.Gm01DRp.findOne({
+      where: {
+        gm01lEntity: {
+          id: roomListEntity.id,
+        },
+        ua01mEntity: {
+          userId: userId,
+        },
+      },
+    });
+    room.gmRsltCd = result;
+    room.getScr = myScore;
+    room.lossScr = opScore;
+    room.exitDttm = new Date();
+    console.log(room);
+    await this.Gm01DRp.save(room);
   }
 }

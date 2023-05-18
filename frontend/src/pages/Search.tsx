@@ -4,6 +4,8 @@ import CustomOnKeyUpInput from "components/utils/CustomOnKeyUpInput";
 import CustomProfileButton from "components/utils/CustomProfileButton";
 import { UserDetail } from "types/Detail";
 import UserService from "API/UserService";
+import { useDispatch } from "react-redux";
+import { LoginStatusActionTypes } from "types/redux/Login";
 import "styles/global.scss";
 import "styles/Search.scss";
 
@@ -18,8 +20,13 @@ interface serverFriend {
 
 const Search = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [inputNickname, setInputNickname] = useState<string>("");
   const [searchedUsers, setSearchedUsers] = useState<UserDetail[]>([]);
+
+  dispatch({
+    type: LoginStatusActionTypes.STATUS_MAIN,
+  });
 
   const handleValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {

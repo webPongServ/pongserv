@@ -4,6 +4,7 @@ import {
   HttpStatus,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
@@ -33,7 +34,17 @@ export class DbUsersManagerService {
     return user;
   }
 
+  async getUserByNickname(nickname: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        nickname: nickname,
+      },
+    });
+    return user;
+  }
+
   // TODO: move to UsersModule
+  // TODO: modify
   async checkinUser(intraData: { intraId: string; intraImagePath: string }) {
     /*!SECTION
       1. 인자로 들어온 nickname을 가진 유저가 user master table(ua01mRp)에 있는지 확인한다. (회원가입 유무 확인)
@@ -370,7 +381,9 @@ export class DbUsersManagerService {
   async getCurrLoginData(user: TbUa01MEntity) {
     const result = await this.ua01lRp.findOne({
       where: {
-        ua01mEntity: user,
+        ua01mEntity: {
+          id: user.id,
+        },
         loginTf: true,
       },
     });
@@ -378,9 +391,8 @@ export class DbUsersManagerService {
   }
 
   async getFriendList(myEntity: TbUa01MEntity) {
-    const friendList = await this.ua02lRp.findAndCount({
+    const friendDatas = await this.ua02lRp.find({
       relations: {
-        ua01mEntity: true,
         ua01mEntityAsFr: true,
       },
       where: {
@@ -388,18 +400,21 @@ export class DbUsersManagerService {
           id: myEntity.id,
         },
         stCd: '01',
+        delTf: false,
       },
     });
-    if (!friendList) throw new BadRequestException('No Friend available');
-    const friendData = friendList[0].map((friend) => {
-      return {
-        nickname: friend.ua01mEntityAsFr.nickname,
-        imageUrl: friend.ua01mEntityAsFr.imgPath,
-      };
-    });
-    if (friendData) return friendData;
-    else throw new BadRequestException('No Friend available');
+    return (friendDatas);
+    // const friendList = friendsData.map((friend) => {
+    //   return {
+    //     userId: friend.ua01mEntityAsFr.userId,
+    //     nickname: friend.ua01mEntityAsFr.nickname,
+    //     imageUrl: friend.ua01mEntityAsFr.imgPath,
+    //   };
+    // });
+    // if (friendList) return friendList;
+    // else throw new BadRequestException('No Friend available'); // REVIEW: Is no friend error?
   }
+
   async getUserList(startswith: string) {
     const users = await this.ua01mRp.find({
       where: {
@@ -415,5 +430,33 @@ export class DbUsersManagerService {
     }));
 
     return result;
+  }
+
+  addLoginData(user: TbUa01MEntity) {
+    const newLoginData: TbUa01LEntity = this.ua01lRp.create({
+      ua01mEntity: user,
+      connDttm: new Date(),
+      stsCd: '01',
+      loginTf: true,
+    });
+    this.ua01lRp.save(newLoginData);
+    return ;
+  }
+
+  async setLoginFinsh(user: TbUa01MEntity) {
+    const currLoginData: TbUa01LEntity = await this.ua01lRp.findOne({
+      where: {
+        ua01mEntity: {
+          id: user.id,
+        },
+        loginTf: true,
+      },
+    });
+    if (!currLoginData)
+      throw new NotFoundException(`not existed login data when logout`);
+    currLoginData.logoutDttm = new Date();
+    currLoginData.loginTf = false;
+    this.ua01lRp.save(currLoginData);
+    return ;
   }
 }

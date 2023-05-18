@@ -5,5 +5,5 @@ export class ChatroomKickingDto {
     id: string;
 
 	@ApiProperty({ type: String })
-    userIdToKick: string;
+    nicknameToKick: string;
 }

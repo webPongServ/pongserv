@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState, useRef } from "react";
+import { useLayoutEffect, useState, useRef, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import io from "socket.io-client";
 import qs from "query-string";
@@ -8,12 +8,13 @@ import FriendDrawer from "components/common/FriendDrawer";
 import ChattingDrawer from "components/common/ChattingDrawer";
 import ErrorNotification from "components/utils/ErrorNotification";
 import { ChattingDrawerWidth } from "constant";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { apiURL } from "API/api";
 import instance from "API/api";
 import UserService from "API/UserService";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 import { SocketsActionTypes } from "types/redux/Sockets";
+import { IRootState } from "components/common/store";
 import "styles/global.scss";
 
 import { Box, CssBaseline } from "@mui/material";
@@ -43,6 +44,7 @@ export default function AppHeader() {
   const paramsCode: string | undefined = qs.parse(window.location.search)
     .error as string;
   const notiRef = useRef<HTMLDivElement>(null);
+  const status = useSelector((state: IRootState) => state.loginStatus);
   const dispatch = useDispatch();
 
   const token = localStorage.getItem("accessToken");
@@ -57,8 +59,6 @@ export default function AppHeader() {
     type: SocketsActionTypes.CHATTINGSOCKET_UPDATE,
     payload: chattingSocket,
   });
-
-  console.group("chatting socket : ", chattingSocket);
 
   const alertMessage = (message: string) => {
     alert(message);
@@ -109,7 +109,7 @@ export default function AppHeader() {
       <Box id="AppHeader-container" className="flex-container">
         <CssBaseline />
         <AppBar open={open} setOpen={setOpen} />
-        <FriendDrawer />
+        {status === "game" ? null : <FriendDrawer />}
         <Main id="Main-box" open={open}>
           <Routes>
             <Route path="/*" element={<MainRoute />} />

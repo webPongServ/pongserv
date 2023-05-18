@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { IRootState } from "components/common/store";
 import { UserDetail } from "types/Detail";
+import { FriendStatusType } from "constant";
 import EmptyListMessage from "components/utils/EmptyListMessage";
 import CustomIconButton from "components/utils/CustomIconButton";
 import CustomProfileButton from "components/utils/CustomProfileButton";
@@ -52,7 +53,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
 interface serverFriend {
   nickname: string;
   imageUrl: string;
-  isCurrLogin: boolean;
+  isCurrStatus: boolean;
 }
 
 const FriendDrawer = () => {
@@ -76,7 +77,7 @@ const FriendDrawer = () => {
         (value: serverFriend): UserDetail => ({
           nickname: value.nickname,
           imgURL: value.imageUrl,
-          status: value.isCurrLogin ? "login" : "logout",
+          status: value.isCurrStatus ? "login" : "logout",
         })
       ),
     });
@@ -128,7 +129,7 @@ const FriendDrawer = () => {
         {friends !== null && friends.length !== 0 && (
           <List>
             {friends!
-              .filter((friend) => friend.status === "login")
+              .filter((friend) => friend.status === FriendStatusType.login)
               .map((value, index) => (
                 <ListItem key={value.nickname + index} disablePadding>
                   <CustomProfileButton
@@ -143,7 +144,7 @@ const FriendDrawer = () => {
                 </ListItem>
               ))}
             {friends
-              .filter((friend) => friend.status === "logout")
+              .filter((friend) => friend.status === FriendStatusType.logout)
               .map((value, index) => (
                 <ListItem key={value.nickname + index} disablePadding>
                   <CustomProfileButton

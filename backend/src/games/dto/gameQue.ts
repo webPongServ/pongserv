@@ -15,4 +15,17 @@ export default class GameQueue {
   get length() {
     return this.queue.length;
   }
+
+  isEmpty() {
+    return this.queue.length === 0;
+  }
+
+  removeAndCheckExistence(item: string): boolean {
+    const index = this.queue.indexOf(item);
+    if (index !== -1) {
+      this.queue.splice(index, 1);
+      return true;
+    }
+    return false;
+  }
 }

@@ -36,7 +36,7 @@ export class GamesController {
     description: '게임 전적 가져오기 실패',
   })
   @ApiOperation({ summary: '일반 게임 입장' })
-  @Post('/static')
+  @Get('/static')
   entryGame(@Param('userId') userId: string) {
     return this.gamesService.getUserStatic(userId);
   }

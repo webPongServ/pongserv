@@ -13,7 +13,8 @@ import SkeletonButtons from "components/utils/SkeletonButtons";
 import MyButtons from "components/profile/MyButtons";
 import OthersButtons from "components/profile/OthersButtons";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
-import { ProfileStatusType } from "constant";
+import { ProfileFriendType } from "constant";
+import { LoginStatusActionTypes } from "types/redux/Login";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
@@ -31,6 +32,10 @@ const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { nickname } = useParams();
+
+  dispatch({
+    type: LoginStatusActionTypes.STATUS_MAIN,
+  });
 
   const getProfile = async () => {
     try {
@@ -83,11 +88,11 @@ const Profile = () => {
         <Box className="button-group flex-container">
           {profileDetail === null && <SkeletonButtons />}
           {profileDetail !== null &&
-            profileDetail.status === ProfileStatusType.self && (
+            profileDetail.status === ProfileFriendType.self && (
               <MyButtons setModalStatus={setModalStatus} />
             )}
           {profileDetail !== null &&
-            profileDetail!.status !== ProfileStatusType.self && (
+            profileDetail!.status !== ProfileFriendType.self && (
               <OthersButtons
                 profileDetail={profileDetail}
                 setProfileDetail={setProfileDetail}

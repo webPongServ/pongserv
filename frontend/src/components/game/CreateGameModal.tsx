@@ -25,6 +25,7 @@ const CreateGameModal = (props: CreateGameModalProps) => {
   const gameSocket = useSelector(
     (state: IRootState) => state.sockets.gameSocket
   );
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [gameRoomForm, setGameRoomForm] = useState<GameRoomForm>({
@@ -92,13 +93,15 @@ const CreateGameModal = (props: CreateGameModalProps) => {
             />
             <GameDifficultyRadioGroup
               name="난이도"
-              defaultValue={GameDifficultyType.easy}
+              defaultValue={GameDifficultyType.normal}
               handleFunction={handleDifficulty}
             />
           </Box>
           <Box className="footer flex-container">
             <Button
               onClick={() => {
+                if (gameRoomForm.title === "")
+                  return alert("제목을 입력해주세요!");
                 gameSocket.emit(
                   "createGameRoom",
                   {
@@ -109,8 +112,14 @@ const CreateGameModal = (props: CreateGameModalProps) => {
                   },
                   (uuid: string) => {
                     dispatch({
-                      type: CurrentGameActionTypes.UPDATE_GAMEID,
-                      payload: uuid,
+                      type: CurrentGameActionTypes.UPDATE_GAMEROOM,
+                      payload: {
+                        id: uuid,
+                        title: gameRoomForm.title,
+                        owner: myInfo.nickname,
+                        maxScore: gameRoomForm.maxScore,
+                        difficulty: gameRoomForm.difficulty,
+                      },
                     });
                     navigate(`/game/${uuid}`);
                   }

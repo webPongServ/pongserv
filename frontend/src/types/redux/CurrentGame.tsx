@@ -1,38 +1,55 @@
+import { GameRoomDetail } from "types/Detail";
+
 export interface CurrentGame {
-  id: string | null;
+  currentGame: GameRoomDetail | null;
+  score1: number;
+  score2: number;
 }
 
 const INITIAL_CURRENTGAME: CurrentGame = {
-  id: null,
+  currentGame: null,
+  score1: 0,
+  score2: 0,
 };
 
 export enum CurrentGameActionTypes {
-  UPDATE_GAMEID = "UPDATE_GAMEID",
-  DELETE_GAMEID = "DELETE_GAMEID",
+  UPDATE_GAMEROOM = "UPDATE_GAMEROOM",
+  DELETE_GAMEROOM = "DELETE_GAMEROOM",
+  INCREMENT_SCORE = "INCREMENT_SCORE",
 }
 
-export interface CurrentGame_UpdateGameIdAction {
-  type: CurrentGameActionTypes.UPDATE_GAMEID;
+export interface CurrentGame_UpdateGameRoomAction {
+  type: CurrentGameActionTypes.UPDATE_GAMEROOM;
+  payload: GameRoomDetail;
+}
+export interface CurrentGame_DeleteGameRoomAction {
+  type: CurrentGameActionTypes.DELETE_GAMEROOM;
   payload: string;
 }
-export interface CurrentGame_DeleteGameIdAction {
-  type: CurrentGameActionTypes.DELETE_GAMEID;
+
+export interface CurrentGame_IncrementScore1Action {
+  type: CurrentGameActionTypes.INCREMENT_SCORE;
   payload: string;
 }
 
 type CurrentGameAction =
-  | CurrentGame_UpdateGameIdAction
-  | CurrentGame_DeleteGameIdAction;
+  | CurrentGame_UpdateGameRoomAction
+  | CurrentGame_DeleteGameRoomAction
+  | CurrentGame_IncrementScore1Action;
 
 export const CurrentGameReducer = (
   state = INITIAL_CURRENTGAME,
   action: CurrentGameAction
 ): CurrentGame => {
   switch (action.type) {
-    case CurrentGameActionTypes.UPDATE_GAMEID:
-      return { id: action.payload };
-    case CurrentGameActionTypes.DELETE_GAMEID:
-      return { id: null };
+    case CurrentGameActionTypes.UPDATE_GAMEROOM:
+      return { ...state, currentGame: action.payload };
+    case CurrentGameActionTypes.DELETE_GAMEROOM:
+      return { currentGame: null, score1: 0, score2: 0 };
+    case CurrentGameActionTypes.INCREMENT_SCORE:
+      return action.payload === "score1"
+        ? { ...state, score1: state.score1 + 1 }
+        : { ...state, score2: state.score2 + 1 };
     default:
       return state;
   }

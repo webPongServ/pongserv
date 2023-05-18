@@ -27,6 +27,7 @@ export class GamesGateway
   @WebSocketServer()
   server: Server;
 
+  private GameSocketId = new Map<string, string>();
   private logger = new Logger('GameGateway');
   private gameQueue = new GameQueue();
 
@@ -65,21 +66,37 @@ export class GamesGateway
   }
   handleConnection(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
+    if (typeof socket.data === 'string') {
+      this.GameSocketId.set(socket.data, socket.id);
+    }
+    console.log('Game Socket ID is ', this.GameSocketId);
     this.logger.log(
       `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
     );
     socket.on('disconnecting', (reason) => {
+      /*
+      1. 만약에 방에 들어와있는 소켓이 끊긴다면
+      2. 그 방 안에 있는 인원들에게 endGame보낸다.
+      3. 그 방에 있는 인원들을 전부 나가게 한다.
+      4. 그 방을 삭제한다.(조건 04로 변경)
+      */
       for (const room of socket.rooms) {
         if (room !== socket.id) {
-          console.log('ROOMS is', room, reason);
           socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
           this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
           this.GamesService.endGame(room);
+          this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
+          if (this.gameQueue.removeAndCheckExistence(room))
+            console.log('GameQueue에서 방 삭제 성공');
         }
       }
     });
   }
   handleDisconnect(@ConnectedSocket() socket: Socket) {
+    if (typeof socket.data === 'string') {
+      this.GameSocketId.delete(socket.data);
+    }
+    console.log('[Deletion]Game Socket ID is ', this.GameSocketId);
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 
@@ -127,11 +144,16 @@ export class GamesGateway
     */
     const userId = socket.data;
     const inRoom = await this.server.in(message.roomId).fetchSockets();
-    if (inRoom.length == 1) socket.join(message.roomId);
+    if (inRoom.length == 1 && inRoom[0].data == userId) {
+      socket.emit('exception', '방장은 게임에 참여할 수 없습니다.');
+      this.logger.log('방장은 자신의 게임에 참여할 수 없습니다.');
+      return 'NO';
+    } else if (inRoom.length == 1) socket.join(message.roomId);
     else {
       socket.emit('exception', '방이 꽉 차서 들어가실 수 없습니다.');
       return 'NO';
     }
+
     this.logger.log(userId, 'joined', message.roomId);
     return 'OK';
   }
@@ -152,9 +174,10 @@ export class GamesGateway
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: any,
   ) {
-    socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
-    socket.emit('roomGuest');
-    this.server.to(message.roomId).emit('gameStart');
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+    await socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
+    await socket.emit('roomGuest');
+    await this.server.to(message.roomId).emit('gameStart');
     console.log(
       socket.rooms,
       (await this.server.in(message.roomId).fetchSockets()).length,
@@ -171,26 +194,85 @@ export class GamesGateway
 
   @SubscribeMessage('inGameReq')
   inGame(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
-    const roomId = message.roomId;
+    const roomId = message.roomId
+      ? message.roomId
+      : this.getRoomIdFromSocket(socket);
     // {user : owner, data : 350}
-    console.log('in game req', message.data);
+    // if (message.type != 'ball')
+    // console.log(socket.data, '\n\n', message, '\n\n', roomId);
     socket.to(roomId).emit('inGameRes', message);
     return 'OK';
   }
 
-  @SubscribeMessage('scoreUpdate')
+  @SubscribeMessage('dodge')
   scoreUpdate(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
+    this.logger.log('Dodge Game Score Update', message);
+    // console.log('Dodge Game Score Update', message);
+    // 필요한 데이터 roodId, Score(양쪽 다), userId
     const roomId = message.roomId;
-    const score = message.score;
-    socket.to(roomId).emit('scoreUpdate', score);
+    const myScore = message.myScore;
+    const opScore = message.opScore;
+    const userId = socket.data;
+    this.GamesService.dodgeGame(userId, roomId, myScore, opScore);
+    return 'OK';
   }
 
-  @SubscribeMessage('leaveGameRoom')
+  @SubscribeMessage('finishGame')
   leaveGameRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: any,
   ) {
     const userId = socket.data;
-    console.log('leaveGameRoom');
+    const roomId = message.roomId;
+    const myScore = message.myScore;
+    const opScore = message.opScore;
+    this.logger.log('finishgame DATA', userId, roomId, myScore, opScore);
+    this.server.socketsLeave(roomId);
+    this.GamesService.finishGame(userId, roomId, myScore, opScore);
+    this.GamesService.endGame(roomId);
+    return 'OK';
+  }
+
+  @SubscribeMessage('ladderGame')
+  async createLadderRoom(@ConnectedSocket() socket: Socket) {
+    /*
+    1. 래더 대기열이 있는지 확인한다.
+      1-1. 래더 대기열이 비어있다면, 새로운 방을 만들고 대기열 추가
+      1-2. 래더 대기열이 있다면, 해당 방에 join 후 대기열 삭제
+    2. socket을 통해 프론트에 방이 만들어졌음을 알린다(roomCreated)
+    */
+    console.log('Now Queue is : ', this.gameQueue);
+    const userId = socket.data;
+    if (this.gameQueue.isEmpty()) {
+      const message: roomOption = {
+        roomName: 'LADDER_GAME_' + socket.data,
+        difficulty: '02',
+        score: 5,
+        type: '02', // 래더는 02로 설정,
+      };
+      const roomList = await this.GamesService.createGameRoom(userId, message);
+      await this.GamesService.createGameDetail(roomList, userId, message.type);
+      await socket.join(roomList.id);
+      this.gameQueue.enqueue(roomList.id);
+      this.logger.log('Ladder Game Room Created', roomList.id);
+      return { roomId: roomList.id, action: 'create' };
+    } else {
+      const roomId = this.gameQueue.dequeue();
+      socket.join(roomId);
+      this.logger.log('Ladder Game Room Joined', roomId);
+      // await this.gameStart(socket, { roomId: roomId, type: '02' });
+      return { roomId: roomId, action: 'join' };
+    }
+    return 'OK';
+  }
+
+  // 내부 함수
+  private getRoomIdFromSocket(socket: Socket): string {
+    for (const room of socket.rooms) {
+      if (room !== socket.id) {
+        return room;
+      }
+    }
+    return null; // 방이 없는 경우 null 반환
   }
 }

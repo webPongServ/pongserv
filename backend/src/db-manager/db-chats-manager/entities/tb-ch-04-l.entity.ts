@@ -39,7 +39,7 @@ export class TbCh04LEntity {
   @JoinColumn({ name: 'BLOCK_USER_ID' })
   ua01mEntityAsBlock: TbUa01MEntity;
 
-  // ST_CD
+  // ST_CD // '01': 등록, '02': 해제
   @Column({ name: 'ST_CD', type: 'varchar', length: 2 })
   stCd: string;
 
@@ -48,11 +48,11 @@ export class TbCh04LEntity {
   rsstDttm: Date;
 
   // RELE_DTTM
-  @Column({ name: 'RELE_DTTM', type: 'timestamp with time zone', precision: 0 })
+  @Column({ name: 'RELE_DTTM', type: 'timestamp with time zone', precision: 0, nullable: true })
   releDttm: Date;
 
   // DEL_TF
-  @Column({ name: 'DEL_TF', type: 'boolean' })
+  @Column({ name: 'DEL_TF', type: 'boolean', default: false })
   delTf: boolean;
 
   // FRST_DTTM

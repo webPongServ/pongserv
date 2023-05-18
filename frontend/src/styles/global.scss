@@ -234,33 +234,34 @@ body,
 
 #error {
   position: fixed;
-  width: 50%;
+  width: 800px;
   left: 50%;
+  top: -10%;
   transform: translateX(-50%);
   animation-duration: 0.5s;
   animation-name: slidedown;
   animation-iteration-count: 1;
   animation-direction: alternate;
   animation-fill-mode: forwards;
-  z-index: 3;
+  z-index: 5;
 
   @keyframes slidedown {
     from {
-      margin-top: -10%;
+      top: -10%;
     }
 
     to {
-      margin-top: 0%;
+      top: 1%;
     }
   }
 
   @keyframes slideup {
     from {
-      margin-top: 0%;
+      top: 1%;
     }
 
     to {
-      margin-top: -10%;
+      top: -10%;
     }
   }
 
@@ -278,33 +279,33 @@ body,
 
 #success {
   position: fixed;
-  width: 50%;
+  width: 800px;
   left: 50%;
-  margin-top: -10%;
+  top: -10%;
   transform: translateX(-50%);
   animation-duration: 0.5s;
   animation-iteration-count: 1;
   animation-direction: alternate;
   animation-fill-mode: forwards;
-  z-index: 3;
+  z-index: 5;
 
   @keyframes slidedown {
     from {
-      margin-top: -10%;
+      top: -10%;
     }
 
     to {
-      margin-top: 0%;
+      top: 1%;
     }
   }
 
   @keyframes slideup {
     from {
-      margin-top: 0%;
+      top: 1%;
     }
 
     to {
-      margin-top: -10%;
+      top: -10%;
     }
   }
 

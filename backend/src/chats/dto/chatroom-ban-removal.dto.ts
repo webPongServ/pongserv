@@ -5,5 +5,5 @@ export class ChatroomBanRemovalDto {
     id: string;
 
 	@ApiProperty({ type: String })
-    userIdToFree: string;
+    nicknameToFree: string;
 }

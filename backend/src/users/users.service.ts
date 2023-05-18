@@ -5,6 +5,7 @@ import { AuthService } from './../auth/auth.service';
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -109,7 +110,18 @@ export class UsersService {
       friendUserId,
     );
     const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
-    return await this.dbmanagerUsersService.makeFriend(myEntity, friendEntity);
+    const resultOfMade = await this.dbmanagerUsersService.makeFriend(myEntity, friendEntity);
+    if (resultOfMade.result === "Success") {
+      const frndCurrLogin = await this.dbmanagerUsersService.getCurrLoginData(friendEntity);
+      if (frndCurrLogin) {
+        if (frndCurrLogin.stsCd === '02')
+          return ({ isCurrStatus: '02' }); // game
+        else
+          return ({ isCurrStatus: '01' }); // login
+      } else {
+        return ({ isCurrStatus: '03' }) // logout
+      }
+    }
   }
 
   async deleteFriend(intraId: string, friendNickname: string) {
@@ -131,9 +143,47 @@ export class UsersService {
     return await this.dbmanagerUsersService.getFriendProfile(intraId, friendId);
   }
 
-  async getFriendList(intraId: string) {
-    const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
-    return await this.dbmanagerUsersService.getFriendList(myEntity);
+  async getFriendList(userId: string) {
+    /*!SECTION
+      제공해야하는 데이터: nickname, imgPath, isCurrLogin
+      1. friend list 가져오기
+      2. 각 친구별로 현재 로그인 상태 가져오기
+    */
+    let results: {
+      nickname: string,
+      imageUrl: string,
+      currStat: string,
+    }[] = [];
+    // 1
+    const myEntity = await this.dbmanagerUsersService.getMasterEntity(userId);
+    const friendDatas = await this.dbmanagerUsersService.getFriendList(myEntity);
+    // 2
+    for (const eachFriendData of friendDatas) {
+      const currLogin = await this.dbmanagerUsersService.getCurrLoginData(eachFriendData.ua01mEntityAsFr);
+      let statusCode: string = null;
+      if (currLogin)
+        statusCode = currLogin.stsCd;
+      else
+        statusCode = '03';
+      const eachToPush = {
+        nickname: eachFriendData.ua01mEntityAsFr.nickname,
+        imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
+        currStat: statusCode, // NOTE: It will be true if currLogin exists, false otherwise.
+         // TODO: isCurrStatus 로 바꿔서 login, gaming, logout 상태 표시하도록 변경
+      }
+      results.push(eachToPush);
+    }
+    return results;
+  }
+
+  async getFriendUserIds(userId: string) {
+    const user = await this.dbmanagerUsersService.getUserByUserId(userId);
+    const friendDatas = await this.dbmanagerUsersService.getFriendList(user);
+    let retFrndUserIds: string[] = [];
+    for (const eachData of friendDatas) {
+      retFrndUserIds.push(eachData.ua01mEntityAsFr.userId);
+    }
+    return (retFrndUserIds);
   }
 
   async getUserList(startsWith: string) {
@@ -151,5 +201,32 @@ export class UsersService {
     if (user.length == 0) {
       throw new BadRequestException('존재하지 않는 사용자입니다.');
     }
+  }
+
+  async processLogin(userId: string) {
+    /*!SECTION
+      1. userId에 해당하는 user master entity 찾기
+      2. 해당 유저의 status에 login 데이터 추가
+    */
+    // 1
+    const user = await this.dbmanagerUsersService.getUserByUserId(userId);
+    if (!user)
+      throw new NotFoundException(`The user not existed.`);
+    // 2
+    this.dbmanagerUsersService.addLoginData(user);
+    return ;
+  }
+
+  async processLogout(userId: string) {
+    /*!SECTION
+      1. userId에 해당하는 user master entity 찾기
+      2. 해당 유저의 status에 login 비활성화
+    */
+    // 1
+    const user = await this.dbmanagerUsersService.getUserByUserId(userId);
+    if (!user)
+      throw new NotFoundException(`The user not existed.`);
+    await this.dbmanagerUsersService.setLoginFinsh(user);
+    return ;
   }
 }

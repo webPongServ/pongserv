@@ -5,5 +5,5 @@ export class ChatroomBanDto {
     id: string;
 
 	@ApiProperty({ type: String })
-    userIdToBan: string;
+    nicknameToBan: string;
 }
