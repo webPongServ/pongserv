@@ -4,6 +4,7 @@ import {
   HttpStatus,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
@@ -43,6 +44,7 @@ export class DbUsersManagerService {
   }
 
   // TODO: move to UsersModule
+  // TODO: modify
   async checkinUser(intraData: { intraId: string; intraImagePath: string }) {
     /*!SECTION
       1. 인자로 들어온 nickname을 가진 유저가 user master table(ua01mRp)에 있는지 확인한다. (회원가입 유무 확인)
@@ -428,5 +430,33 @@ export class DbUsersManagerService {
     }));
 
     return result;
+  }
+
+  addLoginData(user: TbUa01MEntity) {
+    const newLoginData: TbUa01LEntity = this.ua01lRp.create({
+      ua01mEntity: user,
+      connDttm: new Date(),
+      stsCd: '01',
+      loginTf: true,
+    });
+    this.ua01lRp.save(newLoginData);
+    return ;
+  }
+
+  async setLoginFinsh(user: TbUa01MEntity) {
+    const currLoginData: TbUa01LEntity = await this.ua01lRp.findOne({
+      where: {
+        ua01mEntity: {
+          id: user.id,
+        },
+        loginTf: true,
+      },
+    });
+    if (!currLoginData)
+      throw new NotFoundException(`not existed login data when logout`);
+    currLoginData.logoutDttm = new Date();
+    currLoginData.loginTf = false;
+    this.ua01lRp.save(currLoginData);
+    return ;
   }
 }

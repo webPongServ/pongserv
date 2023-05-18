@@ -5,6 +5,7 @@ import { AuthService } from './../auth/auth.service';
 import {
   BadRequestException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -190,5 +191,32 @@ export class UsersService {
     if (user.length == 0) {
       throw new BadRequestException('존재하지 않는 사용자입니다.');
     }
+  }
+
+  async processLogin(userId: string) {
+    /*!SECTION
+      1. userId에 해당하는 user master entity 찾기
+      2. 해당 유저의 status에 login 데이터 추가
+    */
+    // 1
+    const user = await this.dbmanagerUsersService.getUserByUserId(userId);
+    if (!user)
+      throw new NotFoundException(`The user not existed.`);
+    // 2
+    this.dbmanagerUsersService.addLoginData(user);
+    return ;
+  }
+
+  async processLogout(userId: string) {
+    /*!SECTION
+      1. userId에 해당하는 user master entity 찾기
+      2. 해당 유저의 status에 login 비활성화
+    */
+    // 1
+    const user = await this.dbmanagerUsersService.getUserByUserId(userId);
+    if (!user)
+      throw new NotFoundException(`The user not existed.`);
+    await this.dbmanagerUsersService.setLoginFinsh(user);
+    return ;
   }
 }

@@ -65,31 +65,35 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
     /*!SECTION
-      0. intraId-socketId map에 상태 저장
-      1. Friend user socket room에 등록 - Friend_userId
-      2. Block user socket room에 등록 - Block_userId
-      3. 해당 유저 전용 friends socket room으로 로그인 알람 보내기
+      1. Login 진행 (정보 DB에 저장)
+      2. intraId-socketId map에 상태 저장
+      3. Friend user socket room에 등록 - Friend_userId
+      4. Block user socket room에 등록 - Block_userId
+      5. 해당 유저 전용 friends socket room으로 로그인 알람 보내기
     */
-    // 0
+    // 1
+    this.usersService.processLogin(userId);
+    // 2
     this.userIdToSocketIdMap.set(userId, socket.id);
     console.log(`In handleConnection -> this.userIdToSocketIdMap: `)
     console.log(this.userIdToSocketIdMap)
-    // 1
+    // 3
     const friendList = await this.usersService.getFriendList(userId);
     for (const eachFriend of friendList) {
       const nameOfFriendRoom = `friends_of_${eachFriend.nickname}`;
       socket.join(nameOfFriendRoom);
     }
-    // 2
+    // 4
     const blockingNickList = await this.chatsService.getBlockedUserNicknameList(userId);
     for (const eachNick of blockingNickList) {
       const nameOfBlockingRoom = `blocking_${eachNick}`;
       socket.join(nameOfBlockingRoom);
     }
-    // 3
+    // 5
     const myProfile = await this.usersService.getProfile(userId);
     const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogin`, myProfile.nickname);
+
 
     // handleDisconnecting
     socket.on("disconnecting", (reason) => {
@@ -128,6 +132,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     /*!SECTION
       1. 해당 유저 전용 friends socket room으로 로그아웃 알람 보내기
       2. intraId-socketId map에 상태 제거
+      3. logout 진행 (logout 상태로 업데이트)
     */
     // 1
     const myProfile = await this.usersService.getProfile(userId);
@@ -147,7 +152,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     console.log(`In handleDisconnect after delete -> this.userIdToSocketIdMap: `)
     console.log(this.userIdToSocketIdMap)
-    
+
+    // 3
+    this.usersService.processLogout(userId);
   }
 
   @SubscribeMessage('chatroomCreation')
@@ -208,6 +215,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         infoMsg,
       );
       const nameOfChtrmSocketRoom = `chatroom_${infoMsg.id}`;
+      const nameOfblockedSocketRoom = `blocking_${userId}`; // NOTE: userid 사용
       socket.to(nameOfChtrmSocketRoom).emit('chatroomMessage', toSendInChtrm);
       return true;
     } catch (err) {

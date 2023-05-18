@@ -56,12 +56,12 @@ export class TbUa01LEntity {
   })
   logoutDttm: Date;
 
-  // STS_CD   // NOTE: 상태코드 '01': 일반상태, '02': 게임상태
+  // STS_CD   // NOTE: 상태코드 - '01': 일반상태, '02': 게임상태
   @Column({ name: 'STTS_CD', type: 'varchar', length: 2, nullable: true })
   stsCd: string;
 
   // REFRESH_TKN
-  @Column({ name: 'REFRESH_TKN', type: 'varchar', length: 200 })
+  @Column({ name: 'REFRESH_TKN', type: 'varchar', length: 200, nullable: true })
   refreshTkn: string;
 
   // LOGIN_TF
@@ -69,7 +69,7 @@ export class TbUa01LEntity {
   loginTf: boolean;
 
   // DEL_TF
-  @Column({ name: 'DEL_TF', type: 'boolean' })
+  @Column({ name: 'DEL_TF', type: 'boolean', default: false })
   delTf: boolean;
 
   // FRST_DTTM
