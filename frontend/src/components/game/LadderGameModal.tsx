@@ -48,17 +48,32 @@ const LadderGameModal = (props: LadderGameModalProps) => {
             <Button
               onClick={() => {
                 gameSocket.emit("ladderGame", (data: any) => {
-                  dispatch({
-                    type: CurrentGameActionTypes.UPDATE_GAMEROOM,
-                    payload: {
-                      id: data.roomId,
-                      title: "ladder game",
-                      owner: myInfo.nickname,
-                      maxScore: 5,
-                      difficulty: GameDifficultyType.hard,
-                    },
-                  });
-                  if (data.action === "join") {
+                  if (data.action === "create") {
+                    dispatch({
+                      type: CurrentGameActionTypes.UPDATE_GAMEROOM,
+                      payload: {
+                        id: data.roomId,
+                        title: "ladder game",
+                        owner: myInfo,
+                        maxScore: 5,
+                        difficulty: GameDifficultyType.hard,
+                      },
+                    });
+                  } else if (data.action === "join") {
+                    dispatch({
+                      type: CurrentGameActionTypes.UPDATE_GAMEROOM,
+                      payload: {
+                        id: data.roomId,
+                        title: "ladder game",
+                        owner: {
+                          nickname: data.owner,
+                          imgURL: "",
+                          status: "",
+                        },
+                        maxScore: 5,
+                        difficulty: GameDifficultyType.hard,
+                      },
+                    });
                     gameSocket.emit("gameRoomFulfilled", {
                       roomId: data.roomId,
                       type: GameRoomType.ladder,

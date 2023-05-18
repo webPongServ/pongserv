@@ -39,6 +39,7 @@ const GameBoard = (props: GameBoardProps) => {
     (state: IRootState) => state.sockets.gameSocket
   );
   const currentGame = useSelector((state: IRootState) => state.currentGame);
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const notiRef = useRef<HTMLDivElement>(null);
@@ -86,7 +87,10 @@ const GameBoard = (props: GameBoardProps) => {
 
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (paddleRef.current || paddle2Ref.current) {
-      const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
+      const role: string =
+        currentGame.currentGame!.owner.nickname === myInfo.nickname
+          ? "owner"
+          : "guest";
 
       if (event.key === "ArrowUp") {
         selectedPaddleRef!.current!.style.top =
@@ -140,7 +144,10 @@ const GameBoard = (props: GameBoardProps) => {
   // useEffect(() => {
   const moveBall = (dx: number, dy: number, dxd: number, dyd: number) => {
     if (ballRef.current) {
-      const role: string = selectedPaddleRef === paddleRef ? "owner" : "guest";
+      const role: string =
+        currentGame.currentGame!.owner.nickname === myInfo.nickname
+          ? "owner"
+          : "guest";
 
       if (ball_rel.top <= 0) dyd = 1;
       if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
@@ -164,17 +171,13 @@ const GameBoard = (props: GameBoardProps) => {
             type: CurrentGameActionTypes.INCREMENT_SCORE,
             payload: "score2",
           });
-          console.log(
-            "selectedPaddleRef === paddleRef",
-            selectedPaddleRef === paddleRef ? "owner" : "guest"
-          );
           if (score2 === currentGame.currentGame!.maxScore) {
             gameSocket.emit(
               "finishGame",
               {
                 roomId: currentGame.currentGame!.id,
-                myScore: selectedPaddleRef === paddleRef ? score1 : score2,
-                opScore: selectedPaddleRef === paddleRef ? score2 : score1,
+                myScore: role === "owner" ? score1 : score2,
+                opScore: role === "owner" ? score2 : score1,
               },
               () => {
                 random = 2;
@@ -223,17 +226,13 @@ const GameBoard = (props: GameBoardProps) => {
             type: CurrentGameActionTypes.INCREMENT_SCORE,
             payload: "score1",
           });
-          console.log(
-            "selectedPaddleRef === paddleRef",
-            selectedPaddleRef === paddleRef ? "owner" : "guest"
-          );
           if (score1 === currentGame.currentGame!.maxScore) {
             gameSocket.emit(
               "finishGame",
               {
                 roomId: currentGame.currentGame!.id,
-                myScore: selectedPaddleRef === paddleRef ? score1 : score2,
-                opScore: selectedPaddleRef === paddleRef ? score2 : score1,
+                myScore: role === "owner" ? score1 : score2,
+                opScore: role === "owner" ? score2 : score1,
               },
               () => {
                 random = 2;
@@ -288,10 +287,6 @@ const GameBoard = (props: GameBoardProps) => {
           });
           random = 4;
         }
-        console.log(
-          "selectedPaddleRef === paddleRef",
-          selectedPaddleRef === paddleRef ? "owner" : "guest"
-        );
         if (
           score1 === currentGame.currentGame!.maxScore ||
           score2 === currentGame.currentGame!.maxScore
@@ -300,8 +295,8 @@ const GameBoard = (props: GameBoardProps) => {
             "finishGame",
             {
               roomId: currentGame.currentGame!.id,
-              myScore: selectedPaddleRef === paddleRef ? score1 : score2,
-              opScore: selectedPaddleRef === paddleRef ? score2 : score1,
+              myScore: role === "owner" ? score1 : score2,
+              opScore: role === "owner" ? score2 : score1,
             },
             () => {
               random = 2;
@@ -440,7 +435,6 @@ const GameBoard = (props: GameBoardProps) => {
 
   useEffect(() => {
     const socketEndGame = () => {
-      // 1. 게임 정보 보내기
       gameSocket.emit(
         "dodge",
         {
