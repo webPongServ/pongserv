@@ -61,7 +61,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
-      socket.disconnect(true);
+      socket.disconnect();
       return;
     }
     /*!SECTION
@@ -216,7 +216,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       );
       const nameOfChtrmSocketRoom = `chatroom_${infoMsg.id}`;
       const nameOfblockedSocketRoom = `blocking_${userId}`; // NOTE: userid 사용
-      socket.to(nameOfChtrmSocketRoom).emit('chatroomMessage', toSendInChtrm);
+      socket.to(nameOfChtrmSocketRoom)
+            .except(nameOfblockedSocketRoom)
+            .emit('chatroomMessage', toSendInChtrm);
       return true;
     } catch (err) {
       console.log(err);
