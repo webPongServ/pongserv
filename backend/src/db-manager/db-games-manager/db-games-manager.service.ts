@@ -99,11 +99,35 @@ export class DbGamesManagerService {
   }
 
   async getUserStatic(userEntity) {
-    const user = await this.Gm01DRp.find({
-      where: { ua01mEntity: userEntity },
-      select: ['gmRsltCd', 'getScr', 'lossScr'], // opUserId
+    const users = await this.Gm01DRp.find({
+      where: {
+        ua01mEntity: {
+          userId: userEntity.userId,
+        },
+      },
+      select: ['opUserId', 'gmRsltCd', 'getScr', 'lossScr'],
     });
-    return user;
+
+    // opUserId가 null인 요소를 제외합니다.
+    const filteredUsers = users.filter((user) => user.opUserId !== null);
+    const userId = userEntity.userId;
+    const userImgPath = userEntity.imgPath;
+    // filteredUsers 배열의 각 요소에 대해, Ua01MRp에서 opUserId를 이용해 imgPath를 찾는 Promise를 생성합니다.
+    const updateUsers = await Promise.all(
+      filteredUsers.map(async (user) => {
+        const ua01m = await this.Ua01MRp.findOne({
+          where: { userId: user.opUserId },
+          select: ['imgPath'],
+        });
+        return {
+          userId,
+          userImgPath,
+          imgPath: ua01m ? ua01m.imgPath : null,
+          ...user,
+        };
+      }),
+    );
+    return updateUsers;
   }
 
   async updateOpponent(roomId, userId, opponentId) {
