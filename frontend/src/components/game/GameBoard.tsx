@@ -158,6 +158,13 @@ const GameBoard = (props: GameBoardProps) => {
       ) {
         // why 10?
         if (ball_rel.left <= 10) {
+          console.log(
+            currentGame.currentGame!.owner.nickname,
+            myInfo.nickname,
+            currentGame.currentGame!.owner.nickname === myInfo.nickname
+              ? "owner"
+              : "guest"
+          );
           score2++;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
@@ -213,6 +220,13 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.bottom <= paddle2_rel.bottom
       ) {
         if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
+          console.log(
+            currentGame.currentGame!.owner.nickname,
+            myInfo.nickname,
+            currentGame.currentGame!.owner.nickname === myInfo.nickname
+              ? "owner"
+              : "guest"
+          );
           score1++;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
@@ -264,6 +278,13 @@ const GameBoard = (props: GameBoardProps) => {
         } else dxd = 0;
       }
       if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
+        console.log(
+          currentGame.currentGame!.owner.nickname,
+          myInfo.nickname,
+          currentGame.currentGame!.owner.nickname === myInfo.nickname
+            ? "owner"
+            : "guest"
+        );
         ballRef.current!.style.top = "300px";
         ballRef.current!.style.bottom = "315px";
         ballRef.current!.style.left = "500px";
