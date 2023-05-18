@@ -91,20 +91,19 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const nameOfMyRoomForFriends = `friends_of_${myProfile.nickname}`;
     socket.to(nameOfMyRoomForFriends).emit(`friendStatusLogin`, myProfile.nickname);
 
-    console.log(`socket.rooms in connecting: `)
-    console.log(socket.rooms)
-
-    socket.on("disconnect", (reason) => {
-      // ...
-      console.log(`socket disconnect`);
-      console.log(socket.rooms); // Set { ... }
-    });
-
+    // handleDisconnecting
     socket.on("disconnecting", (reason) => {
+      /*!SECTION
+        1. chatroom에 참여하고 있는 상태였다면, 나가도록 처리하기
+          1-1. 유저가 참여하고 있는 채팅방 id 찾기
+          1-2. 해당 채팅방에 대한 leaveChatroom 실행
+      */
       console.log(`socket disconnecting`);
       console.log(socket.rooms); // Set { ... }
 
+      // 1
       for (const eachRoom of socket.rooms) {
+        // 1-1
         if (eachRoom.startsWith("chatroom_")) {
           let parts = eachRoom.split("chatroom_");
           let chtrmId: string = null;
@@ -113,6 +112,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
           const infoLeav: ChatroomLeavingDto = {
             id: chtrmId,
           };
+        // 1-2
           this.leaveChatroom(socket,infoLeav); // await 어케 적용시키지..?
         }
       }
@@ -127,9 +127,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
     /*!SECTION
       1. 해당 유저 전용 friends socket room으로 로그아웃 알람 보내기
-      2. chatroom에 참여하고 있는 상태였다면, 나가도록 처리하기
-        2-1. 유저가 참여하고 있는 채팅방 id 찾기
-      3. intraId-socketId map에 상태 제거
+      2. intraId-socketId map에 상태 제거
     */
     // 1
     const myProfile = await this.usersService.getProfile(userId);
@@ -140,7 +138,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`socket.rooms in disconnecting: `)
     console.log(socket.rooms)
 
-    // 3
+    // 2
     console.log(`In handleDisconnect before delete -> this.userIdToSocketIdMap: `)
     console.log(this.userIdToSocketIdMap)
     const entry = Array.from(this.userIdToSocketIdMap.entries()).find(([, socketId]) => socketId === socket.id);
