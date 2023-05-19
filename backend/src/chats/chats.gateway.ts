@@ -23,6 +23,7 @@ import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
 import { ChatroomBanDto } from './dto/chatroom-ban.dto';
 import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
 import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
+import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -176,6 +177,27 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   // TODO: chatroomDirectMessage
+  @SubscribeMessage('chatroomDirectMessage')
+  async takeDmRequest(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoDmReq: ChatroomDmReqDto,
+  ) {
+    const userId = this.validateAccessToken(socket);
+    if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomDirectMessage]`);
+    console.log(`ChatroomDmReqDto: `);
+    console.log(infoDmReq);
+    try {
+      const dmChtrmId = await this.chatsService.takeDmRequest(userId, infoDmReq);
+      const nameOfChtrmSocketRoom = `chatroom_${dmChtrmId}`;
+      socket.join(nameOfChtrmSocketRoom);
+      return { chtrmId: dmChtrmId };
+    } catch (err) {
+      socket.emit('errorChatroomDirectMessage', err.response.message);
+      return;
+    }
+
+  }
 
   @SubscribeMessage('chatroomCreation')
   async createChatroom(
