@@ -150,7 +150,7 @@ const UserList = (props: UserListProps) => {
                         {
                           user: null,
                           message:
-                            selectedUser.nickname + "님이 강퇴되었습니다.",
+                            selectedUser.nickname + "님이 강제 퇴장되었습니다.",
                         },
                       ]);
                       dispatch({
