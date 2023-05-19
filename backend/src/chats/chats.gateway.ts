@@ -208,8 +208,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(infoEntr);
     try {
       const nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
-      socket.join(infoEntr.id);
-      socket.to(infoEntr.id).emit('chatroomWelcome', nickname);
+      const nameOfChtrmSocketRoom = `chatroom_${infoEntr.id}`;
+      socket.join(nameOfChtrmSocketRoom);
+      socket.to(nameOfChtrmSocketRoom).emit('chatroomWelcome', nickname);
       return true;
     } catch (err) {
       socket.emit('errorChatroomEntrance', err.response.message);
