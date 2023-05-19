@@ -404,7 +404,6 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end - done
   @SubscribeMessage('chatroomEmpowerment')
   async empowerChatroomUser(
     @ConnectedSocket() socket: Socket,
@@ -416,13 +415,10 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomEmpowermentDto: `);
     console.log(infoEmpwr);
     try {
-      const targetUserId = await this.chatsService.empowerUser(userId, infoEmpwr);
-      // target user의 socket에 empowered 정보 emit
-      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingEmpowered', { chtrmId: infoEmpwr.id });
-      }
+      const targetNick = await this.chatsService.empowerUser(userId, infoEmpwr);
+      const nameOfChtrmSocketRoom = `chatroom_${infoEmpwr.id}`;
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingEmpowered', 
+        { chtrmId: infoEmpwr.id, nickname: targetNick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       return true;
     } catch (err) {
       console.log(err);
