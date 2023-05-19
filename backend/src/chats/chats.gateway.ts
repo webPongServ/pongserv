@@ -283,7 +283,10 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       await this.chatsService.putBlockUserInChats(userId, infoBlck);
       const nameOfblockingSocketRoom = `blocking_${infoBlck.nickname}`;
-      socket.join(nameOfblockingSocketRoom);
+      if (infoBlck.boolToBlock === true)
+        socket.join(nameOfblockingSocketRoom);
+      else
+        socket.leave(nameOfblockingSocketRoom);
       return true;
     } catch (err) {
       console.log(err);
@@ -373,11 +376,11 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMute', err.response.message);
+      socket.emit('errorChatroomRegisterBan', err.response.message);
     }
   }
 
-  // TODO - to combine with front-end - 이건 기존 REST API를 그대로 써도 될 듯
+  // TODO - to combine with front-end - 이건 기존 REST API를 그대로 써도 될 듯 - done
   @SubscribeMessage('chatroomRemovalBan')
   async removalChatroomBan(
     @ConnectedSocket() socket: Socket,
@@ -394,11 +397,11 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMute', err.response.message);
+      socket.emit('errorChatroomRemovalBan', err.response.message);
     }
   }
 
-  // TODO - to combine with front-end
+  // TODO - to combine with front-end - done
   @SubscribeMessage('chatroomEmpowerment')
   async empowerChatroomUser(
     @ConnectedSocket() socket: Socket,
@@ -415,7 +418,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id });
+        this.server.to(targetSocketId).emit('chatroomBeingEmpowered', { chtrmId: infoEmpwr.id });
       }
       return true;
     } catch (err) {

@@ -435,7 +435,7 @@ export class ChatsService {
 			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
 			2. 해당 방의 뮤트할 target의 정보를 확인한다.
 				2-1. 해당 방에 존재하는지 체크한다.
-				2-2. 뮤트할 타겟이 owner 이면 안 된다.
+				2-2. 타겟이 owner 이면 안 된다.
 				2-3. 이미 administrator일 때도 거절한다.
 			3. target의 권한을 admin으로 바꾸고 저장한다.
 			4. target의 정보를 반환한다.
@@ -532,7 +532,21 @@ export class ChatsService {
       throw new NotFoundException("The chatroom isn't exist currently.");
     // 2
     const banList = await this.dbChatsManagerService.getBanListInARoom(chtrm);
-    return banList;
+
+    const results: {
+      nickname: string;
+      imgPath: string;
+      authInChtrm: string;
+    }[] = [];
+    for (const eachBan of banList) {
+      const eachUserBanned: TbUa01MEntity = eachBan.ua01mEntity;
+      results.push({
+        nickname: eachUserBanned.nickname,
+        imgPath: eachUserBanned.imgPath,
+        authInChtrm: '03', // default: normal
+      });
+    }
+    return results;
   }
 
   async removeBan(userId: string, infoBanRmv: ChatroomBanRemovalDto) {
@@ -665,5 +679,15 @@ export class ChatsService {
 		retUserIdsBlocked.push(each.ua01mEntityAsBlock.userId);
 	}
 	return (retUserIdsBlocked);
+  }
+
+  async isTargetBlockedByUser(userId: string, targetNickname: string) {
+    const requestUser = await this.dbUsersManagerService.getUserByUserId(userId);
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(targetNickname);
+    const blockingData = await this.dbChatsManagerService.getBlockingData(requestUser, targetUser);
+    if (!blockingData || blockingData.stCd === '02') {
+      return false;
+    }
+    return true;
   }
 }
