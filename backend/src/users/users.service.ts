@@ -1,26 +1,20 @@
-import { start } from 'repl';
+import { AuthService } from 'src/auth/auth.service';
 import { ConfigService } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
-import { AuthService } from './../auth/auth.service';
 import {
   BadRequestException,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
-  UseGuards,
 } from '@nestjs/common';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import { DbGamesManagerService } from 'src/db-manager/db-games-manager/db-games-manager.service';
 import * as fs from 'fs-extra';
 import * as path from 'path';
-import { config } from 'dotenv';
 import { ChatsService } from 'src/chats/chats.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly AuthService: AuthService,
-    private readonly JwtService: JwtService,
     private readonly dbmanagerUsersService: DbUsersManagerService,
     private readonly DbGamesManagerService: DbGamesManagerService,
     private readonly config: ConfigService,
@@ -31,7 +25,7 @@ export class UsersService {
     try {
       console.log(token);
       token = token.split(' ')[1];
-      const decoded = await this.JwtService.verifyAsync(token);
+      const decoded = await this.AuthService.verifyAsync(token);
       console.log(decoded);
       return decoded;
     } catch (error) {
