@@ -272,6 +272,29 @@ export class GamesGateway
     return 'OK';
   }
 
+  async reqDirectGame(requestId: string, targetId: string) {
+    const userId = requestId;
+    const option = {
+      type: '01',
+      roomName: 'DIRECT_GAME_' + userId,
+      difficulty: '01',
+      score: 5,
+    };
+    const roomList = await this.GamesService.createGameRoom(userId, option);
+    const gameRoomId = await this.GamesService.createGameDetail(
+      roomList,
+      userId,
+      option.type,
+    );
+    const requesterSocket = this.GameSocketId.get(requestId);
+    requesterSocket.join(roomList.id);
+    const targetSocket = this.GameSocketId.get(message.target);
+    this.server.sockets[targetSocket].join(roomList.id);
+    await this.UsersChatsGateway.notifyGameStartToFriends(userId);
+    // Notify To friends
+    return roomList.id;
+  }
+
   // 내부 함수
   private getRoomIdFromSocket(socket: Socket): string {
     for (const room of socket.rooms) {
