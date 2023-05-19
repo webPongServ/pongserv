@@ -217,6 +217,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
+  // TODO: mute 상태 체크하고 muted event emit 하기
   @SubscribeMessage('chatroomMessage')
   async sendMessage(
     @ConnectedSocket() socket: Socket,
@@ -289,7 +290,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end
+  // TODO - to combine with front-end - done
   @SubscribeMessage('chatroomKick')
   async kickChatroomUser(
     @ConnectedSocket() socket: Socket,
@@ -305,9 +306,14 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       // target user의 socket에 kicked 정보 emit
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
-      }
+      this.server.to(targetSocketId).emit('chatroomBeingKicked', 
+        { 
+          chtrmId: infoKick.id, 
+          nicknameKicked: infoKick.nicknameToKick 
+        });
+      // if (targetSocketId) {
+      //   this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
+      // }
       return true;
     } catch (err) {
       console.log(err);
@@ -315,7 +321,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end
+  // TODO - to combine with front-end - done
   @SubscribeMessage('chatroomMute')
   async muteChatroomUser(
     @ConnectedSocket() socket: Socket,
@@ -358,6 +364,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       if (targetSocketId) {
+        // TODO - targetSocketId가 해당 chatroom에 대한 socket room을 나가도록 처리
+        const targetSocket: Socket = this.server.sockets.sockets.get(targetSocketId); // NOTE: Find socket by socket id
+        targetSocket.leave(`chatroom_${infoBan.id}`);
         this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
       }
       return true;
