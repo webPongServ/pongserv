@@ -249,6 +249,7 @@ export class DbUsersManagerService {
         ELO: 1000,
         winRate: 0,
         status: await this.getRelation(userId, user.userId),
+        isblocked: false,
       };
       return userData;
     } else {

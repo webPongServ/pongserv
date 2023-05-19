@@ -14,6 +14,7 @@ import { DbGamesManagerService } from 'src/db-manager/db-games-manager/db-games-
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { config } from 'dotenv';
+import { ChatsService } from 'src/chats/chats.service';
 
 @Injectable()
 export class UsersService {
@@ -23,6 +24,7 @@ export class UsersService {
     private readonly dbmanagerUsersService: DbUsersManagerService,
     private readonly DbGamesManagerService: DbGamesManagerService,
     private readonly config: ConfigService,
+    private readonly chatsService: ChatsService,
   ) {}
 
   async verifyToken(token: string): Promise<any> {
@@ -152,6 +154,10 @@ export class UsersService {
     const gameSummary = await this.DbGamesManagerService.getGameSummary(
       friendUserId,
     );
+    Profile.isblocked = await this.chatsService.isTargetBlockedByUser(
+      intraId,
+      friendNickname,
+    );
     Profile.ELO = gameSummary.ladder;
     Profile.winRate = gameSummary.winRate * 100;
     Profile.total = gameSummary.total;
@@ -173,6 +179,7 @@ export class UsersService {
     Profile.total = gameSummary.total;
     Profile.win = gameSummary.win;
     Profile.lose = gameSummary.lose;
+    Profile.isblocked = false;
     return await this.dbmanagerUsersService.getProfile(intraId);
   }
 
