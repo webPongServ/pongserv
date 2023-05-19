@@ -21,8 +21,8 @@ export enum CurrentChattingActionTypes {
   UPDATE_STATUS_WAITING = "UPDATE_STATUS_WAITING",
   UPDATE_STATUS_CREATING = "UPDATE_STATUS_CREATING",
   UPDATE_STATUS_CHATTING = "UPDATE_STATUS_CHATTING",
+  UPDATE_STATUS_ERROR = "UPDATE_STATUS_ERROR",
   EDIT_CHATTINGROOM = "EDIT_CHATTINGROOM",
-  EDIT_CHATTING = "EDIT_CHATTING",
   GET_USERLIST = "GET_USERLIST",
   ADD_USERLIST = "ADD_USERLIST",
   DELETE_USERLIST = "DELETE_USERLIST",
@@ -30,6 +30,7 @@ export enum CurrentChattingActionTypes {
   ADD_BANLIST = "ADD_BANLIST",
   DELETE_BANLIST = "DELETE_BANLIST",
   ADD_MYDETAIL = "ADD_MYDETAIL",
+  UPDATE_MYDETAIL = "UPDATE_MYDETAIL",
   DELETE_MYDETAIL = "DELETE_MYDETAIL",
 }
 
@@ -45,6 +46,10 @@ export interface CurrentChatting_UpdateStatusCreatingAction {
 export interface CurrentChatting_UpdateStatusChattingAction {
   type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING;
   payload: ChattingRoomDetail;
+}
+export interface CurrentChatting_UpdateStatusErrorAction {
+  type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR;
+  payload: string;
 }
 
 export interface CurrentChatting_EditChattingRoomAction {
@@ -86,6 +91,11 @@ export interface CurrentChatting_AddMyDetail {
   payload: ChattingUserDetail;
 }
 
+export interface CurrentChatting_UpdateMyDetail {
+  type: CurrentChattingActionTypes.UPDATE_MYDETAIL;
+  payload: string;
+}
+
 export interface CurrentChatting_DeleteMyDetail {
   type: CurrentChattingActionTypes.DELETE_MYDETAIL;
   payload: string;
@@ -95,6 +105,7 @@ type CurrentChattingAction =
   | CurrentChatting_UpdateStatusWaitingAction
   | CurrentChatting_UpdateStatusChattingAction
   | CurrentChatting_UpdateStatusCreatingAction
+  | CurrentChatting_UpdateStatusErrorAction
   | CurrentChatting_EditChattingRoomAction
   | CurrentChatting_GetUserListAction
   | CurrentChatting_AddUserListAction
@@ -103,6 +114,7 @@ type CurrentChattingAction =
   | CurrentChatting_AddBanListAction
   | CurrentChatting_DeleteBanListAction
   | CurrentChatting_AddMyDetail
+  | CurrentChatting_UpdateMyDetail
   | CurrentChatting_DeleteMyDetail;
 
 export const CurrentChattingReducer = (
@@ -114,14 +126,25 @@ export const CurrentChattingReducer = (
       return INITIAL_CURRENTCHATTING;
     case CurrentChattingActionTypes.UPDATE_STATUS_CREATING:
       return {
-        ...state,
         status: "creating",
+        myDetail: null,
+        chattingRoom: null,
+        userList: [],
+        banList: [],
       };
     case CurrentChattingActionTypes.UPDATE_STATUS_CHATTING:
       return {
         ...state,
         status: "chatting",
         chattingRoom: action.payload,
+      };
+    case CurrentChattingActionTypes.UPDATE_STATUS_ERROR:
+      return {
+        status: action.payload,
+        myDetail: null,
+        chattingRoom: null,
+        userList: [],
+        banList: [],
       };
     case CurrentChattingActionTypes.EDIT_CHATTINGROOM:
       return {
@@ -171,6 +194,11 @@ export const CurrentChattingReducer = (
       return {
         ...state,
         myDetail: action.payload,
+      };
+    case CurrentChattingActionTypes.UPDATE_MYDETAIL:
+      return {
+        ...state,
+        myDetail: { ...state.myDetail!, role: action.payload },
       };
     case CurrentChattingActionTypes.DELETE_MYDETAIL:
       return {

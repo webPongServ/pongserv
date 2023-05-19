@@ -36,7 +36,6 @@ const RoomLeave = (props: RoomLeaveProps) => {
       "chatroomLeaving",
       { id: chattingRoom.id },
       (response: any) => {
-        console.log("chatroomLeaving : ", response);
         dispatch({
           type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
           payload: "",
