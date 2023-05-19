@@ -1,3 +1,4 @@
+import { DbGamesManagerModule } from './../db-manager/db-games-manager/db-games-manager.module';
 import { HttpModule } from '@nestjs/axios';
 import { AuthService } from './../auth/auth.service';
 import { Module } from '@nestjs/common';
@@ -12,6 +13,7 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
   imports: [
     HttpModule,
     DbUsersManagerModule,
+    DbGamesManagerModule,
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
@@ -25,6 +27,6 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
   ],
   controllers: [UsersController],
   providers: [UsersService, AuthService],
-  exports: [UsersService]
+  exports: [UsersService],
 })
 export class UsersModule {}
