@@ -8,6 +8,7 @@ import { ChatsModule } from './chats/chats.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersChatsSocketModule } from './users-chats-socket/users-chats-socket.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
         synchronize: true,
       }),
     }),
+    UsersChatsSocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],

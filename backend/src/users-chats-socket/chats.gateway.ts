@@ -8,21 +8,22 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
-import { ChatsService } from './chats.service';
+import { ChatroomEntranceDto } from '../chats/dto/chatroom-entrance.dto';
+import { ChatsService } from '../chats/chats.service';
 import { Logger, UnauthorizedException } from '@nestjs/common';
-import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
+import { ChatroomRequestMessageDto } from '../chats/dto/chatroom-request-message.dto';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
-import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
-import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
+import { ChatroomCreationDto } from '../chats/dto/chatroom-creation.dto';
+import { ChatroomLeavingDto } from '../chats/dto/chatroom-leaving.dto';
 import { UsersService } from 'src/users/users.service';
-import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
-import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
-import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
-import { ChatroomBanDto } from './dto/chatroom-ban.dto';
-import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
-import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
+import { BlockingUserInChatsDto } from '../chats/dto/blocking-user-in-chats.dto';
+import { ChatroomKickingDto } from '../chats/dto/chatroom-kicking.dto';
+import { ChatroomMuteDto } from '../chats/dto/chatroom-mute.dto';
+import { ChatroomBanDto } from '../chats/dto/chatroom-ban.dto';
+import { ChatroomBanRemovalDto } from '../chats/dto/chatroom-ban-removal.dto';
+import { ChatroomEmpowermentDto } from '../chats/dto/chatroom-empowerment.dto';
+import { ChatroomDmReqDto } from '../chats/dto/chatroom-dm-req.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -30,7 +31,7 @@ import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
     origin: '*',
   },
 })
-export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class UsersChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly usersService: UsersService,
@@ -57,7 +58,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end
+  // TODO - to organize
   async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
@@ -185,6 +186,45 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // }
   }
 
+  async notifyGameStartToFriends(userId: string) {
+    const myProfile = await this.usersService.getProfile(userId);
+    const userSocketId = this.userIdToSocketIdMap.get(userId);
+    const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+    const nameOfMyRoomForFriends = `friends_of_${userId}`;
+    userSocket.to(nameOfMyRoomForFriends).emit(`friendStatusGameStart`, myProfile.nickname);
+  }
+
+  async notifyGameEndToFriends(userId: string) {
+    const myProfile = await this.usersService.getProfile(userId);
+    const userSocketId = this.userIdToSocketIdMap.get(userId);
+    const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+    const nameOfMyRoomForFriends = `friends_of_${userId}`;
+    userSocket.to(nameOfMyRoomForFriends).emit(`friendStatusGameEnd`, myProfile.nickname);
+  }
+  
+  // TODO: chatroomDirectMessage
+  @SubscribeMessage('chatroomDirectMessage')
+  async takeDmRequest(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody() infoDmReq: ChatroomDmReqDto,
+  ) {
+    const userId = this.validateAccessToken(socket);
+    if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomDirectMessage]`);
+    console.log(`ChatroomDmReqDto: `);
+    console.log(infoDmReq);
+    try {
+      const dmChtrmId = await this.chatsService.takeDmRequest(userId, infoDmReq);
+      const nameOfChtrmSocketRoom = `chatroom_${dmChtrmId}`;
+      socket.join(nameOfChtrmSocketRoom);
+      return { chtrmId: dmChtrmId };
+    } catch (err) {
+      socket.emit('errorChatroomDirectMessage', err.response.message);
+      return;
+    }
+
+  }
+
   @SubscribeMessage('chatroomCreation')
   async createChatroom(
     @ConnectedSocket() socket: Socket,
@@ -278,8 +318,10 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const nameOfChtrmSocketRoom = `chatroom_${infoLeav.id}`;
       socket.leave(nameOfChtrmSocketRoom);
       socket.to(nameOfChtrmSocketRoom).emit('chatroomLeaving', leaverNick);
-      socket.to(nameOfChtrmSocketRoom).emit('chatroomAuthChange'
-        , { chtrmId: infoLeav.id, nickname: nextOwnerNick, auth: '01' }); // REVIEW: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
+      if (nextOwnerNick) {
+        socket.to(nameOfChtrmSocketRoom).emit('chatroomAuthChange', 
+          { chtrmId: infoLeav.id, nickname: nextOwnerNick, auth: '01' }); // REVIEW: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
+      }
       return true;
     } catch (err) {
       console.log(err);
@@ -329,9 +371,9 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       
       const nameOfChtrmSocketRoom = `chatroom_${infoKick.id}`;
-      // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - 
+      // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - chtrm에 대한 socket room에서 나가지게 하기
       this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', 
-        { chtrmId: infoKick.id, nicknameKicked: infoKick.nicknameToKick }); // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
+        { chtrmId: infoKick.id, nicknameKicked: infoKick.nicknameToKick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       // if (targetSocketId) {
       //   this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
       // }

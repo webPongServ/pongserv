@@ -602,7 +602,10 @@ export class ChatsService {
     let result: {
       leaverNick: string,
       nextOwnerNick: string,
-    } = null;
+    } = {
+      leaverNick: null,
+      nextOwnerNick: null,
+    };
     // 1
     const user = await this.dbUsersManagerService.getUserByUserId(userId);
     const chtrm = await this.dbChatsManagerService.getLiveChtrmById(
@@ -656,7 +659,7 @@ export class ChatsService {
     // 4
     userInChtrm.chtRmJoinTf = false;
     this.dbChatsManagerService.saveChtrmUser(userInChtrm);
-    result.nextOwnerNick = user.nickname;
+    result.leaverNick = user.nickname;
     return result;
   }
 
