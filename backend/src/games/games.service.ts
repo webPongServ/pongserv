@@ -1,15 +1,12 @@
 import { DbUsersManagerService } from './../db-manager/db-users-manager/db-users-manager.service';
 import { roomOption } from './dto/roomOption.dto';
-import { HttpService } from '@nestjs/axios';
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable } from '@nestjs/common';
 import { DbGamesManagerService } from 'src/db-manager/db-games-manager/db-games-manager.service';
 @Injectable()
 export class GamesService {
   constructor(
     private readonly DbGamesManagerService: DbGamesManagerService,
     private readonly DbUsersManagerService: DbUsersManagerService,
-    private readonly configService: ConfigService,
   ) {}
 
   // GameRoom 생성한다.

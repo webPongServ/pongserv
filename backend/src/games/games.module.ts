@@ -1,7 +1,6 @@
-import { ChatsModule } from './../chats/chats.module';
 import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-manager.module';
 import { DbGamesManagerModule } from './../db-manager/db-games-manager/db-games-manager.module';
-import { HttpService, HttpModule } from '@nestjs/axios';
+import { HttpModule } from '@nestjs/axios';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { GamesController } from './games.controller';
