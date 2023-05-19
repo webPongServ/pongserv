@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { ChatsService } from './chats.service';
 import { ChatsController } from './chats.controller';
 import { DbChatsManagerModule } from 'src/db-manager/db-chats-manager/db-chats-manager.module';
@@ -8,7 +8,7 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [DbChatsManagerModule, DbUsersManagerModule, UsersModule],
+  imports: [DbChatsManagerModule, DbUsersManagerModule, forwardRef(() => UsersModule)],
   providers: [ChatsService, DbChatsManagerService, DbUsersManagerService],
   controllers: [ChatsController],
   exports: [ChatsService],

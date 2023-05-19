@@ -14,6 +14,7 @@ import { DbGamesManagerService } from 'src/db-manager/db-games-manager/db-games-
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { config } from 'dotenv';
+import { ChatsService } from 'src/chats/chats.service';
 
 @Injectable()
 export class UsersService {
@@ -23,6 +24,7 @@ export class UsersService {
     private readonly dbmanagerUsersService: DbUsersManagerService,
     private readonly DbGamesManagerService: DbGamesManagerService,
     private readonly config: ConfigService,
+    private readonly chatsService: ChatsService,
   ) {}
 
   async verifyToken(token: string): Promise<any> {
@@ -152,6 +154,10 @@ export class UsersService {
     const gameSummary = await this.DbGamesManagerService.getGameSummary(
       friendUserId,
     );
+    Profile.isblocked = await this.chatsService.isTargetBlockedByUser(
+      intraId,
+      friendNickname,
+    );
     Profile.ELO = gameSummary.ladder;
     Profile.winRate = gameSummary.winRate * 100;
     Profile.total = gameSummary.total;
@@ -173,6 +179,7 @@ export class UsersService {
     Profile.total = gameSummary.total;
     Profile.win = gameSummary.win;
     Profile.lose = gameSummary.lose;
+    Profile.isblocked = false;
     return await this.dbmanagerUsersService.getProfile(intraId);
   }
 
@@ -265,5 +272,51 @@ export class UsersService {
     console.log(`logoutData: `);
     console.log(logoutData);
     return;
+  }
+
+  async getGameRecord(userId: string, friendNickname: string = null) {
+    // Nickname을 받아서, 해당 인원의 userId를 찾아서, 그 userId로 게임 기록을 가져온다.
+    const friendUserId = friendNickname
+      ? await this.dbmanagerUsersService.findUserIdByNickname(friendNickname)
+      : userId;
+    const userEntity = await this.dbmanagerUsersService.getMasterEntity(
+      friendUserId,
+    );
+    const gameRecord = await this.DbGamesManagerService.getUserStatic(
+      userEntity,
+    );
+    return gameRecord;
+  }
+
+  async achievement(userId: string, friendNickname: string = null) {
+    const winAchievement = ['WIN1', 'WIN10', 'WIN100', 'WIN1000'];
+    const lossAchievement = ['LOSS1', 'LOSS10', 'LOSS100', 'LOSS1000'];
+    const friendAchievement = [
+      'FRIEND1',
+      'FRIEND10',
+      'FRIEND100',
+      'FRIEND1000',
+    ];
+    const friendUserId = friendNickname
+      ? await this.dbmanagerUsersService.findUserIdByNickname(friendNickname)
+      : userId;
+    const gameSummary = await this.DbGamesManagerService.getGameSummary(
+      friendUserId,
+    );
+    const friendList = await this.getFriendList(friendUserId);
+    const totalAchievement = [];
+    if (gameSummary.win > 0)
+      totalAchievement.push(
+        ...winAchievement.slice(0, gameSummary.win.toString().length),
+      );
+    if (gameSummary.lose > 0)
+      totalAchievement.push(
+        ...lossAchievement.slice(0, gameSummary.lose.toString().length),
+      );
+    if (friendList.length > 0)
+      totalAchievement.push(
+        ...friendAchievement.slice(0, friendList.length.toString().length),
+      );
+    return totalAchievement;
   }
 }

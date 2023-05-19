@@ -249,6 +249,7 @@ export class DbUsersManagerService {
         ELO: 1000,
         winRate: 0,
         status: await this.getRelation(userId, user.userId),
+        isblocked: false,
       };
       return userData;
     } else {
@@ -371,9 +372,7 @@ export class DbUsersManagerService {
         stCd: '01',
       },
     });
-    // console.log('isFriend', isFriend);
     if (isFriend && isFriend.length != 0) {
-      // console.log('we are friend');
       return '01';
     } else return '02';
   }

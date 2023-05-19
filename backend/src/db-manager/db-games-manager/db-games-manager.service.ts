@@ -154,7 +154,7 @@ export class DbGamesManagerService {
     };
   }
 
-  async getUserStatic(userEntity) {
+  async getUserStatic(userEntity: TbUa01MEntity) {
     // 개인 프로필을 누르면 나오는 정보들 모두 돌려준다.
     // console.log(userEntity);
     const users = await this.Gm01DRp.find({
@@ -171,39 +171,30 @@ export class DbGamesManagerService {
 
     // opUserId가 null인 요소를 제외합니다.
     const filteredUsers = users.filter((user) => user.opUserId !== null);
-    const userId = userEntity.userId;
+    const userNickname = userEntity.nickname;
     const userImgPath = userEntity.imgPath;
     // filteredUsers 배열의 각 요소에 대해, Ua01MRp에서 opUserId를 이용해 imgPath를 찾는 Promise를 생성합니다.
     const updateUsers = await Promise.all(
       filteredUsers.map(async (user) => {
         const ua01m = await this.Ua01MRp.findOne({
           where: { userId: user.opUserId },
-          select: ['imgPath'],
+          select: ['imgPath', 'nickname'],
         });
         return {
-          userId,
+          userNickname,
           userImgPath,
-          imgPath: ua01m ? ua01m.imgPath : null,
-          ...user,
+          opImgPath: ua01m ? ua01m.imgPath : null,
+          opNickname: ua01m ? ua01m.nickname : null,
+          opUserId: user.opUserId,
+          getScr: user.getScr,
+          lossScr: user.lossScr,
+          gmRsltCd: user.gmRsltCd,
+          gmType: user.gm01lEntity.gmType, // gmType만 가져옵니다.
         };
       }),
     );
-    const win = updateUsers.filter((item) => item.gmRsltCd === '01').length;
-    const lose = updateUsers.filter((item) => item.gmRsltCd === '02').length;
-    const ladderWin = updateUsers.filter(
-      (item) => item.gmRsltCd === '01' && item.gm01lEntity.gmType === '02',
-    ).length;
-    const ladderLose = updateUsers.filter(
-      (item) => item.gmRsltCd === '02' && item.gm01lEntity.gmType === '02',
-    ).length;
-    const staticData = {
-      win: win,
-      lose: lose,
-      total: win + lose,
-      ladder: 1000 + (ladderWin - ladderLose) * 10,
-    };
-
-    return [staticData, updateUsers];
+    console.log(updateUsers);
+    return updateUsers;
   }
 
   async updateOpponent(roomId, userId, opponentId) {
@@ -255,5 +246,16 @@ export class DbGamesManagerService {
     room.exitDttm = new Date();
     console.log(room);
     await this.Gm01DRp.save(room);
+  }
+
+  async isInGame(userId: string) {
+    const room = await this.Gm01LRp.find({
+      where: [
+        { owner: userId, endType: '04' },
+        { opUserId: userId, endType: '04' },
+      ],
+    });
+    console.log(room);
+    return room.length > 0;
   }
 }
