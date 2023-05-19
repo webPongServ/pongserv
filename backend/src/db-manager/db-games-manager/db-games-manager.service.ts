@@ -247,4 +247,15 @@ export class DbGamesManagerService {
     console.log(room);
     await this.Gm01DRp.save(room);
   }
+
+  async isInGame(userId: string) {
+    const room = await this.Gm01LRp.find({
+      where: [
+        { owner: userId, endType: '04' },
+        { opUserId: userId, endType: '04' },
+      ],
+    });
+    console.log(room);
+    return room.length > 0;
+  }
 }
