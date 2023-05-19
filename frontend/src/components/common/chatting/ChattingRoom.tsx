@@ -161,7 +161,7 @@ const ChattingRoom = () => {
       chattingSocket.on("chatroomBeingKicked", socketChatroomBeingKicked);
       chattingSocket.on("chatroomBeingMuted", socketChatroomBeingMuted);
       chattingSocket.on(
-        "chatroomRegisteredBan",
+        "chatroomBeingRegisteredBan",
         socketChatroomBeingRegisteredBan
       );
     }
@@ -173,7 +173,7 @@ const ChattingRoom = () => {
       chattingSocket.off("chatroomBeingKicked", socketChatroomBeingKicked);
       chattingSocket.off("chatroomBeingMuted", socketChatroomBeingMuted);
       chattingSocket.off(
-        "chatroomRegisteredBan",
+        "chatroomBeingRegisteredBan",
         socketChatroomBeingRegisteredBan
       );
     };
