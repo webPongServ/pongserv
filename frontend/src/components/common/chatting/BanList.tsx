@@ -64,7 +64,13 @@ const BanList = (props: BanListProps) => {
     );
     dispatch({
       type: CurrentChattingActionTypes.GET_BANLIST,
-      payload: response.data,
+      payload: response.data.map(
+        (value: serverChattingUserDetail): ChattingUserDetail => ({
+          ...value,
+          imgURL: value.imgPath,
+          role: value.authInChtrm,
+        })
+      ),
     });
   };
 
