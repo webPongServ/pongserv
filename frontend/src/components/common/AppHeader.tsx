@@ -49,6 +49,8 @@ export const errorMessageCreator = (errorCode: string): string => {
       return "로그인 정보가 올바르지 않습니다!";
     case "already_login":
       return "이미 로그인 되어있는 계정입니다. 로그아웃 후 다시 시도해주세요.";
+    case "kicked":
+      return "채팅방에서 강퇴당하였습니다.";
     default:
       return "에러가 발생하였습니다.";
   }

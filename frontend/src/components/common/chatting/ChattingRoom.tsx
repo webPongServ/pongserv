@@ -132,8 +132,8 @@ const ChattingRoom = () => {
 
     const socketChatroomBeingKicked = () => {
       dispatch({
-        type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,
-        payload: "",
+        type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
+        payload: "error-kicked",
       });
     };
 
