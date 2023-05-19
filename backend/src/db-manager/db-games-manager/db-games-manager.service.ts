@@ -98,6 +98,62 @@ export class DbGamesManagerService {
     return room;
   }
 
+  async getGameSummary(userId) {
+    const WinCount = await this.Gm01DRp.count({
+      where: {
+        ua01mEntity: {
+          userId: userId,
+        },
+        gmRsltCd: '01', // gmRsltCd가 01인 데이터 필터링
+      },
+    });
+
+    const LoseCount = await this.Gm01DRp.count({
+      where: {
+        ua01mEntity: {
+          userId: userId,
+        },
+        gmRsltCd: '02', // gmRsltCd가 02인 데이터 필터링
+      },
+    });
+
+    const LadderLoseCount = await this.Gm01DRp.count({
+      relations: {
+        gm01lEntity: true,
+      },
+      where: {
+        ua01mEntity: {
+          userId: userId,
+        },
+        gmRsltCd: '02',
+        gm01lEntity: {
+          gmType: '02',
+        },
+      },
+    });
+    const LadderWinCount = await this.Gm01DRp.count({
+      relations: {
+        gm01lEntity: true,
+      },
+      where: {
+        ua01mEntity: {
+          userId: userId,
+        },
+        gmRsltCd: '01',
+        gm01lEntity: {
+          gmType: '02',
+        },
+      },
+    });
+    return {
+      total: WinCount + LoseCount,
+      win: WinCount,
+      lose: LoseCount,
+      winRate: LadderWinCount / (LadderWinCount + LadderLoseCount),
+      ladder: 1000 + (LadderWinCount - LadderLoseCount) * 10,
+    };
+  }
+
   async getUserStatic(userEntity) {
     // 개인 프로필을 누르면 나오는 정보들 모두 돌려준다.
     // console.log(userEntity);
