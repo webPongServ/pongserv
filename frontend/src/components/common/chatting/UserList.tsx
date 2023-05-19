@@ -68,6 +68,7 @@ const UserList = (props: UserListProps) => {
     const response = await ChattingService.getUsersList(
       currentChatting.chattingRoom!.id
     );
+
     dispatch({
       type: CurrentChattingActionTypes.GET_USERLIST,
       payload: response.data.map(
@@ -205,7 +206,22 @@ const UserList = (props: UserListProps) => {
               >
                 벙어리
               </MenuItem>
-              <MenuItem>관리자 권한 부여</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  chattingSocket.emit(
+                    "chatroomEmpowerment",
+                    {
+                      id: currentChatting.chattingRoom?.id,
+                      nicknameToEmpower: selectedUser.nickname,
+                    },
+                    () => {
+                      setAnchorEl(null);
+                    }
+                  );
+                }}
+              >
+                관리자 권한 부여
+              </MenuItem>
               <MenuItem>대결 신청</MenuItem>
             </Box>
           )}

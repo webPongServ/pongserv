@@ -154,6 +154,13 @@ const ChattingRoom = () => {
       });
     };
 
+    const socketChatroomBeingEmpowered = () => {
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_MYDETAIL,
+        payload: ChattingUserRoleType.admin,
+      });
+    };
+
     if (chattingSocket) {
       chattingSocket.on("chatroomMessage", socketChatroomMessage);
       chattingSocket.on("chatroomWelcome", socketChatroomWelcome);
@@ -164,6 +171,7 @@ const ChattingRoom = () => {
         "chatroomBeingRegisteredBan",
         socketChatroomBeingRegisteredBan
       );
+      chattingSocket.on("chatroomBeingEmpowered", socketChatroomBeingEmpowered);
     }
 
     return () => {
@@ -175,6 +183,10 @@ const ChattingRoom = () => {
       chattingSocket.off(
         "chatroomBeingRegisteredBan",
         socketChatroomBeingRegisteredBan
+      );
+      chattingSocket.off(
+        "chatroomBeingEmpowered",
+        socketChatroomBeingEmpowered
       );
     };
   }, [chatting, roomStatus]);
@@ -229,7 +241,9 @@ const ChattingRoom = () => {
               <form className="input" onSubmit={handleSubmitSend}>
                 <Input
                   value={chattingInput}
-                  placeholder="채팅을 입력하세요."
+                  placeholder={
+                    isMute ? "60초간 벙어리입니다." : "채팅을 입력하세요."
+                  }
                   slotProps={{ input: { maxLength: 1000 } }}
                   disabled={isMute}
                   onChange={handleChattingInput}
