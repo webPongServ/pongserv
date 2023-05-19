@@ -8,22 +8,22 @@ import {
   WebSocketServer,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ChatroomEntranceDto } from './dto/chatroom-entrance.dto';
-import { ChatsService } from './chats.service';
+import { ChatroomEntranceDto } from '../chats/dto/chatroom-entrance.dto';
+import { ChatsService } from '../chats/chats.service';
 import { Logger, UnauthorizedException } from '@nestjs/common';
-import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
+import { ChatroomRequestMessageDto } from '../chats/dto/chatroom-request-message.dto';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
-import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
-import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
+import { ChatroomCreationDto } from '../chats/dto/chatroom-creation.dto';
+import { ChatroomLeavingDto } from '../chats/dto/chatroom-leaving.dto';
 import { UsersService } from 'src/users/users.service';
-import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
-import { ChatroomKickingDto } from './dto/chatroom-kicking.dto';
-import { ChatroomMuteDto } from './dto/chatroom-mute.dto';
-import { ChatroomBanDto } from './dto/chatroom-ban.dto';
-import { ChatroomBanRemovalDto } from './dto/chatroom-ban-removal.dto';
-import { ChatroomEmpowermentDto } from './dto/chatroom-empowerment.dto';
-import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
+import { BlockingUserInChatsDto } from '../chats/dto/blocking-user-in-chats.dto';
+import { ChatroomKickingDto } from '../chats/dto/chatroom-kicking.dto';
+import { ChatroomMuteDto } from '../chats/dto/chatroom-mute.dto';
+import { ChatroomBanDto } from '../chats/dto/chatroom-ban.dto';
+import { ChatroomBanRemovalDto } from '../chats/dto/chatroom-ban-removal.dto';
+import { ChatroomEmpowermentDto } from '../chats/dto/chatroom-empowerment.dto';
+import { ChatroomDmReqDto } from '../chats/dto/chatroom-dm-req.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -31,7 +31,7 @@ import { ChatroomDmReqDto } from './dto/chatroom-dm-req.dto';
     origin: '*',
   },
 })
-export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class UsersChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly usersService: UsersService,
