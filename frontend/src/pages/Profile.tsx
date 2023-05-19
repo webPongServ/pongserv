@@ -13,8 +13,8 @@ import SkeletonButtons from "components/utils/SkeletonButtons";
 import MyButtons from "components/profile/MyButtons";
 import OthersButtons from "components/profile/OthersButtons";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
-import { ProfileFriendType } from "constant";
 import { LoginStatusActionTypes } from "types/redux/Login";
+import { ProfileFriendType } from "constant";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
@@ -49,6 +49,7 @@ const Profile = () => {
         ELO: response.data.ELO,
         winRate: response.data.winRate,
         status: response.data.status,
+        isBlocked: response.data.isblocked,
       });
       if (isNew)
         dispatch({
@@ -73,16 +74,7 @@ const Profile = () => {
           {profileDetail === null ? (
             <SkeletonProfile />
           ) : (
-            <UserInfo
-              nickname={profileDetail!.nickname}
-              imgURL={profileDetail!.imgURL}
-              total={profileDetail!.total}
-              win={profileDetail!.win}
-              lose={profileDetail!.lose}
-              ELO={profileDetail!.ELO}
-              winRate={profileDetail!.winRate}
-              status={profileDetail!.status}
-            />
+            <UserInfo profileDetail={profileDetail} />
           )}
         </Box>
         <Box className="button-group flex-container">
@@ -128,8 +120,8 @@ const Profile = () => {
           <Tab>업적</Tab>
         </TabList>
         <Box className="history overflow">
-          <GameHistoryList />
-          <AchievementList />
+          <GameHistoryList nickname={nickname!} />
+          <AchievementList nickname={nickname!} />
         </Box>
       </Tabs>
       <EditNicknameModal
