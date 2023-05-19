@@ -383,7 +383,6 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end - 이건 기존 REST API를 그대로 써도 될 듯 - done
   @SubscribeMessage('chatroomRemovalBan')
   async removalChatroomBan(
     @ConnectedSocket() socket: Socket,
@@ -395,8 +394,10 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomBanRemovalDto: `);
     console.log(infoBanRmv);
     try {
-      await this.chatsService.removeBan(userId, infoBanRmv);
-      //REVIEW - 다른 유저들에게 이 사실을 알려야할까?
+      const targetNick = await this.chatsService.removeBan(userId, infoBanRmv);
+      const nameOfChtrmSocketRoom = `chatroom_${infoBanRmv.id}`;
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRemovedBan', 
+        { chtrmId: infoBanRmv.id, nickname: targetNick }); //REVIEW - 다른 유저들에게 이 사실을 알리기
       return true;
     } catch (err) {
       console.log(err);

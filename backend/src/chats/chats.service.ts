@@ -584,7 +584,7 @@ export class ChatsService {
     // 3
     banInfoOfTarget.vldTf = false;
     this.dbChatsManagerService.saveChtrmRstrInfo(banInfoOfTarget);
-    return ;
+    return target.nickname;
   }
 
   async leaveChatroom(userId: string, infoLeav: ChatroomLeavingDto) {
