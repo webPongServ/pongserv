@@ -176,6 +176,22 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // }
   }
 
+  async notifyGameStartToFriends(userId: string) {
+    const myProfile = await this.usersService.getProfile(userId);
+    const userSocketId = this.userIdToSocketIdMap.get(userId);
+    const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+    const nameOfMyRoomForFriends = `friends_of_${userId}`;
+    userSocket.to(nameOfMyRoomForFriends).emit(`friendStatusGameStart`, myProfile.nickname);
+  }
+
+  async notifyGameEndToFriends(userId: string) {
+    const myProfile = await this.usersService.getProfile(userId);
+    const userSocketId = this.userIdToSocketIdMap.get(userId);
+    const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+    const nameOfMyRoomForFriends = `friends_of_${userId}`;
+    userSocket.to(nameOfMyRoomForFriends).emit(`friendStatusGameEnd`, myProfile.nickname);
+  }
+  
   // TODO: chatroomDirectMessage
   @SubscribeMessage('chatroomDirectMessage')
   async takeDmRequest(
@@ -341,7 +357,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       
       const nameOfChtrmSocketRoom = `chatroom_${infoKick.id}`;
-      // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - 
+      // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - chtrm에 대한 socket room에서 나가지게 하기
       this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', 
         { chtrmId: infoKick.id, nicknameKicked: infoKick.nicknameToKick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       // if (targetSocketId) {
