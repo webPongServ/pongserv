@@ -8,7 +8,11 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
 import { UsersModule } from 'src/users/users.module';
 
 @Module({
-  imports: [DbChatsManagerModule, DbUsersManagerModule, forwardRef(() => UsersModule)],
+  imports: [
+    DbChatsManagerModule,
+    DbUsersManagerModule,
+    forwardRef(() => UsersModule),
+  ],
   providers: [ChatsService, DbChatsManagerService, DbUsersManagerService],
   controllers: [ChatsController],
   exports: [ChatsService],
