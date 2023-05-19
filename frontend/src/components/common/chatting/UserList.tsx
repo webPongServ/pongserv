@@ -12,6 +12,7 @@ import { IRootState } from "components/common/store";
 import { ChattingUserRoleType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
+import { ChatObject } from "components/common/chatting/ChattingRoom";
 
 import { Box } from "@mui/material";
 import List from "@mui/material/List";
@@ -21,6 +22,8 @@ import MenuItem from "@mui/material/MenuItem";
 
 interface UserListProps {
   myDetail: ChattingUserDetail;
+  chatting: ChatObject[];
+  setChatting: Function;
 }
 
 interface serverChattingUserDetail {
@@ -32,6 +35,9 @@ interface serverChattingUserDetail {
 const UserList = (props: UserListProps) => {
   const currentChatting: CurrentChatting = useSelector(
     (state: IRootState) => state.currentChatting
+  );
+  const chattingSocket: any = useSelector(
+    (state: IRootState) => state.sockets.chattingSocket!
   );
   const [selectedUser, setSelectedUser] = useState<ChattingUserDetail>({
     nickname: "",
@@ -62,7 +68,6 @@ const UserList = (props: UserListProps) => {
     const response = await ChattingService.getUsersList(
       currentChatting.chattingRoom!.id
     );
-    console.log(response.data);
     dispatch({
       type: CurrentChattingActionTypes.GET_USERLIST,
       payload: response.data.map(
@@ -77,6 +82,11 @@ const UserList = (props: UserListProps) => {
 
   useEffect(() => {
     getUserList();
+  }, []);
+
+  useEffect(() => {
+    if (chattingSocket) {
+    }
   }, []);
 
   return currentChatting.userList.length === 0 ? (
@@ -124,14 +134,41 @@ const UserList = (props: UserListProps) => {
         {!(selectedUser.nickname === props.myDetail.nickname) &&
           props.myDetail.role !== ChattingUserRoleType.normal && (
             <Box>
-              <MenuItem>채팅방 내보내기</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  chattingSocket.emit(
+                    "chatroomKick",
+                    {
+                      id: currentChatting.chattingRoom?.id,
+                      nicknameToKick: selectedUser.nickname,
+                    },
+                    () => {
+                      // 1. 여기서 currentChatting.userlist 다시 렌더링하기 => 자동으로 구독되어 렌더링이 되는데
+                      // 2. dispatch할 때, payload가 맞지 않아도 에러가 발생하지 않는 것에 주의(redux 상태 변경 실패)
+                      props.setChatting([
+                        ...props.chatting,
+                        {
+                          user: null,
+                          message:
+                            selectedUser.nickname + "님이 강퇴되었습니다.",
+                        },
+                      ]);
+                      dispatch({
+                        type: CurrentChattingActionTypes.DELETE_USERLIST,
+                        payload: selectedUser.nickname,
+                      });
+                      setAnchorEl(null);
+                    }
+                  );
+                }}
+              >
+                채팅방 내보내기
+              </MenuItem>
               <MenuItem
                 onClick={() => {
                   dispatch({
                     type: CurrentChattingActionTypes.DELETE_USERLIST,
-                    payload: currentChatting.userList.filter(
-                      (value) => value.nickname !== selectedUser.nickname
-                    ),
+                    payload: selectedUser.nickname,
                   });
                   dispatch({
                     type: CurrentChattingActionTypes.ADD_BANLIST,
