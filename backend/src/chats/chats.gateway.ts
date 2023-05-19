@@ -57,7 +57,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end
+  // TODO - to organize
   async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
@@ -175,6 +175,8 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // }
   }
 
+  // TODO: chatroomDirectMessage
+
   @SubscribeMessage('chatroomCreation')
   async createChatroom(
     @ConnectedSocket() socket: Socket,
@@ -264,8 +266,10 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const nameOfChtrmSocketRoom = `chatroom_${infoLeav.id}`;
       socket.leave(nameOfChtrmSocketRoom);
       socket.to(nameOfChtrmSocketRoom).emit('chatroomLeaving', leaverNick);
-      socket.to(nameOfChtrmSocketRoom).emit('chatroomAuthChange'
-        , { chtrmId: infoLeav.id, nickname: nextOwnerNick, auth: '01' }); // REVIEW: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
+      if (nextOwnerNick) {
+        socket.to(nameOfChtrmSocketRoom).emit('chatroomAuthChange', 
+          { chtrmId: infoLeav.id, nickname: nextOwnerNick, auth: '01' }); // REVIEW: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
+      }
       return true;
     } catch (err) {
       console.log(err);
@@ -317,7 +321,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const nameOfChtrmSocketRoom = `chatroom_${infoKick.id}`;
       // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - 
       this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', 
-        { chtrmId: infoKick.id, nicknameKicked: infoKick.nicknameToKick }); // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
+        { chtrmId: infoKick.id, nicknameKicked: infoKick.nicknameToKick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       // if (targetSocketId) {
       //   this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
       // }
