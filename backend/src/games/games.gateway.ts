@@ -15,7 +15,7 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { GamesService } from './games.service';
 import { roomOption } from './dto/roomOption.dto';
-import { UsersChatsGateway } from 'src/users-chats-socket/chats.gateway';
+import { UsersChatsGateway } from 'src/users-chats-socket/users-chats.gateway';
 @WebSocketGateway({
   cors: {
     origin: '*',

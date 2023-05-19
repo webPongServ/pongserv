@@ -10,12 +10,15 @@ import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-manager.module';
 
+import { GamesModule } from 'src/games/games.module';
+
 @Module({
   imports: [
     HttpModule,
     DbUsersManagerModule,
     DbGamesManagerModule,
     forwardRef(() => ChatsModule),
+    GamesModule,
     ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({

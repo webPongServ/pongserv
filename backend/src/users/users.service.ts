@@ -11,6 +11,7 @@ import { DbGamesManagerService } from 'src/db-manager/db-games-manager/db-games-
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { ChatsService } from 'src/chats/chats.service';
+import { GamesService } from 'src/games/games.service';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +21,7 @@ export class UsersService {
     private readonly DbGamesManagerService: DbGamesManagerService,
     private readonly config: ConfigService,
     private readonly chatsService: ChatsService,
+    private readonly gameService: GamesService,
   ) {}
 
   logger = new Logger('UsersService');
@@ -207,13 +209,17 @@ export class UsersService {
         eachFriendData.ua01mEntityAsFr,
       );
       let statusCode: string = null;
-      if (currLogin) statusCode = currLogin.stsCd;
-      else statusCode = '03';
+      if (currLogin) {
+        statusCode = currLogin.stsCd; // '01'
+        if (this.gameService.isInGame(userId))
+          statusCode = '02';
+      } else {
+        statusCode = '03';
+      }
       const eachToPush = {
         nickname: eachFriendData.ua01mEntityAsFr.nickname,
         imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
-        currStat: statusCode, // NOTE: It will be true if currLogin exists, false otherwise.
-        // TODO: isCurrStatus 로 바꿔서 login, gaming, logout 상태 표시하도록 변경
+        currStat: statusCode,
       };
       results.push(eachToPush);
     }
