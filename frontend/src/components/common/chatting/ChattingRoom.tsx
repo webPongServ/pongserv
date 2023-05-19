@@ -35,7 +35,6 @@ const ChattingRoom = () => {
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
   const [chatting, setChatting] = useState<ChatObject[]>([]);
-  const [isMute, setIsMute] = useState<boolean>(false);
 
   const [chattingInput, setChattingInput] = useState<string>("");
   const dispatch = useDispatch();
@@ -141,10 +140,6 @@ const ChattingRoom = () => {
 
     const socketChatroomBeingMuted = () => {
       // UI 확실히하기
-      setIsMute(true);
-      setTimeout(() => {
-        setIsMute(false);
-      }, 60000);
     };
 
     const socketChatroomBeingRegisteredBan = () => {
@@ -241,11 +236,8 @@ const ChattingRoom = () => {
               <form className="input" onSubmit={handleSubmitSend}>
                 <Input
                   value={chattingInput}
-                  placeholder={
-                    isMute ? "60초간 벙어리입니다." : "채팅을 입력하세요."
-                  }
+                  placeholder="채팅을 입력하세요."
                   slotProps={{ input: { maxLength: 1000 } }}
-                  disabled={isMute}
                   onChange={handleChattingInput}
                 ></Input>
               </form>
