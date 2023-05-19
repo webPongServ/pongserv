@@ -32,8 +32,8 @@ export class ChatsController {
   @Post('dm')
   async takeDmRequest(@CurrentUser() userId: string, @Body() infoDmReq: ChatroomDmReqDto) {
     console.log(`[${userId}: `, `POST /chats/dm]`);
-    console.log(`ChatroomDmReqDto: `);
-    console.log(infoDmReq);
+    // console.log(`ChatroomDmReqDto: `);
+    // console.log(infoDmReq);
     try {
       const result = await this.chatsService.takeDmRequest(userId, infoDmReq);
       // console.log(`result: `);
@@ -83,8 +83,8 @@ export class ChatsController {
   @Post('entrance')
   async setUserToEnter(@CurrentUser() userId: string, @Body() infoEntr: ChatroomEntranceDto) {
     console.log(`[${userId}: `, `POST /chats/entrance]`);
-    console.log(`ChatroomEntranceDto: `);
-    console.log(infoEntr);
+    // console.log(`ChatroomEntranceDto: `);
+    // console.log(infoEntr);
     try {
       const result = await this.chatsService.setUserToEnter(userId, infoEntr);
       // console.log(`result: `);
@@ -108,8 +108,8 @@ export class ChatsController {
   @Post('creation')
   async createChatroom(@CurrentUser() userId: string, @Body() infoCrtn: ChatroomCreationDto) {
     console.log(`[${userId}: `, `POST /chats/creation]`);
-    console.log(`ChatroomCreationDto: `);
-    console.log(infoCrtn);
+    // console.log(`ChatroomCreationDto: `);
+    // console.log(infoCrtn);
     try {
       const result = await this.chatsService.createChatroom(userId, infoCrtn);
       // console.log(`result: `);
@@ -136,8 +136,8 @@ export class ChatsController {
   @Patch('edit')
   async editChatroomInfo(@CurrentUser() userId: string, @Body() infoEdit: ChatroomEditingDto) {
     console.log(`[${userId}: `, `PATCH /chats/edit]`);
-    console.log(`ChatroomEditingDto: `);
-    console.log(infoEdit);
+    // console.log(`ChatroomEditingDto: `);
+    // console.log(infoEdit);
     try {
       const result = await this.chatsService.editChatroomInfo(userId, infoEdit);
       // console.log(`result: `);
@@ -223,8 +223,8 @@ export class ChatsController {
   @Put('ban')
   async banUser(@CurrentUser() userId: string, @Body() infoBan: ChatroomBanDto) {
     console.log(`[${userId}: `, `PUT /chats/ban]`);
-    console.log(`ChatroomBanDto: `);
-    console.log(infoBan);
+    // console.log(`ChatroomBanDto: `);
+    // console.log(infoBan);
     try {
       const result = await this.chatsService.banUser(userId, infoBan);
       // console.log(`result: `);
@@ -251,8 +251,8 @@ export class ChatsController {
   @Put('mute')
   async muteUser(@CurrentUser() userId: string, @Body() infoMute: ChatroomMuteDto) {
     console.log(`[${userId}: `, `PUT /chats/mute]`);
-    console.log(`ChatroomMuteDto: `);
-    console.log(infoMute);
+    // console.log(`ChatroomMuteDto: `);
+    // console.log(infoMute);
     try {
       const result = await this.chatsService.muteUser(userId, infoMute);
       // console.log(`result: `);
@@ -279,8 +279,8 @@ export class ChatsController {
   @Patch('empowerment')
   async empowerUser(@CurrentUser() userId: string, @Body() infoEmpwr: ChatroomEmpowermentDto) {
     console.log(`[${userId}: `, `PATCH /chats/empowerment]`);
-    console.log(`ChatroomEmpowermentDto: `);
-    console.log(infoEmpwr);
+    // console.log(`ChatroomEmpowermentDto: `);
+    // console.log(infoEmpwr);
     try {
       const result = await this.chatsService.empowerUser(userId, infoEmpwr);
       // console.log(`result: `);
@@ -303,8 +303,8 @@ export class ChatsController {
   @Post('game-request')
   async takeGameRequest(@CurrentUser() userId: string, @Body() infoGameReq: ChatroomGameRequestDto) {
     console.log(`[${userId}: `, `POST /chats/game-request]`);
-    console.log(`ChatroomGameRequestDto: `);
-    console.log(infoGameReq);
+    // console.log(`ChatroomGameRequestDto: `);
+    // console.log(infoGameReq);
     try {
       const result = await this.chatsService.takeGameRequest(userId, infoGameReq);
       // console.log(`result: `);
@@ -354,8 +354,8 @@ export class ChatsController {
   @Patch('ban-removal')
   async removeBan(@CurrentUser() userId: string, @Body() infoBanRmv: ChatroomBanRemovalDto) {
     console.log(`[${userId}: `, `PATCH /chats/ban-removal]`);
-    console.log(`ChatroomBanRemovalDto: `);
-    console.log(infoBanRmv);
+    // console.log(`ChatroomBanRemovalDto: `);
+    // console.log(infoBanRmv);
     try {
       const result = await this.chatsService.removeBan(userId, infoBanRmv);
       // console.log(`result: `);
@@ -379,8 +379,8 @@ export class ChatsController {
   @Post('leaving')
   async leaveChatroom(@CurrentUser() userId: string, @Body() infoLeav: ChatroomLeavingDto) {
     console.log(`[${userId}: `, `POST /chats/leaving]`);
-    console.log(`ChatroomLeavingDto: `);
-    console.log(infoLeav);
+    // console.log(`ChatroomLeavingDto: `);
+    // console.log(infoLeav);
     try {
       const result = await this.chatsService.leaveChatroom(userId, infoLeav);
       // console.log(`result: `);
@@ -404,8 +404,8 @@ export class ChatsController {
   @Put('blocking-user')
   async putBlockUserInChats(@CurrentUser() userId: string, @Body() infoBlck: BlockingUserInChatsDto) {
     console.log(`[${userId}: `, `POST /chats/blocking-user]`);
-    console.log(`BlockingUserInChatsDto: `);
-    console.log(infoBlck);
+    // console.log(`BlockingUserInChatsDto: `);
+    // console.log(infoBlck);
     try {
       const result = await this.chatsService.putBlockUserInChats(userId, infoBlck);
       // console.log(`result: `);
