@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { AxiosResponse } from "axios";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
-import { UserDetail } from "types/Detail";
+import { ProfileDetail } from "types/Detail";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -17,7 +17,7 @@ import UserService from "API/UserService";
 interface EditImageModalProps {
   modalStatus: string;
   setModalStatus: Function;
-  profileDetail: UserDetail;
+  profileDetail: ProfileDetail;
   setProfileDetail: Function;
 }
 
