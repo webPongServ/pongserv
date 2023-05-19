@@ -42,11 +42,11 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
 export const errorMessageCreator = (errorCode: string): string => {
   switch (errorCode) {
     case "invalid_user":
-      return "찾으려는 사용자가 존재하지 않습니다!";
-    case "wrong_game_acces":
-      return "잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요!";
+      return "찾으려는 사용자가 존재하지 않습니다.";
+    case "wrong_game_access":
+      return "잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요.";
     case "auth_failed":
-      return "로그인 정보가 올바르지 않습니다!";
+      return "로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.";
     case "already_login":
       return "이미 로그인 되어있는 계정입니다. 로그아웃 후 다시 시도해주세요.";
     case "kicked":
