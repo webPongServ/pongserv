@@ -35,6 +35,7 @@ const ChattingRoom = () => {
   // API 요청
   const [roomStatus, setRoomStatus] = useState<string>("chat");
   const [chatting, setChatting] = useState<ChatObject[]>([]);
+  const [isMute, setIsMute] = useState<boolean>(false);
 
   const [chattingInput, setChattingInput] = useState<string>("");
   const dispatch = useDispatch();
@@ -131,10 +132,18 @@ const ChattingRoom = () => {
     };
 
     const socketChatroomBeingKicked = () => {
+      // 나인지 판단하고 dispatch할지 채팅에 추가할지 결정
       dispatch({
         type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
         payload: "error-kicked",
       });
+    };
+
+    const socketChatroomBeingMuted = () => {
+      setIsMute(true);
+      setTimeout(() => {
+        setIsMute(false);
+      }, 60000);
     };
 
     if (chattingSocket) {
@@ -142,6 +151,7 @@ const ChattingRoom = () => {
       chattingSocket.on("chatroomWelcome", socketChatroomWelcome);
       chattingSocket.on("chatroomLeaving", socketChatroomLeaving);
       chattingSocket.on("chatroomBeingKicked", socketChatroomBeingKicked);
+      chattingSocket.on("chatroomBeingMuted", socketChatroomBeingMuted);
     }
 
     return () => {
@@ -149,6 +159,7 @@ const ChattingRoom = () => {
       chattingSocket.off("chatroomWelcome", socketChatroomWelcome);
       chattingSocket.off("chatroomLeaving", socketChatroomLeaving);
       chattingSocket.off("chatroomBeingKicked", socketChatroomBeingKicked);
+      chattingSocket.off("chatroomBeingMuted", socketChatroomBeingMuted);
     };
   }, [chatting, roomStatus]);
 
@@ -204,6 +215,7 @@ const ChattingRoom = () => {
                   value={chattingInput}
                   placeholder="채팅을 입력하세요."
                   slotProps={{ input: { maxLength: 1000 } }}
+                  disabled={isMute}
                   onChange={handleChattingInput}
                 ></Input>
               </form>
