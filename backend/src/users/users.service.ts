@@ -273,4 +273,50 @@ export class UsersService {
     console.log(logoutData);
     return;
   }
+
+  async getGameRecord(userId: string, friendNickname: string = null) {
+    // Nickname을 받아서, 해당 인원의 userId를 찾아서, 그 userId로 게임 기록을 가져온다.
+    const friendUserId = friendNickname
+      ? await this.dbmanagerUsersService.findUserIdByNickname(friendNickname)
+      : userId;
+    const userEntity = await this.dbmanagerUsersService.getMasterEntity(
+      friendUserId,
+    );
+    const gameRecord = await this.DbGamesManagerService.getUserStatic(
+      userEntity,
+    );
+    return gameRecord;
+  }
+
+  async achievement(userId: string, friendNickname: string = null) {
+    const winAchievement = ['WIN1', 'WIN10', 'WIN100', 'WIN1000'];
+    const lossAchievement = ['LOSS1', 'LOSS10', 'LOSS100', 'LOSS1000'];
+    const friendAchievement = [
+      'FRIEND1',
+      'FRIEND10',
+      'FRIEND100',
+      'FRIEND1000',
+    ];
+    const friendUserId = friendNickname
+      ? await this.dbmanagerUsersService.findUserIdByNickname(friendNickname)
+      : userId;
+    const gameSummary = await this.DbGamesManagerService.getGameSummary(
+      friendUserId,
+    );
+    const friendList = await this.getFriendList(friendUserId);
+    const totalAchievement = [];
+    if (gameSummary.win > 0)
+      totalAchievement.push(
+        ...winAchievement.slice(0, gameSummary.win.toString().length),
+      );
+    if (gameSummary.lose > 0)
+      totalAchievement.push(
+        ...lossAchievement.slice(0, gameSummary.lose.toString().length),
+      );
+    if (friendList.length > 0)
+      totalAchievement.push(
+        ...friendAchievement.slice(0, friendList.length.toString().length),
+      );
+    return totalAchievement;
+  }
 }

@@ -188,4 +188,37 @@ export class UsersController {
   async getUserList(@Query('search') startswith: string) {
     return this.UsersService.getUserList(startswith);
   }
+
+  @ApiResponse({
+    status: 201,
+    description: 'User 게임 전적 가져오기 성공',
+  })
+  @ApiOperation({ summary: 'User 게임 전적 가져오기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('/gamehistory')
+  async getGameRecord(
+    @CurrentUser() user: string,
+    @Query('friendNickname') friendNickname?: string,
+  ) {
+    if (!friendNickname) return this.UsersService.getGameRecord(user);
+    return this.UsersService.getGameRecord(user, friendNickname);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'User 업적 가져오기 성공',
+  })
+  @ApiOperation({ summary: 'User 업적 가져오기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('/achievement')
+  async achievement(
+    @CurrentUser() user: string,
+    @Query('friendNickname') friendNickname?: string,
+  ) {
+    if (friendNickname)
+      return this.UsersService.achievement(user, friendNickname);
+    else {
+      return this.UsersService.achievement(user);
+    }
+  }
 }
