@@ -48,7 +48,6 @@ const GamePlay = () => {
           </Toolbar>
         </TopBar>
       </Box>
-      <GameBoard id="board" />
     </Box>
   );
 };

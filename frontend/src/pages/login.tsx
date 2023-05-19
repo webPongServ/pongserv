@@ -2,7 +2,7 @@ import { useRef } from "react";
 import ErrorNotification from "components/utils/ErrorNotification";
 import instance from "API/api";
 import UserService from "API/UserService";
-// import { useNavigate } from "react-router-dom";
+import { errorMessageCreator } from "components/common/AppHeader";
 import qs from "query-string";
 import "styles/Login.scss";
 
@@ -30,12 +30,12 @@ const Login = () => {
 
   return (
     <>
-      {paramsCode === "auth_failed" ? (
+      {paramsCode === undefined ? null : (
         <ErrorNotification
-          errorMessage="로그인 정보가 올바르지 않습니다!"
+          errorMessage={errorMessageCreator(paramsCode)}
           ref={notiRef}
         />
-      ) : null}
+      )}
       <Box id="Login" className="flex-container">
         <Box>
           <Button onClick={handleLogin}>Login with 42</Button>

@@ -4,6 +4,7 @@ $ChattingDrawerWidth: 500px;
   width: $ChattingDrawerWidth;
   height: 100%;
   flex-shrink: 0;
+  z-index: 0;
 
   & .MuiDrawer-paper {
     width: $ChattingDrawerWidth;

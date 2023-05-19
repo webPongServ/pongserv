@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
 import RoomEditor from "components/common/chatting/RoomEditor";
 import RoomUsers from "components/common/chatting/RoomUsers";
@@ -9,6 +9,7 @@ import OtherMessage from "components/common/chatting/OtherMessage";
 import InformMessage from "components/common/chatting/InformMessage";
 import { IRootState } from "components/common/store";
 import { ChattingUserRoleType } from "constant";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -36,6 +37,7 @@ const ChattingRoom = () => {
   const [chatting, setChatting] = useState<ChatObject[]>([]);
 
   const [chattingInput, setChattingInput] = useState<string>("");
+  const dispatch = useDispatch();
 
   const handleChattingInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const target: HTMLInputElement = e.target;
@@ -85,9 +87,11 @@ const ChattingRoom = () => {
     );
   };
 
-  chattingSocket.on(
-    "chatroomMessage",
-    (data: {
+  useEffect(() => {
+    if (chattingRef.current)
+      chattingRef.current.scrollTop = chattingRef.current.scrollHeight;
+
+    const socketChatroomMessage = (data: {
       nickname: string;
       imgPath: string;
       role: string;
@@ -104,42 +108,93 @@ const ChattingRoom = () => {
           message: data.msg,
         },
       ]);
+    };
+
+    const socketChatroomWelcome = (nickname: string) => {
+      setChatting([
+        ...chatting,
+        {
+          user: null,
+          message: nickname + "님이 입장하셨습니다.",
+        },
+      ]);
+    };
+
+    const socketChatroomLeaving = (nickname: string) => {
+      setChatting([
+        ...chatting,
+        {
+          user: null,
+          message: nickname + "님이 퇴장하셨습니다.",
+        },
+      ]);
+    };
+
+    const socketChatroomBeingKicked = () => {
+      // 나인지 판단하고 dispatch할지 채팅에 추가할지 결정
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
+        payload: "error-kicked",
+      });
+    };
+
+    const socketChatroomBeingMuted = () => {
+      // UI 확실히하기
+    };
+
+    const socketChatroomBeingRegisteredBan = () => {
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
+        payload: "error-banned",
+      });
+    };
+
+    const socketChatroomBeingEmpowered = () => {
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_MYDETAIL,
+        payload: ChattingUserRoleType.admin,
+      });
+    };
+
+    if (chattingSocket) {
+      chattingSocket.on("chatroomMessage", socketChatroomMessage);
+      chattingSocket.on("chatroomWelcome", socketChatroomWelcome);
+      chattingSocket.on("chatroomLeaving", socketChatroomLeaving);
+      chattingSocket.on("chatroomBeingKicked", socketChatroomBeingKicked);
+      chattingSocket.on("chatroomBeingMuted", socketChatroomBeingMuted);
+      chattingSocket.on(
+        "chatroomBeingRegisteredBan",
+        socketChatroomBeingRegisteredBan
+      );
+      chattingSocket.on("chatroomBeingEmpowered", socketChatroomBeingEmpowered);
     }
-  );
 
-  chattingSocket.on("chatroomWelcome", (nickname: string) => {
-    setChatting([
-      ...chatting,
-      {
-        user: null,
-        message: nickname + "님이 입장하셨습니다.",
-      },
-    ]);
-  });
-
-  chattingSocket.on("chatroomLeaving", (nickname: string) => {
-    setChatting([
-      ...chatting,
-      {
-        user: null,
-        message: nickname + "님이 퇴장하셨습니다.",
-      },
-    ]);
-  });
-
-  // const queryClient = useQueryClient();
-
-  // useEffect(() => {
-  //   socket.on('data', (data) => {
-  //     // 데이터를 수신할 때마다, 쿼리 캐시를 업데이트합니다.
-  //     queryClient.setQueryData('data', data);
-  //   });
-  // }, [queryClient]);
+    return () => {
+      chattingSocket.off("chatroomMessage", socketChatroomMessage);
+      chattingSocket.off("chatroomWelcome", socketChatroomWelcome);
+      chattingSocket.off("chatroomLeaving", socketChatroomLeaving);
+      chattingSocket.off("chatroomBeingKicked", socketChatroomBeingKicked);
+      chattingSocket.off("chatroomBeingMuted", socketChatroomBeingMuted);
+      chattingSocket.off(
+        "chatroomBeingRegisteredBan",
+        socketChatroomBeingRegisteredBan
+      );
+      chattingSocket.off(
+        "chatroomBeingEmpowered",
+        socketChatroomBeingEmpowered
+      );
+    };
+  }, [chatting, roomStatus]);
 
   useEffect(() => {
-    if (chattingRef.current)
-      chattingRef.current.scrollTop = chattingRef.current.scrollHeight;
-  }, [chatting, roomStatus]);
+    setChatting([
+      ...chatting,
+      {
+        user: null,
+        message: myDetail.nickname + "님이 입장하셨습니다.",
+      },
+    ]);
+  }, []);
 
   return (
     <Box id="page">
@@ -154,15 +209,24 @@ const ChattingRoom = () => {
                 return (
                   <>
                     {value.user === null && (
-                      <InformMessage informChat={value} index={index} />
+                      <InformMessage
+                        key={"inform-message" + index}
+                        informChat={value}
+                      />
                     )}
                     {value.user !== null &&
                       myDetail.nickname === value.user.nickname && (
-                        <MyMessage myChat={value} index={index} />
+                        <MyMessage
+                          key={value.user!.nickname + index}
+                          myChat={value}
+                        />
                       )}
                     {value.user !== null &&
                       myDetail.nickname !== value.user.nickname && (
-                        <OtherMessage otherChat={value} index={index} />
+                        <OtherMessage
+                          key={value.user!.nickname + index}
+                          otherChat={value}
+                        />
                       )}
                   </>
                 );
@@ -219,7 +283,12 @@ const ChattingRoom = () => {
         />
       )}
       {roomStatus === "users" && (
-        <RoomUsers myDetail={myDetail} setRoomStatus={setRoomStatus} />
+        <RoomUsers
+          myDetail={myDetail}
+          chatting={chatting}
+          setChatting={setChatting}
+          setRoomStatus={setRoomStatus}
+        />
       )}
       {roomStatus === "leave" && <RoomLeave setRoomStatus={setRoomStatus} />}
     </Box>

@@ -317,8 +317,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoKick.userIdToKick,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoKick.nicknameToKick,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -365,8 +365,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoBan.userIdToBan,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoBan.nicknameToBan
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -384,7 +384,7 @@ export class ChatsService {
       targetInChtrm,
     );
     // 4
-    return targetUser.nickname;
+    return { targetUserId: targetUser.userId, targetNick: targetUser.nickname };
   }
 
   async muteUser(userId: string, infoBan: ChatroomMuteDto) {
@@ -409,8 +409,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoBan.userIdToMute,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoBan.nicknameToMute,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -435,7 +435,7 @@ export class ChatsService {
 			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
 			2. 해당 방의 뮤트할 target의 정보를 확인한다.
 				2-1. 해당 방에 존재하는지 체크한다.
-				2-2. 뮤트할 타겟이 owner 이면 안 된다.
+				2-2. 타겟이 owner 이면 안 된다.
 				2-3. 이미 administrator일 때도 거절한다.
 			3. target의 권한을 admin으로 바꾸고 저장한다.
 			4. target의 정보를 반환한다.
@@ -455,8 +455,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const targetUser = await this.dbUsersManagerService.getUserByUserId(
-      infoEmpwr.userIdToEmpower,
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      infoEmpwr.nicknameToEmpower,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -500,8 +500,8 @@ export class ChatsService {
     if (requesterInChtrm.chtRmJoinTf === false)
       throw new UnauthorizedException('You are not in the chatroom.');
     // 2
-    const target = await this.dbUsersManagerService.getUserByUserId(
-      infoGameReq.userIdToGame,
+    const target = await this.dbUsersManagerService.getUserByNickname(
+      infoGameReq.nicknameToGame,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       target,
@@ -532,7 +532,21 @@ export class ChatsService {
       throw new NotFoundException("The chatroom isn't exist currently.");
     // 2
     const banList = await this.dbChatsManagerService.getBanListInARoom(chtrm);
-    return banList;
+
+    const results: {
+      nickname: string;
+      imgPath: string;
+      authInChtrm: string;
+    }[] = [];
+    for (const eachBan of banList) {
+      const eachUserBanned: TbUa01MEntity = eachBan.ua01mEntity;
+      results.push({
+        nickname: eachUserBanned.nickname,
+        imgPath: eachUserBanned.imgPath,
+        authInChtrm: '03', // default: normal
+      });
+    }
+    return results;
   }
 
   async removeBan(userId: string, infoBanRmv: ChatroomBanRemovalDto) {
@@ -557,8 +571,8 @@ export class ChatsService {
     )
       throw new UnauthorizedException('You do not have permission.');
     // 2
-    const target = await this.dbUsersManagerService.getUserByUserId(
-      infoBanRmv.userIdToFree,
+    const target = await this.dbUsersManagerService.getUserByNickname(
+      infoBanRmv.nicknameToFree,
     );
     const banInfoOfTarget = await this.dbChatsManagerService.getBanInfoInAChtrm(
       target,
@@ -570,7 +584,7 @@ export class ChatsService {
     // 3
     banInfoOfTarget.vldTf = false;
     this.dbChatsManagerService.saveChtrmRstrInfo(banInfoOfTarget);
-    return;
+    return target.nickname;
   }
 
   async leaveChatroom(userId: string, infoLeav: ChatroomLeavingDto) {
@@ -585,6 +599,10 @@ export class ChatsService {
 				3-2. 나가는 유저의 권한을 normal로 바꾼다.
 			4. 채널 참여 여부를 false로 바꾸고 반환한다.
 		*/
+    let result: {
+      leaverNick: string,
+      nextOwnerNick: string,
+    } = null;
     // 1
     const user = await this.dbUsersManagerService.getUserByUserId(userId);
     const chtrm = await this.dbChatsManagerService.getLiveChtrmById(
@@ -630,6 +648,7 @@ export class ChatsService {
         }
         sccssrToOwner.chtRmAuth = '01';
         this.dbChatsManagerService.saveChtrmUser(sccssrToOwner);
+        result.nextOwnerNick = sccssrToOwner.ua01mEntity.nickname;
       }
       // 3-2
       userInChtrm.chtRmAuth = '03';
@@ -637,7 +656,8 @@ export class ChatsService {
     // 4
     userInChtrm.chtRmJoinTf = false;
     this.dbChatsManagerService.saveChtrmUser(userInChtrm);
-    return user.nickname;
+    result.nextOwnerNick = user.nickname;
+    return result;
   }
 
   async putBlockUserInChats(userId: string, infoBlck: BlockingUserInChatsDto)
@@ -656,14 +676,24 @@ export class ChatsService {
 	return ;
   }
 
-  async getBlockedUserNicknameList(userId: string)
+  async getUserIdsForThisUserToBlock(userId: string)
   {
 	const user = await this.dbUsersManagerService.getUserByUserId(userId);
-	const blockingDataList = await this.dbChatsManagerService.getBlockingUserInChatsList(user);
-	let blockedUserNicknameList: string[] = [];
-	for (const each of blockingDataList) {
-		blockedUserNicknameList.push(each.ua01mEntityAsBlock.nickname);
+	const blockingList = await this.dbChatsManagerService.getListForThisUserToBlock(user);
+	let retUserIdsBlocked: string[] = [];
+	for (const each of blockingList) {
+		retUserIdsBlocked.push(each.ua01mEntityAsBlock.userId);
 	}
-	return (blockedUserNicknameList);
+	return (retUserIdsBlocked);
+  }
+
+  async isTargetBlockedByUser(userId: string, targetNickname: string) {
+    const requestUser = await this.dbUsersManagerService.getUserByUserId(userId);
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(targetNickname);
+    const blockingData = await this.dbChatsManagerService.getBlockingData(requestUser, targetUser);
+    if (!blockingData || blockingData.stCd === '02') {
+      return false;
+    }
+    return true;
   }
 }

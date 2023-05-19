@@ -14,6 +14,7 @@ import MyButtons from "components/profile/MyButtons";
 import OthersButtons from "components/profile/OthersButtons";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 import { ProfileFriendType } from "constant";
+import { LoginStatusActionTypes } from "types/redux/Login";
 import "styles/Profile.scss";
 import "styles/global.scss";
 
@@ -31,6 +32,10 @@ const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { nickname } = useParams();
+
+  dispatch({
+    type: LoginStatusActionTypes.STATUS_MAIN,
+  });
 
   const getProfile = async () => {
     try {

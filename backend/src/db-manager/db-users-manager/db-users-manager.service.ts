@@ -4,6 +4,7 @@ import {
   HttpStatus,
   BadRequestException,
   UnauthorizedException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
@@ -43,6 +44,7 @@ export class DbUsersManagerService {
   }
 
   // TODO: move to UsersModule
+  // TODO: modify
   async checkinUser(intraData: { intraId: string; intraImagePath: string }) {
     /*!SECTION
       1. 인자로 들어온 nickname을 가진 유저가 user master table(ua01mRp)에 있는지 확인한다. (회원가입 유무 확인)
@@ -227,6 +229,33 @@ export class DbUsersManagerService {
     }
     // const userGame = await this.ua02lRp.find({
   }
+  async getFriendProfile(userId: string, friendId: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: friendId,
+      },
+    });
+
+    if (user) {
+      const userData = {
+        userId: user.userId,
+        nickname: user.nickname,
+        imgPath: user.imgPath,
+        lastDttm: user.lastDttm,
+        //Debug Needed
+        total: 0,
+        win: 0,
+        lose: 0,
+        ELO: 1000,
+        winRate: 0,
+        status: await this.getRelation(userId, user.userId),
+        isblocked: false,
+      };
+      return userData;
+    } else {
+      throw new BadRequestException('No User available');
+    }
+  }
 
   async getMasterEntity(userId: string) {
     const user = await this.ua01mRp.findOne({
@@ -343,37 +372,9 @@ export class DbUsersManagerService {
         stCd: '01',
       },
     });
-    // console.log('isFriend', isFriend);
     if (isFriend && isFriend.length != 0) {
-      // console.log('we are friend');
       return '01';
     } else return '02';
-  }
-
-  async getFriendProfile(userId: string, friendNickname: string) {
-    const user = await this.ua01mRp.findOne({
-      where: {
-        nickname: friendNickname,
-      },
-    });
-
-    if (user) {
-      return {
-        userId: user.userId,
-        nickname: user.nickname,
-        imgPath: user.imgPath,
-        lastDttm: user.lastDttm,
-        //Debug Needed
-        total: 99,
-        win: 99,
-        lose: 0,
-        ELO: 9999,
-        winRate: 100.0,
-        status: await this.getRelation(userId, user.userId),
-      };
-    } else {
-      throw new BadRequestException('No User available');
-    }
   }
 
   async getCurrLoginData(user: TbUa01MEntity) {
@@ -401,7 +402,7 @@ export class DbUsersManagerService {
         delTf: false,
       },
     });
-    return (friendDatas);
+    return friendDatas;
     // const friendList = friendsData.map((friend) => {
     //   return {
     //     userId: friend.ua01mEntityAsFr.userId,
@@ -428,5 +429,31 @@ export class DbUsersManagerService {
     }));
 
     return result;
+  }
+
+  async addLoginData(user: TbUa01MEntity) {
+    const newLoginData: TbUa01LEntity = this.ua01lRp.create({
+      ua01mEntity: user,
+      connDttm: new Date(),
+      stsCd: '01',
+      loginTf: true,
+    });
+    return await this.ua01lRp.save(newLoginData);
+  }
+
+  async setLoginFinsh(user: TbUa01MEntity) {
+    const currLoginData: TbUa01LEntity = await this.ua01lRp.findOne({
+      where: {
+        ua01mEntity: {
+          id: user.id,
+        },
+        loginTf: true,
+      },
+    });
+    if (!currLoginData)
+      throw new NotFoundException(`not existed login data when logout`);
+    currLoginData.logoutDttm = new Date();
+    currLoginData.loginTf = false;
+    return await this.ua01lRp.save(currLoginData);
   }
 }

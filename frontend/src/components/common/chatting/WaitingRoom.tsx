@@ -42,49 +42,46 @@ const WaitingRoom = () => {
         <Box>대기실</Box>
       </Box>
       <Box className="page-body">
-        {chattingRoomList === null && <LoadingCircle />}
-        {chattingRoomList !== null && (
-          <>
-            <Box className="list">
-              {chattingRoomList.length === 0 && (
-                <EmptyListMessage message="채팅방이 존재하지 않습니다!" />
-              )}
-              {chattingRoomList.length !== 0 &&
-                chattingRoomList.map((value, index) =>
-                  5 * (page - 1) <= index && index < 5 * page ? (
-                    index === pwIndex ? (
-                      <PasswordFormCard
-                        room={value}
-                        setPwIndex={setPwIndex}
-                        key={"password" + value.id}
-                      />
-                    ) : (
-                      <RoomCard
-                        room={value}
-                        index={index}
-                        setPwIndex={setPwIndex}
-                        key={"chattingRoom" + value.id}
-                      />
-                    )
-                  ) : null
-                )}
-            </Box>
-            <Box className="pagination flex-container">
-              <Pagination
-                count={Math.ceil(
-                  chattingRoomList === null
-                    ? 1
-                    : Math.floor(chattingRoomList.length / 5) + 1
-                )}
-                variant="outlined"
-                shape="rounded"
-                onChange={(e, number) => {
-                  setPage(number);
-                }}
-              />
-            </Box>
-          </>
-        )}
+        <Box className="list">
+          {chattingRoomList === null && <LoadingCircle />}
+          {chattingRoomList !== null && chattingRoomList.length === 0 && (
+            <EmptyListMessage message="채팅방이 존재하지 않습니다!" />
+          )}
+          {chattingRoomList !== null &&
+            chattingRoomList.length !== 0 &&
+            chattingRoomList.map((value, index) =>
+              5 * (page - 1) <= index && index < 5 * page ? (
+                index === pwIndex ? (
+                  <PasswordFormCard
+                    room={value}
+                    setPwIndex={setPwIndex}
+                    key={"password" + value.id}
+                  />
+                ) : (
+                  <RoomCard
+                    room={value}
+                    index={index}
+                    setPwIndex={setPwIndex}
+                    key={"chattingRoom" + value.id}
+                  />
+                )
+              ) : null
+            )}
+        </Box>
+        <Box className="pagination flex-container">
+          <Pagination
+            count={Math.ceil(
+              chattingRoomList === null || chattingRoomList.length === 0
+                ? 1
+                : Math.ceil(chattingRoomList.length / 5)
+            )}
+            variant="outlined"
+            shape="rounded"
+            onChange={(e, number) => {
+              setPage(number);
+            }}
+          />
+        </Box>
       </Box>
       <Box className="page-footer flex-container">
         <Button

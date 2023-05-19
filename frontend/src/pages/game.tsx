@@ -10,15 +10,19 @@ import EmptyListMessage from "components/utils/EmptyListMessage";
 import { useDispatch } from "react-redux";
 import { SocketsActionTypes } from "types/redux/Sockets";
 import ErrorNotification from "components/utils/ErrorNotification";
+import CustomIconButton from "components/utils/CustomIconButton";
 import { CurrentGameActionTypes } from "types/redux/CurrentGame";
 import GameService from "API/GameService";
 import { GameRoomDetail } from "types/Detail";
+import { LoginStatusActionTypes } from "types/redux/Login";
+import LoadingCircle from "components/utils/LoadingCircle";
 
 import "styles/global.scss";
 import "styles/Game.scss";
 
 import { Box, Pagination } from "@mui/material";
 import { Button } from "@mui/joy";
+import SyncIcon from "@mui/icons-material/Sync";
 
 interface serverGameRoomDetail {
   id: string;
@@ -30,7 +34,7 @@ interface serverGameRoomDetail {
 }
 
 const Game = () => {
-  const [gameRooms, setGameRooms] = useState<GameRoomDetail[]>([]);
+  const [gameRooms, setGameRooms] = useState<GameRoomDetail[] | null>(null);
   const [roomStatus, setRoomStatus] = useState<string>("game");
   const [selectedRoom, setSelectedRoom] = useState<GameRoomDetail | null>(null);
   const [page, setPage] = useState<number>(1);
@@ -50,23 +54,23 @@ const Game = () => {
     }
   );
 
+  dispatch({
+    type: LoginStatusActionTypes.STATUS_MAIN,
+  });
+
   const getGameRooms = async () => {
+    setGameRooms(null);
     const response = await GameService.getGameRooms();
     console.log(response.data);
     setGameRooms(
-      response.data.map(
-        (value: serverGameRoomDetail): GameRoomDetail => ({
-          id: value.id,
-          title: value.gmRmNm,
-          owner: {
-            nickname: value.owner,
-            imgURL: value.ownerImage,
-            status: "login",
-          },
-          maxScore: value.trgtScr,
-          difficulty: value.lvDfct,
-        })
-      )
+      response.data.map((value: serverGameRoomDetail): any => ({
+        id: value.id,
+        title: value.gmRmNm,
+        owner: value.owner,
+        maxScore: value.trgtScr,
+        difficulty: value.lvDfct,
+        ownerImage: value.ownerImage,
+      }))
     );
   };
 
@@ -99,36 +103,41 @@ const Game = () => {
   }, []);
 
   return (
-    <>
+    <Box id="GameWaiting" className="flex-container">
       {/* <ErrorNotification ref={notiRef} errorMessage={errorMessage} /> */}
-      <Box id="GameWaiting" className="flex-container">
-        <Box id="game-box">
-          <Box className="list flex-wrap-container">
-            {gameRooms.length === 0 ? ( // null 처리하기(loading circle)
-              <EmptyListMessage message="게임방이 존재하지 않습니다!" />
-            ) : (
-              gameRooms.map((value, index) =>
-                4 * (page - 1) <= index && index < 4 * page ? (
-                  <GameCard
-                    key={value.id + index}
-                    gameDetail={{
-                      id: value.id,
-                      title: value.title,
-                      owner: value.owner,
-                      maxScore: value.maxScore,
-                      difficulty: value.difficulty,
-                    }}
-                    setRoomStatus={setRoomStatus}
-                    setSelectedRoom={setSelectedRoom}
-                  />
-                ) : null
-              )
+      <Box id="game-box">
+        <Box className="list flex-wrap-container">
+          {gameRooms === null && <LoadingCircle />}
+          {gameRooms !== null && gameRooms.length === 0 && (
+            <EmptyListMessage message="게임방이 존재하지 않습니다!" />
+          )}
+          {gameRooms !== null &&
+            gameRooms.length !== 0 &&
+            gameRooms.map((value, index) =>
+              4 * (page - 1) <= index && index < 4 * page ? (
+                <GameCard
+                  key={value.id + index}
+                  gameDetail={{
+                    id: value.id,
+                    title: value.title,
+                    owner: value.owner,
+                    ownerImage: value.ownerImage,
+                    maxScore: value.maxScore,
+                    difficulty: value.difficulty,
+                  }}
+                  setRoomStatus={setRoomStatus}
+                  setSelectedRoom={setSelectedRoom}
+                />
+              ) : null
             )}
-          </Box>
         </Box>
         <Box className="pagination flex-container">
           <Pagination
-            count={Math.floor(gameRooms.length / 4) + 1}
+            count={
+              gameRooms === null || gameRooms.length === 0
+                ? 1
+                : Math.ceil(gameRooms.length / 4)
+            }
             variant="outlined"
             shape="rounded"
             onChange={(e, number) => {
@@ -136,29 +145,34 @@ const Game = () => {
             }}
           />
         </Box>
-        <Box id="button-box" className="flex-container">
-          <Button onClick={() => setRoomStatus("create-game")}>
-            일반 게임 생성
-          </Button>
-          <Button onClick={() => setRoomStatus("ladder-game")}>
-            래더 게임 시작
-          </Button>
-        </Box>
-        <NormalGameModal
-          roomStatus={roomStatus}
-          setRoomStatus={setRoomStatus}
-          selectedRoom={selectedRoom}
-        />
-        <LadderGameModal
-          roomStatus={roomStatus}
-          setRoomStatus={setRoomStatus}
-        />
-        <CreateGameModal
-          roomStatus={roomStatus}
-          setRoomStatus={setRoomStatus}
+      </Box>
+      <Box id="button-box" className="flex-container">
+        <Button
+          className="game-button"
+          onClick={() => setRoomStatus("create-game")}
+        >
+          일반 게임 생성
+        </Button>
+        <Button
+          className="game-button"
+          onClick={() => setRoomStatus("ladder-game")}
+        >
+          래더 게임 시작
+        </Button>
+        <CustomIconButton
+          class=""
+          icon={<SyncIcon />}
+          handleFunction={getGameRooms}
         />
       </Box>
-    </>
+      <NormalGameModal
+        roomStatus={roomStatus}
+        setRoomStatus={setRoomStatus}
+        selectedRoom={selectedRoom}
+      />
+      <LadderGameModal roomStatus={roomStatus} setRoomStatus={setRoomStatus} />
+      <CreateGameModal roomStatus={roomStatus} setRoomStatus={setRoomStatus} />
+    </Box>
   );
 };
 

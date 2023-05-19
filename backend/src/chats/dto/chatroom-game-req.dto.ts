@@ -5,6 +5,6 @@ export class ChatroomGameRequestDto {
     id: string;
 
 	@ApiProperty({ type: String })
-    userIdToGame: string;
+    nicknameToGame: string;
 }
 
