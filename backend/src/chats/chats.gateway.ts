@@ -328,7 +328,6 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end - done
   @SubscribeMessage('chatroomMute')
   async muteChatroomUser(
     @ConnectedSocket() socket: Socket,
@@ -340,13 +339,10 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomMuteDto: `);
     console.log(infoMute);
     try {
-      const targetUserId = await this.chatsService.muteUser(userId, infoMute);
-      // target user의 socket에 muted 정보 emit
-      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingMuted', { chtrmId: infoMute.id });
-      }
+      const targetNick = await this.chatsService.muteUser(userId, infoMute);
+      const nameOfChtrmSocketRoom = `chatroom_${infoMute.id}`;
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingMuted', 
+        { chtrmId: infoMute.id, nickname: targetNick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       return true;
     } catch (err) {
       console.log(err);
@@ -354,7 +350,6 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end
   @SubscribeMessage('chatroomRegisterBan')
   async registerChatroomBan(
     @ConnectedSocket() socket: Socket,

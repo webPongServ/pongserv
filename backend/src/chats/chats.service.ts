@@ -427,7 +427,7 @@ export class ChatsService {
     // 3
     await this.dbChatsManagerService.setMuteUserInfo(targetUser, chtrm);
     // 4
-    return targetUser.userId;
+    return targetUser.nickname;
   }
 
   async empowerUser(userId: string, infoEmpwr: ChatroomEmpowermentDto) {
