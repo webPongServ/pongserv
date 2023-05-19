@@ -384,7 +384,7 @@ export class ChatsService {
       targetInChtrm,
     );
     // 4
-    return targetUser.userId;
+    return { targetUserId: targetUser.userId, targetNick: targetUser.nickname };
   }
 
   async muteUser(userId: string, infoBan: ChatroomMuteDto) {

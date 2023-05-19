@@ -366,16 +366,16 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomBanDto: `);
     console.log(infoBan);
     try {
-      const targetUserId = await this.chatsService.banUser(userId, infoBan);
-      // target user의 socket에 baned 정보 emit
+      const { targetUserId, targetNick } = await this.chatsService.banUser(userId, infoBan);
+      const nameOfChtrmSocketRoom = `chatroom_${infoBan.id}`;
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       if (targetSocketId) {
-        // TODO - targetSocketId가 해당 chatroom에 대한 socket room을 나가도록 처리
+        // REVIEW - targetSocketId가 해당 chatroom에 대한 socket room을 나가도록 처리
         const targetSocket: Socket = this.server.sockets.sockets.get(targetSocketId); // NOTE: Find socket by socket id
-        targetSocket.leave(`chatroom_${infoBan.id}`);
-        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
+        targetSocket.leave(nameOfChtrmSocketRoom);
       }
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRegisteredBan', 
+        { chtrmId: infoBan.id, nickname: targetNick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       return true;
     } catch (err) {
       console.log(err);
