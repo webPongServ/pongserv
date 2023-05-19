@@ -295,6 +295,40 @@ export class GamesGateway
     return roomList.id;
   }
 
+  async resDirectGame(
+    roomId: string,
+    requestId: string,
+    targetId: string,
+    status: boolean,
+  ) {
+    if (status) {
+      const requesterSocket: Socket = this.server.sockets.sockets.get(
+        this.GameSocketId.get(requestId),
+      );
+      const targetSocket: Socket = this.server.sockets.sockets.get(
+        this.GameSocketId.get(targetId),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      await requesterSocket.emit('roomOwner'); // 방장에게 방장임을 알려주는 것
+      await targetSocket.emit('roomGuest');
+      await requesterSocket.emit('gameStart');
+      await targetSocket.emit('gameStart');
+
+      await this.GamesService.enterRoom(targetId, roomId, '01');
+      await this.GamesService.updateOpponent(requestId, roomId);
+      await this.GamesService.startGame(targetId, roomId);
+      await this.UsersChatsGateway.notifyGameStartToFriends(targetId);
+      return 'OK';
+    } else {
+      const requesterSocket: Socket = this.server.sockets.sockets.get(
+        this.GameSocketId.get(requestId),
+      );
+      await requesterSocket.emit('gameReject');
+      return 'OK';
+    }
+  }
+
   // 내부 함수
   private getRoomIdFromSocket(socket: Socket): string {
     for (const room of socket.rooms) {
