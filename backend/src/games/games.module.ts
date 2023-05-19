@@ -10,6 +10,7 @@ import { GamesGateway } from './games.gateway';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersChatsSocketModule } from 'src/users-chats-socket/users-chats-socket.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { UsersChatsSocketModule } from 'src/users-chats-socket/users-chats-socke
   ],
   providers: [GamesService, GamesGateway],
   controllers: [GamesController],
+  exports: [GamesService],
 })
 export class GamesModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

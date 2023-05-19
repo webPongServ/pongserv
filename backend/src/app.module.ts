@@ -17,6 +17,7 @@ import { UsersChatsSocketModule } from './users-chats-socket/users-chats-socket.
     GamesModule,
     ChatsModule,
     DbManagerModule,
+    UsersChatsSocketModule,
     ConfigModule.forRoot({
       envFilePath: '.env',
       isGlobal: true,
@@ -35,7 +36,6 @@ import { UsersChatsSocketModule } from './users-chats-socket/users-chats-socket.
         synchronize: true,
       }),
     }),
-    UsersChatsSocketModule,
   ],
   controllers: [AppController],
   providers: [AppService],
