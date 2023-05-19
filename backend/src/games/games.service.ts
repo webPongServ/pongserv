@@ -131,4 +131,8 @@ export class GamesService {
       opScore,
     );
   }
+
+  async isInGame(userId) {
+    return await this.DbGamesManagerService.isInGame(userId);
+  }
 }
