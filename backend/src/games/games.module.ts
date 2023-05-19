@@ -9,13 +9,14 @@ import { LoggerMiddleware } from '../common/middlewares/logger.middleware';
 import { GamesGateway } from './games.gateway';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersChatsSocketModule } from 'src/users-chats-socket/users-chats-socket.module';
 
 @Module({
   imports: [
     ConfigModule,
     DbGamesManagerModule,
     DbUsersManagerModule,
-    ChatsModule,
+    UsersChatsSocketModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

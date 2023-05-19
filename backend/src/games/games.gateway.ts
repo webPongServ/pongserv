@@ -15,6 +15,7 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { GamesService } from './games.service';
 import { roomOption } from './dto/roomOption.dto';
+import { UsersChatsGateway } from 'src/users-chats-socket/chats.gateway';
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -34,6 +35,7 @@ export class GamesGateway
   constructor(
     private jwtService: JwtService,
     private GamesService: GamesService,
+    private UsersChatsGateway: UsersChatsGateway,
   ) {
     this.logger.log('GameGateway constructor');
   }
@@ -128,6 +130,8 @@ export class GamesGateway
       roomList.id, // Room의 이름
     );
     console.log(roomList.id);
+    await this.UsersChatsGateway.notifyGameStartToFriends(userId.toString());
+    // Notify To friends
     return roomList.id;
   }
 
@@ -188,6 +192,7 @@ export class GamesGateway
     await this.GamesService.enterRoom(userId, roomId, type);
     await this.GamesService.updateOpponent(userId, roomId);
     await this.GamesService.startGame(userId, roomId);
+    await this.UsersChatsGateway.notifyGameStartToFriends(userId.toString());
     return 'OK';
   }
   // Game Data 요청 받고 보내기
@@ -218,7 +223,7 @@ export class GamesGateway
   }
 
   @SubscribeMessage('finishGame')
-  leaveGameRoom(
+  async leaveGameRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: any,
   ) {
@@ -230,6 +235,7 @@ export class GamesGateway
     this.server.socketsLeave(roomId);
     this.GamesService.finishGame(userId, roomId, myScore, opScore);
     this.GamesService.endGame(roomId);
+    await this.UsersChatsGateway.notifyGameEndToFriends(userId.toString());
     return 'OK';
   }
 
