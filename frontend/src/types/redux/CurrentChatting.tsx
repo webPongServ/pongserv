@@ -30,6 +30,7 @@ export enum CurrentChattingActionTypes {
   ADD_BANLIST = "ADD_BANLIST",
   DELETE_BANLIST = "DELETE_BANLIST",
   ADD_MYDETAIL = "ADD_MYDETAIL",
+  UPDATE_MYDETAIL = "UPDATE_MYDETAIL",
   DELETE_MYDETAIL = "DELETE_MYDETAIL",
 }
 
@@ -90,6 +91,11 @@ export interface CurrentChatting_AddMyDetail {
   payload: ChattingUserDetail;
 }
 
+export interface CurrentChatting_UpdateMyDetail {
+  type: CurrentChattingActionTypes.UPDATE_MYDETAIL;
+  payload: string;
+}
+
 export interface CurrentChatting_DeleteMyDetail {
   type: CurrentChattingActionTypes.DELETE_MYDETAIL;
   payload: string;
@@ -108,6 +114,7 @@ type CurrentChattingAction =
   | CurrentChatting_AddBanListAction
   | CurrentChatting_DeleteBanListAction
   | CurrentChatting_AddMyDetail
+  | CurrentChatting_UpdateMyDetail
   | CurrentChatting_DeleteMyDetail;
 
 export const CurrentChattingReducer = (
@@ -187,6 +194,11 @@ export const CurrentChattingReducer = (
       return {
         ...state,
         myDetail: action.payload,
+      };
+    case CurrentChattingActionTypes.UPDATE_MYDETAIL:
+      return {
+        ...state,
+        myDetail: { ...state.myDetail!, role: action.payload },
       };
     case CurrentChattingActionTypes.DELETE_MYDETAIL:
       return {
