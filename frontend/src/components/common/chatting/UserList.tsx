@@ -145,6 +145,7 @@ const UserList = (props: UserListProps) => {
                     () => {
                       // 1. 여기서 currentChatting.userlist 다시 렌더링하기 => 자동으로 구독되어 렌더링이 되는데
                       // 2. dispatch할 때, payload가 맞지 않아도 에러가 발생하지 않는 것에 주의(redux 상태 변경 실패)
+                      // 지금은 강퇴한 사람한테만 보임
                       props.setChatting([
                         ...props.chatting,
                         {
@@ -179,7 +180,22 @@ const UserList = (props: UserListProps) => {
               >
                 채팅방 차단
               </MenuItem>
-              <MenuItem>벙어리</MenuItem>
+              <MenuItem
+                onClick={() => {
+                  chattingSocket.emit(
+                    "chatroomMute",
+                    {
+                      id: currentChatting.chattingRoom?.id,
+                      nicknameToMute: selectedUser.nickname,
+                    },
+                    () => {
+                      setAnchorEl(null);
+                    }
+                  );
+                }}
+              >
+                벙어리
+              </MenuItem>
               <MenuItem>관리자 권한 부여</MenuItem>
               <MenuItem>대결 신청</MenuItem>
             </Box>
