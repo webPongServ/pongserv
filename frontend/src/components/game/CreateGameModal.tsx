@@ -117,6 +117,7 @@ const CreateGameModal = (props: CreateGameModalProps) => {
                         id: uuid,
                         title: gameRoomForm.title,
                         owner: myInfo.nickname,
+                        ownerImage: myInfo.imgURL,
                         maxScore: gameRoomForm.maxScore,
                         difficulty: gameRoomForm.difficulty,
                       },

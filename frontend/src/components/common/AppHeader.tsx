@@ -39,6 +39,23 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   }),
 }));
 
+export const errorMessageCreator = (errorCode: string): string => {
+  switch (errorCode) {
+    case "invalid_user":
+      return "찾으려는 사용자가 존재하지 않습니다.";
+    case "wrong_game_access":
+      return "잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요.";
+    case "auth_failed":
+      return "로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.";
+    case "already_login":
+      return "이미 로그인 되어있는 계정입니다. 로그아웃 후 다시 시도해주세요.";
+    case "kicked":
+      return "채팅방에서 강제 퇴장당하였습니다.";
+    default:
+      return "에러가 발생하였습니다.";
+  }
+};
+
 export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
   const paramsCode: string | undefined = qs.parse(window.location.search)
@@ -46,26 +63,6 @@ export default function AppHeader() {
   const notiRef = useRef<HTMLDivElement>(null);
   const status = useSelector((state: IRootState) => state.loginStatus);
   const dispatch = useDispatch();
-
-  const token = localStorage.getItem("accessToken");
-
-  const chattingSocket = io(apiURL, {
-    extraHeaders: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  dispatch({
-    type: SocketsActionTypes.CHATTINGSOCKET_UPDATE,
-    payload: chattingSocket,
-  });
-
-  const alertMessage = (message: string) => {
-    alert(message);
-  };
-
-  // error handling
-  chattingSocket.on("errorChatroomFull", alertMessage);
 
   const loadMyData = async () => {
     const token = localStorage.getItem("accessToken");
@@ -89,23 +86,48 @@ export default function AppHeader() {
   }, 5000);
 
   useLayoutEffect(() => {
+    const token = localStorage.getItem("accessToken");
+    const chattingSocket = io(apiURL, {
+      extraHeaders: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    dispatch({
+      type: SocketsActionTypes.CHATTINGSOCKET_UPDATE,
+      payload: chattingSocket,
+    });
+
+    const alertMessage = (message: string) => {
+      alert(message);
+    };
+
+    const socketAlreadyLogin = () => {
+      window.location.href = "/login?error=already_login";
+    };
+
+    // error handling
+    if (chattingSocket) {
+      chattingSocket.on("errorAlreadyLogin", socketAlreadyLogin);
+      chattingSocket.on("errorChatroomFull", alertMessage);
+      chattingSocket.on("errorChatroomEntrance", alertMessage);
+    }
     loadMyData();
+
+    return () => {
+      chattingSocket.off("errorChatroomFull", alertMessage);
+      chattingSocket.off("errorAlreadyLogin", socketAlreadyLogin);
+    };
   }, []);
 
   return (
     <>
-      {paramsCode === "invalid_user" ? (
+      {paramsCode === undefined ? null : (
         <ErrorNotification
-          errorMessage="찾으려는 사용자가 존재하지 않습니다!"
+          errorMessage={errorMessageCreator(paramsCode)}
           ref={notiRef}
         />
-      ) : null}
-      {paramsCode === "wrong_game_access" ? (
-        <ErrorNotification
-          errorMessage="잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요!"
-          ref={notiRef}
-        />
-      ) : null}
+      )}
       <Box id="AppHeader-container" className="flex-container">
         <CssBaseline />
         <AppBar open={open} setOpen={setOpen} />

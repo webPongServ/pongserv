@@ -111,9 +111,7 @@ const BanList = (props: BanListProps) => {
             onClick={() => {
               dispatch({
                 type: CurrentChattingActionTypes.DELETE_BANLIST,
-                payload: currentChatting.userList.filter(
-                  (value) => value.nickname !== selectedUser.nickname
-                ),
+                payload: selectedUser.nickname,
               });
               dispatch({
                 type: CurrentChattingActionTypes.ADD_USERLIST,

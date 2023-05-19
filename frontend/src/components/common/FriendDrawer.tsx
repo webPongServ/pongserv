@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { FriendDrawerWidth } from "constant";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -99,14 +99,21 @@ const FriendDrawer = () => {
 
   useEffect(() => {
     getFriends();
-    chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
-    chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+  }, []);
+
+  useEffect(() => {
+    if (chattingSocket) {
+      chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
+      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+    }
 
     return () => {
-      chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
-      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+      if (chattingSocket) {
+        chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
+        chattingSocket.off("friendStatusLogout", socketFriendStatusLogout);
+      }
     };
-  }, []);
+  }, [friends]);
 
   return (
     <Drawer id="FriendDrawer" variant="permanent" open={true}>

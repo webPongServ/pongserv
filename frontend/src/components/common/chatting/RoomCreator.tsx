@@ -86,7 +86,6 @@ const RoomCreator = () => {
         pwd: chattingRoomForm.password,
       },
       (response: { chtrmId: string }) => {
-        console.log("chatroomCreation : ", response);
         dispatch({
           type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
           payload: {
