@@ -29,6 +29,9 @@ const BanList = (props: BanListProps) => {
   const currentChatting: CurrentChatting = useSelector(
     (state: IRootState) => state.currentChatting
   );
+  const chattingSocket: any = useSelector(
+    (state: IRootState) => state.sockets.chattingSocket!
+  );
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [contextMenu, setContextMenu] = useState<{
     mouseX: number;
@@ -109,15 +112,24 @@ const BanList = (props: BanListProps) => {
         ) : (
           <MenuItem
             onClick={() => {
-              dispatch({
-                type: CurrentChattingActionTypes.DELETE_BANLIST,
-                payload: selectedUser.nickname,
-              });
-              dispatch({
-                type: CurrentChattingActionTypes.ADD_USERLIST,
-                payload: selectedUser,
-              });
-              setAnchorEl(null);
+              chattingSocket.emit(
+                "chatroomRemovalBan",
+                {
+                  id: currentChatting.chattingRoom?.id,
+                  nicknameToFree: selectedUser.nickname,
+                },
+                () => {
+                  dispatch({
+                    type: CurrentChattingActionTypes.DELETE_BANLIST,
+                    payload: selectedUser.nickname,
+                  });
+                  dispatch({
+                    type: CurrentChattingActionTypes.ADD_USERLIST,
+                    payload: selectedUser,
+                  });
+                  setAnchorEl(null);
+                }
+              );
             }}
           >
             채팅방 차단 해제

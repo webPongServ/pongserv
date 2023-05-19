@@ -167,15 +167,24 @@ const UserList = (props: UserListProps) => {
               </MenuItem>
               <MenuItem
                 onClick={() => {
-                  dispatch({
-                    type: CurrentChattingActionTypes.DELETE_USERLIST,
-                    payload: selectedUser.nickname,
-                  });
-                  dispatch({
-                    type: CurrentChattingActionTypes.ADD_BANLIST,
-                    payload: selectedUser,
-                  });
-                  setAnchorEl(null);
+                  chattingSocket.emit(
+                    "chatroomRegisterBan",
+                    {
+                      id: currentChatting.chattingRoom?.id,
+                      nicknameToBan: selectedUser.nickname,
+                    },
+                    () => {
+                      dispatch({
+                        type: CurrentChattingActionTypes.DELETE_USERLIST,
+                        payload: selectedUser.nickname,
+                      });
+                      dispatch({
+                        type: CurrentChattingActionTypes.ADD_BANLIST,
+                        payload: selectedUser,
+                      });
+                      setAnchorEl(null);
+                    }
+                  );
                 }}
               >
                 채팅방 차단

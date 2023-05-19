@@ -51,6 +51,8 @@ export const errorMessageCreator = (errorCode: string): string => {
       return "이미 로그인 되어있는 계정입니다. 로그아웃 후 다시 시도해주세요.";
     case "kicked":
       return "채팅방에서 강제 퇴장당하였습니다.";
+    case "banned":
+      return "채팅방에서 차단되었습니다. 같은 채팅방은 다시 입장이 불가합니다.";
     default:
       return "에러가 발생하였습니다.";
   }
@@ -117,6 +119,7 @@ export default function AppHeader() {
     return () => {
       chattingSocket.off("errorChatroomFull", alertMessage);
       chattingSocket.off("errorAlreadyLogin", socketAlreadyLogin);
+      chattingSocket.off("errorChatroomEntrance", alertMessage);
     };
   }, []);
 

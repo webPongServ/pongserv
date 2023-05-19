@@ -140,10 +140,18 @@ const ChattingRoom = () => {
     };
 
     const socketChatroomBeingMuted = () => {
+      // UI 확실히하기
       setIsMute(true);
       setTimeout(() => {
         setIsMute(false);
       }, 60000);
+    };
+
+    const socketChatroomBeingRegisteredBan = () => {
+      dispatch({
+        type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
+        payload: "error-banned",
+      });
     };
 
     if (chattingSocket) {
@@ -152,6 +160,10 @@ const ChattingRoom = () => {
       chattingSocket.on("chatroomLeaving", socketChatroomLeaving);
       chattingSocket.on("chatroomBeingKicked", socketChatroomBeingKicked);
       chattingSocket.on("chatroomBeingMuted", socketChatroomBeingMuted);
+      chattingSocket.on(
+        "chatroomRegisteredBan",
+        socketChatroomBeingRegisteredBan
+      );
     }
 
     return () => {
@@ -160,6 +172,10 @@ const ChattingRoom = () => {
       chattingSocket.off("chatroomLeaving", socketChatroomLeaving);
       chattingSocket.off("chatroomBeingKicked", socketChatroomBeingKicked);
       chattingSocket.off("chatroomBeingMuted", socketChatroomBeingMuted);
+      chattingSocket.off(
+        "chatroomRegisteredBan",
+        socketChatroomBeingRegisteredBan
+      );
     };
   }, [chatting, roomStatus]);
 
