@@ -287,11 +287,11 @@ export class GamesGateway
       option.type,
     );
     const requesterSocket = this.GameSocketId.get(requestId);
-    requesterSocket.join(roomList.id);
-    const targetSocket = this.GameSocketId.get(message.target);
-    this.server.sockets[targetSocket].join(roomList.id);
+    this.server.in(requesterSocket).socketsJoin(roomList.id);
+    const targetSocket = this.GameSocketId.get(targetId);
+    this.server.in(targetSocket).socketsJoin(roomList.id);
+    // // Notify To friends
     await this.UsersChatsGateway.notifyGameStartToFriends(userId);
-    // Notify To friends
     return roomList.id;
   }
 

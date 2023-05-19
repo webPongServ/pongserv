@@ -132,7 +132,7 @@ export class GamesService {
     );
   }
 
-  async isInGame(userId) {
+  async isInGame(userId: string) {
     return await this.DbGamesManagerService.isInGame(userId);
   }
 }
