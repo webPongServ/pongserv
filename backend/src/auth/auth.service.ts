@@ -145,4 +145,8 @@ export class AuthService {
       return { success: true };
     } else throw new BadRequestException('OTP Validation Failed');
   }
+
+  async verifyAsync(token) {
+    return await this.jwtService.verifyAsync(token);
+  }
 }
