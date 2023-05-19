@@ -106,8 +106,9 @@ export default function AppHeader() {
 
     // error handling
     if (chattingSocket) {
-      chattingSocket.on("errorChatroomFull", alertMessage);
       chattingSocket.on("errorAlreadyLogin", socketAlreadyLogin);
+      chattingSocket.on("errorChatroomFull", alertMessage);
+      chattingSocket.on("errorChatroomEntrance", alertMessage);
     }
     loadMyData();
 
