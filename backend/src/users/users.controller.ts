@@ -109,8 +109,9 @@ export class UsersController {
     @CurrentUser() user: string,
     @Query('friendNickname') friendNickname?: string,
   ) {
+    console.log('FriendNickname', friendNickname);
     if (friendNickname) {
-      return await this.UsersService.getFriendProfile(user, friendNickname);
+      return await this.UsersService.getProfilebyNickname(user, friendNickname);
     } else {
       return await this.UsersService.getProfile(user);
     }
