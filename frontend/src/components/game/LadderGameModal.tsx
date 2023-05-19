@@ -77,7 +77,7 @@ const LadderGameModal = (props: LadderGameModalProps) => {
                       type: GameRoomType.ladder,
                     });
                   }
-                  navigate(`/game/${data.roomId}`);
+                  navigate(`/game/ladder`);
                 });
               }}
             >
