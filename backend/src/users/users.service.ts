@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
+import { DbGamesManagerService } from 'src/db-manager/db-games-manager/db-games-manager.service';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 import { config } from 'dotenv';
@@ -20,6 +21,7 @@ export class UsersService {
     private readonly AuthService: AuthService,
     private readonly JwtService: JwtService,
     private readonly dbmanagerUsersService: DbUsersManagerService,
+    private readonly DbGamesManagerService: DbGamesManagerService,
     private readonly config: ConfigService,
   ) {}
 
@@ -76,9 +78,6 @@ export class UsersService {
       return { result: true };
     } else return { result: false };
   }
-  async getProfile(intraId: string) {
-    return await this.dbmanagerUsersService.getProfile(intraId);
-  }
 
   async changeImage(userId: string, base64Data: string) {
     const matches = base64Data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/);
@@ -110,16 +109,19 @@ export class UsersService {
       friendUserId,
     );
     const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
-    const resultOfMade = await this.dbmanagerUsersService.makeFriend(myEntity, friendEntity);
-    if (resultOfMade.result === "Success") {
-      const frndCurrLogin = await this.dbmanagerUsersService.getCurrLoginData(friendEntity);
+    const resultOfMade = await this.dbmanagerUsersService.makeFriend(
+      myEntity,
+      friendEntity,
+    );
+    if (resultOfMade.result === 'Success') {
+      const frndCurrLogin = await this.dbmanagerUsersService.getCurrLoginData(
+        friendEntity,
+      );
       if (frndCurrLogin) {
-        if (frndCurrLogin.stsCd === '02')
-          return ({ isCurrStatus: '02' }); // game
-        else
-          return ({ isCurrStatus: '01' }); // login
+        if (frndCurrLogin.stsCd === '02') return { isCurrStatus: '02' }; // game
+        else return { isCurrStatus: '01' }; // login
       } else {
-        return ({ isCurrStatus: '03' }) // logout
+        return { isCurrStatus: '03' }; // logout
       }
     }
   }
@@ -139,8 +141,39 @@ export class UsersService {
     );
   }
 
-  async getFriendProfile(intraId: string, friendId: string) {
-    return await this.dbmanagerUsersService.getFriendProfile(intraId, friendId);
+  async getProfilebyNickname(intraId: string, friendNickname: string) {
+    const friendUserId = await this.dbmanagerUsersService.findUserIdByNickname(
+      friendNickname,
+    );
+    const Profile = await this.dbmanagerUsersService.getFriendProfile(
+      intraId,
+      friendUserId,
+    );
+    const gameSummary = await this.DbGamesManagerService.getGameSummary(
+      friendUserId,
+    );
+    Profile.ELO = gameSummary.ladder;
+    Profile.winRate = gameSummary.winRate * 100;
+    Profile.total = gameSummary.total;
+    Profile.win = gameSummary.win;
+    Profile.lose = gameSummary.lose;
+    // console.log('Profile is ', Profile, '\n\nGameSummary', gameSummary);
+    return Profile;
+  }
+  async getProfile(intraId: string) {
+    const Profile = await this.dbmanagerUsersService.getFriendProfile(
+      intraId,
+      intraId,
+    );
+    const gameSummary = await this.DbGamesManagerService.getGameSummary(
+      intraId,
+    );
+    Profile.ELO = gameSummary.ladder;
+    Profile.winRate = gameSummary.winRate * 100;
+    Profile.total = gameSummary.total;
+    Profile.win = gameSummary.win;
+    Profile.lose = gameSummary.lose;
+    return await this.dbmanagerUsersService.getProfile(intraId);
   }
 
   async getFriendList(userId: string) {
@@ -149,28 +182,30 @@ export class UsersService {
       1. friend list 가져오기
       2. 각 친구별로 현재 로그인 상태 가져오기
     */
-    let results: {
-      nickname: string,
-      imageUrl: string,
-      currStat: string,
+    const results: {
+      nickname: string;
+      imageUrl: string;
+      currStat: string;
     }[] = [];
     // 1
     const myEntity = await this.dbmanagerUsersService.getMasterEntity(userId);
-    const friendDatas = await this.dbmanagerUsersService.getFriendList(myEntity);
+    const friendDatas = await this.dbmanagerUsersService.getFriendList(
+      myEntity,
+    );
     // 2
     for (const eachFriendData of friendDatas) {
-      const currLogin = await this.dbmanagerUsersService.getCurrLoginData(eachFriendData.ua01mEntityAsFr);
+      const currLogin = await this.dbmanagerUsersService.getCurrLoginData(
+        eachFriendData.ua01mEntityAsFr,
+      );
       let statusCode: string = null;
-      if (currLogin)
-        statusCode = currLogin.stsCd;
-      else
-        statusCode = '03';
+      if (currLogin) statusCode = currLogin.stsCd;
+      else statusCode = '03';
       const eachToPush = {
         nickname: eachFriendData.ua01mEntityAsFr.nickname,
         imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
         currStat: statusCode, // NOTE: It will be true if currLogin exists, false otherwise.
-         // TODO: isCurrStatus 로 바꿔서 login, gaming, logout 상태 표시하도록 변경
-      }
+        // TODO: isCurrStatus 로 바꿔서 login, gaming, logout 상태 표시하도록 변경
+      };
       results.push(eachToPush);
     }
     return results;
@@ -179,11 +214,11 @@ export class UsersService {
   async getFriendUserIds(userId: string) {
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
     const friendDatas = await this.dbmanagerUsersService.getFriendList(user);
-    let retFrndUserIds: string[] = [];
+    const retFrndUserIds: string[] = [];
     for (const eachData of friendDatas) {
       retFrndUserIds.push(eachData.ua01mEntityAsFr.userId);
     }
-    return (retFrndUserIds);
+    return retFrndUserIds;
   }
 
   async getUserList(startsWith: string) {
@@ -210,13 +245,12 @@ export class UsersService {
     */
     // 1
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
-    if (!user)
-      throw new NotFoundException(`The user not existed.`);
+    if (!user) throw new NotFoundException(`The user not existed.`);
     // 2
     const loginData = await this.dbmanagerUsersService.addLoginData(user);
     console.log(`loginData: `);
     console.log(loginData);
-    return ;
+    return;
   }
 
   async processLogout(userId: string) {
@@ -226,11 +260,10 @@ export class UsersService {
     */
     // 1
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
-    if (!user)
-      throw new NotFoundException(`The user not existed.`);
+    if (!user) throw new NotFoundException(`The user not existed.`);
     const logoutData = await this.dbmanagerUsersService.setLoginFinsh(user);
     console.log(`logoutData: `);
     console.log(logoutData);
-    return ;
+    return;
   }
 }
