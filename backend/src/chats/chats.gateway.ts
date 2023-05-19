@@ -257,11 +257,15 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomLeavingDto: `);
     console.log(infoLeav);
     try {
-      const nickname = await this.chatsService.leaveChatroom(userId, infoLeav);
+      const {
+        leaverNick, 
+        nextOwnerNick
+      } = await this.chatsService.leaveChatroom(userId, infoLeav);
       const nameOfChtrmSocketRoom = `chatroom_${infoLeav.id}`;
       socket.leave(nameOfChtrmSocketRoom);
-      socket.to(nameOfChtrmSocketRoom).emit('chatroomLeaving', nickname);
-      // TODO: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
+      socket.to(nameOfChtrmSocketRoom).emit('chatroomLeaving', leaverNick);
+      socket.to(nameOfChtrmSocketRoom).emit('chatroomAuthChange'
+        , { chtrmId: infoLeav.id, nickname: nextOwnerNick, auth: '01' }); // REVIEW: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
       return true;
     } catch (err) {
       console.log(err);
@@ -309,12 +313,11 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const targetUserId = await this.chatsService.kickUser(userId, infoKick);
       // target user의 socket에 kicked 정보 emit
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      this.server.to(targetSocketId).emit('chatroomBeingKicked', 
-        { 
-          chtrmId: infoKick.id, 
-          nicknameKicked: infoKick.nicknameToKick 
-        });
+      
+      const nameOfChtrmSocketRoom = `chatroom_${infoKick.id}`;
+      // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - 
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', 
+        { chtrmId: infoKick.id, nicknameKicked: infoKick.nicknameToKick }); // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       // if (targetSocketId) {
       //   this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
       // }

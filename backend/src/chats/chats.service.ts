@@ -599,6 +599,10 @@ export class ChatsService {
 				3-2. 나가는 유저의 권한을 normal로 바꾼다.
 			4. 채널 참여 여부를 false로 바꾸고 반환한다.
 		*/
+    let result: {
+      leaverNick: string,
+      nextOwnerNick: string,
+    } = null;
     // 1
     const user = await this.dbUsersManagerService.getUserByUserId(userId);
     const chtrm = await this.dbChatsManagerService.getLiveChtrmById(
@@ -644,6 +648,7 @@ export class ChatsService {
         }
         sccssrToOwner.chtRmAuth = '01';
         this.dbChatsManagerService.saveChtrmUser(sccssrToOwner);
+        result.nextOwnerNick = sccssrToOwner.ua01mEntity.nickname;
       }
       // 3-2
       userInChtrm.chtRmAuth = '03';
@@ -651,7 +656,8 @@ export class ChatsService {
     // 4
     userInChtrm.chtRmJoinTf = false;
     this.dbChatsManagerService.saveChtrmUser(userInChtrm);
-    return user.nickname;
+    result.nextOwnerNick = user.nickname;
+    return result;
   }
 
   async putBlockUserInChats(userId: string, infoBlck: BlockingUserInChatsDto)
