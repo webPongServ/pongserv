@@ -1,3 +1,4 @@
+import { ChatsModule } from './../chats/chats.module';
 import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-manager.module';
 import { DbGamesManagerModule } from './../db-manager/db-games-manager/db-games-manager.module';
 import { HttpService, HttpModule } from '@nestjs/axios';
@@ -14,6 +15,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     ConfigModule,
     DbGamesManagerModule,
     DbUsersManagerModule,
+    ChatsModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

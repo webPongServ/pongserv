@@ -21,6 +21,6 @@ import { UsersModule } from 'src/users/users.module';
     DbUsersManagerService,
   ],
   controllers: [ChatsController],
-  exports: [ChatsService],
+  exports: [ChatsService, ChatsGateway],
 })
 export class ChatsModule {}
