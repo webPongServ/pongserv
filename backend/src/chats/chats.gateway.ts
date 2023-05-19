@@ -271,11 +271,15 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomLeavingDto: `);
     console.log(infoLeav);
     try {
-      const nickname = await this.chatsService.leaveChatroom(userId, infoLeav);
+      const {
+        leaverNick, 
+        nextOwnerNick
+      } = await this.chatsService.leaveChatroom(userId, infoLeav);
       const nameOfChtrmSocketRoom = `chatroom_${infoLeav.id}`;
       socket.leave(nameOfChtrmSocketRoom);
-      socket.to(nameOfChtrmSocketRoom).emit('chatroomLeaving', nickname);
-      // TODO: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
+      socket.to(nameOfChtrmSocketRoom).emit('chatroomLeaving', leaverNick);
+      socket.to(nameOfChtrmSocketRoom).emit('chatroomAuthChange'
+        , { chtrmId: infoLeav.id, nickname: nextOwnerNick, auth: '01' }); // REVIEW: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
       return true;
     } catch (err) {
       console.log(err);
@@ -297,7 +301,10 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     try {
       await this.chatsService.putBlockUserInChats(userId, infoBlck);
       const nameOfblockingSocketRoom = `blocking_${infoBlck.nickname}`;
-      socket.join(nameOfblockingSocketRoom);
+      if (infoBlck.boolToBlock === true)
+        socket.join(nameOfblockingSocketRoom);
+      else
+        socket.leave(nameOfblockingSocketRoom);
       return true;
     } catch (err) {
       console.log(err);
@@ -320,11 +327,11 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const targetUserId = await this.chatsService.kickUser(userId, infoKick);
       // target user의 socket에 kicked 정보 emit
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      this.server.to(targetSocketId).emit('chatroomBeingKicked', {
-        chtrmId: infoKick.id,
-        nicknameKicked: infoKick.nicknameToKick,
-      });
+      
+      const nameOfChtrmSocketRoom = `chatroom_${infoKick.id}`;
+      // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - 
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', 
+        { chtrmId: infoKick.id, nicknameKicked: infoKick.nicknameToKick }); // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       // if (targetSocketId) {
       //   this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
       // }
@@ -335,7 +342,6 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end - done
   @SubscribeMessage('chatroomMute')
   async muteChatroomUser(
     @ConnectedSocket() socket: Socket,
@@ -352,9 +358,7 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       if (targetSocketId) {
-        this.server
-          .to(targetSocketId)
-          .emit('chatroomBeingMuted', { chtrmId: infoMute.id });
+        this.server.to(targetSocketId).emit('chatroomBeingMuted', { chtrmId: infoMute.id });
       }
       return true;
     } catch (err) {
@@ -363,7 +367,6 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  // TODO - to combine with front-end
   @SubscribeMessage('chatroomRegisterBan')
   async registerChatroomBan(
     @ConnectedSocket() socket: Socket,
@@ -375,27 +378,24 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomBanDto: `);
     console.log(infoBan);
     try {
-      const targetUserId = await this.chatsService.banUser(userId, infoBan);
-      // target user의 socket에 baned 정보 emit
+      const { targetUserId, targetNick } = await this.chatsService.banUser(userId, infoBan);
+      const nameOfChtrmSocketRoom = `chatroom_${infoBan.id}`;
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       if (targetSocketId) {
         // TODO - targetSocketId가 해당 chatroom에 대한 socket room을 나가도록 처리
-        const targetSocket: Socket =
-          this.server.sockets.sockets.get(targetSocketId); // NOTE: Find socket by socket id
+        const targetSocket: Socket = this.server.sockets.sockets.get(targetSocketId); // NOTE: Find socket by socket id
         targetSocket.leave(`chatroom_${infoBan.id}`);
-        this.server
-          .to(targetSocketId)
-          .emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
+        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
       }
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRegisteredBan', 
+        { chtrmId: infoBan.id, nickname: targetNick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMute', err.response.message);
+      socket.emit('errorChatroomRegisterBan', err.response.message);
     }
   }
 
-  // TODO - to combine with front-end - 이건 기존 REST API를 그대로 써도 될 듯
   @SubscribeMessage('chatroomRemovalBan')
   async removalChatroomBan(
     @ConnectedSocket() socket: Socket,
@@ -407,16 +407,17 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomBanRemovalDto: `);
     console.log(infoBanRmv);
     try {
-      await this.chatsService.removeBan(userId, infoBanRmv);
-      //REVIEW - 다른 유저들에게 이 사실을 알려야할까?
+      const targetNick = await this.chatsService.removeBan(userId, infoBanRmv);
+      const nameOfChtrmSocketRoom = `chatroom_${infoBanRmv.id}`;
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRemovedBan', 
+        { chtrmId: infoBanRmv.id, nickname: targetNick }); //REVIEW - 다른 유저들에게 이 사실을 알리기
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMute', err.response.message);
+      socket.emit('errorChatroomRemovalBan', err.response.message);
     }
   }
 
-  // TODO - to combine with front-end
   @SubscribeMessage('chatroomEmpowerment')
   async empowerChatroomUser(
     @ConnectedSocket() socket: Socket,
@@ -428,17 +429,12 @@ export class ChatsGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`ChatroomEmpowermentDto: `);
     console.log(infoEmpwr);
     try {
-      const targetUserId = await this.chatsService.empowerUser(
-        userId,
-        infoEmpwr,
-      );
+      const targetUserId = await this.chatsService.empowerUser(userId, infoEmpwr);
       // target user의 socket에 empowered 정보 emit
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       if (targetSocketId) {
-        this.server
-          .to(targetSocketId)
-          .emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id });
+        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id });
       }
       return true;
     } catch (err) {
