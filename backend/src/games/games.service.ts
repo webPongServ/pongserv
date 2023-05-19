@@ -77,6 +77,7 @@ export class GamesService {
       nickname,
     );
     console.log(userId, '\n\n');
+    this.DbGamesManagerService.getGameSummary(userId);
     const user = await this.DbUsersManagerService.getUserByUserId(userId);
     console.log(user, userId);
     const userStatic = await this.DbGamesManagerService.getUserStatic(user);

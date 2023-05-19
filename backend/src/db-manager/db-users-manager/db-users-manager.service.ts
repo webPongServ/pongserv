@@ -229,6 +229,32 @@ export class DbUsersManagerService {
     }
     // const userGame = await this.ua02lRp.find({
   }
+  async getFriendProfile(userId: string, friendId: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: friendId,
+      },
+    });
+
+    if (user) {
+      const userData = {
+        userId: user.userId,
+        nickname: user.nickname,
+        imgPath: user.imgPath,
+        lastDttm: user.lastDttm,
+        //Debug Needed
+        total: 0,
+        win: 0,
+        lose: 0,
+        ELO: 1000,
+        winRate: 0,
+        status: await this.getRelation(userId, user.userId),
+      };
+      return userData;
+    } else {
+      throw new BadRequestException('No User available');
+    }
+  }
 
   async getMasterEntity(userId: string) {
     const user = await this.ua01mRp.findOne({
@@ -352,32 +378,6 @@ export class DbUsersManagerService {
     } else return '02';
   }
 
-  async getFriendProfile(userId: string, friendNickname: string) {
-    const user = await this.ua01mRp.findOne({
-      where: {
-        nickname: friendNickname,
-      },
-    });
-
-    if (user) {
-      return {
-        userId: user.userId,
-        nickname: user.nickname,
-        imgPath: user.imgPath,
-        lastDttm: user.lastDttm,
-        //Debug Needed
-        total: 99,
-        win: 99,
-        lose: 0,
-        ELO: 9999,
-        winRate: 100.0,
-        status: await this.getRelation(userId, user.userId),
-      };
-    } else {
-      throw new BadRequestException('No User available');
-    }
-  }
-
   async getCurrLoginData(user: TbUa01MEntity) {
     const result = await this.ua01lRp.findOne({
       where: {
@@ -403,7 +403,7 @@ export class DbUsersManagerService {
         delTf: false,
       },
     });
-    return (friendDatas);
+    return friendDatas;
     // const friendList = friendsData.map((friend) => {
     //   return {
     //     userId: friend.ua01mEntityAsFr.userId,
@@ -439,7 +439,7 @@ export class DbUsersManagerService {
       stsCd: '01',
       loginTf: true,
     });
-    return (await this.ua01lRp.save(newLoginData));
+    return await this.ua01lRp.save(newLoginData);
   }
 
   async setLoginFinsh(user: TbUa01MEntity) {
@@ -455,6 +455,6 @@ export class DbUsersManagerService {
       throw new NotFoundException(`not existed login data when logout`);
     currLoginData.logoutDttm = new Date();
     currLoginData.loginTf = false;
-    return (await this.ua01lRp.save(currLoginData));
+    return await this.ua01lRp.save(currLoginData);
   }
 }
