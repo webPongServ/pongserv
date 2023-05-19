@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
@@ -21,12 +22,11 @@ export class UsersService {
     private readonly chatsService: ChatsService,
   ) {}
 
+  logger = new Logger('UsersService');
   async verifyToken(token: string): Promise<any> {
     try {
-      console.log(token);
       token = token.split(' ')[1];
       const decoded = await this.AuthService.verifyAsync(token);
-      console.log(decoded);
       return decoded;
     } catch (error) {
       return null;
@@ -58,7 +58,7 @@ export class UsersService {
       if (user) {
         user.nickname = nickname;
         await this.dbmanagerUsersService.saveUser(user);
-        console.log('Nickname is sucessfuly changed');
+        this.logger.log(`닉네임 변경: ${intraId} -> ${nickname}`);
         return { new: nickname };
       } else {
         throw new BadRequestException('사용자의 정보를 확인할 수 없습니다.');
@@ -71,8 +71,12 @@ export class UsersService {
       nickname,
     );
     if (isAvailable) {
+      this.logger.log(`사용 불가능한 닉네임: ${nickname}`);
       return { result: true };
-    } else return { result: false };
+    } else {
+      this.logger.log(`사용 가능한 닉네임: ${nickname}`);
+      return { result: false };
+    }
   }
 
   async changeImage(userId: string, base64Data: string) {
@@ -93,6 +97,7 @@ export class UsersService {
     const IMAGE_URL = this.config.get('IMAGE_URL');
     const filePath = IMAGE_URL + fileName;
     await this.dbmanagerUsersService.changeImagePath(userId, filePath);
+    this.logger.log(`프로필 사진 변경: ${userId} -> ${filePath}`);
     return filePath;
   }
 
@@ -110,6 +115,7 @@ export class UsersService {
       friendEntity,
     );
     if (resultOfMade.result === 'Success') {
+      this.logger.log(`친구 추가: ${intraId} -> ${friendNickname}`);
       const frndCurrLogin = await this.dbmanagerUsersService.getCurrLoginData(
         friendEntity,
       );
@@ -131,6 +137,7 @@ export class UsersService {
       friendUserId,
     );
     const myEntity = await this.dbmanagerUsersService.getMasterEntity(intraId);
+    this.logger.log(`친구 삭제: ${intraId} -> ${friendNickname}`);
     return await this.dbmanagerUsersService.deleteFriend(
       myEntity,
       friendEntity,
@@ -157,7 +164,7 @@ export class UsersService {
     Profile.total = gameSummary.total;
     Profile.win = gameSummary.win;
     Profile.lose = gameSummary.lose;
-    // console.log('Profile is ', Profile, '\n\nGameSummary', gameSummary);
+    this.logger.log(`프로필 조회: ${intraId} -> ${friendNickname}`);
     return Profile;
   }
   async getProfile(intraId: string) {
@@ -174,6 +181,7 @@ export class UsersService {
     Profile.win = gameSummary.win;
     Profile.lose = gameSummary.lose;
     Profile.isblocked = false;
+    this.logger.log(`프로필 조회: ${intraId}`);
     return await this.dbmanagerUsersService.getProfile(intraId);
   }
 
@@ -223,14 +231,14 @@ export class UsersService {
   }
 
   async getUserList(startsWith: string) {
-    console.log(startsWith);
+    // console.log(startsWith);
     if (startsWith.length === 0) return [];
     const withPercent = startsWith + '%';
     return await this.dbmanagerUsersService.getUserList(withPercent);
   }
 
   async blockUser(nickName: string) {
-    console.log('blockUser', nickName);
+    // console.log('blockUser', nickName);
     const user = await this.dbmanagerUsersService.findUserIdByNickname(
       nickName,
     );
@@ -249,8 +257,7 @@ export class UsersService {
     if (!user) throw new NotFoundException(`The user not existed.`);
     // 2
     const loginData = await this.dbmanagerUsersService.addLoginData(user);
-    console.log(`loginData: `);
-    console.log(loginData);
+    this.logger.log(`loginData: ${loginData}`);
     return;
   }
 
@@ -263,8 +270,7 @@ export class UsersService {
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
     if (!user) throw new NotFoundException(`The user not existed.`);
     const logoutData = await this.dbmanagerUsersService.setLoginFinsh(user);
-    console.log(`logoutData: `);
-    console.log(logoutData);
+    this.logger.log(`logoutData: ${logoutData}`);
     return;
   }
 
@@ -279,6 +285,7 @@ export class UsersService {
     const gameRecord = await this.DbGamesManagerService.getUserStatic(
       userEntity,
     );
+    this.logger.log(`게임 기록 조회: ${userId} -> ${friendNickname}`);
     return gameRecord;
   }
 
@@ -311,6 +318,7 @@ export class UsersService {
       totalAchievement.push(
         ...friendAchievement.slice(0, friendList.length.toString().length),
       );
+    this.logger.log(`Achievement 호출: ${totalAchievement}`);
     return totalAchievement;
   }
 }

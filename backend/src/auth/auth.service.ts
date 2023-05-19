@@ -4,6 +4,7 @@ import {
   HttpException,
   HttpStatus,
   Injectable,
+  Logger,
   UnauthorizedException,
 } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
@@ -22,6 +23,8 @@ export class AuthService {
     private readonly dbmanagerUsersService: DbUsersManagerService,
     private jwtService: JwtService,
   ) {}
+
+  logger = new Logger('AuthService');
 
   async issueToken42OAuth(code: string): Promise<Token42OAuthData> {
     let result: Token42OAuthData;
@@ -45,9 +48,9 @@ export class AuthService {
         accessToken: tokenResult.data.access_token,
         refreshToken: tokenResult.data.refresh_token,
       };
-      console.log(result);
+      this.logger.log('42 token 발급 성공');
     } catch (err) {
-      console.log('42 token 발급 실패');
+      this.logger.log('42 token 발급 실패');
       throw new HttpException(err, HttpStatus.UNAUTHORIZED);
     }
     return result;
@@ -69,6 +72,7 @@ export class AuthService {
       throw new UnauthorizedException('Token42OAuth You are not 42 User');
     const intraId: string = intraInfoResult.data.login;
     const intraImagePath: string = intraInfoResult.data.image.link;
+    this.logger.log('42 유저 정보 조회 성공 : ${intraId}');
     return { intraId, intraImagePath };
   }
 
@@ -78,13 +82,7 @@ export class AuthService {
     const intraData: { intraId: string; intraImagePath: string } =
       await this.getIntraId(token42OAuth);
     // NOTE: TB_UA01M에 유저 자체가 있는지 검증하고 없으면 등록하는 로직 추가 (2023-05-08, mgo)
-    // console.log(intraData);
     const isMember = await this.dbmanagerUsersService.checkinUser(intraData);
-    // console.log(`user: `);
-    // console.log(user);
-    // let user = await this.dbmanagerUsersService.getUserByUserId(intraData.intraId);
-    // if (user === null)
-    //   await this.dbmanagerUsersService.setUser()
     let OAuthData = false;
     if (await this.dbmanagerUsersService.checkOauth(intraData.intraId)) {
       OAuthData = true;
@@ -109,6 +107,7 @@ export class AuthService {
     await this.dbmanagerUsersService.applyTwofactor(userId, secret.base32);
     const QRCODE = await QRCode.toDataURL(secret.otpauth_url);
     const QrcodeImage = '<img src="' + QRCODE + '"/>';
+    this.logger.log('QRCODE 발급 성공');
     return QrcodeImage;
   }
 
@@ -123,6 +122,7 @@ export class AuthService {
     });
     const Payload = { userId };
     if (verified == true) {
+      this.logger.log('OTP 발급 성공');
       return { accessToken: await this.jwtService.signAsync(Payload) };
     } else throw new BadRequestException('OTP Validation Failed');
   }
@@ -141,7 +141,7 @@ export class AuthService {
     });
     if (verified == true) {
       await this.dbmanagerUsersService.activate2fa(userId);
-      console.log('Activate');
+      this.logger.log('OTP 발급 성공');
       return { success: true };
     } else throw new BadRequestException('OTP Validation Failed');
   }
