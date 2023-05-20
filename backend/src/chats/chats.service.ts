@@ -699,4 +699,14 @@ export class ChatsService {
     }
     return true;
   }
+
+  async checkBothUserInSameChtrm(frstUserId: string, scndUserId: string, chtrmId: string) {
+    const frstUser = await this.dbUsersManagerService.getUserByUserId(frstUserId);
+    const scndUser = await this.dbUsersManagerService.getUserByUserId(scndUserId);
+    const chtrm = await this.dbChatsManagerService.getLiveChtrmById(chtrmId);
+    if (await this.dbChatsManagerService.isUserListedInThisChatroom(frstUser, chtrm) === false
+      || await this.dbChatsManagerService.isUserListedInThisChatroom(scndUser, chtrm) === false)
+      throw new NotFoundException(`같은 채팅방에 존재하지 않습니다.`);
+    return true;
+  }
 }

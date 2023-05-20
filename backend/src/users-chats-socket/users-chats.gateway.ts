@@ -24,6 +24,8 @@ import { ChatroomBanDto } from '../chats/dto/chatroom-ban.dto';
 import { ChatroomBanRemovalDto } from '../chats/dto/chatroom-ban-removal.dto';
 import { ChatroomEmpowermentDto } from '../chats/dto/chatroom-empowerment.dto';
 import { ChatroomDmReqDto } from '../chats/dto/chatroom-dm-req.dto';
+import { ChatroomDirectGameRequestDto } from 'src/chats/dto/chatroom-dg-req.dto';
+import { GamesGateway } from 'src/games/games.gateway';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -35,6 +37,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly usersService: UsersService,
+    private readonly gamesGateway: GamesGateway,
     private readonly config: ConfigService,
   ) {}
   @WebSocketServer()
@@ -480,11 +483,44 @@ export class UsersChatsGateway implements OnGatewayConnection {
   @SubscribeMessage('chatroomRequestGame')
   async requestGameChatroomUser(
     @ConnectedSocket() socket: Socket,
+    @MessageBody() infoDgReq: ChatroomDirectGameRequestDto
+  ) {
+    const userId: string = this.validateAccessToken(socket);
+    if (!userId) return;
+    console.log(`[${userId}: `, `socket emit - chatroomRequestGame]`);
+    // console.log(`ChatroomEmpowermentDto: `);
+    // console.log(infoEmpwr);
+    try {
+      /*!SECTION
+        1. 같은 chatroom에 있는지 검증
+        2. gameGateway에 reqDirectGame 요청
+        3. target에게 emit
+      */
+      // this.usersService.getNicknameByUserId(userId);
+      const targetUserId = await this.usersService.getUserIdByNickname(infoDgReq.targetNickname);
+      await this.chatsService.checkBothUserInSameChtrm(userId, targetUserId, infoDgReq.id) // NOTE: userId, nickname, chtrmId
+      await this.gamesGateway.reqDirectGame(userId, targetUserId);
+
+      const requesterNick = await this.usersService.getNicknameByUserId(userId);
+      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      if (targetSocketId) {
+        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', { chtrmId: infoDgReq.id, requester: requesterNick });
+      }
+      return true;
+    } catch (err) {
+      console.log(err);
+      socket.emit('errorChatroomMute', err.response.message);
+    }
+  }
+
+  @SubscribeMessage('chatroomResponseGame')
+  async responseGameChatroomUser(
+    @ConnectedSocket() socket: Socket,
     @MessageBody() infoEmpwr: ChatroomEmpowermentDto
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - chatroomEmpowerment]`);
+    console.log(`[${userId}: `, `socket emit - chatroomResponseGame]`);
     // console.log(`ChatroomEmpowermentDto: `);
     // console.log(infoEmpwr);
     try {
@@ -492,7 +528,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
       // target user의 socket에 empowered 정보 emit
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id });
+        this.server.to(targetSocketId).emit('chatroomResponseGame', { chtrmId: infoEmpwr.id });
       }
       return true;
     } catch (err) {
