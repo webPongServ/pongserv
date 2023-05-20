@@ -120,11 +120,11 @@ export default function AppHeader() {
     const socketChatroomBeingRequestedGame = (data: {
       gmRmId: string;
       rqstrNick: string;
-      rqstrImage: string;
+      rqstrImg: string;
     }) => {
       setRequester({
         nickname: data.rqstrNick,
-        imgURL: data.rqstrImage,
+        imgURL: data.rqstrImg,
         roomId: data.gmRmId,
       });
       setOpenModal(true);

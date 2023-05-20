@@ -56,17 +56,13 @@ const RequestGameModal = (props: RequestGameModalProps) => {
         difficulty: GameDifficultyType.normal,
       },
     });
-    chattinSocket.emit(
-      "chatroomResponseGame",
-      {
-        gmRmId: props.requester.roomId,
-        rqstrNick: props.requester.nickname,
-        isApprv: true,
-      },
-      () => {
-        navigate(`/game/${props.requester.roomId}`);
-      }
-    );
+    chattinSocket.emit("chatroomResponseGame", {
+      gmRmId: props.requester.roomId,
+      rqstrNick: props.requester.nickname,
+      isApprv: true,
+    });
+    props.setOpenModal(false);
+    navigate(`/game/${props.requester.roomId}`);
   };
 
   return (
@@ -82,14 +78,16 @@ const RequestGameModal = (props: RequestGameModalProps) => {
             />
           </Box>
           <Box className="body flex-container">
-            <CustomProfileButton
-              class="login"
-              nickname={props.requester.nickname}
-              imgURL={props.requester.imgURL}
-              position="RequestGame"
-              handleFunction={() => {}}
-            />
-            <span>가 일반 게임 대결을 신청하였습니다.</span>
+            <Box>
+              <CustomProfileButton
+                class="login"
+                nickname={props.requester.nickname}
+                imgURL={props.requester.imgURL}
+                position="RequestGame"
+                handleFunction={() => {}}
+              />
+            </Box>
+            <span>일반 게임 대결을 신청하였습니다.</span>
             <b>대결을 수락하시겠습니까?</b>
           </Box>
           <Box className="footer flex-container">

@@ -10,10 +10,11 @@ import {
 } from "types/redux/CurrentChatting";
 import ChattingService from "API/ChattingService";
 import { IRootState } from "components/common/store";
-import { ChattingUserRoleType } from "constant";
+import { ChattingUserRoleType, GameDifficultyType } from "constant";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 import { ChatObject } from "components/common/chatting/ChattingRoom";
+import { CurrentGameActionTypes } from "types/redux/CurrentGame";
 
 import { Box } from "@mui/material";
 import List from "@mui/material/List";
@@ -40,6 +41,7 @@ const UserList = (props: UserListProps) => {
   const chattingSocket: any = useSelector(
     (state: IRootState) => state.sockets.chattingSocket!
   );
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const [selectedUser, setSelectedUser] = useState<ChattingUserDetail>({
     nickname: "",
     imgURL: "",
@@ -170,6 +172,17 @@ const UserList = (props: UserListProps) => {
         targetNickname: selectedUser.nickname,
       },
       (uuid: string) => {
+        dispatch({
+          type: CurrentGameActionTypes.UPDATE_GAMEROOM,
+          payload: {
+            id: uuid,
+            title: myInfo.nickname + "의 신청 게임",
+            owner: myInfo.nickname,
+            ownerImage: myInfo.imgURL,
+            maxScore: 5,
+            difficulty: GameDifficultyType.normal,
+          },
+        });
         setAnchorEl(null);
         navigate(`/game/${uuid}`);
       }
@@ -220,7 +233,7 @@ const UserList = (props: UserListProps) => {
         )}
         {!(selectedUser.nickname === props.myDetail.nickname) &&
           props.myDetail.role === ChattingUserRoleType.normal && (
-            <MenuItem>대결 신청</MenuItem>
+            <MenuItem onClick={handleRequestGame}>대결 신청</MenuItem>
           )}
         {!(selectedUser.nickname === props.myDetail.nickname) &&
           props.myDetail.role !== ChattingUserRoleType.normal && (
