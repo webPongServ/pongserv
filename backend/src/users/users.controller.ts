@@ -7,17 +7,14 @@ import {
   UseGuards,
   HttpStatus,
   HttpException,
-  Res,
   Get,
   Query,
   BadRequestException,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ConfigService } from '@nestjs/config';
-import { start } from 'repl';
 
 @ApiTags('users')
 @Controller('users')
@@ -109,8 +106,9 @@ export class UsersController {
     @CurrentUser() user: string,
     @Query('friendNickname') friendNickname?: string,
   ) {
+    console.log('FriendNickname', friendNickname);
     if (friendNickname) {
-      return await this.UsersService.getFriendProfile(user, friendNickname);
+      return await this.UsersService.getProfilebyNickname(user, friendNickname);
     } else {
       return await this.UsersService.getProfile(user);
     }
@@ -186,5 +184,38 @@ export class UsersController {
   @Get('/list')
   async getUserList(@Query('search') startswith: string) {
     return this.UsersService.getUserList(startswith);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'User 게임 전적 가져오기 성공',
+  })
+  @ApiOperation({ summary: 'User 게임 전적 가져오기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('/gamehistory')
+  async getGameRecord(
+    @CurrentUser() user: string,
+    @Query('friendNickname') friendNickname?: string,
+  ) {
+    if (!friendNickname) return this.UsersService.getGameRecord(user);
+    return this.UsersService.getGameRecord(user, friendNickname);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: 'User 업적 가져오기 성공',
+  })
+  @ApiOperation({ summary: 'User 업적 가져오기' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Get('/achievement')
+  async achievement(
+    @CurrentUser() user: string,
+    @Query('friendNickname') friendNickname?: string,
+  ) {
+    if (friendNickname)
+      return this.UsersService.achievement(user, friendNickname);
+    else {
+      return this.UsersService.achievement(user);
+    }
   }
 }

@@ -6,15 +6,11 @@ import { Box } from "@mui/material";
 
 interface InformMessageProps {
   informChat: ChatObject;
-  index: number;
 }
 
 const InformMessage = (props: InformMessageProps) => {
   return (
-    <Box
-      className="inform-message"
-      key={props.informChat.user!.nickname + props.index}
-    >
+    <Box className="inform-message">
       <Box>{props.informChat.message}</Box>
     </Box>
   );

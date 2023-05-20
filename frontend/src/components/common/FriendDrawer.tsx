@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { FriendDrawerWidth } from "constant";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -53,7 +53,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
 interface serverFriend {
   nickname: string;
   imageUrl: string;
-  isCurrStatus: boolean;
+  currStat: string;
 }
 
 const FriendDrawer = () => {
@@ -77,7 +77,7 @@ const FriendDrawer = () => {
         (value: serverFriend): UserDetail => ({
           nickname: value.nickname,
           imgURL: value.imageUrl,
-          status: value.isCurrStatus ? "login" : "logout",
+          status: value.currStat,
         })
       ),
     });
@@ -86,27 +86,34 @@ const FriendDrawer = () => {
   const socketFriendStatusLogin = (nickname: string) => {
     dispatch({
       type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
-      payload: { nickname: nickname, status: "login" },
+      payload: { nickname: nickname, status: FriendStatusType.login },
     });
   };
 
   const socketFriendStatusLogout = (nickname: string) => {
     dispatch({
       type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
-      payload: { nickname: nickname, status: "logout" },
+      payload: { nickname: nickname, status: FriendStatusType.logout },
     });
   };
 
   useEffect(() => {
     getFriends();
-    chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
-    chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+  }, []);
+
+  useEffect(() => {
+    if (chattingSocket) {
+      chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
+      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+    }
 
     return () => {
-      chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
-      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+      if (chattingSocket) {
+        chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
+        chattingSocket.off("friendStatusLogout", socketFriendStatusLogout);
+      }
     };
-  }, []);
+  }, [friends]);
 
   return (
     <Drawer id="FriendDrawer" variant="permanent" open={true}>

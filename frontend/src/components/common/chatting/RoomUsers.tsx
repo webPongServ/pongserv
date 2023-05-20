@@ -5,6 +5,7 @@ import BanList from "components/common/chatting/BanList";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { ChattingUserDetail, ChattingRoomDetail } from "types/Detail";
 import { IRootState } from "components/common/store";
+import { ChatObject } from "components/common/chatting/ChattingRoom";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -16,15 +17,17 @@ import CloseIcon from "@mui/icons-material/Close";
 interface RoomUsersProps {
   myDetail: ChattingUserDetail;
   setRoomStatus: Function;
+  chatting: ChatObject[];
+  setChatting: Function;
 }
 
 const RoomUsers = (props: RoomUsersProps) => {
-  const currentChatting: ChattingRoomDetail | null = useSelector(
-    (state: IRootState) => state.currentChatting.chattingRoom
-  );
+  // const currentChatting: ChattingRoomDetail | null = useSelector(
+  //   (state: IRootState) => state.currentChatting.chattingRoom
+  // );
   const [selected, setSelected] = useState<string>("users");
   const divRef = useRef<HTMLDivElement>(null);
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const pressESC = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Escape" || event.key === "Esc") {
@@ -71,7 +74,11 @@ const RoomUsers = (props: RoomUsersProps) => {
         </Box>
         <Box className="users-box overflow">
           {selected === "users" ? (
-            <UserList myDetail={props.myDetail} />
+            <UserList
+              myDetail={props.myDetail}
+              chatting={props.chatting}
+              setChatting={props.setChatting}
+            />
           ) : (
             <BanList myDetail={props.myDetail} />
           )}
