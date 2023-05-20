@@ -330,4 +330,12 @@ export class UsersService {
     this.logger.log(`Achievement 호출: ${userId} -> ${friendNickname}}`);
     return totalAchievement;
   }
+
+  async getUserIdByNickname(nickname: string) {
+    return await this.dbmanagerUsersService.findUserIdByNickname(nickname);
+  }
+
+  async getNicknameByUserId(userId: string) {
+    return await this.dbmanagerUsersService.findNicknameByUserId(userId);
+  }
 }
