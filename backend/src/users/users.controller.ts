@@ -10,6 +10,7 @@ import {
   Get,
   Query,
   BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
@@ -24,6 +25,7 @@ export class UsersController {
     private readonly config: ConfigService,
   ) {}
 
+  logger = new Logger('UsersController');
   @ApiResponse({
     status: 201,
     description: '로그인 API',
@@ -40,7 +42,7 @@ export class UsersController {
         'API_UID',
       )}&redirect_uri=${this.config.get('REDIRECT_URI')}&response_type=code`;
     } else {
-      console.log('Already Logged in!');
+      this.logger.error('Already Logged in!');
       return 'http://localhost:3001/game';
     }
   }
@@ -124,8 +126,8 @@ export class UsersController {
     @CurrentUser() user: string,
     @Body('base64Data') base64Data: string,
   ) {
-    console.log(base64Data);
     if (!base64Data) throw new BadRequestException('base64Data가 없습니다.');
+    this.logger.log('changeImage ${user}');
     return await this.UsersService.changeImage(user, base64Data);
   }
 
@@ -137,7 +139,7 @@ export class UsersController {
   @UseGuards(JwtAccessTokenGuard)
   @Post('/friend')
   async makeFriend(@CurrentUser() user: string, @Body() body: any) {
-    // console.log('In makeFriend', user, body);
+    this.logger.log(`[makeFriend] user: ${user}, body: ${body.nickname}`);
     return await this.UsersService.makeFriend(user, body.nickname);
   }
 
@@ -149,7 +151,7 @@ export class UsersController {
   @UseGuards(JwtAccessTokenGuard)
   @Post('/friend/delete')
   async deleteFriend(@CurrentUser() user: string, @Body() body: any) {
-    // console.log('In deleteFriend', user, body);
+    this.logger.log(`[deleteFriend] user: ${user}, body: ${body.nickname}`);
     return await this.UsersService.deleteFriend(user, body.nickname);
   }
 
@@ -161,15 +163,13 @@ export class UsersController {
   @UseGuards(JwtAccessTokenGuard)
   @Get('/friend')
   async getFriendList(@CurrentUser() userId: string) {
-    console.log(`[${userId}: `, `GET /users/friend]`);
+    this.logger.log(`[getFriendList] userId: [${userId}]`);
     try {
       const result = await this.UsersService.getFriendList(userId);
-      console.log(`result: `);
-      console.log(result);
+      this.logger.log(`[getFriendList] result: ${result.length} Friends`);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.error(`[getFriendList] excpt: ${excpt}`);
       throw excpt;
     }
   }
