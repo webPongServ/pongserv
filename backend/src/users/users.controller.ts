@@ -36,7 +36,6 @@ export class UsersController {
       !authHeader ||
       (await this.UsersService.verifyToken(authHeader)) == null
     ) {
-      console.log('redirect to 42API/V2');
       return `https://api.intra.42.fr/oauth/authorize?client_id=${this.config.get(
         'API_UID',
       )}&redirect_uri=${this.config.get('REDIRECT_URI')}&response_type=code`;
@@ -54,7 +53,7 @@ export class UsersController {
   @UseGuards(JwtAccessTokenGuard)
   @Get('/me')
   async me(@CurrentUser() user: string) {
-    console.log('In USER/ME' + user);
+    // console.log('In USER/ME' + user);
     return await this.UsersService.getMe(user);
   }
 
@@ -106,7 +105,7 @@ export class UsersController {
     @CurrentUser() user: string,
     @Query('friendNickname') friendNickname?: string,
   ) {
-    console.log('FriendNickname', friendNickname);
+    // console.log('FriendNickname', friendNickname);
     if (friendNickname) {
       return await this.UsersService.getProfilebyNickname(user, friendNickname);
     } else {

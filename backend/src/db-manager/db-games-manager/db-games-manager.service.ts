@@ -191,7 +191,7 @@ export class DbGamesManagerService {
         };
       }),
     );
-    console.log(updateUsers);
+    // console.log(updateUsers);
     return updateUsers;
   }
 
@@ -242,7 +242,7 @@ export class DbGamesManagerService {
     room.getScr = myScore;
     room.lossScr = opScore;
     room.exitDttm = new Date();
-    console.log(room);
+    // console.log(room);
     await this.Gm01DRp.save(room);
   }
 
@@ -253,7 +253,7 @@ export class DbGamesManagerService {
         { opUserId: userId, endType: '04' },
       ],
     });
-    console.log(room);
+    // console.log(room);
     return room.length > 0;
   }
 }

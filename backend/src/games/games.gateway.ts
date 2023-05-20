@@ -71,9 +71,8 @@ export class GamesGateway
     if (typeof socket.data === 'string') {
       this.GameSocketId.set(socket.data, socket.id);
     }
-    console.log('Game Socket ID is ', this.GameSocketId);
     this.logger.log(
-      `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
+      `GameGateway handleConnection: ${socket.data} -> ${socket.id}`,
     );
     socket.on('disconnecting', (reason) => {
       /*
@@ -98,7 +97,7 @@ export class GamesGateway
     if (typeof socket.data === 'string') {
       this.GameSocketId.delete(socket.data);
     }
-    console.log('[Deletion]Game Socket ID is ', this.GameSocketId);
+    this.logger.log('[Deletion]Game Socket ID is ', this.GameSocketId);
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 
@@ -129,7 +128,7 @@ export class GamesGateway
       message.score,
       roomList.id, // Room의 이름
     );
-    console.log(roomList.id);
+    this.logger.log(`GameGateway createGameRoom: ${socket.id}`);
     await this.UsersChatsGateway.notifyGameStartToFriends(userId.toString());
     // Notify To friends
     return roomList.id;
@@ -168,7 +167,7 @@ export class GamesGateway
     @MessageBody() message,
   ) {
     const userId = socket.data;
-    console.log(userId, 'cancel', message.roomId);
+    this.logger.log(userId, 'cancel', message.roomId);
     await socket.leave(message.roomId);
     return 'OK';
   }
@@ -182,10 +181,7 @@ export class GamesGateway
     await socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
     await socket.emit('roomGuest');
     await this.server.to(message.roomId).emit('gameStart');
-    console.log(
-      socket.rooms,
-      (await this.server.in(message.roomId).fetchSockets()).length,
-    );
+    this.logger.log(`Game condition fulfilled: ${message.roomId} started`);
     const userId = socket.data;
     const roomId = message.roomId;
     const type = message.type;

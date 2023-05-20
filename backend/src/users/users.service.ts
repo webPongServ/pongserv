@@ -211,8 +211,7 @@ export class UsersService {
       let statusCode: string = null;
       if (currLogin) {
         statusCode = currLogin.stsCd; // '01'
-        if (this.gameService.isInGame(userId))
-          statusCode = '02';
+        if (this.gameService.isInGame(userId)) statusCode = '02';
       } else {
         statusCode = '03';
       }
@@ -263,7 +262,7 @@ export class UsersService {
     if (!user) throw new NotFoundException(`The user not existed.`);
     // 2
     const loginData = await this.dbmanagerUsersService.addLoginData(user);
-    this.logger.log(`loginData: ${loginData}`);
+    this.logger.log(`loginData: ${userId}`);
     return;
   }
 
@@ -276,7 +275,7 @@ export class UsersService {
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
     if (!user) throw new NotFoundException(`The user not existed.`);
     const logoutData = await this.dbmanagerUsersService.setLoginFinsh(user);
-    this.logger.log(`logoutData: ${logoutData}`);
+    this.logger.log(`logoutData: ${userId}`);
     return;
   }
 
@@ -324,7 +323,7 @@ export class UsersService {
       totalAchievement.push(
         ...friendAchievement.slice(0, friendList.length.toString().length),
       );
-    this.logger.log(`Achievement 호출: ${totalAchievement}`);
+    this.logger.log(`Achievement 호출: ${userId} -> ${friendNickname}}`);
     return totalAchievement;
   }
 }
