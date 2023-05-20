@@ -10,7 +10,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatroomEntranceDto } from '../chats/dto/chatroom-entrance.dto';
 import { ChatsService } from '../chats/chats.service';
-import { Logger, UnauthorizedException } from '@nestjs/common';
+import { Inject, Logger, UnauthorizedException, forwardRef } from '@nestjs/common';
 import { ChatroomRequestMessageDto } from '../chats/dto/chatroom-request-message.dto';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
@@ -38,6 +38,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly usersService: UsersService,
+    @Inject(forwardRef(() => GamesGateway)) // NOTE - 순환 종속성 솔루션
     private readonly gamesGateway: GamesGateway,
     private readonly config: ConfigService,
   ) {}

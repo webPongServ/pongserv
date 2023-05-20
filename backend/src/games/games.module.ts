@@ -1,7 +1,7 @@
 import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-manager.module';
 import { DbGamesManagerModule } from './../db-manager/db-games-manager/db-games-manager.module';
 import { HttpModule } from '@nestjs/axios';
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { GamesController } from './games.controller';
 import { GamesGateway } from './games.gateway';
@@ -14,7 +14,7 @@ import { UsersChatsSocketModule } from 'src/users-chats-socket/users-chats-socke
     ConfigModule,
     DbGamesManagerModule,
     DbUsersManagerModule,
-    UsersChatsSocketModule,
+    forwardRef(() => UsersChatsSocketModule),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -27,6 +27,6 @@ import { UsersChatsSocketModule } from 'src/users-chats-socket/users-chats-socke
   ],
   providers: [GamesService, GamesGateway],
   controllers: [GamesController],
-  exports: [GamesService],
+  exports: [GamesService, GamesGateway],
 })
 export class GamesModule {}

@@ -1,5 +1,5 @@
 import { EnterOption } from './dto/enter.dto';
-import { Logger } from '@nestjs/common';
+import { Inject, Logger, forwardRef } from '@nestjs/common';
 import GameQueue from './dto/gameQue';
 import {
   ConnectedSocket,
@@ -35,6 +35,7 @@ export class GamesGateway
   constructor(
     private jwtService: JwtService,
     private GamesService: GamesService,
+    @Inject(forwardRef(() => UsersChatsGateway)) // NOTE - 순환 종속성 솔루션
     private UsersChatsGateway: UsersChatsGateway,
   ) {
     this.logger.log('GameGateway constructor');
