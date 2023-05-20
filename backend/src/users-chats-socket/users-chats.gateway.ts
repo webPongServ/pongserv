@@ -102,7 +102,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
     }
     // 1
     // console.log(`process login`);
-    this.usersService.processLogin(userId);
+    // this.usersService.processLogin(userId);
     // 2
     this.userIdToSocketIdMap.set(userId, socket.id);
     // console.log(`In handleConnection -> this.userIdToSocketIdMap: `);
@@ -194,7 +194,25 @@ export class UsersChatsGateway implements OnGatewayConnection {
 
     // 3
     // console.log(`process logout`);
-    this.usersService.processLogout(userId);
+    // this.usersService.processLogout(userId);
+  }
+  
+  // TODO: to combine with front-end
+  @SubscribeMessage('getFriendList')
+  async getFriendList(@ConnectedSocket() socket: Socket) {
+    const userId = this.validateAccessToken(socket);
+    if (!userId) return;
+    this.logger.log(`[getFriendList] userId: [${userId}]`);
+    try {
+      const result = await this.usersService.getFriendList(userId);
+      this.logger.log(`[getFriendList] result: ${result.length} Friends`);
+      return result;
+    } catch (err) {
+      this.logger.error(`[getFriendList] excpt: ${err}`);
+      socket.emit('errorGetFriendList', err.response.message);
+      return;
+    }
+
   }
 
   async notifyGameStartToFriends(userId: string) {
