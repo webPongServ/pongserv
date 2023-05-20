@@ -546,19 +546,12 @@ export class UsersChatsGateway implements OnGatewayConnection {
       const requesterProfile = await this.usersService.getProfile(userId);
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       if (targetSocketId) {
-<<<<<<< HEAD
-        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', {
-          gmRmId: gmRmId,
-          requester: requesterNick,
-        });
-=======
         this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', 
           { 
             gmRmId: gmRmId, 
             rqstrNick: requesterProfile.nickname, 
             rqstrImg: requesterProfile.imgPath 
           });
->>>>>>> 26334174c475aaf06d4bf4870e6dd27c846fbd15
       }
       return true;
     } catch (err) {
