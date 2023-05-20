@@ -499,12 +499,12 @@ export class UsersChatsGateway implements OnGatewayConnection {
       // this.usersService.getNicknameByUserId(userId);
       const targetUserId = await this.usersService.getUserIdByNickname(infoDgReq.targetNickname);
       await this.chatsService.checkBothUserInSameChtrm(userId, targetUserId, infoDgReq.id) // NOTE: userId, nickname, chtrmId
-      await this.gamesGateway.reqDirectGame(userId, targetUserId);
+      const gmRmId = await this.gamesGateway.reqDirectGame(userId, targetUserId);
 
       const requesterNick = await this.usersService.getNicknameByUserId(userId);
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', { chtrmId: infoDgReq.id, requester: requesterNick });
+        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', { gmRmId: gmRmId, requester: requesterNick });
       }
       return true;
     } catch (err) {
