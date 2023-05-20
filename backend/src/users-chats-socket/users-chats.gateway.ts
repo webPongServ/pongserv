@@ -503,10 +503,16 @@ export class UsersChatsGateway implements OnGatewayConnection {
       await this.chatsService.checkBothUserInSameChtrm(userId, targetUserId, infoDgReq.id) // NOTE: userId, nickname, chtrmId
       const gmRmId = await this.gamesGateway.reqDirectGame(userId, targetUserId);
 
-      const requesterNick = await this.usersService.getNicknameByUserId(userId);
+      // const requesterNick = await this.usersService.getNicknameByUserId(userId);
+      const requesterProfile = await this.usersService.getProfile(userId);
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', { gmRmId: gmRmId, requester: requesterNick });
+        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', 
+          { 
+            gmRmId: gmRmId, 
+            rqstrNick: requesterProfile.nickname, 
+            rqstrImg: requesterProfile.imgPath 
+          });
       }
       return true;
     } catch (err) {
