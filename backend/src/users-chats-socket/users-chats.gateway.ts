@@ -532,8 +532,8 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomEmpowermentDto: `);
     // console.log(infoEmpwr);
     try {
-      const requesterUserId = await this.usersService.getUserIdByNickname(infoDgRes.requesterNick);
-      await this.gamesGateway.resDirectGame(infoDgRes.gmRmid, requesterUserId, userId, infoDgRes.isApproving);
+      const requesterUserId = await this.usersService.getUserIdByNickname(infoDgRes.rqstrNick);
+      await this.gamesGateway.resDirectGame(infoDgRes.gmRmId, requesterUserId, userId, infoDgRes.isApprv);
       return true;
     } catch (err) {
       console.log(err);
