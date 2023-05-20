@@ -87,7 +87,7 @@ export class UsersController {
     if (!nickname) {
       return { result: false };
     }
-    if (nickname.length > 8) {
+    if (nickname.length > 10) {
       throw new HttpException(
         '닉네임은 8자 이하로 입력해주세요.',
         HttpStatus.BAD_REQUEST,

@@ -45,7 +45,9 @@ export class UsersService {
         lastDttm: user.lastDttm,
       };
     } else {
-      throw new BadRequestException('No User available');
+      this.logger.error(`사용자 정보를 찾을 수 없음: ${intraId}`);
+      return;
+      // throw new BadRequestException('No User available');
     }
   }
 
@@ -54,7 +56,8 @@ export class UsersService {
       nickname,
     );
     if (nicknameExist) {
-      throw new BadRequestException('이미 존재하는 닉네임입니다!');
+      this.logger.error(`이미 존재하는 닉네임: ${nickname}`);
+      // throw new BadRequestException('이미 존재하는 닉네임입니다!');
     } else {
       const user = await this.dbmanagerUsersService.getUserByUserId(intraId);
       if (user) {
@@ -63,7 +66,8 @@ export class UsersService {
         this.logger.log(`닉네임 변경: ${intraId} -> ${nickname}`);
         return { new: nickname };
       } else {
-        throw new BadRequestException('사용자의 정보를 확인할 수 없습니다.');
+        this.logger.error(`사용자 정보를 찾을 수 없음: ${intraId}`);
+        // throw new BadRequestException('사용자의 정보를 확인할 수 없습니다.');
       }
     }
   }
@@ -262,7 +266,8 @@ export class UsersService {
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
     if (!user) {
       this.logger.log(`The user not existed. ${userId}`);
-      throw new NotFoundException(`The user not existed.`);
+      return;
+      // throw new NotFoundException(`The user not existed.`);
     }
     // 2
     const loginData = await this.dbmanagerUsersService.addLoginData(user);
@@ -277,7 +282,11 @@ export class UsersService {
     */
     // 1
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
-    if (!user) throw new NotFoundException(`The user not existed.`);
+    if (!user) {
+      this.logger.log(`The user not existed. ${userId}`);
+      // throw new NotFoundException(`The user not existed.`);
+      return;
+    }
     const logoutData = await this.dbmanagerUsersService.setLoginFinsh(user);
     this.logger.log(`logoutData: ${userId}`);
     return;

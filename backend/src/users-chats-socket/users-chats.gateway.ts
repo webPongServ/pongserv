@@ -546,12 +546,11 @@ export class UsersChatsGateway implements OnGatewayConnection {
       const requesterProfile = await this.usersService.getProfile(userId);
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', 
-          { 
-            gmRmId: gmRmId, 
-            rqstrNick: requesterProfile.nickname, 
-            rqstrImg: requesterProfile.imgPath 
-          });
+        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', {
+          gmRmId: gmRmId,
+          rqstrNick: requesterProfile.nickname,
+          rqstrImg: requesterProfile.imgPath,
+        });
       }
       return true;
     } catch (err) {
@@ -571,8 +570,15 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomEmpowermentDto: `);
     // console.log(infoEmpwr);
     try {
-      const requesterUserId = await this.usersService.getUserIdByNickname(infoDgRes.rqstrNick);
-      await this.gamesGateway.resDirectGame(infoDgRes.gmRmId, requesterUserId, userId, infoDgRes.isApprv);
+      const requesterUserId = await this.usersService.getUserIdByNickname(
+        infoDgRes.rqstrNick,
+      );
+      await this.gamesGateway.resDirectGame(
+        infoDgRes.gmRmId,
+        requesterUserId,
+        userId,
+        infoDgRes.isApprv,
+      );
       return true;
     } catch (err) {
       console.log(err);
