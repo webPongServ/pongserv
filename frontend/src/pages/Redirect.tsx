@@ -5,8 +5,9 @@ import instance from "API/api";
 import qs from "query-string";
 import LoadingString from "components/utils/LoadingString";
 import AuthService from "API/AuthService";
-import NewSessionModal from "components/login/NewSessionModal";
+import FirstRegisterModal from "components/login/FirstRegisterModal";
 import TwoFactorModal from "components/login/TwoFactorModal";
+import { FriendStatusType } from "constant";
 import "styles/global.scss";
 import "styles/Redirect.scss";
 
@@ -32,7 +33,7 @@ const Redirect = () => {
           payload: {
             nickname: response.data.intraId,
             imgURL: response.data.intraImagePath,
-            status: "login",
+            status: FriendStatusType.login,
           },
         });
         dispatch({ type: LoginStatusActionTypes.STATUS_TWOFACTOR });
@@ -42,7 +43,7 @@ const Redirect = () => {
           payload: {
             nickname: response.data.userId,
             imgURL: response.data.imgPath,
-            status: "login",
+            status: FriendStatusType.login,
           },
         });
         localStorage.setItem("accessToken", response.data.accessToken);
@@ -60,7 +61,7 @@ const Redirect = () => {
     <Box id="Redirect" className="flex-container">
       <img src="../loading.gif" alt="loading_gif" />
       <LoadingString message="로그인 중입니다" />
-      <NewSessionModal />
+      <FirstRegisterModal />
       <TwoFactorModal />
     </Box>
   );
