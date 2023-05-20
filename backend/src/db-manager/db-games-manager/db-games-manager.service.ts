@@ -259,7 +259,9 @@ export class DbGamesManagerService {
   }
 
   async updateDirectGame(roomEntity: TbGm01LEntity) {
-    roomEntity.endType = '05';
-    await this.Gm01LRp.save(roomEntity);
+    await this.Gm01LRp.save({
+      ...roomEntity,
+      endType: '05',
+    });
   }
 }
