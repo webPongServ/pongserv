@@ -85,8 +85,7 @@ export class GamesGateway
         if (room !== socket.id) {
           socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
           this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
-          this.GamesService.endGame(room);
-          this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
+          this.GamesService.endGame(room); // 해당 방 삭제
           if (this.gameQueue.removeAndCheckExistence(room))
             console.log('GameQueue에서 방 삭제 성공');
         }
