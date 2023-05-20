@@ -1,3 +1,5 @@
+$dark_orange: #ff6600;
+
 #AppHeader-container {
   height: 100%;
 }
@@ -86,7 +88,13 @@
     }
 
     .inGame {
-      background-color: yellow;
+      img {
+        // box-shadow: 0 0 10px $dark_orange, 0 0 10px $dark_orange;
+      }
+
+      span {
+        color: $dark_orange;
+      }
     }
   }
 
