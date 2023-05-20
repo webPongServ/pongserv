@@ -37,4 +37,5 @@ export interface ProfileDetail {
   ELO: number;
   winRate: number;
   status: string;
+  isBlocked: boolean;
 }

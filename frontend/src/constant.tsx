@@ -45,3 +45,8 @@ export const GameDifficultyType = {
   normal: "02",
   hard: "03",
 };
+
+export const GameResultType = {
+  win: "01",
+  lose: "02",
+};

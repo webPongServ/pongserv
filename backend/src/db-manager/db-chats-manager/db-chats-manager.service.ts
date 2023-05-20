@@ -88,8 +88,8 @@ export class DbChatsManagerService {
             id: userOfChtrm.id,
           },
         });
-        console.log('userOfChtrmWithRel: ');
-        console.log(userOfChtrmWithRel);
+        // console.log('userOfChtrmWithRel: ');
+        // console.log(userOfChtrmWithRel);
         if (userOfChtrmWithRel.ua01mEntity.userId === user.userId) {
           canUserSee = true;
           break;
@@ -212,8 +212,8 @@ export class DbChatsManagerService {
         chtRmJoinTf: true,
       },
     });
-    console.log(`result in getLiveUserListAndCountInARoom: `);
-    console.log(result);
+    // console.log(`result in getLiveUserListAndCountInARoom: `);
+    // console.log(result);
     return result;
   }
 

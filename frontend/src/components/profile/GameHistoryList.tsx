@@ -1,82 +1,34 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { History } from "types/Profile";
 import EmptyListMessage from "components/utils/EmptyListMessage";
+import { History } from "types/Profile";
+import UserService from "API/UserService";
+import { GameRoomType, GameResultType } from "constant";
+import LoadingCircle from "components/utils/LoadingCircle";
 import "styles/global.scss";
 import "styles/Profile.scss";
 
 import { Box, Typography } from "@mui/material";
 import { TabPanel, Card } from "@mui/joy";
 
-const GameHistoryList = () => {
-  const [historyList, setHistoryList] = useState<History[]>([
-    {
-      isWin: true,
-      myId: 0,
-      myNick: "susong",
-      myImg: "../image.png",
-      myScore: 3,
-      opId: 5,
-      opNick: "seongtki",
-      opImg: "../favicon.ico",
-      opScore: 1,
-    },
-    {
-      isWin: false,
-      myId: 0,
-      myNick: "susong",
-      myImg: "../image.png",
-      myScore: 2,
-      opId: 5,
-      opNick: "noname_12",
-      opImg: "../favicon.ico",
-      opScore: 3,
-    },
-    {
-      isWin: false,
-      myId: 0,
-      myNick: "susong",
-      myImg: "../image.png",
-      myScore: 2,
-      opId: 5,
-      opNick: "chanhyle",
-      opImg: "../favicon.ico",
-      opScore: 3,
-    },
-    {
-      isWin: false,
-      myId: 0,
-      myNick: "susong",
-      myImg: "../image.png",
-      myScore: 2,
-      opId: 5,
-      opNick: "mgo",
-      opImg: "../favicon.ico",
-      opScore: 3,
-    },
-    {
-      isWin: false,
-      myId: 0,
-      myNick: "susong",
-      myImg: "../image.png",
-      myScore: 2,
-      opId: 5,
-      opNick: "noname_12",
-      opImg: "../favicon.ico",
-      opScore: 3,
-    },
-    {
-      isWin: false,
-      myId: 0,
-      myNick: "susong",
-      myImg: "../image.png",
-      myScore: 2,
-      opId: 5,
-      opNick: "noname_12",
-      opImg: "../favicon.ico",
-      opScore: 3,
-    },
-  ]);
+interface GameHistoryListProps {
+  nickname: string;
+}
+
+interface serverHistoryList {
+  getScr: number;
+  gmRsltCd: string;
+  gmType: string;
+  lossScr: number;
+  opImgPath: string;
+  opNickname: string;
+  opUserId: string;
+  userImgPath: string;
+  userNickname: string;
+}
+
+const GameHistoryList = (props: GameHistoryListProps) => {
+  const [historyList, setHistoryList] = useState<History[] | null>(null);
 
   const userProfile = (nickname: string, imgURL: string): JSX.Element => {
     return (
@@ -89,18 +41,56 @@ const GameHistoryList = () => {
     );
   };
 
+  const getGameHistory = async () => {
+    const response = await UserService.getGameHistory(props.nickname);
+    console.log(response.data);
+    setHistoryList(
+      response.data.map(
+        (value: serverHistoryList): History => ({
+          isWin: value.gmRsltCd === GameResultType.win,
+          isDodge:
+            (value.gmRsltCd === GameResultType.win &&
+              value.getScr <= value.lossScr) ||
+            (value.gmRsltCd === GameResultType.lose &&
+              value.getScr >= value.lossScr),
+          myNick: value.userNickname,
+          myImg: value.userImgPath,
+          myScore: value.getScr,
+          opNick: value.opNickname,
+          opImg: value.opImgPath,
+          opScore: value.lossScr,
+          type: value.gmType,
+        })
+      )
+    );
+  };
+
+  useEffect(() => {
+    getGameHistory();
+  }, [props.nickname]);
+
   return (
     <TabPanel value={0}>
-      {historyList.length === 0 ? (
+      {historyList === null && <LoadingCircle />}
+      {historyList !== null && historyList.length === 0 && (
         <EmptyListMessage message="전적이 존재하지 않습니다!" />
-      ) : (
-        historyList.map((value, index) => {
+      )}
+      {historyList !== null &&
+        historyList.length !== 0 &&
+        historyList!.map((value, index) => {
           return (
-            <Box className="flex-container" key={value.myId + index}>
+            <Box
+              className="flex-container"
+              key={value.myNick + value.opNick + index}
+            >
               <Card className="history-card flex-container" variant="outlined">
                 <Box className="result">
+                  <Typography>
+                    {value.type === GameRoomType.normal ? "일반" : "래더"}
+                  </Typography>
                   <Typography className={value.isWin ? "win" : "lose"}>
                     {value.isWin ? "승리" : "패배"}
+                    {value.isDodge ? "(몰수)" : null}
                   </Typography>
                 </Box>
                 {userProfile(value.myNick, value.myImg)}
@@ -113,8 +103,7 @@ const GameHistoryList = () => {
               </Card>
             </Box>
           );
-        })
-      )}
+        })}
     </TabPanel>
   );
 };
