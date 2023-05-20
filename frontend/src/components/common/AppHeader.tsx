@@ -66,7 +66,7 @@ export default function AppHeader() {
   const paramsCode: string | undefined = qs.parse(window.location.search)
     .error as string;
   const notiRef = useRef<HTMLDivElement>(null);
-  const status = useSelector((state: IRootState) => state.loginStatus);
+  const loginStatus = useSelector((state: IRootState) => state.loginStatus);
   const [requester, setRequester] = useState<RequesterDetail>({
     nickname: "",
     imgURL: "",
@@ -86,7 +86,7 @@ export default function AppHeader() {
       payload: {
         nickname: response.data.nickname,
         imgURL: response.data.imgPath,
-        status: "login",
+        status: FriendStatusType.login,
       },
     });
   };
@@ -180,7 +180,7 @@ export default function AppHeader() {
       <Box id="AppHeader-container" className="flex-container">
         <CssBaseline />
         <AppBar open={open} setOpen={setOpen} />
-        {status === "game" ? null : <FriendDrawer />}
+        {loginStatus === "game" ? null : <FriendDrawer />}
         <Main id="Main-box" open={open}>
           <Routes>
             <Route path="/*" element={<MainRoute />} />
