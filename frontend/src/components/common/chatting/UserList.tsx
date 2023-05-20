@@ -184,7 +184,7 @@ const UserList = (props: UserListProps) => {
           },
         });
         setAnchorEl(null);
-        navigate(`/game/${uuid}`);
+        navigate(`/game/${gmRmId}`);
       }
     );
   };
