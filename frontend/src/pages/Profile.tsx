@@ -70,7 +70,7 @@ const Profile = () => {
   return (
     <Box id="Profile" className="flex-container">
       <Box id="user-info-box" className="flex-container">
-        <Box className="user-info flex-container">
+        <Box className="user-info">
           {profileDetail === null ? (
             <SkeletonProfile />
           ) : (
