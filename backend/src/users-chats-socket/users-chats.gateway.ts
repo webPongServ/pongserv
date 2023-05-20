@@ -552,7 +552,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
           rqstrImg: requesterProfile.imgPath,
         });
       }
-      return true;
+      return gmRmId;
     } catch (err) {
       console.log(err);
       socket.emit('errorChatroomMute', err.response.message);
