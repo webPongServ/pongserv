@@ -259,7 +259,10 @@ export class UsersService {
     */
     // 1
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
-    if (!user) throw new NotFoundException(`The user not existed.`);
+    if (!user) {
+      this.logger.log(`The user not existed. ${userId}`);
+      throw new NotFoundException(`The user not existed.`);
+    }
     // 2
     const loginData = await this.dbmanagerUsersService.addLoginData(user);
     this.logger.log(`loginData: ${userId}`);
