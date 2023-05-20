@@ -25,6 +25,7 @@ import { ChatroomLeavingDto } from './dto/chatroom-leaving.dto';
 import { ChatroomRequestMessageDto } from './dto/chatroom-request-message.dto';
 import { ChatroomResponseMessageDto } from './dto/chatroom-response-message.dto';
 import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class ChatsService {
@@ -37,14 +38,15 @@ export class ChatsService {
     userId: string,
     chatroomCreationDto: ChatroomCreationDto,
   ) {
+    const saltOrRounds = 10; // TODO: Replace to use env
     const name: string = chatroomCreationDto.name;
     const type: string = chatroomCreationDto.type;
-    const pwd: string = chatroomCreationDto.pwd;
+    const pwdCryptd: string = await bcrypt.hash(chatroomCreationDto.pwd, saltOrRounds);
     const max: number = chatroomCreationDto.max;
     const newChatroom = await this.dbChatsManagerService.createChatroom(
       name,
       type,
-      pwd,
+      pwdCryptd,
       max,
     );
     const user = await this.dbUsersManagerService.getUserByUserId(userId);
@@ -160,7 +162,8 @@ export class ChatsService {
       throw new NotFoundException('The chatroom not exist');
     // 2
     if (targetRoom.chtRmType === '02') {
-      if (targetRoom.chtRmPwd !== infoEntr.pwd) {
+      const isPwdMatched = await bcrypt.compare(targetRoom.chtRmPwd, infoEntr.pwd); // TODO: Replace to use env
+      if (isPwdMatched === false) {
         throw new ForbiddenException('Wrong chatroom password');
       }
     }
