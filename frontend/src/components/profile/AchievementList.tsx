@@ -66,7 +66,6 @@ const Achievements = (props: AchievementsProps) => {
 
   const getAchievements = async () => {
     const response = await UserService.getAchievement(props.nickname);
-    console.log(response.data);
     setAchieved(null);
   };
 

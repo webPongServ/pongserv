@@ -43,7 +43,6 @@ const GameHistoryList = (props: GameHistoryListProps) => {
 
   const getGameHistory = async () => {
     const response = await UserService.getGameHistory(props.nickname);
-    console.log(response.data);
     setHistoryList(
       response.data.map(
         (value: serverHistoryList): History => ({
