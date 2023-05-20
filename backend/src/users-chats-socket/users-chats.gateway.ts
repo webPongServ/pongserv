@@ -71,6 +71,15 @@ export class UsersChatsGateway implements OnGatewayConnection {
 
   // TODO - to organize
   async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
+    try {
+      this.initUserConnection(socket);
+    } catch (err) {
+      console.log(err);
+      return ;
+    } 
+  }
+
+  async initUserConnection(@ConnectedSocket() socket: Socket) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
       socket.disconnect();
