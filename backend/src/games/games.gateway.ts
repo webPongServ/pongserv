@@ -97,7 +97,6 @@ export class GamesGateway
     if (typeof socket.data === 'string') {
       this.GameSocketId.delete(socket.data);
     }
-    this.logger.log('[Deletion]Game Socket ID is ', this.GameSocketId);
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 

@@ -305,7 +305,7 @@ export class DbUsersManagerService {
         delTf: false,
       });
       await this.ua02lRp.save(friendList);
-      console.log('make new friend');
+      // console.log('make new friend');
       return { result: 'Success' };
     }
   }

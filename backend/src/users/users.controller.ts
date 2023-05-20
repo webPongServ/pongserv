@@ -137,7 +137,7 @@ export class UsersController {
   @UseGuards(JwtAccessTokenGuard)
   @Post('/friend')
   async makeFriend(@CurrentUser() user: string, @Body() body: any) {
-    console.log('In makeFriend', user, body);
+    // console.log('In makeFriend', user, body);
     return await this.UsersService.makeFriend(user, body.nickname);
   }
 
@@ -149,7 +149,7 @@ export class UsersController {
   @UseGuards(JwtAccessTokenGuard)
   @Post('/friend/delete')
   async deleteFriend(@CurrentUser() user: string, @Body() body: any) {
-    console.log('In deleteFriend', user, body);
+    // console.log('In deleteFriend', user, body);
     return await this.UsersService.deleteFriend(user, body.nickname);
   }
 
