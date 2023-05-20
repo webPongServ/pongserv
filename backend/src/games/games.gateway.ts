@@ -241,7 +241,7 @@ export class GamesGateway
       1-2. 래더 대기열이 있다면, 해당 방에 join 후 대기열 삭제
     2. socket을 통해 프론트에 방이 만들어졌음을 알린다(roomCreated)
     */
-    this.logger.log(`Queue Present: ${this.gameQueue.length}`);
+
     const userId = socket.data;
     if (this.gameQueue.isEmpty()) {
       const message: roomOption = {
