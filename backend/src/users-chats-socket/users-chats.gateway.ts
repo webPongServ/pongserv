@@ -26,6 +26,7 @@ import { ChatroomEmpowermentDto } from '../chats/dto/chatroom-empowerment.dto';
 import { ChatroomDmReqDto } from '../chats/dto/chatroom-dm-req.dto';
 import { ChatroomDirectGameRequestDto } from 'src/chats/dto/chatroom-dg-req.dto';
 import { GamesGateway } from 'src/games/games.gateway';
+import { ChatroomDirectGameResponseDto } from 'src/chats/dto/chatroom-dg-res.dto';
 
 // @UseGuards(WsJwtGuard)
 @WebSocketGateway({
@@ -516,7 +517,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
   @SubscribeMessage('chatroomResponseGame')
   async responseGameChatroomUser(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() infoEmpwr: ChatroomEmpowermentDto
+    @MessageBody() infoDgRes: ChatroomDirectGameResponseDto
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
@@ -524,12 +525,8 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomEmpowermentDto: `);
     // console.log(infoEmpwr);
     try {
-      const targetUserId = await this.chatsService.empowerUser(userId, infoEmpwr);
-      // target user의 socket에 empowered 정보 emit
-      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomResponseGame', { chtrmId: infoEmpwr.id });
-      }
+      const requesterUserId = await this.usersService.getUserIdByNickname(infoDgRes.requesterNick);
+      await this.gamesGateway.resDirectGame(infoDgRes.gmRmid, requesterUserId, userId, infoDgRes.isApproving);
       return true;
     } catch (err) {
       console.log(err);

@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class ChatroomDirectGameResponseDto {
     @ApiProperty({ type: String })
-    id: string;
+    gmRmid: string;
 
     @ApiProperty({ type: String })
     requesterNick: string;
