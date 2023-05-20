@@ -232,6 +232,8 @@ export class UsersService {
 
   async getFriendUserIds(userId: string) {
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
+    if (!user)
+      throw new NotFoundException(`회원가입 된 유저가 아닙니다.`);
     const friendDatas = await this.dbmanagerUsersService.getFriendList(user);
     const retFrndUserIds: string[] = [];
     for (const eachData of friendDatas) {
