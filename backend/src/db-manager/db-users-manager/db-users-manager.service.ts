@@ -408,7 +408,7 @@ export class DbUsersManagerService {
   }
 
   async getFriendList(myEntity: TbUa01MEntity) {
-    if (!myEntity) throw new UnauthorizedException('No User available');
+    // if (!myEntity) return [];
     const friendDatas = await this.ua02lRp.find({
       relations: {
         ua01mEntityAsFr: true,
