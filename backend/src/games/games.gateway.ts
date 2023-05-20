@@ -206,7 +206,7 @@ export class GamesGateway
 
   @SubscribeMessage('dodge')
   scoreUpdate(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
-    this.logger.log(`Dodge Game Score Update ${message.roomId}}}`);
+    this.logger.log(`Dodge Game Score Update ${message.roomId}`);
     // console.log('Dodge Game Score Update', message);
     // 필요한 데이터 roodId, Score(양쪽 다), userId
     const roomId = message.roomId;
