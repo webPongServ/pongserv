@@ -366,7 +366,7 @@ export class ChatsService {
       throw new UnauthorizedException('You do not have permission.');
     // 2
     const targetUser = await this.dbUsersManagerService.getUserByNickname(
-      infoBan.nicknameToBan
+      infoBan.nicknameToBan,
     );
     const targetInChtrm = await this.dbChatsManagerService.getUserInfoInChatrm(
       targetUser,
@@ -384,7 +384,7 @@ export class ChatsService {
       targetInChtrm,
     );
     // 4
-    return targetUser.userId;
+    return { targetUserId: targetUser.userId, targetNick: targetUser.nickname };
   }
 
   async muteUser(userId: string, infoBan: ChatroomMuteDto) {
@@ -427,7 +427,7 @@ export class ChatsService {
     // 3
     await this.dbChatsManagerService.setMuteUserInfo(targetUser, chtrm);
     // 4
-    return targetUser.userId;
+    return targetUser.nickname;
   }
 
   async empowerUser(userId: string, infoEmpwr: ChatroomEmpowermentDto) {
@@ -435,7 +435,7 @@ export class ChatsService {
 			1. user의 권한이 owner 혹은 administrator 인지 확인한다.
 			2. 해당 방의 뮤트할 target의 정보를 확인한다.
 				2-1. 해당 방에 존재하는지 체크한다.
-				2-2. 뮤트할 타겟이 owner 이면 안 된다.
+				2-2. 타겟이 owner 이면 안 된다.
 				2-3. 이미 administrator일 때도 거절한다.
 			3. target의 권한을 admin으로 바꾸고 저장한다.
 			4. target의 정보를 반환한다.
@@ -532,7 +532,21 @@ export class ChatsService {
       throw new NotFoundException("The chatroom isn't exist currently.");
     // 2
     const banList = await this.dbChatsManagerService.getBanListInARoom(chtrm);
-    return banList;
+
+    const results: {
+      nickname: string;
+      imgPath: string;
+      authInChtrm: string;
+    }[] = [];
+    for (const eachBan of banList) {
+      const eachUserBanned: TbUa01MEntity = eachBan.ua01mEntity;
+      results.push({
+        nickname: eachUserBanned.nickname,
+        imgPath: eachUserBanned.imgPath,
+        authInChtrm: '03', // default: normal
+      });
+    }
+    return results;
   }
 
   async removeBan(userId: string, infoBanRmv: ChatroomBanRemovalDto) {
@@ -570,7 +584,7 @@ export class ChatsService {
     // 3
     banInfoOfTarget.vldTf = false;
     this.dbChatsManagerService.saveChtrmRstrInfo(banInfoOfTarget);
-    return ;
+    return target.nickname;
   }
 
   async leaveChatroom(userId: string, infoLeav: ChatroomLeavingDto) {
@@ -585,6 +599,13 @@ export class ChatsService {
 				3-2. 나가는 유저의 권한을 normal로 바꾼다.
 			4. 채널 참여 여부를 false로 바꾸고 반환한다.
 		*/
+    const result: {
+      leaverNick: string;
+      nextOwnerNick: string;
+    } = {
+      leaverNick: null,
+      nextOwnerNick: null,
+    };
     // 1
     const user = await this.dbUsersManagerService.getUserByUserId(userId);
     const chtrm = await this.dbChatsManagerService.getLiveChtrmById(
@@ -630,6 +651,7 @@ export class ChatsService {
         }
         sccssrToOwner.chtRmAuth = '01';
         this.dbChatsManagerService.saveChtrmUser(sccssrToOwner);
+        result.nextOwnerNick = sccssrToOwner.ua01mEntity.nickname;
       }
       // 3-2
       userInChtrm.chtRmAuth = '03';
@@ -637,33 +659,66 @@ export class ChatsService {
     // 4
     userInChtrm.chtRmJoinTf = false;
     this.dbChatsManagerService.saveChtrmUser(userInChtrm);
-    return user.nickname;
+    result.leaverNick = user.nickname;
+    return result;
   }
 
-  async putBlockUserInChats(userId: string, infoBlck: BlockingUserInChatsDto)
-  {
-	/*!SECTION
+  async putBlockUserInChats(userId: string, infoBlck: BlockingUserInChatsDto) {
+    /*!SECTION
 		1. requester user 정보를 가져온다.
 		2. target user를 찾아서 가져온다.
 		3. boolToBlock 정보에 따라서 TB_CH04L에 등록한다.
 	*/
-	// 1
-	const requester = await this.dbUsersManagerService.getUserByUserId(userId);
-	// 2
-	const target = await this.dbUsersManagerService.getUserByNickname(infoBlck.nickname);
-	// 3
-	await this.dbChatsManagerService.setBlockingData(requester, target, infoBlck.boolToBlock);
-	return ;
+    // 1
+    const requester = await this.dbUsersManagerService.getUserByUserId(userId);
+    // 2
+    const target = await this.dbUsersManagerService.getUserByNickname(
+      infoBlck.nickname,
+    );
+    // 3
+    await this.dbChatsManagerService.setBlockingData(
+      requester,
+      target,
+      infoBlck.boolToBlock,
+    );
+    return;
   }
 
-  async getUserIdsForThisUserToBlock(userId: string)
-  {
-	const user = await this.dbUsersManagerService.getUserByUserId(userId);
-	const blockingList = await this.dbChatsManagerService.getListForThisUserToBlock(user);
-	let retUserIdsBlocked: string[] = [];
-	for (const each of blockingList) {
-		retUserIdsBlocked.push(each.ua01mEntityAsBlock.userId);
-	}
-	return (retUserIdsBlocked);
+  async getUserIdsForThisUserToBlock(userId: string) {
+    const user = await this.dbUsersManagerService.getUserByUserId(userId);
+    const blockingList =
+      await this.dbChatsManagerService.getListForThisUserToBlock(user);
+    const retUserIdsBlocked: string[] = [];
+    for (const each of blockingList) {
+      retUserIdsBlocked.push(each.ua01mEntityAsBlock.userId);
+    }
+    return retUserIdsBlocked;
+  }
+
+  async isTargetBlockedByUser(userId: string, targetNickname: string) {
+    const requestUser = await this.dbUsersManagerService.getUserByUserId(
+      userId,
+    );
+    const targetUser = await this.dbUsersManagerService.getUserByNickname(
+      targetNickname,
+    );
+    const blockingData = await this.dbChatsManagerService.getBlockingData(
+      requestUser,
+      targetUser,
+    );
+    if (!blockingData || blockingData.stCd === '02') {
+      return false;
+    }
+    return true;
+  }
+
+  async checkBothUserInSameChtrm(frstUserId: string, scndUserId: string, chtrmId: string) {
+    const frstUser = await this.dbUsersManagerService.getUserByUserId(frstUserId);
+    const scndUser = await this.dbUsersManagerService.getUserByUserId(scndUserId);
+    const chtrm = await this.dbChatsManagerService.getLiveChtrmById(chtrmId);
+    if (await this.dbChatsManagerService.isUserListedInThisChatroom(frstUser, chtrm) === false
+      || await this.dbChatsManagerService.isUserListedInThisChatroom(scndUser, chtrm) === false)
+      throw new NotFoundException(`같은 채팅방에 존재하지 않습니다.`);
+    return true;
   }
 }

@@ -4,17 +4,22 @@ import "styles/global.scss";
 
 import { Box } from "@mui/material";
 
-const UserInfo = (props: ProfileDetail) => {
+interface UserInfoProps {
+  profileDetail: ProfileDetail;
+}
+
+const UserInfo = (props: UserInfoProps) => {
   return (
-    <Box className="flex-container">
-      <img src={props.imgURL} alt="profile_image" />
+    <Box className="flex-container justify-flex-start">
+      <img src={props.profileDetail.imgURL} alt="profile_image" />
       <Box>
-        <Box className="title">{props.nickname}</Box>
+        <Box className="title">{props.profileDetail.nickname}</Box>
         <Box>
-          전적 : {props.total}G {props.win}W {props.lose}L
+          전적 : {props.profileDetail.total}G {props.profileDetail.win}W{" "}
+          {props.profileDetail.lose}L
         </Box>
         <Box>
-          래더 점수 : {props.ELO} ({props.winRate}%)
+          래더 점수 : {props.profileDetail.ELO} ({props.profileDetail.winRate}%)
         </Box>
       </Box>
     </Box>

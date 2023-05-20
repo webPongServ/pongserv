@@ -1,6 +1,9 @@
+import { useRef, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
 import CustomIconButton from "components/utils/CustomIconButton";
+import ErrorNotification from "components/utils/ErrorNotification";
+import { errorMessageCreator } from "components/common/AppHeader";
 import "styles/global.scss";
 import "styles/ChattingDrawer.scss";
 
@@ -29,6 +32,7 @@ const ChattingDrawer = (props: HandleOpen) => {
   const currentChatting = useSelector(
     (state: IRootState) => state.currentChatting
   );
+  const divRef = useRef<HTMLDivElement>(null);
 
   const theme = useTheme();
 
@@ -36,36 +40,55 @@ const ChattingDrawer = (props: HandleOpen) => {
     props.setOpen(false);
   };
 
+  useEffect(() => {
+    if (divRef.current !== null) divRef.current.focus();
+  }, []);
+
+  setTimeout(() => {
+    if (divRef.current) divRef.current.style.animationName = "slideup";
+  }, 5000);
+
   return (
-    <Drawer
-      id="ChattingDrawer"
-      variant="persistent"
-      anchor="right"
-      open={props.open}
-    >
-      <DrawerHeader id="header">
-        <CustomIconButton
-          class=""
-          icon={
-            theme.direction === "rtl" ? (
-              <ChevronLeftIcon />
-            ) : (
-              <ChevronRightIcon />
-            )
-          }
-          handleFunction={handleDrawerClose}
+    <>
+      {currentChatting.status.includes("error") ? (
+        <ErrorNotification
+          ref={divRef}
+          errorMessage={errorMessageCreator(
+            currentChatting.status.substring(6)
+          )}
         />
-        <Box id="title" className="flex-container">
-          채팅
+      ) : null}
+      <Drawer
+        id="ChattingDrawer"
+        variant="persistent"
+        anchor="right"
+        open={props.open}
+      >
+        <DrawerHeader id="header">
+          <CustomIconButton
+            class=""
+            icon={
+              theme.direction === "rtl" ? (
+                <ChevronLeftIcon />
+              ) : (
+                <ChevronRightIcon />
+              )
+            }
+            handleFunction={handleDrawerClose}
+          />
+          <Box id="title" className="flex-container">
+            채팅
+          </Box>
+        </DrawerHeader>
+        <Divider />
+        <Box id="body">
+          {(currentChatting.status === "waiting" ||
+            currentChatting.status.includes("error")) && <WaitingRoom />}
+          {currentChatting.status === "creating" && <RoomCreator />}
+          {currentChatting.status === "chatting" && <ChattingRoom />}
         </Box>
-      </DrawerHeader>
-      <Divider />
-      <Box id="body">
-        {currentChatting.status === "waiting" && <WaitingRoom />}
-        {currentChatting.status === "creating" && <RoomCreator />}
-        {currentChatting.status === "chatting" && <ChattingRoom />}
-      </Box>
-    </Drawer>
+      </Drawer>
+    </>
   );
 };
 

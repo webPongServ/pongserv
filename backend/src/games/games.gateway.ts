@@ -1,5 +1,5 @@
 import { EnterOption } from './dto/enter.dto';
-import { Logger, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Inject, Logger, forwardRef } from '@nestjs/common';
 import GameQueue from './dto/gameQue';
 import {
   ConnectedSocket,
@@ -15,6 +15,7 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 import { GamesService } from './games.service';
 import { roomOption } from './dto/roomOption.dto';
+import { UsersChatsGateway } from 'src/users-chats-socket/users-chats.gateway';
 @WebSocketGateway({
   cors: {
     origin: '*',
@@ -34,6 +35,8 @@ export class GamesGateway
   constructor(
     private jwtService: JwtService,
     private GamesService: GamesService,
+    @Inject(forwardRef(() => UsersChatsGateway)) // NOTE - 순환 종속성 솔루션
+    private UsersChatsGateway: UsersChatsGateway,
   ) {
     this.logger.log('GameGateway constructor');
   }
@@ -69,9 +72,8 @@ export class GamesGateway
     if (typeof socket.data === 'string') {
       this.GameSocketId.set(socket.data, socket.id);
     }
-    console.log('Game Socket ID is ', this.GameSocketId);
     this.logger.log(
-      `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
+      `GameGateway handleConnection: ${socket.data} -> ${socket.id}`,
     );
     socket.on('disconnecting', (reason) => {
       /*
@@ -84,10 +86,9 @@ export class GamesGateway
         if (room !== socket.id) {
           socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
           this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
-          this.GamesService.endGame(room);
-          this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
+          this.GamesService.endGame(room); // 해당 방 삭제
           if (this.gameQueue.removeAndCheckExistence(room))
-            console.log('GameQueue에서 방 삭제 성공');
+            this.logger.log('gameQueue removed');
         }
       }
     });
@@ -96,7 +97,6 @@ export class GamesGateway
     if (typeof socket.data === 'string') {
       this.GameSocketId.delete(socket.data);
     }
-    console.log('[Deletion]Game Socket ID is ', this.GameSocketId);
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 
@@ -127,7 +127,9 @@ export class GamesGateway
       message.score,
       roomList.id, // Room의 이름
     );
-    console.log(roomList.id);
+    this.logger.log(`GameGateway createGameRoom: ${socket.id}`);
+    await this.UsersChatsGateway.notifyGameStartToFriends(userId.toString());
+    // Notify To friends
     return roomList.id;
   }
 
@@ -164,7 +166,7 @@ export class GamesGateway
     @MessageBody() message,
   ) {
     const userId = socket.data;
-    console.log(userId, 'cancel', message.roomId);
+    this.logger.log(userId, 'cancel', message.roomId);
     await socket.leave(message.roomId);
     return 'OK';
   }
@@ -178,16 +180,14 @@ export class GamesGateway
     await socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
     await socket.emit('roomGuest');
     await this.server.to(message.roomId).emit('gameStart');
-    console.log(
-      socket.rooms,
-      (await this.server.in(message.roomId).fetchSockets()).length,
-    );
+    this.logger.log(`Game condition fulfilled: ${message.roomId} started`);
     const userId = socket.data;
     const roomId = message.roomId;
     const type = message.type;
     await this.GamesService.enterRoom(userId, roomId, type);
     await this.GamesService.updateOpponent(userId, roomId);
     await this.GamesService.startGame(userId, roomId);
+    await this.UsersChatsGateway.notifyGameStartToFriends(userId.toString());
     return 'OK';
   }
   // Game Data 요청 받고 보내기
@@ -218,7 +218,7 @@ export class GamesGateway
   }
 
   @SubscribeMessage('finishGame')
-  leaveGameRoom(
+  async leaveGameRoom(
     @ConnectedSocket() socket: Socket,
     @MessageBody() message: any,
   ) {
@@ -230,6 +230,7 @@ export class GamesGateway
     this.server.socketsLeave(roomId);
     this.GamesService.finishGame(userId, roomId, myScore, opScore);
     this.GamesService.endGame(roomId);
+    await this.UsersChatsGateway.notifyGameEndToFriends(userId.toString());
     return 'OK';
   }
 
@@ -241,7 +242,7 @@ export class GamesGateway
       1-2. 래더 대기열이 있다면, 해당 방에 join 후 대기열 삭제
     2. socket을 통해 프론트에 방이 만들어졌음을 알린다(roomCreated)
     */
-    console.log('Now Queue is : ', this.gameQueue);
+
     const userId = socket.data;
     if (this.gameQueue.isEmpty()) {
       const message: roomOption = {
@@ -264,6 +265,67 @@ export class GamesGateway
       return { roomId: roomId, action: 'join' };
     }
     return 'OK';
+  }
+
+  async reqDirectGame(requestId: string, targetId: string) {
+    const userId = requestId;
+    const option = {
+      type: '01',
+      roomName: 'DIRECT_GAME_' + userId,
+      difficulty: '01',
+      score: 5,
+    };
+    const roomList = await this.GamesService.createGameRoom(userId, option);
+    const gameRoomId = await this.GamesService.createGameDetail(
+      roomList,
+      userId,
+      option.type,
+    );
+    const requesterSocket = this.GameSocketId.get(requestId);
+    this.server.in(requesterSocket).socketsJoin(roomList.id);
+    const targetSocket = this.GameSocketId.get(targetId);
+    this.server.in(targetSocket).socketsJoin(roomList.id);
+    // // Notify To friends
+    await this.UsersChatsGateway.notifyGameStartToFriends(userId);
+    return roomList.id;
+  }
+
+  async resDirectGame(
+    roomId: string,
+    requestId: string,
+    targetId: string,
+    status: boolean,
+  ) {
+    if (status) {
+      const requesterSocket: Socket = this.server.sockets.sockets.get(
+        this.GameSocketId.get(requestId),
+      );
+      const targetSocket: Socket = this.server.sockets.sockets.get(
+        this.GameSocketId.get(targetId),
+      );
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+
+      if (!requesterSocket || !targetSocket) {
+        return 'OK';
+      }
+      await requesterSocket.emit('roomOwner'); // 방장에게 방장임을 알려주는 것
+      await targetSocket.emit('roomGuest');
+      await requesterSocket.emit('gameStart');
+      await targetSocket.emit('gameStart');
+
+      await this.GamesService.enterRoom(targetId, roomId, '01');
+      await this.GamesService.updateOpponent(requestId, roomId);
+      await this.GamesService.startGame(targetId, roomId);
+      await this.UsersChatsGateway.notifyGameStartToFriends(targetId);
+      return 'OK';
+    } else {
+      const requesterSocket: Socket = this.server.sockets.sockets.get(
+        this.GameSocketId.get(requestId),
+      );
+      await requesterSocket.emit('gameReject');
+      // Reject하면 -> 프론트에서 다른 곳으로 나가고 -> 그렇게 함으로써 소켓 끊으면? 모두 해결
+      return 'OK';
+    }
   }
 
   // 내부 함수

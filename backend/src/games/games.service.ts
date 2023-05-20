@@ -1,17 +1,15 @@
 import { DbUsersManagerService } from './../db-manager/db-users-manager/db-users-manager.service';
 import { roomOption } from './dto/roomOption.dto';
-import { HttpService } from '@nestjs/axios';
 import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { DbGamesManagerService } from 'src/db-manager/db-games-manager/db-games-manager.service';
 @Injectable()
 export class GamesService {
   constructor(
     private readonly DbGamesManagerService: DbGamesManagerService,
     private readonly DbUsersManagerService: DbUsersManagerService,
-    private readonly configService: ConfigService,
   ) {}
 
+  logger = new Logger('GamesService');
   // GameRoom 생성한다.
   async createGameRoom(userId, message: roomOption) {
     const { type, roomName, difficulty, score } = message;
@@ -22,6 +20,7 @@ export class GamesService {
       score,
       userId,
     );
+    this.logger.log('게임방 생성 성공');
     return room;
   }
 
@@ -32,6 +31,7 @@ export class GamesService {
       userEntity,
       type,
     );
+    this.logger.log('게임방 상세 생성 성공');
     return true;
   }
 
@@ -63,6 +63,7 @@ export class GamesService {
     await this.DbGamesManagerService.updateOpponent(roomId, opponent, owner);
     await this.DbGamesManagerService.updateOpponent(roomId, owner, opponent);
     await this.DbGamesManagerService.updateOpponentList(roomId, opponent);
+    this.logger.log('GM Table Detail에 상대편 등록 성공');
   }
 
   async startGame(userId, roomId) {
@@ -77,6 +78,7 @@ export class GamesService {
       nickname,
     );
     console.log(userId, '\n\n');
+    this.DbGamesManagerService.getGameSummary(userId);
     const user = await this.DbUsersManagerService.getUserByUserId(userId);
     console.log(user, userId);
     const userStatic = await this.DbGamesManagerService.getUserStatic(user);
@@ -95,7 +97,7 @@ export class GamesService {
         ? roomListEntity.opUserId
         : roomListEntity.owner;
 
-    console.log('Dodge Game opUserId', opUserId, 'userId', userId, '\n\n\n');
+    this.logger.log(`Dodge Game opUserId : ${opUserId} userId : ${userId}`);
     // console.log(roomListEntity);
     await this.DbGamesManagerService.SaveGame(
       roomListEntity,
@@ -112,6 +114,7 @@ export class GamesService {
       opScore,
       myScore,
     );
+    this.logger.log('Dodge Game 저장 성공 게임 종료됨');
   }
 
   async finishGame(userId, roomId, myScore, opScore) {
@@ -129,5 +132,10 @@ export class GamesService {
       myScore,
       opScore,
     );
+    this.logger.log('Finish Game 저장 성공 게임 종료됨');
+  }
+
+  async isInGame(userId: string) {
+    return await this.DbGamesManagerService.isInGame(userId);
   }
 }

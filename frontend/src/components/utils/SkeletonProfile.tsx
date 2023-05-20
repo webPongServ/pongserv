@@ -5,7 +5,7 @@ import { Box, Skeleton } from "@mui/material";
 
 const SkeletonProfile = () => {
   return (
-    <Box className="flex-container">
+    <Box className="flex-container justify-flex-start">
       <Skeleton className="skeleton-img" variant="circular" />
       <Box>
         <Skeleton className="skeleton-title" variant="rectangular" />
