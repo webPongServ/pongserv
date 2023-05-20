@@ -7,17 +7,14 @@ import {
   UseGuards,
   HttpStatus,
   HttpException,
-  Res,
   Get,
   Query,
   BadRequestException,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ConfigService } from '@nestjs/config';
-import { start } from 'repl';
 
 @ApiTags('users')
 @Controller('users')

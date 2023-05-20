@@ -1,5 +1,5 @@
 import { EnterOption } from './dto/enter.dto';
-import { Logger, UnauthorizedException, UseGuards } from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 import GameQueue from './dto/gameQue';
 import {
   ConnectedSocket,
@@ -310,6 +310,9 @@ export class GamesGateway
       );
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
+      if (!requesterSocket || !targetSocket) {
+        return 'OK';
+      }
       await requesterSocket.emit('roomOwner'); // 방장에게 방장임을 알려주는 것
       await targetSocket.emit('roomGuest');
       await requesterSocket.emit('gameStart');
