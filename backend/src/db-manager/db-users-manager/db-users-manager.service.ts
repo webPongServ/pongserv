@@ -27,13 +27,17 @@ export class DbUsersManagerService {
   ) {}
 
   logger = new Logger('DbUsersManagerService');
+
   async getUserByUserId(userId: string) {
-    const user = await this.ua01mRp.findOne({
-      where: {
-        userId: userId,
-      },
-    });
-    return user;
+    try {
+      return await this.ua01mRp.findOne({
+        where: {
+          userId: userId,
+        },
+      });
+    } catch (e) {
+      return null;
+    }
   }
 
   async getUserByNickname(nickname: string) {
@@ -260,14 +264,14 @@ export class DbUsersManagerService {
   }
 
   async getMasterEntity(userId: string) {
-    const user = await this.ua01mRp.findOne({
-      where: {
-        userId: userId,
-      },
-    });
-    if (!user) throw new BadRequestException('No User available');
-    else {
-      return user;
+    try {
+      return await this.ua01mRp.findOne({
+        where: {
+          userId: userId,
+        },
+      });
+    } catch (e) {
+      throw new BadRequestException('No User available');
     }
   }
 
@@ -404,6 +408,7 @@ export class DbUsersManagerService {
   }
 
   async getFriendList(myEntity: TbUa01MEntity) {
+    if (!myEntity) throw new UnauthorizedException('No User available');
     const friendDatas = await this.ua02lRp.find({
       relations: {
         ua01mEntityAsFr: true,
