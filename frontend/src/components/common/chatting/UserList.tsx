@@ -171,11 +171,11 @@ const UserList = (props: UserListProps) => {
         id: currentChatting.chattingRoom?.id,
         targetNickname: selectedUser.nickname,
       },
-      (uuid: string) => {
+      (gmRmId: string) => {
         dispatch({
           type: CurrentGameActionTypes.UPDATE_GAMEROOM,
           payload: {
-            id: uuid,
+            id: gmRmId,
             title: myInfo.nickname + "의 신청 게임",
             owner: myInfo.nickname,
             ownerImage: myInfo.imgURL,
