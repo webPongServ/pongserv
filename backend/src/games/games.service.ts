@@ -97,7 +97,7 @@ export class GamesService {
         ? roomListEntity.opUserId
         : roomListEntity.owner;
 
-    console.log('Dodge Game opUserId', opUserId, 'userId', userId, '\n\n\n');
+    this.logger.log(`Dodge Game opUserId : ${opUserId} userId : ${userId}`);
     // console.log(roomListEntity);
     await this.DbGamesManagerService.SaveGame(
       roomListEntity,

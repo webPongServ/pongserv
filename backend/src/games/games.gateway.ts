@@ -87,7 +87,7 @@ export class GamesGateway
           this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
           this.GamesService.endGame(room); // 해당 방 삭제
           if (this.gameQueue.removeAndCheckExistence(room))
-            console.log('GameQueue에서 방 삭제 성공');
+            this.logger.log('gameQueue removed');
         }
       }
     });
@@ -241,7 +241,7 @@ export class GamesGateway
       1-2. 래더 대기열이 있다면, 해당 방에 join 후 대기열 삭제
     2. socket을 통해 프론트에 방이 만들어졌음을 알린다(roomCreated)
     */
-    console.log('Now Queue is : ', this.gameQueue);
+    this.logger.log(`Queue Present: ${this.gameQueue.length}`);
     const userId = socket.data;
     if (this.gameQueue.isEmpty()) {
       const message: roomOption = {
