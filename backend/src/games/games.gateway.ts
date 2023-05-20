@@ -297,26 +297,23 @@ export class GamesGateway
     status: boolean,
   ) {
     if (status) {
-      const requesterSocket: Socket = this.server.sockets.sockets.get(
-        this.GameSocketId.get(requestId),
-      );
-      const targetSocket: Socket = this.server.sockets.sockets.get(
-        this.GameSocketId.get(targetId),
-      );
+      const requesterSocketId = this.GameSocketId.get(requestId);
+      const targetSocketId = this.GameSocketId.get(targetId);
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      if (!requesterSocket || !targetSocket) {
+      if (!requesterSocketId || !targetSocketId) {
         return 'OK';
       }
-      await requesterSocket.emit('roomOwner'); // 방장에게 방장임을 알려주는 것
-      await targetSocket.emit('roomGuest');
-      await requesterSocket.emit('gameStart');
-      await targetSocket.emit('gameStart');
+      await this.server.to(requesterSocketId).emit('roomOwner');
+      await this.server.to(targetSocketId).emit('roomGuest');
+      await this.server.to(requesterSocketId).emit('gameStart');
+      await this.server.to(targetSocketId).emit('gameStart');
 
       await this.GamesService.enterRoom(targetId, roomId, '01');
       await this.GamesService.updateOpponent(requestId, roomId);
       await this.GamesService.startGame(targetId, roomId);
       await this.UsersChatsGateway.notifyGameStartToFriends(targetId);
+      await this.GamesService.updateDirectGame(roomId);
       return 'OK';
     } else {
       const requesterSocket: Socket = this.server.sockets.sockets.get(
