@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useLayoutEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
+import { useParams } from "react-router-dom";
 import { IRootState } from "components/common/store";
 import { useNavigate } from "react-router-dom";
 import GameReady from "components/game/GameReady";
@@ -11,6 +12,7 @@ import { LoginStatusActionTypes } from "types/redux/Login";
 import { GameDifficultyType } from "constant";
 
 import { Box } from "@mui/material";
+import { SocketsActionTypes } from "types/redux/Sockets";
 
 interface GameBoardProps {
   id: string;
@@ -43,6 +45,7 @@ const GameBoard = (props: GameBoardProps) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const notiRef = useRef<HTMLDivElement>(null);
+  const { id } = useParams();
   const [isWaiting, setIsWaiting] = useState<boolean>(true);
   const [timer, setTimer] = useState<number>(3);
   const [selectedPaddleRef, setSelectedPaddleRef] =
@@ -471,6 +474,7 @@ const GameBoard = (props: GameBoardProps) => {
       gameSocket.off("roomGuest", socketRoomGuest);
       gameSocket.off("inGameRes", socketInGameRes);
       gameSocket.disconnect();
+      dispatch({ type: SocketsActionTypes.GAMESOCKET_DELETE, payload: "" });
     };
   }, []);
 
@@ -492,10 +496,11 @@ const GameBoard = (props: GameBoardProps) => {
             successMessage={`${timer}초 후에 게임이 시작됩니다.`}
             ref={notiRef}
           />
+
           <GameReady
-            type="일반 게임"
+            type={id === "ladder" ? "래더 게임" : "일반 게임"}
             content="상대를 기다리는 중"
-            funnyImg="funny3.gif"
+            funnyImg={id === "ladder" ? "funny4.gif" : "funny3.gif"}
           />
         </>
       ) : (

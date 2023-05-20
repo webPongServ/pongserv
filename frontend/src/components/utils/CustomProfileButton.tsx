@@ -26,7 +26,12 @@ const CustomProfileButton = (props: CustomProfileButtonProps) => {
           alt={`${props.position}-profile`}
         />
       </ListItemIcon>
-      <ListItemText className={props.class} primary={props.nickname} />
+      <ListItemText
+        className={props.class}
+        primary={
+          props.nickname + (props.class === "inGame" ? " - 게임 중" : "")
+        }
+      />
     </ListItemButton>
   );
 };

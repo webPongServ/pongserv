@@ -1,7 +1,9 @@
 import { useEffect, useLayoutEffect, useState, useRef } from "react";
 import io from "socket.io-client";
+import { useSelector } from "react-redux";
 import { useQuery } from "@tanstack/react-query";
 import { apiURL } from "API/api";
+import { IRootState } from "components/common/store";
 import GameCard from "components/game/GameCard";
 import NormalGameModal from "components/game/NormalGameModal";
 import LadderGameModal from "components/game/LadderGameModal";
@@ -34,6 +36,9 @@ interface serverGameRoomDetail {
 }
 
 const Game = () => {
+  const gameSocket = useSelector(
+    (state: IRootState) => state.sockets.gameSocket
+  );
   const [gameRooms, setGameRooms] = useState<GameRoomDetail[] | null>(null);
   const [roomStatus, setRoomStatus] = useState<string>("game");
   const [selectedRoom, setSelectedRoom] = useState<GameRoomDetail | null>(null);
@@ -79,23 +84,24 @@ const Game = () => {
   };
 
   useLayoutEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    const gameSocket = io(`${apiURL}/games`, {
-      extraHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    dispatch({
-      type: SocketsActionTypes.GAMESOCKET_UPDATE,
-      payload: gameSocket,
-    });
-    console.log(gameSocket);
-    gameSocket.on("exception", socketException);
+    if (!gameSocket) {
+      const token = localStorage.getItem("accessToken");
+      const gameSocket = io(`${apiURL}/games`, {
+        extraHeaders: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      dispatch({
+        type: SocketsActionTypes.GAMESOCKET_UPDATE,
+        payload: gameSocket,
+      });
+      gameSocket.on("exception", socketException);
 
-    return () => {
-      gameSocket.off("exception", socketException);
-    };
-  }, []);
+      return () => {
+        gameSocket.off("exception", socketException);
+      };
+    }
+  }, [gameSocket]);
 
   useEffect(() => {
     getGameRooms();

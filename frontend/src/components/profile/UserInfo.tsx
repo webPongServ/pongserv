@@ -10,7 +10,7 @@ interface UserInfoProps {
 
 const UserInfo = (props: UserInfoProps) => {
   return (
-    <Box className="flex-container">
+    <Box className="flex-container justify-flex-start">
       <img src={props.profileDetail.imgURL} alt="profile_image" />
       <Box>
         <Box className="title">{props.profileDetail.nickname}</Box>
