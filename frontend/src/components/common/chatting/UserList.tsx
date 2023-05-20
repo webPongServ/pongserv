@@ -162,6 +162,21 @@ const UserList = (props: UserListProps) => {
     );
   };
 
+  const handleInvite = () => {
+    chattingSocket.emit(
+      "",
+      {
+        id: currentChatting.chattingRoom?.id,
+        nicknameToEmpower: selectedUser.nickname,
+      },
+      (uuid: string) => {
+        setAnchorEl(null);
+        // 소켓 emit
+        navigate(`/game/${uuid}`);
+      }
+    );
+  };
+
   useEffect(() => {
     getUserList();
   }, []);
@@ -216,7 +231,7 @@ const UserList = (props: UserListProps) => {
               <MenuItem onClick={handleMute}>벙어리</MenuItem>
               <MenuItem onClick={handleKick}>채팅방 내보내기</MenuItem>
               <MenuItem onClick={handleBan}>채팅방 차단</MenuItem>
-              <MenuItem>대결 신청</MenuItem>
+              <MenuItem onClick={handleInvite}>대결 신청</MenuItem>
             </Box>
           )}
       </Menu>

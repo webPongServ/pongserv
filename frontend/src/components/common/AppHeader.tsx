@@ -15,6 +15,7 @@ import UserService from "API/UserService";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 import { SocketsActionTypes } from "types/redux/Sockets";
 import { IRootState } from "components/common/store";
+import InviteGameModal from "components/common/InviteGameModal";
 import "styles/global.scss";
 
 import { Box, CssBaseline } from "@mui/material";
@@ -60,6 +61,7 @@ export const errorMessageCreator = (errorCode: string): string => {
 
 export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<boolean>(false);
   const paramsCode: string | undefined = qs.parse(window.location.search)
     .error as string;
   const notiRef = useRef<HTMLDivElement>(null);
@@ -157,6 +159,7 @@ export default function AppHeader() {
           </Routes>
         </Main>
         <ChattingDrawer open={open} setOpen={setOpen} />
+        <InviteGameModal openModal={openModal} setOpenModal={setOpenModal} />
       </Box>
     </>
   );
