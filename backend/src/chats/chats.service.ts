@@ -162,7 +162,8 @@ export class ChatsService {
       throw new NotFoundException('The chatroom not exist');
     // 2
     if (targetRoom.chtRmType === '02') {
-      const isPwdMatched = await bcrypt.compare(targetRoom.chtRmPwd, infoEntr.pwd); // TODO: Replace to use env
+      // NOTE: hased password가 2rd arg로 들어가야한다.
+      const isPwdMatched = await bcrypt.compare(infoEntr.pwd, targetRoom.chtRmPwd); // TODO: Replace to use env
       if (isPwdMatched === false) {
         throw new ForbiddenException('Wrong chatroom password');
       }
@@ -225,9 +226,10 @@ export class ChatsService {
       throw new UnauthorizedException('Not owner in this room');
     }
     // 2
+    const saltOrRounds = 10; // TODO: Replace to use env
     targetRoom.chtRmNm = infoEdit.name;
     targetRoom.chtRmType = infoEdit.type;
-    targetRoom.chtRmPwd = infoEdit.pwd;
+    targetRoom.chtRmPwd = await bcrypt.hash(infoEdit.pwd, saltOrRounds);
     targetRoom.maxUserCnt = infoEdit.max;
     await this.dbChatsManagerService.saveChatroom(targetRoom);
     // 3
