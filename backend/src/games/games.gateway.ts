@@ -310,7 +310,7 @@ export class GamesGateway
       await this.server.to(targetSocketId).emit('gameStart');
 
       await this.GamesService.enterRoom(targetId, roomId, '01');
-      await this.GamesService.updateOpponent(requestId, roomId);
+      await this.GamesService.updateOpponent(targetId, roomId);
       await this.GamesService.startGame(targetId, roomId);
       await this.UsersChatsGateway.notifyGameStartToFriends(targetId);
       await this.GamesService.updateDirectGame(roomId);
