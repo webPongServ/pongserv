@@ -71,9 +71,8 @@ export class GamesGateway
     if (typeof socket.data === 'string') {
       this.GameSocketId.set(socket.data, socket.id);
     }
-    console.log('Game Socket ID is ', this.GameSocketId);
     this.logger.log(
-      `GameGateway handleConnection: ${socket.id} intraId : ${socket.data}`,
+      `GameGateway handleConnection: ${socket.data} -> ${socket.id}`,
     );
     socket.on('disconnecting', (reason) => {
       /*
@@ -86,10 +85,9 @@ export class GamesGateway
         if (room !== socket.id) {
           socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
           this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
-          this.GamesService.endGame(room);
-          this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
+          this.GamesService.endGame(room); // 해당 방 삭제
           if (this.gameQueue.removeAndCheckExistence(room))
-            console.log('GameQueue에서 방 삭제 성공');
+            this.logger.log('gameQueue removed');
         }
       }
     });
@@ -98,7 +96,6 @@ export class GamesGateway
     if (typeof socket.data === 'string') {
       this.GameSocketId.delete(socket.data);
     }
-    console.log('[Deletion]Game Socket ID is ', this.GameSocketId);
     this.logger.log(`GameGateway handleDisconnect: ${socket.id}`);
   }
 
@@ -129,7 +126,7 @@ export class GamesGateway
       message.score,
       roomList.id, // Room의 이름
     );
-    console.log(roomList.id);
+    this.logger.log(`GameGateway createGameRoom: ${socket.id}`);
     await this.UsersChatsGateway.notifyGameStartToFriends(userId.toString());
     // Notify To friends
     return roomList.id;
@@ -168,7 +165,7 @@ export class GamesGateway
     @MessageBody() message,
   ) {
     const userId = socket.data;
-    console.log(userId, 'cancel', message.roomId);
+    this.logger.log(userId, 'cancel', message.roomId);
     await socket.leave(message.roomId);
     return 'OK';
   }
@@ -182,10 +179,7 @@ export class GamesGateway
     await socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
     await socket.emit('roomGuest');
     await this.server.to(message.roomId).emit('gameStart');
-    console.log(
-      socket.rooms,
-      (await this.server.in(message.roomId).fetchSockets()).length,
-    );
+    this.logger.log(`Game condition fulfilled: ${message.roomId} started`);
     const userId = socket.data;
     const roomId = message.roomId;
     const type = message.type;
@@ -247,7 +241,7 @@ export class GamesGateway
       1-2. 래더 대기열이 있다면, 해당 방에 join 후 대기열 삭제
     2. socket을 통해 프론트에 방이 만들어졌음을 알린다(roomCreated)
     */
-    console.log('Now Queue is : ', this.gameQueue);
+
     const userId = socket.data;
     if (this.gameQueue.isEmpty()) {
       const message: roomOption = {

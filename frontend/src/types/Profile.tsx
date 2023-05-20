@@ -1,13 +1,13 @@
 export interface History {
   isWin: boolean;
-  myId: number;
+  isDodge: boolean;
   myNick: string;
   myImg: string;
   myScore: number;
-  opId: number;
   opNick: string;
   opImg: string;
   opScore: number;
+  type: string;
 }
 
 export type Achievement = {

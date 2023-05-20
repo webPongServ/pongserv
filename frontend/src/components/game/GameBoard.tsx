@@ -470,6 +470,7 @@ const GameBoard = (props: GameBoardProps) => {
       gameSocket.off("roomOwner", socketRoomOwner);
       gameSocket.off("roomGuest", socketRoomGuest);
       gameSocket.off("inGameRes", socketInGameRes);
+      gameSocket.disconnect();
     };
   }, []);
 

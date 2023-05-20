@@ -23,6 +23,14 @@ const UserService = {
     await instance.post(usersURL("friend/delete"), body),
   getSearchedUser: async (search: string) =>
     await instance.get(usersURL(`list?search=${search}`)),
+  getGameHistory: async (friendNickname: string) =>
+    await instance.get(
+      usersURL(`gamehistory?friendNickname=${friendNickname}`)
+    ),
+  getAchievement: async (friendNickname: string) =>
+    await instance.get(
+      usersURL(`achievement?friendNickname=${friendNickname}`)
+    ),
 };
 
 export default UserService;

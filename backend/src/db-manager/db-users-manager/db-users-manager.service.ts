@@ -305,7 +305,7 @@ export class DbUsersManagerService {
         delTf: false,
       });
       await this.ua02lRp.save(friendList);
-      console.log('make new friend');
+      // console.log('make new friend');
       return { result: 'Success' };
     }
   }
@@ -348,6 +348,18 @@ export class DbUsersManagerService {
     });
     if (user) {
       return user.userId;
+    } else {
+      throw new BadRequestException('No User available');
+    }
+  }
+  async findNicknameByUserId(userId: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    if (user) {
+      return user.nickname;
     } else {
       throw new BadRequestException('No User available');
     }

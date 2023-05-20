@@ -108,11 +108,19 @@ export default function AppHeader() {
       window.location.href = "/login?error=already_login";
     };
 
-    // error handling
     if (chattingSocket) {
+      // error handling
       chattingSocket.on("errorAlreadyLogin", socketAlreadyLogin);
       chattingSocket.on("errorChatroomFull", alertMessage);
       chattingSocket.on("errorChatroomEntrance", alertMessage);
+      chattingSocket.on("errorChatroomMessage", alertMessage);
+      chattingSocket.on("errorChatroomLeaving", alertMessage);
+      chattingSocket.on("errorChatroomKick", alertMessage);
+      chattingSocket.on("errorChatroomRegisterBan", alertMessage);
+      chattingSocket.on("errorChatroomMute", alertMessage);
+      chattingSocket.on("errorChatroomEmpowerment", alertMessage);
+      chattingSocket.on("errorChatroomCreation", alertMessage);
+      chattingSocket.on("errorChatroomRemovalBan", alertMessage);
     }
     loadMyData();
 
@@ -120,6 +128,14 @@ export default function AppHeader() {
       chattingSocket.off("errorChatroomFull", alertMessage);
       chattingSocket.off("errorAlreadyLogin", socketAlreadyLogin);
       chattingSocket.off("errorChatroomEntrance", alertMessage);
+      chattingSocket.off("errorChatroomMessage", alertMessage);
+      chattingSocket.off("errorChatroomLeaving", alertMessage);
+      chattingSocket.off("errorChatroomKick", alertMessage);
+      chattingSocket.off("errorChatroomRegisterBan", alertMessage);
+      chattingSocket.off("errorChatroomMute", alertMessage);
+      chattingSocket.off("errorChatroomEmpowerment", alertMessage);
+      chattingSocket.off("errorChatroomCreation", alertMessage);
+      chattingSocket.off("errorChatroomRemovalBan", alertMessage);
     };
   }, []);
 

@@ -7,6 +7,7 @@ import { TbGm03DEntity } from './entities/tb-gm-03-d.entity';
 import { TbGm04LEntity } from './entities/tb-gm-04-l.entity';
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm/repository/Repository';
+import { In } from 'typeorm';
 
 @Injectable()
 export class DbGamesManagerService {
@@ -191,7 +192,7 @@ export class DbGamesManagerService {
         };
       }),
     );
-    console.log(updateUsers);
+    // console.log(updateUsers);
     return updateUsers;
   }
 
@@ -242,18 +243,18 @@ export class DbGamesManagerService {
     room.getScr = myScore;
     room.lossScr = opScore;
     room.exitDttm = new Date();
-    console.log(room);
+    // console.log(room);
     await this.Gm01DRp.save(room);
   }
 
   async isInGame(userId: string) {
     const room = await this.Gm01LRp.find({
       where: [
-        { owner: userId, endType: '04' },
-        { opUserId: userId, endType: '04' },
+        { owner: userId, endType: In(['01', '04']) },
+        { opUserId: userId, endType: In(['01', '04']) },
       ],
     });
-    console.log(room);
+    // console.log(room);
     return room.length > 0;
   }
 }

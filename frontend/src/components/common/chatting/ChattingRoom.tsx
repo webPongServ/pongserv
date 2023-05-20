@@ -130,30 +130,120 @@ const ChattingRoom = () => {
       ]);
     };
 
-    const socketChatroomBeingKicked = () => {
-      // 나인지 판단하고 dispatch할지 채팅에 추가할지 결정
-      dispatch({
-        type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
-        payload: "error-kicked",
-      });
+    const socketChatroomBeingKicked = (data: {
+      chtrmId: string;
+      nickname: string;
+    }) => {
+      if (data.nickname === myDetail.nickname) {
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
+          payload: "error-kicked",
+        });
+      } else {
+        setChatting([
+          ...chatting,
+          {
+            user: null,
+            message: data.nickname + "님이 강제 퇴장당하였습니다.",
+          },
+        ]);
+      }
     };
 
-    const socketChatroomBeingMuted = () => {
+    const socketChatroomBeingMuted = (data: {
+      chtrmId: string;
+      nickname: string;
+    }) => {
       // UI 확실히하기
+      setChatting([
+        ...chatting,
+        {
+          user: null,
+          message: data.nickname + "님이 60초간 벙어리가 되었습니다.",
+        },
+      ]);
     };
 
-    const socketChatroomBeingRegisteredBan = () => {
-      dispatch({
-        type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
-        payload: "error-banned",
-      });
+    const socketChatroomBeingRegisteredBan = (data: {
+      chtrmId: string;
+      nickname: string;
+    }) => {
+      if (data.nickname === myDetail.nickname) {
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_STATUS_ERROR,
+          payload: "error-banned",
+        });
+      } else {
+        setChatting([
+          ...chatting,
+          {
+            user: null,
+            message: data.nickname + "님이 차단되었습니다.",
+          },
+        ]);
+      }
     };
 
-    const socketChatroomBeingEmpowered = () => {
-      dispatch({
-        type: CurrentChattingActionTypes.UPDATE_MYDETAIL,
-        payload: ChattingUserRoleType.admin,
-      });
+    const socketChatroomBeingEmpowered = (data: {
+      chtrmId: string;
+      nickname: string;
+    }) => {
+      if (data.nickname === myDetail.nickname) {
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_MYDETAIL,
+          payload: ChattingUserRoleType.admin,
+        });
+      }
+      setChatting([
+        ...chatting,
+        {
+          user: null,
+          message: data.nickname + "님이 관리자가 되었습니다.",
+        },
+      ]);
+    };
+
+    const socketChatroomBeingRemovedBan = (data: {
+      chtrmId: string;
+      nickname: string;
+    }) => {
+      if (data.nickname !== myDetail.nickname) {
+        setChatting([
+          ...chatting,
+          {
+            user: null,
+            message: data.nickname + "님이 차단 해제되었습니다.",
+          },
+        ]);
+      }
+    };
+
+    const socketChatroomAuthChange = (data: {
+      chtrmId: string;
+      nickname: string;
+      auth: string;
+    }) => {
+      if (data.nickname === myDetail.nickname) {
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_MYDETAIL,
+          payload: data.auth,
+        });
+      }
+      setChatting([
+        ...chatting,
+        {
+          user: null,
+          message:
+            data.nickname +
+            `님이 새로운 ${
+              data.auth === ChattingUserRoleType.owner
+                ? "방장"
+                : data.auth === ChattingUserRoleType.admin
+                ? "관리자"
+                : "일반 유저"
+            }이 되었습니다.`,
+        },
+      ]);
     };
 
     if (chattingSocket) {
@@ -167,6 +257,11 @@ const ChattingRoom = () => {
         socketChatroomBeingRegisteredBan
       );
       chattingSocket.on("chatroomBeingEmpowered", socketChatroomBeingEmpowered);
+      chattingSocket.on(
+        "chatroomBeingRemovedBan",
+        socketChatroomBeingRemovedBan
+      );
+      chattingSocket.on("chatroomAuthChange", socketChatroomAuthChange);
     }
 
     return () => {
@@ -183,6 +278,11 @@ const ChattingRoom = () => {
         "chatroomBeingEmpowered",
         socketChatroomBeingEmpowered
       );
+      chattingSocket.off(
+        "chatroomBeingRemovedBan",
+        socketChatroomBeingRemovedBan
+      );
+      chattingSocket.off("chatroomAuthChange", socketChatroomAuthChange);
     };
   }, [chatting, roomStatus]);
 

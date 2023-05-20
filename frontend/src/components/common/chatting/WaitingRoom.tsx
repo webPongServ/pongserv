@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import PasswordFormCard from "components/common/chatting/PasswordFormCard";
 import RoomCard from "components/common/chatting/RoomCard";
 import EmptyListMessage from "components/utils/EmptyListMessage";
@@ -7,6 +7,7 @@ import CustomIconButton from "components/utils/CustomIconButton";
 import { ChattingRoomDetail } from "types/Detail";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import ChattingService from "API/ChattingService";
+import { IRootState } from "../store";
 import "styles/ChattingDrawer.scss";
 import "styles/global.scss";
 
@@ -16,8 +17,10 @@ import SyncIcon from "@mui/icons-material/Sync";
 import LoadingCircle from "components/utils/LoadingCircle";
 
 const WaitingRoom = () => {
+  const currentChatting = useSelector(
+    (state: IRootState) => state.currentChatting
+  );
   const dispatch = useDispatch();
-
   // chatroom은 전역에서 관리하지 않음 => 로컬에서도 처음에 받아오는 것만(없어진 것 예외처리 필요)
   // 보이지 않을 수도 있는데, 상태로 관리하는 것은 불필요한 낭비일 수 있음 => 새로고침 버튼을 두자
   const [chattingRoomList, setChattingRoomList] = useState<
@@ -34,7 +37,7 @@ const WaitingRoom = () => {
 
   useEffect(() => {
     getChattingRoomList();
-  }, []);
+  }, [currentChatting]);
 
   return (
     <Box id="page">

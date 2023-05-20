@@ -97,6 +97,20 @@ const FriendDrawer = () => {
     });
   };
 
+  const socketFriendStatusGameStart = (nickname: string) => {
+    dispatch({
+      type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
+      payload: { nickname: nickname, status: FriendStatusType.inGame },
+    });
+  };
+
+  const socketFriendStatusGameEnd = (nickname: string) => {
+    dispatch({
+      type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
+      payload: { nickname: nickname, status: FriendStatusType.login },
+    });
+  };
+
   useEffect(() => {
     getFriends();
   }, []);
@@ -105,12 +119,19 @@ const FriendDrawer = () => {
     if (chattingSocket) {
       chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
       chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+      chattingSocket.on("friendStatusGameStart", socketFriendStatusGameStart);
+      chattingSocket.on("friendStatusGameEnd", socketFriendStatusGameEnd);
     }
 
     return () => {
       if (chattingSocket) {
         chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
         chattingSocket.off("friendStatusLogout", socketFriendStatusLogout);
+        chattingSocket.off(
+          "friendStatusGameStart",
+          socketFriendStatusGameStart
+        );
+        chattingSocket.off("friendStatusGameEnd", socketFriendStatusGameEnd);
       }
     };
   }, [friends]);
@@ -135,6 +156,21 @@ const FriendDrawer = () => {
         )}
         {friends !== null && friends.length !== 0 && (
           <List>
+            {friends!
+              .filter((friend) => friend.status === FriendStatusType.inGame)
+              .map((value, index) => (
+                <ListItem key={value.nickname + index} disablePadding>
+                  <CustomProfileButton
+                    class="inGame"
+                    nickname={value.nickname}
+                    imgURL={value.imgURL}
+                    position="FriendDrawer"
+                    handleFunction={() => {
+                      navigate(`/profile/${value.nickname}`);
+                    }}
+                  />
+                </ListItem>
+              ))}
             {friends!
               .filter((friend) => friend.status === FriendStatusType.login)
               .map((value, index) => (
