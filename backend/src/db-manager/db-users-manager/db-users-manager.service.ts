@@ -352,6 +352,18 @@ export class DbUsersManagerService {
       throw new BadRequestException('No User available');
     }
   }
+  async findNicknameByUserId(userId: string) {
+    const user = await this.ua01mRp.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    if (user) {
+      return user.nickname;
+    } else {
+      throw new BadRequestException('No User available');
+    }
+  }
 
   async getRelation(userId: string, friendUserId: string) {
     if (userId == friendUserId) {

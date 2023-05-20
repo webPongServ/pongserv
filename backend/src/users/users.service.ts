@@ -169,6 +169,7 @@ export class UsersService {
     this.logger.log(`프로필 조회: ${intraId} -> ${friendNickname}`);
     return Profile;
   }
+
   async getProfile(intraId: string) {
     const Profile = await this.dbmanagerUsersService.getFriendProfile(
       intraId,
