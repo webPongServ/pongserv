@@ -4,10 +4,13 @@ import UserService from "API/UserService";
 import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import { FriendsActionTypes } from "types/redux/Friends";
 import { ProfileDetail, UserDetail } from "types/Detail";
-import { ProfileFriendType } from "constant";
+import {
+  ProfileFriendType,
+  ChattingRoomType,
+  ChattingUserRoleType,
+} from "constant";
 
 import { Button } from "@mui/joy";
-import { Tooltip, Typography } from "@mui/material";
 
 interface OthersButtonsProps {
   profileDetail: ProfileDetail;
@@ -16,23 +19,39 @@ interface OthersButtonsProps {
 
 const OthersButtons = (props: OthersButtonsProps) => {
   const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
+  const chattingSocket = useSelector(
+    (state: IRootState) => state.sockets.chattingSocket
+  );
   const dispatch = useDispatch();
 
   const handleDMButton = () => {
-    // const data = ... // 채팅방 생성 API 요청
-    dispatch({
-      type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
-      payload: {
-        id: "202304280001", // API를 통해 받아온 데이터
-        chatroomName: `[DM] ${props.profileDetail!.nickname}, ${
-          myInfo.nickname
-        }`,
-        ownerNickname: `${myInfo.nickname}`,
-        type: "private",
-        maxCount: 2,
-        currentCount: 1,
-      },
-    });
+    chattingSocket.emit(
+      "chatroomDirectMessage",
+      { nickname: props.profileDetail!.nickname },
+      (data: { chtrmId: string }) => {
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
+          payload: {
+            id: data.chtrmId,
+            chatroomName: `[DM] ${props.profileDetail!.nickname}, ${
+              myInfo.nickname
+            }`,
+            ownerNickname: `${myInfo.nickname}`,
+            type: ChattingRoomType.private,
+            maxCount: 2,
+            currentCount: 1,
+          },
+        });
+        dispatch({
+          type: CurrentChattingActionTypes.ADD_MYDETAIL,
+          payload: {
+            nickname: myInfo.nickname,
+            imgURL: myInfo.imgURL,
+            role: ChattingUserRoleType.owner,
+          },
+        });
+      }
+    );
   };
 
   const handleFriendAddButton = async () => {
@@ -68,6 +87,32 @@ const OthersButtons = (props: OthersButtonsProps) => {
     });
   };
 
+  const handleFriendBlockButton = () => {
+    chattingSocket.emit(
+      "putBlockingUserInChats",
+      { nickname: props.profileDetail.nickname, boolToBlock: true }, // true : 차단, false : 차단 해제
+      () => {
+        props.setProfileDetail({
+          ...props.profileDetail,
+          isBlocked: true,
+        });
+      }
+    );
+  };
+
+  const handleFriendUnblockButton = () => {
+    chattingSocket.emit(
+      "putBlockingUserInChats",
+      { nickname: props.profileDetail.nickname, boolToBlock: false }, // true : 차단, false : 차단 해제
+      () => {
+        props.setProfileDetail({
+          ...props.profileDetail,
+          isBlocked: false,
+        });
+      }
+    );
+  };
+
   return (
     <>
       <Button variant="solid" onClick={handleDMButton}>
@@ -82,13 +127,15 @@ const OthersButtons = (props: OthersButtonsProps) => {
           친구 추가
         </Button>
       )}
-      <Tooltip
-        title={<Typography>서비스 준비 중입니다.</Typography>}
-        placement="bottom-start"
-        followCursor
-      >
-        <Button variant="outlined">차단</Button>
-      </Tooltip>
+      {props.profileDetail.isBlocked ? (
+        <Button variant="solid" onClick={handleFriendUnblockButton}>
+          메시지 차단 해제
+        </Button>
+      ) : (
+        <Button variant="outlined" onClick={handleFriendBlockButton}>
+          메시지 차단
+        </Button>
+      )}
     </>
   );
 };

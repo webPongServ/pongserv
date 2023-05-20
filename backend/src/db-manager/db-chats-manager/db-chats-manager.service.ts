@@ -88,8 +88,8 @@ export class DbChatsManagerService {
             id: userOfChtrm.id,
           },
         });
-        console.log('userOfChtrmWithRel: ');
-        console.log(userOfChtrmWithRel);
+        // console.log('userOfChtrmWithRel: ');
+        // console.log(userOfChtrmWithRel);
         if (userOfChtrmWithRel.ua01mEntity.userId === user.userId) {
           canUserSee = true;
           break;
@@ -212,8 +212,8 @@ export class DbChatsManagerService {
         chtRmJoinTf: true,
       },
     });
-    console.log(`result in getLiveUserListAndCountInARoom: `);
-    console.log(result);
+    // console.log(`result in getLiveUserListAndCountInARoom: `);
+    // console.log(result);
     return result;
   }
 
@@ -378,6 +378,7 @@ export class DbChatsManagerService {
     const results = await this.ch02dRp.find({
       relations: {
         ch01lEntity: true,
+        ua01mEntity: true,
       },
       // relationLoadStrategy: "query",
       where: {
@@ -460,8 +461,7 @@ export class DbChatsManagerService {
     requester: TbUa01MEntity, 
     target: TbUa01MEntity, 
     toBlock: boolean
-    )
-  {
+    ) {
     let blockingData = await this.ch04lRp.findOne({
       where: {
         ua01mEntity: {
@@ -489,8 +489,22 @@ export class DbChatsManagerService {
     return ;
   }
 
-  async getListForThisUserToBlock(user: TbUa01MEntity)
-  {
+  async getBlockingData(requester: TbUa01MEntity, target: TbUa01MEntity) {
+    const result = await this.ch04lRp.findOne({
+      where: {
+        ua01mEntity: {
+          id: requester.id
+        },
+        ua01mEntityAsBlock: {
+          id: target.id,
+        },
+        delTf: false,
+      }
+    })
+    return result;
+  }
+
+  async getListForThisUserToBlock(user: TbUa01MEntity) {
     const results = await this.ch04lRp.find({
       relations: {
         ua01mEntityAsBlock: true

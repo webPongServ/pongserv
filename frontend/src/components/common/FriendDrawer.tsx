@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 import { FriendDrawerWidth } from "constant";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -97,16 +97,44 @@ const FriendDrawer = () => {
     });
   };
 
+  const socketFriendStatusGameStart = (nickname: string) => {
+    dispatch({
+      type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
+      payload: { nickname: nickname, status: FriendStatusType.inGame },
+    });
+  };
+
+  const socketFriendStatusGameEnd = (nickname: string) => {
+    dispatch({
+      type: FriendsActionTypes.FRIENDS_UPDATE_STATUS,
+      payload: { nickname: nickname, status: FriendStatusType.login },
+    });
+  };
+
   useEffect(() => {
     getFriends();
-    chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
-    chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+  }, []);
+
+  useEffect(() => {
+    if (chattingSocket) {
+      chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
+      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+      chattingSocket.on("friendStatusGameStart", socketFriendStatusGameStart);
+      chattingSocket.on("friendStatusGameEnd", socketFriendStatusGameEnd);
+    }
 
     return () => {
-      chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
-      chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
+      if (chattingSocket) {
+        chattingSocket.off("friendStatusLogin", socketFriendStatusLogin);
+        chattingSocket.off("friendStatusLogout", socketFriendStatusLogout);
+        chattingSocket.off(
+          "friendStatusGameStart",
+          socketFriendStatusGameStart
+        );
+        chattingSocket.off("friendStatusGameEnd", socketFriendStatusGameEnd);
+      }
     };
-  }, []);
+  }, [friends]);
 
   return (
     <Drawer id="FriendDrawer" variant="permanent" open={true}>
@@ -128,6 +156,21 @@ const FriendDrawer = () => {
         )}
         {friends !== null && friends.length !== 0 && (
           <List>
+            {friends!
+              .filter((friend) => friend.status === FriendStatusType.inGame)
+              .map((value, index) => (
+                <ListItem key={value.nickname + index} disablePadding>
+                  <CustomProfileButton
+                    class="inGame"
+                    nickname={value.nickname}
+                    imgURL={value.imgURL}
+                    position="FriendDrawer"
+                    handleFunction={() => {
+                      navigate(`/profile/${value.nickname}`);
+                    }}
+                  />
+                </ListItem>
+              ))}
             {friends!
               .filter((friend) => friend.status === FriendStatusType.login)
               .map((value, index) => (
