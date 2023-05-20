@@ -1,6 +1,22 @@
 import { ChatsService } from './chats.service';
-import { Body, Controller, Get, Param, Patch, Post, Put, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Put,
+  UseGuards,
+  Logger,
+} from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAccessTokenGuard } from 'src/auth/guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
 import { ChatroomCreationDto } from './dto/chatroom-creation.dto';
@@ -22,6 +38,7 @@ import { BlockingUserInChatsDto } from './dto/blocking-user-in-chats.dto';
 export class ChatsController {
   constructor(private readonly chatsService: ChatsService) {}
 
+  logger = new Logger('ChatsController');
   @ApiResponse({
     status: 201,
     description: 'DM 요청 성공',
@@ -30,8 +47,11 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Post('dm')
-  async takeDmRequest(@CurrentUser() userId: string, @Body() infoDmReq: ChatroomDmReqDto) {
-    console.log(`[${userId}: `, `POST /chats/dm]`);
+  async takeDmRequest(
+    @CurrentUser() userId: string,
+    @Body() infoDmReq: ChatroomDmReqDto,
+  ) {
+    this.logger.log(`[POST /chats/dm] ${userId}`);
     // console.log(`ChatroomDmReqDto: `);
     // console.log(infoDmReq);
     try {
@@ -40,8 +60,8 @@ export class ChatsController {
       // console.log(result);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      // console.log(`excpt: `);
+      // console.log(excpt);
       throw excpt;
     }
   }
@@ -56,15 +76,13 @@ export class ChatsController {
   @ApiBearerAuth('accessToken')
   @Get('rooms')
   async getChatroomsForAUser(@CurrentUser() userId: any) {
-    console.log(`[${userId}: `, `GET /chats/rooms]`);
+    this.logger.log(`[GET /chats/rooms] ${userId}`);
     try {
       const result = await this.chatsService.getChatroomsForAUser(userId);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(`[GET /chats/rooms] ${userId} success`);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(`[GET /chats/rooms] ${userId} fail`);
       throw excpt;
     }
   }
@@ -81,18 +99,18 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Post('entrance')
-  async setUserToEnter(@CurrentUser() userId: string, @Body() infoEntr: ChatroomEntranceDto) {
+  async setUserToEnter(
+    @CurrentUser() userId: string,
+    @Body() infoEntr: ChatroomEntranceDto,
+  ) {
     console.log(`[${userId}: `, `POST /chats/entrance]`);
-    // console.log(`ChatroomEntranceDto: `);
-    // console.log(infoEntr);
+    this.logger.log(`POST /chats/entrance] ${userId}`);
     try {
       const result = await this.chatsService.setUserToEnter(userId, infoEntr);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(`[POST /chats/entrance] ${userId} success`);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(`[POST /chats/entrance] ${userId} fail`);
       throw excpt;
     }
   }
@@ -106,18 +124,18 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Post('creation')
-  async createChatroom(@CurrentUser() userId: string, @Body() infoCrtn: ChatroomCreationDto) {
-    console.log(`[${userId}: `, `POST /chats/creation]`);
-    // console.log(`ChatroomCreationDto: `);
-    // console.log(infoCrtn);
+  async createChatroom(
+    @CurrentUser() userId: string,
+    @Body() infoCrtn: ChatroomCreationDto,
+  ) {
+    this.logger.log(`[POST /chats/creation] ${userId}`);
+
     try {
       const result = await this.chatsService.createChatroom(userId, infoCrtn);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(`[POST /chats/creation] ${userId} success`);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(`[POST /chats/creation] ${userId} fail`);
       throw excpt;
     }
   }
@@ -134,18 +152,17 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Patch('edit')
-  async editChatroomInfo(@CurrentUser() userId: string, @Body() infoEdit: ChatroomEditingDto) {
-    console.log(`[${userId}: `, `PATCH /chats/edit]`);
-    // console.log(`ChatroomEditingDto: `);
-    // console.log(infoEdit);
+  async editChatroomInfo(
+    @CurrentUser() userId: string,
+    @Body() infoEdit: ChatroomEditingDto,
+  ) {
+    this.logger.log(`[PATCH /chats/edit] ${userId}`);
     try {
       const result = await this.chatsService.editChatroomInfo(userId, infoEdit);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(`[PATCH /chats/edit] ${userId} success`);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(`[PATCH /chats/edit] ${userId} fail`);
       throw excpt;
     }
   }
@@ -160,23 +177,27 @@ export class ChatsController {
     description: '채팅방 유저목록 반환 실패',
   })
   @ApiOperation({ summary: '채팅방 유저목록' })
-	@ApiParam({
-		name: 'uuid',
-		type: String,
-	})
+  @ApiParam({
+    name: 'uuid',
+    type: String,
+  })
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Get('users/:uuid')
-  async getChatUsers(@CurrentUser() userId: string, @Param('uuid') uuid: string) {
-    console.log(`[${userId}: `, `GET /chats/users/${uuid}]`);
+  async getChatUsers(
+    @CurrentUser() userId: string,
+    @Param('uuid') uuid: string,
+  ) {
+    this.logger.log(`[GET /chats/users/${uuid}] ${userId}`);
     try {
-      const result = await this.chatsService.getLiveUserListInARoom(userId, uuid);
-      // console.log(`result: `);
-      // console.log(result);
+      const result = await this.chatsService.getLiveUserListInARoom(
+        userId,
+        uuid,
+      );
+      this.logger.log(`[GET /chats/users/${uuid}] ${userId} success`);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(`[GET /chats/users/${uuid}] ${userId} fail`);
       throw excpt;
     }
   }
@@ -193,18 +214,23 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Patch('kick')
-  async kickUser(@CurrentUser() userId: string, @Body() infoKick: ChatroomKickingDto) {
-    console.log(`[${userId}: `, `PATCH /chats/kick]`);
-    console.log(`ChatroomKickingDto: `);
-    console.log(infoKick);
+  async kickUser(
+    @CurrentUser() userId: string,
+    @Body() infoKick: ChatroomKickingDto,
+  ) {
+    this.logger.log(
+      `[PATCH /chats/kick] ${userId} -> ${infoKick.nicknameToKick}`,
+    );
     try {
       const result = await this.chatsService.kickUser(userId, infoKick);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(
+        `[PATCH /chats/kick] ${userId} ${infoKick.nicknameToKick}success`,
+      );
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(
+        `[PATCH /chats/kick] ${userId} ${infoKick.nicknameToKick}fail`,
+      );
       throw excpt;
     }
   }
@@ -221,18 +247,21 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Put('ban')
-  async banUser(@CurrentUser() userId: string, @Body() infoBan: ChatroomBanDto) {
-    console.log(`[${userId}: `, `PUT /chats/ban]`);
-    // console.log(`ChatroomBanDto: `);
-    // console.log(infoBan);
+  async banUser(
+    @CurrentUser() userId: string,
+    @Body() infoBan: ChatroomBanDto,
+  ) {
+    this.logger.log(`[PUT /chats/ban] ${userId} -> ${infoBan.nicknameToBan}`);
     try {
       const result = await this.chatsService.banUser(userId, infoBan);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(
+        `[PUT /chats/ban] ${userId} ${infoBan.nicknameToBan} success`,
+      );
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(
+        `[PUT /chats/ban] ${userId} ${infoBan.nicknameToBan} fail`,
+      );
       throw excpt;
     }
   }
@@ -249,18 +278,23 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Put('mute')
-  async muteUser(@CurrentUser() userId: string, @Body() infoMute: ChatroomMuteDto) {
-    console.log(`[${userId}: `, `PUT /chats/mute]`);
-    // console.log(`ChatroomMuteDto: `);
-    // console.log(infoMute);
+  async muteUser(
+    @CurrentUser() userId: string,
+    @Body() infoMute: ChatroomMuteDto,
+  ) {
+    this.logger.log(
+      `[PUT /chats/mute] ${userId} -> ${infoMute.nicknameToMute}`,
+    );
     try {
       const result = await this.chatsService.muteUser(userId, infoMute);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(
+        `[PUT /chats/mute] ${userId} ${infoMute.nicknameToMute} success`,
+      );
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(
+        `[PUT /chats/mute] ${userId} ${infoMute.nicknameToMute} fail`,
+      );
       throw excpt;
     }
   }
@@ -277,18 +311,23 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Patch('empowerment')
-  async empowerUser(@CurrentUser() userId: string, @Body() infoEmpwr: ChatroomEmpowermentDto) {
-    console.log(`[${userId}: `, `PATCH /chats/empowerment]`);
-    // console.log(`ChatroomEmpowermentDto: `);
-    // console.log(infoEmpwr);
+  async empowerUser(
+    @CurrentUser() userId: string,
+    @Body() infoEmpwr: ChatroomEmpowermentDto,
+  ) {
+    this.logger.log(
+      `[PATCH /chats/empowerment] ${userId} -> ${infoEmpwr.nicknameToEmpower}`,
+    );
     try {
       const result = await this.chatsService.empowerUser(userId, infoEmpwr);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(
+        `[PATCH /chats/empowerment] ${userId} ${infoEmpwr.nicknameToEmpower} success`,
+      );
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(
+        `[PATCH /chats/empowerment] ${userId} ${infoEmpwr.nicknameToEmpower} fail`,
+      );
       throw excpt;
     }
   }
@@ -301,18 +340,26 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Post('game-request')
-  async takeGameRequest(@CurrentUser() userId: string, @Body() infoGameReq: ChatroomGameRequestDto) {
-    console.log(`[${userId}: `, `POST /chats/game-request]`);
-    // console.log(`ChatroomGameRequestDto: `);
-    // console.log(infoGameReq);
+  async takeGameRequest(
+    @CurrentUser() userId: string,
+    @Body() infoGameReq: ChatroomGameRequestDto,
+  ) {
+    this.logger.log(
+      `[POST /chats/game-request] ${userId} -> ${infoGameReq.nicknameToGame}`,
+    );
     try {
-      const result = await this.chatsService.takeGameRequest(userId, infoGameReq);
-      // console.log(`result: `);
-      // console.log(result);
+      const result = await this.chatsService.takeGameRequest(
+        userId,
+        infoGameReq,
+      );
+      this.logger.log(
+        `[POST /chats/game-request] ${userId} ${infoGameReq.nicknameToGame} success`,
+      );
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(
+        `[POST /chats/game-request] ${userId} ${infoGameReq.nicknameToGame} fail`,
+      );
       throw excpt;
     }
   }
@@ -324,22 +371,23 @@ export class ChatsController {
   })
   @ApiOperation({ summary: '채팅방 차단 유저목록' })
   @ApiParam({
-		name: 'uuid',
-		type: String,
-	})
+    name: 'uuid',
+    type: String,
+  })
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Get('bans/:uuid')
-  async getBanListInARoom(@CurrentUser() userId: string, @Param('uuid') uuid: string) {
-    console.log(`[${userId}: `, `GET /chats/bans/${uuid}]`);
+  async getBanListInARoom(
+    @CurrentUser() userId: string,
+    @Param('uuid') uuid: string,
+  ) {
+    this.logger.log(`[GET /chats/bans/${uuid}] ${userId}`);
     try {
       const result = await this.chatsService.getBanListInARoom(userId, uuid);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(`[GET /chats/bans/${uuid}] ${userId} success`);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(`[GET /chats/bans/${uuid}] ${userId} fail`);
       throw excpt;
     }
   }
@@ -352,18 +400,23 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Patch('ban-removal')
-  async removeBan(@CurrentUser() userId: string, @Body() infoBanRmv: ChatroomBanRemovalDto) {
-    console.log(`[${userId}: `, `PATCH /chats/ban-removal]`);
-    // console.log(`ChatroomBanRemovalDto: `);
-    // console.log(infoBanRmv);
+  async removeBan(
+    @CurrentUser() userId: string,
+    @Body() infoBanRmv: ChatroomBanRemovalDto,
+  ) {
+    this.logger.log(
+      `[PATCH /chats/ban-removal] ${userId} -> ${infoBanRmv.nicknameToFree}`,
+    );
     try {
       const result = await this.chatsService.removeBan(userId, infoBanRmv);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(
+        `[PATCH /chats/ban-removal] ${userId} ${infoBanRmv.nicknameToFree} success`,
+      );
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(
+        `[PATCH /chats/ban-removal] ${userId} ${infoBanRmv.nicknameToFree} fail`,
+      );
       throw excpt;
     }
   }
@@ -377,18 +430,17 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Post('leaving')
-  async leaveChatroom(@CurrentUser() userId: string, @Body() infoLeav: ChatroomLeavingDto) {
-    console.log(`[${userId}: `, `POST /chats/leaving]`);
-    // console.log(`ChatroomLeavingDto: `);
-    // console.log(infoLeav);
+  async leaveChatroom(
+    @CurrentUser() userId: string,
+    @Body() infoLeav: ChatroomLeavingDto,
+  ) {
+    this.logger.log(`[POST /chats/leaving] ${userId} -> ${infoLeav.id}`);
     try {
       const result = await this.chatsService.leaveChatroom(userId, infoLeav);
-      // console.log(`result: `);
-      // console.log(result);
+      this.logger.log(`[POST /chats/leaving] ${userId} ${infoLeav.id} success`);
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(`[POST /chats/leaving] ${userId} ${infoLeav.id} fail`);
       throw excpt;
     }
   }
@@ -402,20 +454,27 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Put('blocking-user')
-  async putBlockUserInChats(@CurrentUser() userId: string, @Body() infoBlck: BlockingUserInChatsDto) {
-    console.log(`[${userId}: `, `POST /chats/blocking-user]`);
-    // console.log(`BlockingUserInChatsDto: `);
-    // console.log(infoBlck);
+  async putBlockUserInChats(
+    @CurrentUser() userId: string,
+    @Body() infoBlck: BlockingUserInChatsDto,
+  ) {
+    this.logger.log(
+      `[PUT /chats/blocking-user] ${userId} -> ${infoBlck.nickname}`,
+    );
     try {
-      const result = await this.chatsService.putBlockUserInChats(userId, infoBlck);
-      // console.log(`result: `);
-      // console.log(result);
+      const result = await this.chatsService.putBlockUserInChats(
+        userId,
+        infoBlck,
+      );
+      this.logger.log(
+        `[PUT /chats/blocking-user] ${userId} ${infoBlck.nickname} success`,
+      );
       return result;
     } catch (excpt) {
-      console.log(`excpt: `);
-      console.log(excpt);
+      this.logger.log(
+        `[PUT /chats/blocking-user] ${userId} ${infoBlck.nickname} fail`,
+      );
       throw excpt;
     }
   }
-
 }
