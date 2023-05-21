@@ -143,7 +143,7 @@ export class DbUsersManagerService {
     if (user) {
       user.imgPath = imagePath;
       await this.ua01mRp.save(user);
-      console.log('Image path is sucessfuly saved');
+      // console.log('Image path is sucessfuly saved');
     } else {
       throw new BadRequestException('No User available');
     }
