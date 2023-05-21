@@ -49,6 +49,8 @@ export const errorMessageCreator = (errorCode: string): string => {
       return "잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요.";
     case "auth_failed":
       return "로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.";
+    case "twofactor_failed":
+      return "2차 인증에 실패하였습니다.";
     case "already_login":
       return "이미 로그인 되어있는 계정입니다. 로그아웃 후 다시 시도해주세요.";
     case "kicked":

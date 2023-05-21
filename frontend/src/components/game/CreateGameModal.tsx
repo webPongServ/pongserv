@@ -46,7 +46,7 @@ const CreateGameModal = (props: CreateGameModalProps) => {
       const target: HTMLInputElement = e.target as HTMLInputElement;
       setGameRoomForm({
         ...gameRoomForm,
-        maxScore: parseInt(target.value),
+        maxScore: parseInt(target.value, 10),
       });
     }
   };

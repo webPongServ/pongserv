@@ -53,7 +53,7 @@ const RoomEditor = (props: HandleRoomDetail) => {
       const target: HTMLInputElement = e.target as HTMLInputElement;
       setChattingRoomForm({
         ...chattingRoomForm,
-        maxCount: parseInt(target.value),
+        maxCount: parseInt(target.value, 10),
       });
     }
   };
