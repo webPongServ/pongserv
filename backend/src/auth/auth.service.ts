@@ -51,7 +51,9 @@ export class AuthService {
       this.logger.log('42 token 발급 성공');
     } catch (err) {
       this.logger.log('42 token 발급 실패');
-      throw new HttpException(err, HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException(
+        '42 Token 발급 과정 중 실패(감자서버 에러)',
+      );
     }
     return result;
   }
