@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { IRootState } from "components/common/store";
 import { CurrentGameActionTypes } from "types/redux/CurrentGame";
-import { GameRoomType, GameDifficultyType } from "constant";
+import { GameDifficultyType } from "constant";
 import CustomProfileButton from "components/utils/CustomProfileButton";
 import "styles/Game.scss";
 

@@ -25,6 +25,10 @@ body,
   justify-content: flex-start;
 }
 
+.justify-center {
+  justify-content: center;
+}
+
 .overflow {
   overflow: overlay;
 }
@@ -189,6 +193,11 @@ body,
         .fail {
           color: red;
         }
+
+        button {
+          width: 50%;
+          margin: 0 auto;
+        }
       }
 
       #new-image {
@@ -217,6 +226,11 @@ body,
             width: 150px;
             height: 150px;
           }
+        }
+
+        button {
+          width: 50%;
+          margin: 0 auto;
         }
 
         .inform {
@@ -326,8 +340,8 @@ body,
 }
 
 .big-modal {
-  width: 700px;
-  height: 700px;
+  width: 800px;
+  height: 800px;
 }
 
 .empty-list {

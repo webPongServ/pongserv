@@ -49,6 +49,8 @@ export const errorMessageCreator = (errorCode: string): string => {
       return "잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요.";
     case "auth_failed":
       return "로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.";
+    case "twofactor_failed":
+      return "2차 인증에 실패하였습니다.";
     case "already_login":
       return "이미 로그인 되어있는 계정입니다. 로그아웃 후 다시 시도해주세요.";
     case "kicked":
@@ -66,7 +68,7 @@ export default function AppHeader() {
   const paramsCode: string | undefined = qs.parse(window.location.search)
     .error as string;
   const notiRef = useRef<HTMLDivElement>(null);
-  const status = useSelector((state: IRootState) => state.loginStatus);
+  const loginStatus = useSelector((state: IRootState) => state.loginStatus);
   const [requester, setRequester] = useState<RequesterDetail>({
     nickname: "",
     imgURL: "",
@@ -86,7 +88,7 @@ export default function AppHeader() {
       payload: {
         nickname: response.data.nickname,
         imgURL: response.data.imgPath,
-        status: "login",
+        status: FriendStatusType.login,
       },
     });
   };
@@ -180,7 +182,7 @@ export default function AppHeader() {
       <Box id="AppHeader-container" className="flex-container">
         <CssBaseline />
         <AppBar open={open} setOpen={setOpen} />
-        {status === "game" ? null : <FriendDrawer />}
+        {loginStatus === "game" ? null : <FriendDrawer />}
         <Main id="Main-box" open={open}>
           <Routes>
             <Route path="/*" element={<MainRoute />} />

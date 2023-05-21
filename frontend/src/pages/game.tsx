@@ -66,7 +66,6 @@ const Game = () => {
   const getGameRooms = async () => {
     setGameRooms(null);
     const response = await GameService.getGameRooms();
-    console.log(response.data);
     setGameRooms(
       response.data.map((value: serverGameRoomDetail): any => ({
         id: value.id,
