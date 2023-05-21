@@ -63,7 +63,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       const userId = decoded['userId'];
       return userId;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       socket.emit('errorValidateAuth', 'Not validated Access Token');
       return;
     }
@@ -73,7 +73,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     try {
       await this.initUserConnection(socket);
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       return;
     }
   }
@@ -133,10 +133,10 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   }
 
   async handleDisconnecting(@ConnectedSocket() socket: Socket) {
-    const userId = this.validateAccessToken(socket);
-    if (!userId) {
-      return;
-    }
+    // const userId = this.validateAccessToken(socket);
+    // if (!userId) {
+    //   return;
+    // }
     /*!SECTION
       0. 소켓이 map에 entry로 등록되어 있는지 검증
       1. 해당 유저 전용 friends socket room으로 로그아웃 알람 보내기
@@ -153,6 +153,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     if (!entry) {
       return;
     }
+    const userId = entry[0]; // NOTE: use key
     // 1
     const nameOfMyRoomForFriends = `friends_of_${userId}`;
     const myProfile = await this.usersService.getProfile(userId);
@@ -221,7 +222,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
         .to(nameOfMyRoomForFriends)
         .emit(`friendStatusGameStart`, myProfile.nickname);
     } catch (err) {
-      this.logger.log(err);
+      this.logger.error(err);
     }
   }
 
@@ -248,9 +249,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {
     const userId = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - chatroomDirectMessage]`);
-    // console.log(`ChatroomDmReqDto: `);
-    // console.log(infoDmReq);
+    this.logger.log(`[${userId}: `, `socket emit - chatroomDirectMessage]`);
+    // this.logger.log(`ChatroomDmReqDto: `);
+    // this.logger.log(infoDmReq);
     try {
       const dmChtrmId = await this.chatsService.takeDmRequest(
         userId,
@@ -260,7 +261,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       socket.join(nameOfChtrmSocketRoom);
       return { chtrmId: dmChtrmId };
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomDirectMessage', err.response.message);
       return;
@@ -274,9 +275,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {
     const userId = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - chatroomCreation]`);
-    // console.log(`ChatroomCreationDto: `);
-    // console.log(infoCrtn);
+    this.logger.log(`[${userId}: `, `socket emit - chatroomCreation]`);
+    // this.logger.log(`ChatroomCreationDto: `);
+    // this.logger.log(infoCrtn);
     try {
       const newChtrmId = await this.chatsService.createChatroom(
         userId,
@@ -286,6 +287,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       socket.join(nameOfChtrmSocketRoom);
       return { chtrmId: newChtrmId };
     } catch (err) {
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomEntrance', err.response.message);
       return;
@@ -299,9 +301,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - chatroomEntrance]`);
-    // console.log(`ChatroomEntranceDto: `);
-    // console.log(infoEntr);
+    this.logger.log(`[${userId}: `, `socket emit - chatroomEntrance]`);
+    // this.logger.log(`ChatroomEntranceDto: `);
+    // this.logger.log(infoEntr);
     try {
       const nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
       const nameOfChtrmSocketRoom = `chatroom_${infoEntr.id}`;
@@ -309,6 +311,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       socket.to(nameOfChtrmSocketRoom).emit('chatroomWelcome', nickname);
       return true;
     } catch (err) {
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomEntrance', err.response.message);
       return;
@@ -322,9 +325,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - chatroomMessage]`);
-    // console.log(`ChatroomRequestMessageDto: `);
-    // console.log(infoMsg);
+    this.logger.log(`[${userId}: `, `socket emit - chatroomMessage]`);
+    // this.logger.log(`ChatroomRequestMessageDto: `);
+    // this.logger.log(infoMsg);
     try {
       const toSendInChtrm = await this.chatsService.processSendingMessage(
         userId,
@@ -338,7 +341,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
         .emit('chatroomMessage', toSendInChtrm);
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomMessage', err.response.message);
     }
@@ -351,9 +354,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - chatroomLeaving]`);
-    // console.log(`ChatroomLeavingDto: `);
-    // console.log(infoLeav);
+    this.logger.log(`[${userId}: `, `socket emit - chatroomLeaving]`);
+    // this.logger.log(`ChatroomLeavingDto: `);
+    // this.logger.log(infoLeav);
     try {
       const { leaverNick, nextOwnerNick } =
         await this.chatsService.leaveChatroom(userId, infoLeav);
@@ -369,7 +372,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       }
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomLeaving', err.response.message);
     }
@@ -382,9 +385,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - putBlockingUserInChats]`);
-    // console.log(`BlockingUserInChatsDto: `);
-    // console.log(infoBlck);
+    this.logger.log(`[${userId}: `, `socket emit - putBlockingUserInChats]`);
+    // this.logger.log(`BlockingUserInChatsDto: `);
+    // this.logger.log(infoBlck);
     try {
       await this.chatsService.putBlockUserInChats(userId, infoBlck);
       const nameOfblockingSocketRoom = `blocking_${infoBlck.nickname}`;
@@ -392,7 +395,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       else socket.leave(nameOfblockingSocketRoom);
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorPutBlockingUserInChats', err.response.message);
     }
@@ -405,9 +408,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - chatroomKick]`);
-    // console.log(`ChatroomKickingDto: `);
-    // console.log(infoKick);
+    this.logger.log(`[${userId}: `, `socket emit - chatroomKick]`);
+    // this.logger.log(`ChatroomKickingDto: `);
+    // this.logger.log(infoKick);
     try {
       const targetUserId = await this.chatsService.kickUser(userId, infoKick);
       // target user의 socket에 kicked 정보 emit
@@ -422,7 +425,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       targetSocket.leave(nameOfChtrmSocketRoom); // REVIEW - chtrm에 대한 socket room에서 나가지게 하기
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomKick', err.response.message);
     }
@@ -435,9 +438,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
-    console.log(`[${userId}: `, `socket emit - chatroomMute]`);
-    // console.log(`ChatroomMuteDto: `);
-    // console.log(infoMute);
+    this.logger.log(`[${userId}: `, `socket emit - chatroomMute]`);
+    // this.logger.log(`ChatroomMuteDto: `);
+    // this.logger.log(infoMute);
     try {
       const targetNick = await this.chatsService.muteUser(userId, infoMute);
       // target user의 socket에 muted 정보 emit
@@ -449,7 +452,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       }); // TODO: to combine with front-end
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomMute', err.response.message);
     }
@@ -487,7 +490,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomRegisterBan', err.response.message);
     }
@@ -512,7 +515,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       }); //REVIEW - 다른 유저들에게 이 사실을 알리기
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomRemovalBan', err.response.message);
     }
@@ -540,7 +543,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       }); // TODO: to combine with front-end
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomMute', err.response.message);
     }
@@ -590,7 +593,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       }
       return gmRmId;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomMute', err.response.message);
     }
@@ -618,18 +621,18 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       );
       return true;
     } catch (err) {
-      console.log(err);
+      this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomMute', err.response.message);
     }
   }
 
-  @SubscribeMessage('test')
-  testSocket(@ConnectedSocket() socket: Socket, @MessageBody() msgBody: any) {
-    // console.log(`socket: `);
-    // console.log(socket);
-    console.log(`socket.id: `);
-    console.log(socket.id);
-    return 'Hello world!';
-  }
+  // @SubscribeMessage('test')
+  // testSocket(@ConnectedSocket() socket: Socket, @MessageBody() msgBody: any) {
+  //   // console.log(`socket: `);
+  //   // console.log(socket);
+  //   console.log(`socket.id: `);
+  //   console.log(socket.id);
+  //   return 'Hello world!';
+  // }
 }
