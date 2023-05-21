@@ -389,6 +389,8 @@ const GameBoard = (props: GameBoardProps) => {
     setSelectedPaddleRef(paddleRef);
     setSelectedPaddle(paddle1_rel);
     console.log(
+      currentGame.currentGame!.owner,
+      myInfo.nickname,
       currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
     );
   };
@@ -397,6 +399,8 @@ const GameBoard = (props: GameBoardProps) => {
     setSelectedPaddleRef(paddle2Ref);
     setSelectedPaddle(paddle2_rel);
     console.log(
+      currentGame.currentGame!.owner,
+      myInfo.nickname,
       currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
     );
   };
