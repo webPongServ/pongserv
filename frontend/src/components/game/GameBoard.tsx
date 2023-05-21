@@ -521,14 +521,6 @@ const GameBoard = (props: GameBoardProps) => {
           }
         }
         if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
-          ballRef.current!.style.top = "300px";
-          ballRef.current!.style.bottom = "315px";
-          ballRef.current!.style.left = "500px";
-          ballRef.current!.style.right = "515px";
-          ball_rel.top = 300;
-          ball_rel.bottom = 315;
-          ball_rel.left = 500;
-          ball_rel.right = 515;
           if (ball_rel.left <= 0) {
             score2++;
             dispatch({
@@ -544,6 +536,14 @@ const GameBoard = (props: GameBoardProps) => {
             });
             random = 4;
           }
+          ballRef.current!.style.top = "300px";
+          ballRef.current!.style.bottom = "315px";
+          ballRef.current!.style.left = "500px";
+          ballRef.current!.style.right = "515px";
+          ball_rel.top = 300;
+          ball_rel.bottom = 315;
+          ball_rel.left = 500;
+          ball_rel.right = 515;
           if (
             score1 === currentGame.currentGame!.maxScore ||
             score2 === currentGame.currentGame!.maxScore
