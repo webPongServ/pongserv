@@ -216,7 +216,7 @@ export class UsersService {
       let statusCode: string = null;
       if (currLogin) {
         statusCode = currLogin.stsCd; // '01'
-        if (await this.gameService.isInGame(userId)) statusCode = '02';
+        if (await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)) statusCode = '02';
       } else {
         statusCode = '03';
       }
