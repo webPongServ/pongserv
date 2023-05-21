@@ -203,7 +203,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return result;
     } catch (err) {
       this.logger.error(`[getFriendList] excpt: ${err}`);
-      socket.emit('errorGetFriendList', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorGetFriendList', err.response.message);
       return;
     }
   }
@@ -260,7 +261,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return { chtrmId: dmChtrmId };
     } catch (err) {
       console.log(err);
-      // socket.emit('errorChatroomDirectMessage', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomDirectMessage', err.response.message);
       return;
     }
   }
@@ -284,7 +286,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       socket.join(nameOfChtrmSocketRoom);
       return { chtrmId: newChtrmId };
     } catch (err) {
-      socket.emit('errorChatroomEntrance', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomEntrance', err.response.message);
       return;
     }
   }
@@ -306,7 +309,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       socket.to(nameOfChtrmSocketRoom).emit('chatroomWelcome', nickname);
       return true;
     } catch (err) {
-      socket.emit('errorChatroomEntrance', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomEntrance', err.response.message);
       return;
     }
   }
@@ -335,7 +339,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMessage', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomMessage', err.response.message);
     }
   }
 
@@ -365,7 +370,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      // socket.emit('errorChatroomLeaving', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomLeaving', err.response.message);
     }
   }
 
@@ -387,7 +393,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorPutBlockingUserInChats', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorPutBlockingUserInChats', err.response.message);
     }
   }
 
@@ -416,7 +423,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomKick', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomKick', err.response.message);
     }
   }
 
@@ -442,7 +450,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMute', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomMute', err.response.message);
     }
   }
 
@@ -479,7 +488,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomRegisterBan', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomRegisterBan', err.response.message);
     }
   }
 
@@ -503,7 +513,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomRemovalBan', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomRemovalBan', err.response.message);
     }
   }
 
@@ -530,7 +541,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMute', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomMute', err.response.message);
     }
   }
 
@@ -579,7 +591,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return gmRmId;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMute', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomMute', err.response.message);
     }
   }
 
@@ -606,7 +619,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomMute', err.response.message);
+      if (err?.response?.message)
+        socket.emit('errorChatroomMute', err.response.message);
     }
   }
 
