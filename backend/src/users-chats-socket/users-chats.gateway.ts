@@ -332,7 +332,6 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     }
   }
 
-  // TODO: mute 상태 체크하고 muted event emit 하기
   @SubscribeMessage('chatroomMessage')
   async sendMessage(
     @ConnectedSocket() socket: Socket,
@@ -431,14 +430,12 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
 
       const nameOfChtrmSocketRoom = `chatroom_${infoKick.id}`;
-      // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - chtrm에 대한 socket room에서 나가지게 하기
+      const targetSocket = this.server.sockets.sockets.get(targetSocketId);
       this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', {
         chtrmId: infoKick.id,
         nicknameKicked: infoKick.nicknameToKick,
       }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      // if (targetSocketId) {
-      //   this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
-      // }
+      targetSocket.leave(nameOfChtrmSocketRoom); // REVIEW - chtrm에 대한 socket room에서 나가지게 하기
       return true;
     } catch (err) {
       console.log(err);
