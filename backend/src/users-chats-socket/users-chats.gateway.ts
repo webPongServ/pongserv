@@ -540,18 +540,17 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     // console.log(`ChatroomEmpowermentDto: `);
     // console.log(infoEmpwr);
     try {
-      const targetUserId = await this.chatsService.empowerUser(
+      const targetNick = await this.chatsService.empowerUser(
         userId,
         infoEmpwr,
       );
       // target user의 socket에 empowered 정보 emit
-      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      // const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      if (targetSocketId) {
-        this.server
-          .to(targetSocketId)
-          .emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id });
-      }
+      const nameOfChtrmSocketRoom = `chatroom_${infoEmpwr.id}`;
+      this.server
+        .to(nameOfChtrmSocketRoom)
+        .emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id, nickname: targetNick }); // TODO: to combine with front-end
       return true;
     } catch (err) {
       console.log(err);
