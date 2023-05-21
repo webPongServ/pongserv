@@ -8,7 +8,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
-function App() {
+const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
@@ -21,6 +21,6 @@ function App() {
       </BrowserRouter>
     </QueryClientProvider>
   );
-}
+};
 
 export default App;
