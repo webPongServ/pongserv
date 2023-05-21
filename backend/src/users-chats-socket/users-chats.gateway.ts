@@ -128,8 +128,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       .emit(`friendStatusLogin`, myProfile.nickname);
 
     // handleDisconnecting
-    socket.on('disconnecting', () => {
-      this.handleDisconnecting(socket);
+    socket.on('disconnecting', async () => {
+      await this.handleDisconnecting(socket);
     });
   }
 
@@ -438,9 +438,10 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       // target user의 socket에 muted 정보 emit
       // const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      this.server
-        .to(infoMute.id)
-        .emit('chatroomBeingMuted', { chtrmId: infoMute.id, nickname: targetNick }); // TODO: to combine with front-end
+      this.server.to(infoMute.id).emit('chatroomBeingMuted', {
+        chtrmId: infoMute.id,
+        nickname: targetNick,
+      }); // TODO: to combine with front-end
       return true;
     } catch (err) {
       console.log(err);
@@ -520,17 +521,15 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     // console.log(`ChatroomEmpowermentDto: `);
     // console.log(infoEmpwr);
     try {
-      const targetNick = await this.chatsService.empowerUser(
-        userId,
-        infoEmpwr,
-      );
+      const targetNick = await this.chatsService.empowerUser(userId, infoEmpwr);
       // target user의 socket에 empowered 정보 emit
       // const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       const nameOfChtrmSocketRoom = `chatroom_${infoEmpwr.id}`;
-      this.server
-        .to(nameOfChtrmSocketRoom)
-        .emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id, nickname: targetNick }); // TODO: to combine with front-end
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRegisteredBan', {
+        chtrmId: infoEmpwr.id,
+        nickname: targetNick,
+      }); // TODO: to combine with front-end
       return true;
     } catch (err) {
       console.log(err);
