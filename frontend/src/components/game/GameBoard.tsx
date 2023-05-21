@@ -388,6 +388,9 @@ const GameBoard = (props: GameBoardProps) => {
   const socketRoomOwner = () => {
     setSelectedPaddleRef(paddleRef);
     setSelectedPaddle(paddle1_rel);
+    console.log(
+      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
+    );
   };
 
   const socketRoomGuest = () => {
