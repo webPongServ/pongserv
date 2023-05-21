@@ -27,7 +27,7 @@ const OthersButtons = (props: OthersButtonsProps) => {
   const handleDMButton = () => {
     chattingSocket.emit(
       "chatroomDirectMessage",
-      { nickname: props.profileDetail!.nickname },
+      { targetNickname: props.profileDetail!.nickname },
       (data: { chtrmId: string }) => {
         dispatch({
           type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
