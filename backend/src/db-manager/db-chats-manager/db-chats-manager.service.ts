@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { ArrayContains, In, Repository } from 'typeorm';
 import { TbCh01LEntity } from './entities/tb-ch-01-l.entity';
 import { TbCh02LEntity } from './entities/tb-ch-02-l.entity';
 import { TbCh02DEntity } from './entities/tb-ch-02-d.entity';
@@ -518,6 +518,32 @@ export class DbChatsManagerService {
       }
     })
     return results;
+  }
+
+  async getLiveDmRoomOfThisUsers(frstUser: TbUa01MEntity, scndUser: TbUa01MEntity) {
+    const dmRms = await this.ch01lRp.find({
+      relations: {
+        ch02lEntities: {
+          ua01mEntity: true,
+        }
+      },
+      where: {
+        chtRmTf: true,
+        chtRmType: '03',
+        },
+      }
+    );
+    for (const eachDmRm of dmRms) {
+      let count: number = 0;
+      for (const eachAttnd of eachDmRm.ch02lEntities) {
+        if (eachAttnd.ua01mEntity.id == frstUser.id 
+          || eachAttnd.ua01mEntity.id == scndUser.id)
+          ++count;
+        if (count == 2)
+          return true;
+      }
+    }
+    return false;
   }
 
 }

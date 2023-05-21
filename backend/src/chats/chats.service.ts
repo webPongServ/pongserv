@@ -58,6 +58,7 @@ export class ChatsService {
     /*!SECTION
 			1. requester와 target에 대한 유저 정보를 가져온다.
 				1-1. requester와 target이 같은 유저일 경우에 403 에러를 던진다.
+      +. 기존에 동일한 유저에 대한 DM 방이 존재할 경우에, 에러를 던진다.
 			2. DM용 private type의 chatroom을 만든다.
 			3. requester와 target 모두 DM chatroom의 참여자에 등록한다.
 				3-1. requester는 방 참여 여부(chtRmJoinTf)를 true로 설정한다.
@@ -74,6 +75,9 @@ export class ChatsService {
       infoDmReq.targetNickname,
     );
     const target = await this.dbUsersManagerService.getUserByUserId(trgtUserId);
+    // +
+    if (await this.dbChatsManagerService.getLiveDmRoomOfThisUsers(requester, target))
+      throw new BadRequestException(`상대방과의 DM방이 이미 존재합니다.`);
     // 2
     const nameDmChtrm = '[DM]' + requester.nickname + '->' + target.nickname;
     const newDmChtrm = await this.dbChatsManagerService.createDmChatroom(
@@ -623,9 +627,10 @@ export class ChatsService {
       user,
       chtrm,
     );
-    if (userInChtrm === null || userInChtrm.chtRmJoinTf === false) {
-      throw new NotFoundException("You're not in the chatroom");
-    }
+    // NOTE: when not in the room
+    // if (userInChtrm === null || userInChtrm.chtRmJoinTf === false) {
+    //   throw new NotFoundException("You're not in the chatroom");
+    // }
     const [userListInChtrm, countInChtrm]: [TbCh02LEntity[], number] =
       await this.dbChatsManagerService.getLiveUserListAndCountInARoom(chtrm);
     if (countInChtrm === 1) {

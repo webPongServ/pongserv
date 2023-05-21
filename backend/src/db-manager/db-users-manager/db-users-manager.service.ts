@@ -347,6 +347,8 @@ export class DbUsersManagerService {
   }
 
   async findUserIdByNickname(nickname: string) {
+    if (!nickname)
+      throw new BadRequestException('No nickname arg');
     const user = await this.ua01mRp.findOne({
       where: {
         nickname: nickname,
