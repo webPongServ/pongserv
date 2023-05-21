@@ -13,6 +13,7 @@ import { ChatsService } from '../chats/chats.service';
 import {
   Inject,
   Logger,
+  OnModuleDestroy,
   UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
@@ -39,7 +40,7 @@ import { ChatroomDirectGameResponseDto } from 'src/chats/dto/chatroom-dg-res.dto
     origin: '*',
   },
 })
-export class UsersChatsGateway implements OnGatewayConnection {
+export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly usersService: UsersService,
@@ -102,7 +103,8 @@ export class UsersChatsGateway implements OnGatewayConnection {
     }
     // 1
     // console.log(`process login`);
-    // this.usersService.processLogin(userId);
+    this.logger.log(`process login`);
+    this.usersService.processLogin(userId);
     // 2
     this.userIdToSocketIdMap.set(userId, socket.id);
     // console.log(`In handleConnection -> this.userIdToSocketIdMap: `);
@@ -194,7 +196,19 @@ export class UsersChatsGateway implements OnGatewayConnection {
 
     // 3
     // console.log(`process logout`);
-    // this.usersService.processLogout(userId);
+    this.logger.log(`process login`);
+    this.usersService.processLogout(userId);
+  }
+
+  async onModuleDestroy() {
+    await this.cleanup();
+  }
+
+  async cleanup() {
+    if (this.server) {
+      this.logger.log('GameSocket Disconnecting');
+      await this.server.disconnectSockets();
+    } else this.logger.log('Game Socket Server already removed');
   }
   
   // TODO: to combine with front-end
@@ -360,7 +374,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomLeaving', err.response.message);
+      // socket.emit('errorChatroomLeaving', err.response.message);
     }
   }
 
