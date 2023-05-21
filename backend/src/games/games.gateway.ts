@@ -327,10 +327,10 @@ export class GamesGateway
       if (!requesterSocketId || !targetSocketId) {
         return 'OK';
       }
-      await this.server.to(requesterSocketId).emit('roomOwner');
-      await this.server.to(targetSocketId).emit('roomGuest');
-      await this.server.to(requesterSocketId).emit('gameStart');
-      await this.server.to(targetSocketId).emit('gameStart');
+      this.server.to(requesterSocketId).emit('roomOwner');
+      this.server.to(targetSocketId).emit('roomGuest');
+      this.server.to(requesterSocketId).emit('gameStart');
+      this.server.to(targetSocketId).emit('gameStart');
 
       await this.GamesService.enterRoom(targetId, roomId, '01');
       await this.GamesService.updateOpponent(targetId, roomId);
@@ -342,7 +342,7 @@ export class GamesGateway
       const requesterSocket: Socket = this.server.sockets.sockets.get(
         this.GameSocketId.get(requestId),
       );
-      await requesterSocket.emit('gameReject');
+      requesterSocket.emit('gameReject');
       // Reject하면 -> 프론트에서 다른 곳으로 나가고 -> 그렇게 함으로써 소켓 끊으면? 모두 해결
       return 'OK';
     }
