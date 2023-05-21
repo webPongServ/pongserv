@@ -42,7 +42,7 @@ export class UsersController {
         'API_UID',
       )}&redirect_uri=${this.config.get('REDIRECT_URI')}&response_type=code`;
     } else {
-      this.logger.error('Already Logged in!');
+      // this.logger.error(`Already Logged in!`);
       return 'http://localhost:3001/game';
     }
   }
