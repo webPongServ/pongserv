@@ -30,9 +30,9 @@ const quadrant = [[], [1, 0], [0, 0], [0, 1], [1, 1]];
 let random = 2;
 
 const setDifficulty = (difficulty: string): number => {
-  if (difficulty === GameDifficultyType.easy) return 3;
-  else if (difficulty === GameDifficultyType.normal) return 5;
-  else if (difficulty === GameDifficultyType.hard) return 7;
+  if (difficulty === GameDifficultyType.easy) return 5;
+  else if (difficulty === GameDifficultyType.normal) return 7;
+  else if (difficulty === GameDifficultyType.hard) return 10;
   return 5;
 };
 
