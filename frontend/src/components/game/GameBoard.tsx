@@ -143,7 +143,6 @@ const GameBoard = (props: GameBoardProps) => {
   };
 
   const moveBall = (dx: number, dy: number, dxd: number, dyd: number) => {
-    console.log(1);
     if (ballRef.current) {
       const role: string =
         currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
@@ -384,9 +383,6 @@ const GameBoard = (props: GameBoardProps) => {
   const socketRoomOwner = () => {
     setSelectedPaddleRef(paddleRef);
     setSelectedPaddle(paddle1_rel);
-    console.log(
-      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
-    );
   };
 
   const socketRoomGuest = () => {
@@ -425,6 +421,59 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.top = data.data.top;
         ballRef.current!.style.bottom = data.data.bottom + "px";
         ball_rel.bottom = data.data.bottom;
+        if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
+          ballRef.current!.style.top = "300px";
+          ballRef.current!.style.bottom = "315px";
+          ballRef.current!.style.left = "500px";
+          ballRef.current!.style.right = "515px";
+          ball_rel.top = 300;
+          ball_rel.bottom = 315;
+          ball_rel.left = 500;
+          ball_rel.right = 515;
+          if (ball_rel.left <= 0) {
+            score2++;
+            dispatch({
+              type: CurrentGameActionTypes.INCREMENT_SCORE,
+              payload: "score2",
+            });
+            random = 2;
+          } else {
+            score1++;
+            dispatch({
+              type: CurrentGameActionTypes.INCREMENT_SCORE,
+              payload: "score1",
+            });
+            random = 4;
+          }
+          if (
+            score1 === currentGame.currentGame!.maxScore ||
+            score2 === currentGame.currentGame!.maxScore
+          ) {
+            gameSocket.emit(
+              "finishGame",
+              {
+                roomId: currentGame.currentGame!.id,
+                myScore:
+                  currentGame.currentGame!.owner === myInfo.nickname
+                    ? score1
+                    : score2,
+                opScore:
+                  currentGame.currentGame!.owner === myInfo.nickname
+                    ? score2
+                    : score1,
+              },
+              () => {
+                random = 2;
+                dispatch({
+                  type: CurrentGameActionTypes.DELETE_GAMEROOM,
+                  payload: "",
+                });
+                window.location.href = "/game";
+              }
+            );
+            return;
+          }
+        }
       }
     }
   };
@@ -436,11 +485,11 @@ const GameBoard = (props: GameBoardProps) => {
         {
           roomId: currentGame.currentGame!.id,
           myScore:
-            selectedPaddleRef === paddleRef
+            currentGame.currentGame!.owner === myInfo.nickname
               ? currentGame.score1
               : currentGame.score2,
           opScore:
-            selectedPaddleRef === paddleRef
+            currentGame.currentGame!.owner === myInfo.nickname
               ? currentGame.score2
               : currentGame.score1,
         },
