@@ -143,6 +143,7 @@ const GameBoard = (props: GameBoardProps) => {
   };
 
   const moveBall = (dx: number, dy: number, dxd: number, dyd: number) => {
+    console.log(1);
     if (ballRef.current) {
       const role: string =
         currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
@@ -344,11 +345,11 @@ const GameBoard = (props: GameBoardProps) => {
         role: role,
         type: "ball",
       });
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          moveBall(dx, dy, dxd, dyd);
-        });
-      }, 50);
+      // setTimeout(() => {
+      requestAnimationFrame(() => {
+        moveBall(dx, dy, dxd, dyd);
+      });
+      // }, 50);
     }
   };
 
@@ -383,11 +384,17 @@ const GameBoard = (props: GameBoardProps) => {
   const socketRoomOwner = () => {
     setSelectedPaddleRef(paddleRef);
     setSelectedPaddle(paddle1_rel);
+    console.log(
+      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
+    );
   };
 
   const socketRoomGuest = () => {
     setSelectedPaddleRef(paddle2Ref);
     setSelectedPaddle(paddle2_rel);
+    console.log(
+      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
+    );
   };
 
   const socketInGameRes = (data: {
@@ -409,14 +416,16 @@ const GameBoard = (props: GameBoardProps) => {
         paddle2_rel.bottom = data.data.bottom;
       }
     } else {
-      ballRef.current!.style.left = data.data.left + "px";
-      ball_rel.left = data.data.left;
-      ballRef.current!.style.right = data.data.right + "px";
-      ball_rel.right = data.data.right;
-      ballRef.current!.style.top = data.data.top + "px";
-      ball_rel.top = data.data.top;
-      ballRef.current!.style.bottom = data.data.bottom + "px";
-      ball_rel.bottom = data.data.bottom;
+      if (data.role === "owner") {
+        ballRef.current!.style.left = data.data.left + "px";
+        ball_rel.left = data.data.left;
+        ballRef.current!.style.right = data.data.right + "px";
+        ball_rel.right = data.data.right;
+        ballRef.current!.style.top = data.data.top + "px";
+        ball_rel.top = data.data.top;
+        ballRef.current!.style.bottom = data.data.bottom + "px";
+        ball_rel.bottom = data.data.bottom;
+      }
     }
   };
 
