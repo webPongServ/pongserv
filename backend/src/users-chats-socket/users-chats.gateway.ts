@@ -73,7 +73,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   // TODO - to organize
   async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
     try {
-      this.initUserConnection(socket);
+      await this.initUserConnection(socket);
     } catch (err) {
       console.log(err);
       return ;
@@ -453,15 +453,13 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     // console.log(`ChatroomMuteDto: `);
     // console.log(infoMute);
     try {
-      const targetUserId = await this.chatsService.muteUser(userId, infoMute);
+      const targetNick = await this.chatsService.muteUser(userId, infoMute);
       // target user의 socket에 muted 정보 emit
-      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      if (targetSocketId) {
-        this.server
-          .to(targetSocketId)
-          .emit('chatroomBeingMuted', { chtrmId: infoMute.id });
-      }
+      // const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
+      this.server
+        .to(infoMute.id)
+        .emit('chatroomBeingMuted', { chtrmId: infoMute.id, nickname: targetNick }); // TODO: to combine with front-end
       return true;
     } catch (err) {
       console.log(err);
