@@ -204,11 +204,9 @@ export class DbUsersManagerService {
 
   async checkNickname(nickname: string) {
     const isAvailable = await this.ua01mRp.findOne({
-      where: {
-        nickname: nickname,
-      },
+      where: [{ nickname: nickname }, { userId: nickname }],
     });
-    return isAvailable;
+    return isAvailable !== null;
   }
 
   async getProfile(userId) {
