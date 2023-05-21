@@ -199,9 +199,9 @@ export class GamesGateway
     @MessageBody() message: any,
   ) {
     await new Promise((resolve) => setTimeout(resolve, 1200));
-    await socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
-    await socket.emit('roomGuest');
-    await this.server.to(message.roomId).emit('gameStart');
+    socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
+    socket.emit('roomGuest');
+    this.server.to(message.roomId).emit('gameStart');
     this.logger.log(`Game condition fulfilled: ${message.roomId} started`);
     const userId = socket.data;
     const roomId = message.roomId;
