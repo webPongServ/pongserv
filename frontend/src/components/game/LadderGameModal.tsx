@@ -57,7 +57,7 @@ const LadderGameModal = (props: LadderGameModalProps) => {
                         owner: myInfo.nickname,
                         ownerImage: myInfo.imgURL,
                         maxScore: 5,
-                        difficulty: GameDifficultyType.hard,
+                        difficulty: GameDifficultyType.normal,
                       },
                     });
                   } else if (data.action === "join") {
@@ -69,7 +69,7 @@ const LadderGameModal = (props: LadderGameModalProps) => {
                         owner: data.owner,
                         ownerImage: "",
                         maxScore: 5,
-                        difficulty: GameDifficultyType.hard,
+                        difficulty: GameDifficultyType.normal,
                       },
                     });
                     gameSocket.emit("gameRoomFulfilled", {

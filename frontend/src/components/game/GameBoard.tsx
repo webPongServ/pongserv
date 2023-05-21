@@ -30,9 +30,9 @@ const quadrant = [[], [1, 0], [0, 0], [0, 1], [1, 1]];
 let random = 2;
 
 const setDifficulty = (difficulty: string): number => {
-  if (difficulty === GameDifficultyType.easy) return 3;
-  else if (difficulty === GameDifficultyType.normal) return 5;
-  else if (difficulty === GameDifficultyType.hard) return 7;
+  if (difficulty === GameDifficultyType.easy) return 5;
+  else if (difficulty === GameDifficultyType.normal) return 7;
+  else if (difficulty === GameDifficultyType.hard) return 10;
   return 5;
 };
 
@@ -156,6 +156,7 @@ const GameBoard = (props: GameBoardProps) => {
       ) {
         // why 10?
         if (ball_rel.left <= 10) {
+          console.log("right case 2");
           score2++;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
@@ -211,6 +212,7 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.bottom <= paddle2_rel.bottom
       ) {
         if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
+          console.log("left case 2");
           score1++;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
@@ -262,6 +264,24 @@ const GameBoard = (props: GameBoardProps) => {
         } else dxd = 0;
       }
       if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
+        if (ball_rel.left <= 0) {
+          console.log("right case 1");
+          score2++;
+          dispatch({
+            type: CurrentGameActionTypes.INCREMENT_SCORE,
+            payload: "score2",
+          });
+          random = 2;
+        } else {
+          console.log(ball_rel.left, ball_rel.right);
+          console.log("left case 1");
+          score1++;
+          dispatch({
+            type: CurrentGameActionTypes.INCREMENT_SCORE,
+            payload: "score1",
+          });
+          random = 4;
+        }
         ballRef.current!.style.top = "300px";
         ballRef.current!.style.bottom = "315px";
         ballRef.current!.style.left = "500px";
@@ -270,21 +290,6 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.bottom = 315;
         ball_rel.left = 500;
         ball_rel.right = 515;
-        if (ball_rel.left <= 0) {
-          score2++;
-          dispatch({
-            type: CurrentGameActionTypes.INCREMENT_SCORE,
-            payload: "score2",
-          });
-          random = 2;
-        } else {
-          score1++;
-          dispatch({
-            type: CurrentGameActionTypes.INCREMENT_SCORE,
-            payload: "score1",
-          });
-          random = 4;
-        }
         if (
           score1 === currentGame.currentGame!.maxScore ||
           score2 === currentGame.currentGame!.maxScore
@@ -344,11 +349,11 @@ const GameBoard = (props: GameBoardProps) => {
         role: role,
         type: "ball",
       });
-      setTimeout(() => {
-        requestAnimationFrame(() => {
-          moveBall(dx, dy, dxd, dyd);
-        });
-      }, 50);
+      // setTimeout(() => {
+      requestAnimationFrame(() => {
+        moveBall(dx, dy, dxd, dyd);
+      });
+      // }, 50);
     }
   };
 
@@ -383,11 +388,21 @@ const GameBoard = (props: GameBoardProps) => {
   const socketRoomOwner = () => {
     setSelectedPaddleRef(paddleRef);
     setSelectedPaddle(paddle1_rel);
+    console.log(
+      currentGame.currentGame!.owner,
+      myInfo.nickname,
+      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
+    );
   };
 
   const socketRoomGuest = () => {
     setSelectedPaddleRef(paddle2Ref);
     setSelectedPaddle(paddle2_rel);
+    console.log(
+      currentGame.currentGame!.owner,
+      myInfo.nickname,
+      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
+    );
   };
 
   const socketInGameRes = (data: {
@@ -409,14 +424,162 @@ const GameBoard = (props: GameBoardProps) => {
         paddle2_rel.bottom = data.data.bottom;
       }
     } else {
-      ballRef.current!.style.left = data.data.left + "px";
-      ball_rel.left = data.data.left;
-      ballRef.current!.style.right = data.data.right + "px";
-      ball_rel.right = data.data.right;
-      ballRef.current!.style.top = data.data.top + "px";
-      ball_rel.top = data.data.top;
-      ballRef.current!.style.bottom = data.data.bottom + "px";
-      ball_rel.bottom = data.data.bottom;
+      if (data.role === "owner") {
+        ballRef.current!.style.left = data.data.left + "px";
+        ball_rel.left = data.data.left;
+        ballRef.current!.style.right = data.data.right + "px";
+        ball_rel.right = data.data.right;
+        ballRef.current!.style.top = data.data.top + "px";
+        ball_rel.top = data.data.top;
+        ballRef.current!.style.bottom = data.data.bottom + "px";
+        ball_rel.bottom = data.data.bottom;
+        if (
+          ball_rel.left <= paddle1_rel.right &&
+          ball_rel.top >= paddle1_rel.top &&
+          ball_rel.bottom <= paddle1_rel.bottom
+        ) {
+          // why 10?
+          if (ball_rel.left <= 10) {
+            score2++;
+            ballRef.current!.style.top = "300px";
+            ballRef.current!.style.bottom = "315px";
+            ballRef.current!.style.left = "500px";
+            ballRef.current!.style.right = "515px";
+            ball_rel.top = 300;
+            ball_rel.bottom = 315;
+            ball_rel.left = 500;
+            ball_rel.right = 515;
+            dispatch({
+              type: CurrentGameActionTypes.INCREMENT_SCORE,
+              payload: "score2",
+            });
+            if (score2 === currentGame.currentGame!.maxScore) {
+              gameSocket.emit(
+                "finishGame",
+                {
+                  roomId: currentGame.currentGame!.id,
+                  myScore:
+                    currentGame.currentGame!.owner === myInfo.nickname
+                      ? score1
+                      : score2,
+                  opScore:
+                    currentGame.currentGame!.owner === myInfo.nickname
+                      ? score2
+                      : score1,
+                },
+                () => {
+                  random = 2;
+                  dispatch({
+                    type: CurrentGameActionTypes.DELETE_GAMEROOM,
+                    payload: "",
+                  });
+                  navigate("/game");
+                }
+              );
+            }
+            return;
+          }
+        }
+        if (
+          ball_rel.right >= paddle2_rel.left &&
+          ball_rel.top >= paddle2_rel.top &&
+          ball_rel.bottom <= paddle2_rel.bottom
+        ) {
+          if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
+            score1++;
+            ballRef.current!.style.top = "300px";
+            ballRef.current!.style.bottom = "315px";
+            ballRef.current!.style.left = "500px";
+            ballRef.current!.style.right = "515px";
+            ball_rel.top = 300;
+            ball_rel.bottom = 315;
+            ball_rel.left = 500;
+            ball_rel.right = 515;
+            dispatch({
+              type: CurrentGameActionTypes.INCREMENT_SCORE,
+              payload: "score1",
+            });
+            if (score1 === currentGame.currentGame!.maxScore) {
+              gameSocket.emit(
+                "finishGame",
+                {
+                  roomId: currentGame.currentGame!.id,
+                  myScore:
+                    currentGame.currentGame!.owner === myInfo.nickname
+                      ? score1
+                      : score2,
+                  opScore:
+                    currentGame.currentGame!.owner === myInfo.nickname
+                      ? score2
+                      : score1,
+                },
+                () => {
+                  random = 2;
+                  dispatch({
+                    type: CurrentGameActionTypes.DELETE_GAMEROOM,
+                    payload: "",
+                  });
+                  // 결과 페이지로 navigate => 10초간 보여주고 redirect, 버튼 누르면 redirect(초기화)
+                  window.location.href = "/game";
+                }
+              );
+            }
+            return;
+          }
+        }
+        if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
+          if (ball_rel.left <= 0) {
+            score2++;
+            dispatch({
+              type: CurrentGameActionTypes.INCREMENT_SCORE,
+              payload: "score2",
+            });
+            random = 2;
+          } else {
+            score1++;
+            dispatch({
+              type: CurrentGameActionTypes.INCREMENT_SCORE,
+              payload: "score1",
+            });
+            random = 4;
+          }
+          ballRef.current!.style.top = "300px";
+          ballRef.current!.style.bottom = "315px";
+          ballRef.current!.style.left = "500px";
+          ballRef.current!.style.right = "515px";
+          ball_rel.top = 300;
+          ball_rel.bottom = 315;
+          ball_rel.left = 500;
+          ball_rel.right = 515;
+          if (
+            score1 === currentGame.currentGame!.maxScore ||
+            score2 === currentGame.currentGame!.maxScore
+          ) {
+            gameSocket.emit(
+              "finishGame",
+              {
+                roomId: currentGame.currentGame!.id,
+                myScore:
+                  currentGame.currentGame!.owner === myInfo.nickname
+                    ? score1
+                    : score2,
+                opScore:
+                  currentGame.currentGame!.owner === myInfo.nickname
+                    ? score2
+                    : score1,
+              },
+              () => {
+                random = 2;
+                dispatch({
+                  type: CurrentGameActionTypes.DELETE_GAMEROOM,
+                  payload: "",
+                });
+                window.location.href = "/game";
+              }
+            );
+          }
+        }
+      }
     }
   };
 
@@ -427,11 +590,11 @@ const GameBoard = (props: GameBoardProps) => {
         {
           roomId: currentGame.currentGame!.id,
           myScore:
-            selectedPaddleRef === paddleRef
+            currentGame.currentGame!.owner === myInfo.nickname
               ? currentGame.score1
               : currentGame.score2,
           opScore:
-            selectedPaddleRef === paddleRef
+            currentGame.currentGame!.owner === myInfo.nickname
               ? currentGame.score2
               : currentGame.score1,
         },

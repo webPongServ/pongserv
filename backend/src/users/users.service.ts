@@ -166,7 +166,7 @@ export class UsersService {
       friendNickname,
     );
     Profile.ELO = gameSummary.ladder;
-    Profile.winRate = gameSummary.winRate * 100;
+    Profile.winRate = parseFloat((gameSummary.winRate * 100).toFixed(1));
     Profile.total = gameSummary.total;
     Profile.win = gameSummary.win;
     Profile.lose = gameSummary.lose;
@@ -183,7 +183,7 @@ export class UsersService {
       intraId,
     );
     Profile.ELO = gameSummary.ladder;
-    Profile.winRate = gameSummary.winRate * 100;
+    Profile.winRate = parseFloat((gameSummary.winRate * 100).toFixed(1));
     Profile.total = gameSummary.total;
     Profile.win = gameSummary.win;
     Profile.lose = gameSummary.lose;
