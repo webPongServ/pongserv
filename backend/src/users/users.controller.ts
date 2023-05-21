@@ -42,7 +42,7 @@ export class UsersController {
         'API_UID',
       )}&redirect_uri=${this.config.get('REDIRECT_URI')}&response_type=code`;
     } else {
-      this.logger.error('Already Logged in!');
+      // this.logger.error(`Already Logged in!`);
       return 'http://localhost:3001/game';
     }
   }
@@ -67,7 +67,7 @@ export class UsersController {
   @UseGuards(JwtAccessTokenGuard)
   @Post('/nickname')
   async changeNickname(@CurrentUser() user: string, @Body() body: any) {
-    if (body.nickname.length > 8) {
+    if (body.nickname.length > 10) {
       throw new HttpException(
         '닉네임은 8자 이하로 입력해주세요.',
         HttpStatus.BAD_REQUEST,
@@ -87,7 +87,7 @@ export class UsersController {
     if (!nickname) {
       return { result: false };
     }
-    if (nickname.length > 8) {
+    if (nickname.length > 10) {
       throw new HttpException(
         '닉네임은 8자 이하로 입력해주세요.',
         HttpStatus.BAD_REQUEST,

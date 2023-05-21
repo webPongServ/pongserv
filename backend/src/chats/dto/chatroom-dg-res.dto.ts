@@ -2,11 +2,11 @@ import { ApiProperty } from "@nestjs/swagger";
 
 export class ChatroomDirectGameResponseDto {
     @ApiProperty({ type: String })
-    gmRmid: string;
+    gmRmId: string;
 
     @ApiProperty({ type: String })
-    requesterNick: string;
+    rqstrNick: string;
 	
 	@ApiProperty({ type: Boolean })
-	isApproving: boolean;
+	isApprv: boolean;
 }

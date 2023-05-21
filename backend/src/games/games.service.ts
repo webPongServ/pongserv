@@ -135,6 +135,13 @@ export class GamesService {
     this.logger.log('Finish Game 저장 성공 게임 종료됨');
   }
 
+  async updateDirectGame(roomId: string) {
+    const roomListEntity = await this.DbGamesManagerService.getRoomListByRoomId(
+      roomId,
+    );
+    await this.DbGamesManagerService.updateDirectGame(roomListEntity);
+  }
+
   async isInGame(userId: string) {
     return await this.DbGamesManagerService.isInGame(userId);
   }

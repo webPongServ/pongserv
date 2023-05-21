@@ -1,5 +1,5 @@
 import { EnterOption } from './dto/enter.dto';
-import { Inject, Logger, forwardRef } from '@nestjs/common';
+import { Inject, Logger, forwardRef, OnModuleDestroy } from '@nestjs/common';
 import GameQueue from './dto/gameQue';
 import {
   ConnectedSocket,
@@ -23,7 +23,11 @@ import { UsersChatsGateway } from 'src/users-chats-socket/users-chats.gateway';
   namespace: 'games',
 })
 export class GamesGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+  implements
+    OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleDestroy
 {
   @WebSocketServer()
   server: Server;
@@ -37,9 +41,8 @@ export class GamesGateway
     private GamesService: GamesService,
     @Inject(forwardRef(() => UsersChatsGateway)) // NOTE - 순환 종속성 솔루션
     private UsersChatsGateway: UsersChatsGateway,
-  ) {
-    this.logger.log('GameGateway constructor');
-  }
+  ) {}
+
   validateAccessToken(socket: Socket) {
     const bearerToken = socket.handshake.headers['authorization'];
     // Bearer 토큰이 아닌 경우 에러 메시지를 클라이언트에게 보냅니다.
@@ -67,6 +70,17 @@ export class GamesGateway
   afterInit() {
     this.logger.log('GameGateway initialized');
   }
+  async onModuleDestroy() {
+    await this.cleanup();
+  }
+
+  async cleanup() {
+    if (this.server) {
+      this.logger.log('GameSocket Disconnecting');
+      await this.server.disconnectSockets();
+    } else this.logger.log('Game Socket Server already removed');
+  }
+
   handleConnection(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
     if (typeof socket.data === 'string') {
@@ -75,21 +89,29 @@ export class GamesGateway
     this.logger.log(
       `GameGateway handleConnection: ${socket.data} -> ${socket.id}`,
     );
-    socket.on('disconnecting', (reason) => {
+    socket.on('disconnecting', async (reason) => {
       /*
       1. 만약에 방에 들어와있는 소켓이 끊긴다면
       2. 그 방 안에 있는 인원들에게 endGame보낸다.
       3. 그 방에 있는 인원들을 전부 나가게 한다.
       4. 그 방을 삭제한다.(조건 04로 변경)
       */
+
       for (const room of socket.rooms) {
         if (room !== socket.id) {
-          socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
-          this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
+          this.logger.log(`${room} Game room removing actions`);
+          await socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
+          await this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
           this.GamesService.endGame(room); // 해당 방 삭제
-          if (this.gameQueue.removeAndCheckExistence(room))
+          if (await this.gameQueue.removeAndCheckExistence(room))
             this.logger.log('gameQueue removed');
         }
+      }
+      if (socket.data) {
+        this.logger.log(`Disconnecting Emit End to friends : ${socket.data}`);
+        await this.UsersChatsGateway.notifyGameEndToFriends(
+          socket.data.toString(),
+        );
       }
     });
   }
@@ -148,7 +170,7 @@ export class GamesGateway
     const inRoom = await this.server.in(message.roomId).fetchSockets();
     if (inRoom.length == 1 && inRoom[0].data == userId) {
       socket.emit('exception', '방장은 게임에 참여할 수 없습니다.');
-      this.logger.log('방장은 자신의 게임에 참여할 수 없습니다.');
+      this.logger.error('방장은 자신의 게임에 참여할 수 없습니다.');
       return 'NO';
     } else if (inRoom.length == 1) socket.join(message.roomId);
     else {
@@ -206,7 +228,7 @@ export class GamesGateway
 
   @SubscribeMessage('dodge')
   scoreUpdate(@ConnectedSocket() socket: Socket, @MessageBody() message: any) {
-    this.logger.log('Dodge Game Score Update', message);
+    this.logger.log(`Dodge Game Score Update ${message.roomId}`);
     // console.log('Dodge Game Score Update', message);
     // 필요한 데이터 roodId, Score(양쪽 다), userId
     const roomId = message.roomId;
@@ -256,6 +278,7 @@ export class GamesGateway
       await socket.join(roomList.id);
       this.gameQueue.enqueue(roomList.id);
       this.logger.log('Ladder Game Room Created', roomList.id);
+      await this.UsersChatsGateway.notifyGameStartToFriends(userId.toString());
       return { roomId: roomList.id, action: 'create' };
     } else {
       const roomId = this.gameQueue.dequeue();
@@ -285,7 +308,7 @@ export class GamesGateway
     this.server.in(requesterSocket).socketsJoin(roomList.id);
     const targetSocket = this.GameSocketId.get(targetId);
     this.server.in(targetSocket).socketsJoin(roomList.id);
-    // // Notify To friends
+    // Notify To friends
     await this.UsersChatsGateway.notifyGameStartToFriends(userId);
     return roomList.id;
   }
@@ -297,26 +320,23 @@ export class GamesGateway
     status: boolean,
   ) {
     if (status) {
-      const requesterSocket: Socket = this.server.sockets.sockets.get(
-        this.GameSocketId.get(requestId),
-      );
-      const targetSocket: Socket = this.server.sockets.sockets.get(
-        this.GameSocketId.get(targetId),
-      );
+      const requesterSocketId = this.GameSocketId.get(requestId);
+      const targetSocketId = this.GameSocketId.get(targetId);
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      if (!requesterSocket || !targetSocket) {
+      if (!requesterSocketId || !targetSocketId) {
         return 'OK';
       }
-      await requesterSocket.emit('roomOwner'); // 방장에게 방장임을 알려주는 것
-      await targetSocket.emit('roomGuest');
-      await requesterSocket.emit('gameStart');
-      await targetSocket.emit('gameStart');
+      await this.server.to(requesterSocketId).emit('roomOwner');
+      await this.server.to(targetSocketId).emit('roomGuest');
+      await this.server.to(requesterSocketId).emit('gameStart');
+      await this.server.to(targetSocketId).emit('gameStart');
 
       await this.GamesService.enterRoom(targetId, roomId, '01');
-      await this.GamesService.updateOpponent(requestId, roomId);
+      await this.GamesService.updateOpponent(targetId, roomId);
       await this.GamesService.startGame(targetId, roomId);
       await this.UsersChatsGateway.notifyGameStartToFriends(targetId);
+      await this.GamesService.updateDirectGame(roomId);
       return 'OK';
     } else {
       const requesterSocket: Socket = this.server.sockets.sockets.get(

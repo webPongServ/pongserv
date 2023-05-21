@@ -39,3 +39,9 @@ export interface ProfileDetail {
   status: string;
   isBlocked: boolean;
 }
+
+export interface RequesterDetail {
+  nickname: string;
+  imgURL: string;
+  roomId: string;
+}

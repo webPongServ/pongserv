@@ -7,7 +7,7 @@ import AppBar from "components/common/AppBar";
 import FriendDrawer from "components/common/FriendDrawer";
 import ChattingDrawer from "components/common/ChattingDrawer";
 import ErrorNotification from "components/utils/ErrorNotification";
-import { ChattingDrawerWidth } from "constant";
+import { ChattingDrawerWidth, FriendStatusType } from "constant";
 import { useDispatch, useSelector } from "react-redux";
 import { apiURL } from "API/api";
 import instance from "API/api";
@@ -15,7 +15,8 @@ import UserService from "API/UserService";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 import { SocketsActionTypes } from "types/redux/Sockets";
 import { IRootState } from "components/common/store";
-import InviteGameModal from "components/common/InviteGameModal";
+import RequestGameModal from "components/common/RequestGameModal";
+import { RequesterDetail } from "types/Detail";
 import "styles/global.scss";
 
 import { Box, CssBaseline } from "@mui/material";
@@ -48,6 +49,8 @@ export const errorMessageCreator = (errorCode: string): string => {
       return "잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요.";
     case "auth_failed":
       return "로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.";
+    case "twofactor_failed":
+      return "2차 인증에 실패하였습니다.";
     case "already_login":
       return "이미 로그인 되어있는 계정입니다. 로그아웃 후 다시 시도해주세요.";
     case "kicked":
@@ -65,7 +68,12 @@ export default function AppHeader() {
   const paramsCode: string | undefined = qs.parse(window.location.search)
     .error as string;
   const notiRef = useRef<HTMLDivElement>(null);
-  const status = useSelector((state: IRootState) => state.loginStatus);
+  const loginStatus = useSelector((state: IRootState) => state.loginStatus);
+  const [requester, setRequester] = useState<RequesterDetail>({
+    nickname: "",
+    imgURL: "",
+    roomId: "",
+  });
   const dispatch = useDispatch();
 
   const loadMyData = async () => {
@@ -80,7 +88,7 @@ export default function AppHeader() {
       payload: {
         nickname: response.data.nickname,
         imgURL: response.data.imgPath,
-        status: "login",
+        status: FriendStatusType.login,
       },
     });
   };
@@ -90,6 +98,7 @@ export default function AppHeader() {
   }, 5000);
 
   useLayoutEffect(() => {
+    // if null 적용하기
     const token = localStorage.getItem("accessToken");
     const chattingSocket = io(apiURL, {
       extraHeaders: {
@@ -110,7 +119,24 @@ export default function AppHeader() {
       window.location.href = "/login?error=already_login";
     };
 
+    const socketChatroomBeingRequestedGame = (data: {
+      gmRmId: string;
+      rqstrNick: string;
+      rqstrImg: string;
+    }) => {
+      setRequester({
+        nickname: data.rqstrNick,
+        imgURL: data.rqstrImg,
+        roomId: data.gmRmId,
+      });
+      setOpenModal(true);
+    };
+
     if (chattingSocket) {
+      chattingSocket.on(
+        "chatroomBeingRequestedGame",
+        socketChatroomBeingRequestedGame
+      );
       // error handling
       chattingSocket.on("errorAlreadyLogin", socketAlreadyLogin);
       chattingSocket.on("errorChatroomFull", alertMessage);
@@ -127,6 +153,10 @@ export default function AppHeader() {
     loadMyData();
 
     return () => {
+      chattingSocket.off(
+        "chatroomBeingRequestedGame",
+        socketChatroomBeingRequestedGame
+      );
       chattingSocket.off("errorChatroomFull", alertMessage);
       chattingSocket.off("errorAlreadyLogin", socketAlreadyLogin);
       chattingSocket.off("errorChatroomEntrance", alertMessage);
@@ -152,14 +182,18 @@ export default function AppHeader() {
       <Box id="AppHeader-container" className="flex-container">
         <CssBaseline />
         <AppBar open={open} setOpen={setOpen} />
-        {status === "game" ? null : <FriendDrawer />}
+        {loginStatus === "game" ? null : <FriendDrawer />}
         <Main id="Main-box" open={open}>
           <Routes>
             <Route path="/*" element={<MainRoute />} />
           </Routes>
         </Main>
         <ChattingDrawer open={open} setOpen={setOpen} />
-        <InviteGameModal openModal={openModal} setOpenModal={setOpenModal} />
+        <RequestGameModal
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          requester={requester}
+        />
       </Box>
     </>
   );

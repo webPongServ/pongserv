@@ -21,23 +21,30 @@ const TwoFactorModal = () => {
   const navigate = useNavigate();
 
   const handleTwoFactorLogin = async () => {
-    let response;
-    response = await AuthService.postOtp({
-      userId: myInfo.nickname,
-      sixDigit: value,
-    });
-    localStorage.setItem("accessToken", response.data.accessToken);
-    instance.defaults.headers.common[
-      "Authorization"
-    ] = `Bearer ${response.data.accessToken}`;
+    try {
+      let response;
+      response = await AuthService.postOtp({
+        userId: myInfo.nickname,
+        sixDigit: value,
+      });
+      localStorage.setItem("accessToken", response.data.accessToken);
+      instance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${response.data.accessToken}`;
 
-    navigate("/game");
+      navigate("/game");
+    } catch {
+      alert("비밀번호가 일치하지 않습니다!");
+    }
   };
 
   return (
     <Modal
       open={loginStatus === "two-factor"}
-      onClose={() => dispatch({ type: LoginStatusActionTypes.STATUS_MAIN })}
+      onClose={() => {
+        dispatch({ type: LoginStatusActionTypes.STATUS_MAIN });
+        window.location.href = "/login?error=twofactor_failed";
+      }}
     >
       <ModalDialog className="modal" variant="outlined">
         <Box id="inform" className="outframe">
@@ -46,9 +53,10 @@ const TwoFactorModal = () => {
             <CustomIconButton
               class="right"
               icon={<CloseIcon />}
-              handleFunction={() =>
-                dispatch({ type: LoginStatusActionTypes.STATUS_MAIN })
-              }
+              handleFunction={() => {
+                dispatch({ type: LoginStatusActionTypes.STATUS_MAIN });
+                window.location.href = "/login?error=twofactor_failed";
+              }}
             />
           </Box>
           <Box className="body flex-container">

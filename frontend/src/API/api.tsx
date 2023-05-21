@@ -1,8 +1,6 @@
 import axios from "axios";
 
-// export const apiURL: string = "http://10.19.213.129:3000";
-export const apiURL: string = "http://10.19.210.0:3000";
-// export const apiURL: string = "http://localhost:3000";
+export const apiURL: string = process.env.REACT_APP_API_URL_SUSONG!;
 
 const instance = axios.create({
   baseURL: apiURL,

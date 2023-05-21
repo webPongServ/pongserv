@@ -10,7 +10,13 @@ import {
 import { Server, Socket } from 'socket.io';
 import { ChatroomEntranceDto } from '../chats/dto/chatroom-entrance.dto';
 import { ChatsService } from '../chats/chats.service';
-import { Inject, Logger, UnauthorizedException, forwardRef } from '@nestjs/common';
+import {
+  Inject,
+  Logger,
+  OnModuleDestroy,
+  UnauthorizedException,
+  forwardRef,
+} from '@nestjs/common';
 import { ChatroomRequestMessageDto } from '../chats/dto/chatroom-request-message.dto';
 import { ConfigService } from '@nestjs/config';
 import * as jwt from 'jsonwebtoken';
@@ -34,7 +40,7 @@ import { ChatroomDirectGameResponseDto } from 'src/chats/dto/chatroom-dg-res.dto
     origin: '*',
   },
 })
-export class UsersChatsGateway implements OnGatewayConnection {
+export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   constructor(
     private readonly chatsService: ChatsService,
     private readonly usersService: UsersService,
@@ -48,6 +54,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
 
   private userIdToSocketIdMap = new Map<string, string>();
 
+  logger = new Logger('UsersChatsGateway');
   validateAccessToken(socket: Socket): string {
     try {
       const token = socket?.handshake?.headers?.authorization?.split(' ')[1];
@@ -65,6 +72,15 @@ export class UsersChatsGateway implements OnGatewayConnection {
 
   // TODO - to organize
   async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
+    try {
+      await this.initUserConnection(socket);
+    } catch (err) {
+      console.log(err);
+      return;
+    }
+  }
+
+  async initUserConnection(@ConnectedSocket() socket: Socket) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
       socket.disconnect();
@@ -81,14 +97,15 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // 0
     if (this.userIdToSocketIdMap.get(userId)) {
       socket.emit(`errorAlreadyLogin`, `This connection will be disconnected.`);
-      console.log(
-        `socket.emit(errorAlreadyLogin, This connection will be disconnected.);`,
+      this.logger.error(
+        `socket.emit(errorAlreadyLogin, This connection will be disconnected);`,
       );
       socket.disconnect();
       return;
     }
     // 1
     // console.log(`process login`);
+    this.logger.log(`process login`);
     this.usersService.processLogin(userId);
     // 2
     this.userIdToSocketIdMap.set(userId, socket.id);
@@ -181,25 +198,70 @@ export class UsersChatsGateway implements OnGatewayConnection {
 
     // 3
     // console.log(`process logout`);
+    this.logger.log(`process logout`);
     this.usersService.processLogout(userId);
   }
 
+  async onModuleDestroy() {
+    await this.cleanup();
+  }
+
+  async cleanup() {
+    if (this.server) {
+      this.logger.log('GameSocket Disconnecting');
+      await this.server.disconnectSockets();
+    } else this.logger.log('Game Socket Server already removed');
+  }
+
+  // TODO: to combine with front-end
+  @SubscribeMessage('getFriendList')
+  async getFriendList(@ConnectedSocket() socket: Socket) {
+    const userId = this.validateAccessToken(socket);
+    if (!userId) return;
+    this.logger.log(`[getFriendList] userId: [${userId}]`);
+    try {
+      const result = await this.usersService.getFriendList(userId);
+      this.logger.log(`[getFriendList] result: ${result.length} Friends`);
+      return result;
+    } catch (err) {
+      this.logger.error(`[getFriendList] excpt: ${err}`);
+      socket.emit('errorGetFriendList', err.response.message);
+      return;
+    }
+  }
+
   async notifyGameStartToFriends(userId: string) {
-    const myProfile = await this.usersService.getProfile(userId);
-    const userSocketId = this.userIdToSocketIdMap.get(userId);
-    const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
-    const nameOfMyRoomForFriends = `friends_of_${userId}`;
-    userSocket.to(nameOfMyRoomForFriends).emit(`friendStatusGameStart`, myProfile.nickname);
+    try {
+      this.logger.log(`${userId} notify IN GAME to friends`);
+      const myProfile = await this.usersService.getProfile(userId);
+      const userSocketId = this.userIdToSocketIdMap.get(userId);
+      const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+      if (!userSocket) return;
+      const nameOfMyRoomForFriends = `friends_of_${userId}`;
+      userSocket
+        .to(nameOfMyRoomForFriends)
+        .emit(`friendStatusGameStart`, myProfile.nickname);
+    } catch (err) {
+      this.logger.log(err);
+    }
   }
 
   async notifyGameEndToFriends(userId: string) {
-    const myProfile = await this.usersService.getProfile(userId);
-    const userSocketId = this.userIdToSocketIdMap.get(userId);
-    const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
-    const nameOfMyRoomForFriends = `friends_of_${userId}`;
-    userSocket.to(nameOfMyRoomForFriends).emit(`friendStatusGameEnd`, myProfile.nickname);
+    try {
+      const myProfile = await this.usersService.getProfile(userId);
+      const userSocketId = this.userIdToSocketIdMap.get(userId);
+      const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+      if (!userSocket) return;
+      this.logger.log(`${userId} notify END GAME to friends`);
+      const nameOfMyRoomForFriends = `friends_of_${userId}`;
+      userSocket
+        .to(nameOfMyRoomForFriends)
+        .emit(`friendStatusGameEnd`, myProfile.nickname);
+    } catch (err) {
+      this.logger.log(err);
+    }
   }
-  
+
   @SubscribeMessage('chatroomDirectMessage')
   async takeDmRequest(
     @ConnectedSocket() socket: Socket,
@@ -211,7 +273,10 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomDmReqDto: `);
     // console.log(infoDmReq);
     try {
-      const dmChtrmId = await this.chatsService.takeDmRequest(userId, infoDmReq);
+      const dmChtrmId = await this.chatsService.takeDmRequest(
+        userId,
+        infoDmReq,
+      );
       const nameOfChtrmSocketRoom = `chatroom_${dmChtrmId}`;
       socket.join(nameOfChtrmSocketRoom);
       return { chtrmId: dmChtrmId };
@@ -219,7 +284,6 @@ export class UsersChatsGateway implements OnGatewayConnection {
       socket.emit('errorChatroomDirectMessage', err.response.message);
       return;
     }
-
   }
 
   @SubscribeMessage('chatroomCreation')
@@ -308,21 +372,22 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomLeavingDto: `);
     // console.log(infoLeav);
     try {
-      const {
-        leaverNick, 
-        nextOwnerNick
-      } = await this.chatsService.leaveChatroom(userId, infoLeav);
+      const { leaverNick, nextOwnerNick } =
+        await this.chatsService.leaveChatroom(userId, infoLeav);
       const nameOfChtrmSocketRoom = `chatroom_${infoLeav.id}`;
       socket.leave(nameOfChtrmSocketRoom);
       socket.to(nameOfChtrmSocketRoom).emit('chatroomLeaving', leaverNick);
       if (nextOwnerNick) {
-        socket.to(nameOfChtrmSocketRoom).emit('chatroomAuthChange', 
-          { chtrmId: infoLeav.id, nickname: nextOwnerNick, auth: '01' }); // REVIEW: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
+        socket.to(nameOfChtrmSocketRoom).emit('chatroomAuthChange', {
+          chtrmId: infoLeav.id,
+          nickname: nextOwnerNick,
+          auth: '01',
+        }); // REVIEW: 권한이 바뀐 유저에게 websocket을 이용해서 바뀐 권한을 알려야 한다.
       }
       return true;
     } catch (err) {
       console.log(err);
-      socket.emit('errorChatroomLeaving', err.response.message);
+      // socket.emit('errorChatroomLeaving', err.response.message);
     }
   }
 
@@ -340,10 +405,8 @@ export class UsersChatsGateway implements OnGatewayConnection {
     try {
       await this.chatsService.putBlockUserInChats(userId, infoBlck);
       const nameOfblockingSocketRoom = `blocking_${infoBlck.nickname}`;
-      if (infoBlck.boolToBlock === true)
-        socket.join(nameOfblockingSocketRoom);
-      else
-        socket.leave(nameOfblockingSocketRoom);
+      if (infoBlck.boolToBlock === true) socket.join(nameOfblockingSocketRoom);
+      else socket.leave(nameOfblockingSocketRoom);
       return true;
     } catch (err) {
       console.log(err);
@@ -366,11 +429,13 @@ export class UsersChatsGateway implements OnGatewayConnection {
       const targetUserId = await this.chatsService.kickUser(userId, infoKick);
       // target user의 socket에 kicked 정보 emit
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      
+
       const nameOfChtrmSocketRoom = `chatroom_${infoKick.id}`;
       // targetSocketId.leave(nameOfChtrmSocketRoom); // TODO - chtrm에 대한 socket room에서 나가지게 하기
-      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', 
-        { chtrmId: infoKick.id, nicknameKicked: infoKick.nicknameToKick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', {
+        chtrmId: infoKick.id,
+        nicknameKicked: infoKick.nicknameToKick,
+      }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       // if (targetSocketId) {
       //   this.server.to(targetSocketId).emit('chatroomBeingKicked', { chtrmId: infoKick.id });
       // }
@@ -392,13 +457,13 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomMuteDto: `);
     // console.log(infoMute);
     try {
-      const targetUserId = await this.chatsService.muteUser(userId, infoMute);
+      const targetNick = await this.chatsService.muteUser(userId, infoMute);
       // target user의 socket에 muted 정보 emit
-      const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
-      // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingMuted', { chtrmId: infoMute.id });
-      }
+      // const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
+      this.server
+        .to(infoMute.id)
+        .emit('chatroomBeingMuted', { chtrmId: infoMute.id, nickname: targetNick }); // TODO: to combine with front-end
       return true;
     } catch (err) {
       console.log(err);
@@ -417,17 +482,25 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomBanDto: `);
     // console.log(infoBan);
     try {
-      const { targetUserId, targetNick } = await this.chatsService.banUser(userId, infoBan);
+      const { targetUserId, targetNick } = await this.chatsService.banUser(
+        userId,
+        infoBan,
+      );
       const nameOfChtrmSocketRoom = `chatroom_${infoBan.id}`;
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       if (targetSocketId) {
         // TODO - targetSocketId가 해당 chatroom에 대한 socket room을 나가도록 처리
-        const targetSocket: Socket = this.server.sockets.sockets.get(targetSocketId); // NOTE: Find socket by socket id
+        const targetSocket: Socket =
+          this.server.sockets.sockets.get(targetSocketId); // NOTE: Find socket by socket id
         targetSocket.leave(`chatroom_${infoBan.id}`);
-        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
+        this.server
+          .to(targetSocketId)
+          .emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
       }
-      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRegisteredBan', 
-        { chtrmId: infoBan.id, nickname: targetNick }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRegisteredBan', {
+        chtrmId: infoBan.id,
+        nickname: targetNick,
+      }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       return true;
     } catch (err) {
       console.log(err);
@@ -448,8 +521,10 @@ export class UsersChatsGateway implements OnGatewayConnection {
     try {
       const targetNick = await this.chatsService.removeBan(userId, infoBanRmv);
       const nameOfChtrmSocketRoom = `chatroom_${infoBanRmv.id}`;
-      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRemovedBan', 
-        { chtrmId: infoBanRmv.id, nickname: targetNick }); //REVIEW - 다른 유저들에게 이 사실을 알리기
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRemovedBan', {
+        chtrmId: infoBanRmv.id,
+        nickname: targetNick,
+      }); //REVIEW - 다른 유저들에게 이 사실을 알리기
       return true;
     } catch (err) {
       console.log(err);
@@ -468,12 +543,17 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomEmpowermentDto: `);
     // console.log(infoEmpwr);
     try {
-      const targetUserId = await this.chatsService.empowerUser(userId, infoEmpwr);
+      const targetUserId = await this.chatsService.empowerUser(
+        userId,
+        infoEmpwr,
+      );
       // target user의 socket에 empowered 정보 emit
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id });
+        this.server
+          .to(targetSocketId)
+          .emit('chatroomBeingRegisteredBan', { chtrmId: infoEmpwr.id });
       }
       return true;
     } catch (err) {
@@ -487,7 +567,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
   @SubscribeMessage('chatroomRequestGame')
   async requestGameChatroomUser(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() infoDgReq: ChatroomDirectGameRequestDto
+    @MessageBody() infoDgReq: ChatroomDirectGameRequestDto,
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
@@ -501,16 +581,30 @@ export class UsersChatsGateway implements OnGatewayConnection {
         3. target에게 emit
       */
       // this.usersService.getNicknameByUserId(userId);
-      const targetUserId = await this.usersService.getUserIdByNickname(infoDgReq.targetNickname);
-      await this.chatsService.checkBothUserInSameChtrm(userId, targetUserId, infoDgReq.id) // NOTE: userId, nickname, chtrmId
-      const gmRmId = await this.gamesGateway.reqDirectGame(userId, targetUserId);
+      const targetUserId = await this.usersService.getUserIdByNickname(
+        infoDgReq.targetNickname,
+      );
+      await this.chatsService.checkBothUserInSameChtrm(
+        userId,
+        targetUserId,
+        infoDgReq.id,
+      ); // NOTE: userId, nickname, chtrmId
+      const gmRmId = await this.gamesGateway.reqDirectGame(
+        userId,
+        targetUserId,
+      );
 
-      const requesterNick = await this.usersService.getNicknameByUserId(userId);
+      // const requesterNick = await this.usersService.getNicknameByUserId(userId);
+      const requesterProfile = await this.usersService.getProfile(userId);
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       if (targetSocketId) {
-        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', { gmRmId: gmRmId, requester: requesterNick });
+        this.server.to(targetSocketId).emit('chatroomBeingRequestedGame', {
+          gmRmId: gmRmId,
+          rqstrNick: requesterProfile.nickname,
+          rqstrImg: requesterProfile.imgPath,
+        });
       }
-      return true;
+      return gmRmId;
     } catch (err) {
       console.log(err);
       socket.emit('errorChatroomMute', err.response.message);
@@ -520,7 +614,7 @@ export class UsersChatsGateway implements OnGatewayConnection {
   @SubscribeMessage('chatroomResponseGame')
   async responseGameChatroomUser(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() infoDgRes: ChatroomDirectGameResponseDto
+    @MessageBody() infoDgRes: ChatroomDirectGameResponseDto,
   ) {
     const userId: string = this.validateAccessToken(socket);
     if (!userId) return;
@@ -528,8 +622,15 @@ export class UsersChatsGateway implements OnGatewayConnection {
     // console.log(`ChatroomEmpowermentDto: `);
     // console.log(infoEmpwr);
     try {
-      const requesterUserId = await this.usersService.getUserIdByNickname(infoDgRes.requesterNick);
-      await this.gamesGateway.resDirectGame(infoDgRes.gmRmid, requesterUserId, userId, infoDgRes.isApproving);
+      const requesterUserId = await this.usersService.getUserIdByNickname(
+        infoDgRes.rqstrNick,
+      );
+      await this.gamesGateway.resDirectGame(
+        infoDgRes.gmRmId,
+        requesterUserId,
+        userId,
+        infoDgRes.isApprv,
+      );
       return true;
     } catch (err) {
       console.log(err);
