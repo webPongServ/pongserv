@@ -50,11 +50,10 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   ) {}
   @WebSocketServer()
   server: Server;
-  // private logger: Logger = new Logger('ChatsGateway');
 
   private userIdToSocketIdMap = new Map<string, string>();
+  private logger = new Logger('UsersChatsGateway');
 
-  logger = new Logger('UsersChatsGateway');
   validateAccessToken(socket: Socket): string {
     try {
       const token = socket?.handshake?.headers?.authorization?.split(' ')[1];
@@ -70,8 +69,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     }
   }
 
-  // TODO - to organize
-  async handleConnection(@ConnectedSocket() socket: Socket, ...args: any[]) {
+  async handleConnection(@ConnectedSocket() socket: Socket) {
     try {
       await this.initUserConnection(socket);
     } catch (err) {
@@ -80,6 +78,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     }
   }
 
+  // TODO - to organize
   async initUserConnection(@ConnectedSocket() socket: Socket) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
@@ -90,27 +89,24 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       0. 기존에 이미 connection을 통해 관리하고 있는 socket id가 있다면 이후에 다른데서 연결 시도하는 socket 차단
       1. Login 진행 (정보 DB에 저장)
       2. intraId-socketId map에 상태 저장
-      3. Friend user socket room에 등록 - Friend_userId
-      4. Block user socket room에 등록 - Block_userId
+      3. Friend user socket room에 등록 - friends_of_userId
+      4. Block user socket room에 등록 - blocking_userId
       5. 해당 유저 전용 friends socket room으로 로그인 알람 보내기
     */
     // 0
     if (this.userIdToSocketIdMap.get(userId)) {
       socket.emit(`errorAlreadyLogin`, `This connection will be disconnected.`);
       this.logger.error(
-        `socket.emit(errorAlreadyLogin, This connection will be disconnected);`,
+        `[socket emit - errorAlreadyLogin, This connection will be disconnected]`,
       );
       socket.disconnect();
       return;
     }
     // 1
-    // console.log(`process login`);
     this.logger.log(`process login`);
     this.usersService.processLogin(userId);
     // 2
     this.userIdToSocketIdMap.set(userId, socket.id);
-    // console.log(`In handleConnection -> this.userIdToSocketIdMap: `);
-    // console.log(this.userIdToSocketIdMap);
     // 3
     const frndUserIds = await this.usersService.getFriendUserIds(userId);
     for (const eachUserId of frndUserIds) {
@@ -132,35 +128,46 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       .emit(`friendStatusLogin`, myProfile.nickname);
 
     // handleDisconnecting
-    socket.on('disconnecting', (reason) => {
+    socket.on('disconnecting', () => {
       this.handleDisconnecting(socket);
     });
   }
 
   async handleDisconnecting(@ConnectedSocket() socket: Socket) {
-    // console.log(`handleDisconnecting!!!`);
     const userId = this.validateAccessToken(socket);
     if (!userId) {
       return;
     }
     /*!SECTION
-        1. chatroom에 참여하고 있는 상태였다면, 나가도록 처리하기
-          1-1. 유저가 참여하고 있는 채팅방 id 찾기
-          1-2. 해당 채팅방에 대한 leaveChatroom 실행
+      0. 소켓이 map에 entry로 등록되어 있는지 검증
+      1. 해당 유저 전용 friends socket room으로 로그아웃 알람 보내기
+      2. intraId-socketId map에 상태 제거
+      3. logout 진행 (logout 상태로 업데이트)
+      4. chatroom에 참여하고 있는 상태였다면, 나가도록 처리하기
+        1-1. 유저가 참여하고 있는 채팅방 id 찾기
+        1-2. 해당 채팅방에 대한 leaveChatroom 실행
     */
+    // 0
     const entry = Array.from(this.userIdToSocketIdMap.entries()).find(
       ([, socketId]) => socketId === socket.id,
     );
     if (!entry) {
       return;
     }
-
-    // console.log(`socket disconnecting`);
-    // console.log(socket.rooms); // Set { ... }
-
     // 1
+    const nameOfMyRoomForFriends = `friends_of_${userId}`;
+    const myProfile = await this.usersService.getProfile(userId);
+    socket
+      .to(nameOfMyRoomForFriends)
+      .emit(`friendStatusLogout`, myProfile.nickname);
+    // 2
+    this.userIdToSocketIdMap.delete(entry[0]);
+    // 3
+    this.logger.log(`process logout`);
+    this.usersService.processLogout(userId);
+    // 4
     for (const eachRoom of socket.rooms) {
-      // 1-1
+      // 4-1
       if (eachRoom.startsWith('chatroom_')) {
         const parts = eachRoom.split('chatroom_');
         let chtrmId: string = null;
@@ -168,38 +175,10 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
         const infoLeav: ChatroomLeavingDto = {
           id: chtrmId,
         };
-        // 1-2
-        this.leaveChatroom(socket, infoLeav); // await 어케 적용시키지..?
+        // 4-2
+        await this.leaveChatroom(socket, infoLeav); // await 어케 적용시키지..?
       }
     }
-
-    /*!SECTION
-      1. 해당 유저 전용 friends socket room으로 로그아웃 알람 보내기
-      2. intraId-socketId map에 상태 제거
-      3. logout 진행 (logout 상태로 업데이트)
-    */
-    // 1
-    const nameOfMyRoomForFriends = `friends_of_${userId}`;
-    const myProfile = await this.usersService.getProfile(userId);
-    socket
-      .to(nameOfMyRoomForFriends)
-      .emit(`friendStatusLogout`, myProfile.nickname);
-
-    // 2
-    // console.log(
-    //   `In handleDisconnect before delete -> this.userIdToSocketIdMap: `,
-    // );
-    // console.log(this.userIdToSocketIdMap);
-    this.userIdToSocketIdMap.delete(entry[0]);
-    // console.log(
-    //   `In handleDisconnect after delete -> this.userIdToSocketIdMap: `,
-    // );
-    // console.log(this.userIdToSocketIdMap);
-
-    // 3
-    // console.log(`process logout`);
-    this.logger.log(`process logout`);
-    this.usersService.processLogout(userId);
   }
 
   async onModuleDestroy() {
@@ -281,7 +260,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       socket.join(nameOfChtrmSocketRoom);
       return { chtrmId: dmChtrmId };
     } catch (err) {
-      socket.emit('errorChatroomDirectMessage', err.response.message);
+      console.log(err);
+      // socket.emit('errorChatroomDirectMessage', err.response.message);
       return;
     }
   }
