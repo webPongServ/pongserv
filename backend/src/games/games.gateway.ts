@@ -1,5 +1,5 @@
 import { EnterOption } from './dto/enter.dto';
-import { Inject, Logger, forwardRef } from '@nestjs/common';
+import { Inject, Logger, forwardRef, OnModuleDestroy } from '@nestjs/common';
 import GameQueue from './dto/gameQue';
 import {
   ConnectedSocket,
@@ -23,7 +23,11 @@ import { UsersChatsGateway } from 'src/users-chats-socket/users-chats.gateway';
   namespace: 'games',
 })
 export class GamesGateway
-  implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
+  implements
+    OnGatewayInit,
+    OnGatewayConnection,
+    OnGatewayDisconnect,
+    OnModuleDestroy
 {
   @WebSocketServer()
   server: Server;
@@ -37,9 +41,8 @@ export class GamesGateway
     private GamesService: GamesService,
     @Inject(forwardRef(() => UsersChatsGateway)) // NOTE - 순환 종속성 솔루션
     private UsersChatsGateway: UsersChatsGateway,
-  ) {
-    this.logger.log('GameGateway constructor');
-  }
+  ) {}
+
   validateAccessToken(socket: Socket) {
     const bearerToken = socket.handshake.headers['authorization'];
     // Bearer 토큰이 아닌 경우 에러 메시지를 클라이언트에게 보냅니다.
@@ -67,6 +70,17 @@ export class GamesGateway
   afterInit() {
     this.logger.log('GameGateway initialized');
   }
+  async onModuleDestroy() {
+    await this.cleanup();
+  }
+
+  async cleanup() {
+    if (this.server) {
+      this.logger.log('GameSocket Disconnecting');
+      await this.server.disconnectSockets();
+    } else this.logger.log('Game Socket Server already removed');
+  }
+
   handleConnection(@ConnectedSocket() socket: Socket) {
     this.validateAccessToken(socket);
     if (typeof socket.data === 'string') {
