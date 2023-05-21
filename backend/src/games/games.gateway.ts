@@ -96,21 +96,22 @@ export class GamesGateway
       3. 그 방에 있는 인원들을 전부 나가게 한다.
       4. 그 방을 삭제한다.(조건 04로 변경)
       */
+
+      for (const room of socket.rooms) {
+        if (room !== socket.id) {
+          this.logger.log(`${room} Game room removing actions`);
+          await socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
+          await this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
+          await this.GamesService.endGame(room); // 해당 방 삭제
+          if (this.gameQueue.removeAndCheckExistence(room))
+            this.logger.log('gameQueue removed');
+        }
+      }
       if (socket.data) {
         this.logger.log(`Disconnecting Emit End to friends : ${socket.data}`);
         await this.UsersChatsGateway.notifyGameEndToFriends(
           socket.data.toString(),
         );
-      }
-      for (const room of socket.rooms) {
-        if (room !== socket.id) {
-          socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
-          this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
-          this.GamesService.endGame(room); // 해당 방 삭제
-
-          if (this.gameQueue.removeAndCheckExistence(room))
-            this.logger.log('gameQueue removed');
-        }
       }
     });
   }
@@ -169,7 +170,7 @@ export class GamesGateway
     const inRoom = await this.server.in(message.roomId).fetchSockets();
     if (inRoom.length == 1 && inRoom[0].data == userId) {
       socket.emit('exception', '방장은 게임에 참여할 수 없습니다.');
-      this.logger.log('방장은 자신의 게임에 참여할 수 없습니다.');
+      this.logger.error('방장은 자신의 게임에 참여할 수 없습니다.');
       return 'NO';
     } else if (inRoom.length == 1) socket.join(message.roomId);
     else {
