@@ -78,7 +78,6 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     }
   }
 
-  // TODO - to organize
   async initUserConnection(@ConnectedSocket() socket: Socket) {
     const userId = this.validateAccessToken(socket);
     if (!userId) {
@@ -176,7 +175,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
           id: chtrmId,
         };
         // 4-2
-        await this.leaveChatroom(socket, infoLeav); // await 어케 적용시키지..?
+        await this.leaveChatroom(socket, infoLeav);
       }
     }
   }
@@ -370,7 +369,6 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     }
   }
 
-  // TODO - to combine with front-end
   @SubscribeMessage('putBlockingUserInChats')
   async putBlockingUserInChats(
     @ConnectedSocket() socket: Socket,
@@ -393,7 +391,6 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     }
   }
 
-  // TODO - to combine with front-end - done
   @SubscribeMessage('chatroomKick')
   async kickChatroomUser(
     @ConnectedSocket() socket: Socket,
