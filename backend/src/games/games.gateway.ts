@@ -100,9 +100,9 @@ export class GamesGateway
       for (const room of socket.rooms) {
         if (room !== socket.id) {
           this.logger.log(`${room} Game room removing actions`);
-          await socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
-          await this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
-          this.GamesService.endGame(room); // 해당 방 삭제
+          socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
+          this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
+          await this.GamesService.endGame(room); // 해당 방 삭제
           if (await this.gameQueue.removeAndCheckExistence(room))
             this.logger.log('gameQueue removed');
         }
