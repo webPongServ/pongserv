@@ -57,6 +57,15 @@ async function bootstrap() {
   // 글로벌하게, , dto에 정의된 타입인지 확인해준다.
   app.useGlobalPipes(new ValidationPipe());
   app.useWebSocketAdapter(new IoAdapter(app));
+  // 컨트롤 C 눌렀을 때 정상적동하도록 하는 방법
+  process.on('SIGTERM', async () => {
+    await app.close();
+    process.exit(1);
+  });
+  process.on('SIGINT', async () => {
+    await app.close();
+    process.exit(1);
+  });
   await app.listen(3000);
 }
 bootstrap();

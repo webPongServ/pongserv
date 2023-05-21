@@ -5,6 +5,7 @@ import {
   BadRequestException,
   UnauthorizedException,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Like, Repository } from 'typeorm';
@@ -25,13 +26,18 @@ export class DbUsersManagerService {
     @InjectRepository(TbUa03DEntity) private ua03dRp: Repository<TbUa03DEntity>,
   ) {}
 
+  logger = new Logger('DbUsersManagerService');
+
   async getUserByUserId(userId: string) {
-    const user = await this.ua01mRp.findOne({
-      where: {
-        userId: userId,
-      },
-    });
-    return user;
+    try {
+      return await this.ua01mRp.findOne({
+        where: {
+          userId: userId,
+        },
+      });
+    } catch (e) {
+      return null;
+    }
   }
 
   async getUserByNickname(nickname: string) {
@@ -113,18 +119,18 @@ export class DbUsersManagerService {
       user.twofactor = false;
       user.twofactorData = secret;
       await this.ua01mRp.save(user);
-      console.log('Secret is sucessfuly saved');
+      this.logger.log('Secret is sucessfuly saved');
     } else {
-      throw new BadRequestException('No User available');
+      // throw new BadRequestException('No User available');
     }
   }
 
   async saveUser(user: TbUa01MEntity) {
     try {
       const result = await this.ua01mRp.save(user);
-      console.log(result);
+      // console.log(result);
     } catch (e) {
-      console.log(e);
+      this.logger.log(e);
     }
   }
 
@@ -258,14 +264,14 @@ export class DbUsersManagerService {
   }
 
   async getMasterEntity(userId: string) {
-    const user = await this.ua01mRp.findOne({
-      where: {
-        userId: userId,
-      },
-    });
-    if (!user) throw new BadRequestException('No User available');
-    else {
-      return user;
+    try {
+      return await this.ua01mRp.findOne({
+        where: {
+          userId: userId,
+        },
+      });
+    } catch (e) {
+      throw new BadRequestException('No User available');
     }
   }
 
@@ -402,6 +408,7 @@ export class DbUsersManagerService {
   }
 
   async getFriendList(myEntity: TbUa01MEntity) {
+    // if (!myEntity) return [];
     const friendDatas = await this.ua02lRp.find({
       relations: {
         ua01mEntityAsFr: true,

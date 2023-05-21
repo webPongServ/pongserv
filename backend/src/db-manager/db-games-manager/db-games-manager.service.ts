@@ -250,11 +250,18 @@ export class DbGamesManagerService {
   async isInGame(userId: string) {
     const room = await this.Gm01LRp.find({
       where: [
-        { owner: userId, endType: In(['01', '04']) },
-        { opUserId: userId, endType: In(['01', '04']) },
+        { owner: userId, endType: In(['01', '04', '05']) },
+        { opUserId: userId, endType: In(['01', '04', '05']) },
       ],
     });
-    // console.log(room);
+    // console.log('IsInGame', room, room.length > 0);
     return room.length > 0;
+  }
+
+  async updateDirectGame(roomEntity: TbGm01LEntity) {
+    await this.Gm01LRp.save({
+      ...roomEntity,
+      endType: '05',
+    });
   }
 }

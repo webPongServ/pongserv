@@ -7,7 +7,7 @@ import AppBar from "components/common/AppBar";
 import FriendDrawer from "components/common/FriendDrawer";
 import ChattingDrawer from "components/common/ChattingDrawer";
 import ErrorNotification from "components/utils/ErrorNotification";
-import { ChattingDrawerWidth } from "constant";
+import { ChattingDrawerWidth, FriendStatusType } from "constant";
 import { useDispatch, useSelector } from "react-redux";
 import { apiURL } from "API/api";
 import instance from "API/api";
@@ -15,7 +15,8 @@ import UserService from "API/UserService";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 import { SocketsActionTypes } from "types/redux/Sockets";
 import { IRootState } from "components/common/store";
-import InviteGameModal from "components/common/InviteGameModal";
+import RequestGameModal from "components/common/RequestGameModal";
+import { RequesterDetail } from "types/Detail";
 import "styles/global.scss";
 
 import { Box, CssBaseline } from "@mui/material";
@@ -66,6 +67,11 @@ export default function AppHeader() {
     .error as string;
   const notiRef = useRef<HTMLDivElement>(null);
   const status = useSelector((state: IRootState) => state.loginStatus);
+  const [requester, setRequester] = useState<RequesterDetail>({
+    nickname: "",
+    imgURL: "",
+    roomId: "",
+  });
   const dispatch = useDispatch();
 
   const loadMyData = async () => {
@@ -90,6 +96,7 @@ export default function AppHeader() {
   }, 5000);
 
   useLayoutEffect(() => {
+    // if null 적용하기
     const token = localStorage.getItem("accessToken");
     const chattingSocket = io(apiURL, {
       extraHeaders: {
@@ -110,7 +117,24 @@ export default function AppHeader() {
       window.location.href = "/login?error=already_login";
     };
 
+    const socketChatroomBeingRequestedGame = (data: {
+      gmRmId: string;
+      rqstrNick: string;
+      rqstrImg: string;
+    }) => {
+      setRequester({
+        nickname: data.rqstrNick,
+        imgURL: data.rqstrImg,
+        roomId: data.gmRmId,
+      });
+      setOpenModal(true);
+    };
+
     if (chattingSocket) {
+      chattingSocket.on(
+        "chatroomBeingRequestedGame",
+        socketChatroomBeingRequestedGame
+      );
       // error handling
       chattingSocket.on("errorAlreadyLogin", socketAlreadyLogin);
       chattingSocket.on("errorChatroomFull", alertMessage);
@@ -127,6 +151,10 @@ export default function AppHeader() {
     loadMyData();
 
     return () => {
+      chattingSocket.off(
+        "chatroomBeingRequestedGame",
+        socketChatroomBeingRequestedGame
+      );
       chattingSocket.off("errorChatroomFull", alertMessage);
       chattingSocket.off("errorAlreadyLogin", socketAlreadyLogin);
       chattingSocket.off("errorChatroomEntrance", alertMessage);
@@ -159,7 +187,11 @@ export default function AppHeader() {
           </Routes>
         </Main>
         <ChattingDrawer open={open} setOpen={setOpen} />
-        <InviteGameModal openModal={openModal} setOpenModal={setOpenModal} />
+        <RequestGameModal
+          openModal={openModal}
+          setOpenModal={setOpenModal}
+          requester={requester}
+        />
       </Box>
     </>
   );

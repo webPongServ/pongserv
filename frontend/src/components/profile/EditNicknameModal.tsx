@@ -81,7 +81,7 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
           <Box className="body flex-container">
             <Box id="new-nickname">
               <Box className="inform">
-                닉네임은 1 ~ 8자리 한글 / 영어(대, 소문자) / 숫자만 가능합니다.
+                닉네임은 1 ~ 10자리 한글 / 영어(대, 소문자) / 숫자만 가능합니다.
               </Box>
               <Box className="input">
                 <CustomOnKeyUpInput
