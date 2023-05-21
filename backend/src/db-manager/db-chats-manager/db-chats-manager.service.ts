@@ -458,10 +458,10 @@ export class DbChatsManagerService {
   }
 
   async setBlockingData(
-    requester: TbUa01MEntity, 
-    target: TbUa01MEntity, 
-    toBlock: boolean
-    ) {
+    requester: TbUa01MEntity,
+    target: TbUa01MEntity,
+    toBlock: boolean,
+  ) {
     let blockingData = await this.ch04lRp.findOne({
       where: {
         ua01mEntity: {
@@ -470,10 +470,9 @@ export class DbChatsManagerService {
         ua01mEntityAsBlock: {
           id: target.id,
         },
-      }
+      },
     });
-    if (blockingData === null)
-    {
+    if (blockingData === null) {
       blockingData = this.ch04lRp.create({
         ua01mEntity: requester,
         ua01mEntityAsBlock: target,
@@ -481,69 +480,69 @@ export class DbChatsManagerService {
         rsstDttm: new Date(),
       });
     }
-    if (toBlock === true)
-      blockingData.stCd = '01';
-    else
-      blockingData.stCd = '02';
+    if (toBlock === true) blockingData.stCd = '01';
+    else blockingData.stCd = '02';
     this.ch04lRp.save(blockingData);
-    return ;
+    return;
   }
 
   async getBlockingData(requester: TbUa01MEntity, target: TbUa01MEntity) {
     const result = await this.ch04lRp.findOne({
       where: {
         ua01mEntity: {
-          id: requester.id
+          id: requester.id,
         },
         ua01mEntityAsBlock: {
           id: target.id,
         },
         delTf: false,
-      }
-    })
+      },
+    });
     return result;
   }
 
   async getListForThisUserToBlock(user: TbUa01MEntity) {
     const results = await this.ch04lRp.find({
       relations: {
-        ua01mEntityAsBlock: true
+        ua01mEntityAsBlock: true,
       },
       where: {
         ua01mEntity: {
-          id: user.id
+          id: user.id,
         },
         stCd: '01',
         delTf: false,
-      }
-    })
+      },
+    });
     return results;
   }
 
-  async getLiveDmRoomOfThisUsers(frstUser: TbUa01MEntity, scndUser: TbUa01MEntity) {
+  async getLiveDmRoomOfThisUsers(
+    frstUser: TbUa01MEntity,
+    scndUser: TbUa01MEntity,
+  ) {
     const dmRms = await this.ch01lRp.find({
       relations: {
         ch02lEntities: {
           ua01mEntity: true,
-        }
+        },
       },
       where: {
         chtRmTf: true,
         chtRmType: '03',
-        },
-      }
-    );
+      },
+    });
     for (const eachDmRm of dmRms) {
-      let count: number = 0;
+      let count = 0;
       for (const eachAttnd of eachDmRm.ch02lEntities) {
-        if (eachAttnd.ua01mEntity.id == frstUser.id 
-          || eachAttnd.ua01mEntity.id == scndUser.id)
+        if (
+          eachAttnd.ua01mEntity.id == frstUser.id ||
+          eachAttnd.ua01mEntity.id == scndUser.id
+        )
           ++count;
-        if (count == 2)
-          return true;
+        if (count == 2) return true;
       }
     }
     return false;
   }
-
 }
