@@ -216,11 +216,13 @@ export class UsersService {
       let statusCode: string = null;
       if (currLogin) {
         statusCode = currLogin.stsCd; // '01'
-        if (await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)) statusCode = '02';
+        if (await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)) {
+          statusCode = '02';
+        }
       } else {
         statusCode = '03';
       }
-      // console.log('Status Code', statusCode);
+      console.log('Status Code', statusCode);
       const eachToPush = {
         nickname: eachFriendData.ua01mEntityAsFr.nickname,
         imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
