@@ -163,7 +163,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     this.userIdToSocketIdMap.delete(entry[0]);
     // 3
     this.logger.log(`process logout`);
-    this.usersService.processLogout(userId);
+    await this.usersService.processLogout(userId);
     // 4
     for (const eachRoom of socket.rooms) {
       // 4-1
@@ -186,9 +186,9 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
 
   async cleanup() {
     if (this.server) {
-      this.logger.log('GameSocket Disconnecting');
+      this.logger.log('UserChatGateway Disconnecting');
       await this.server.disconnectSockets();
-    } else this.logger.log('Game Socket Server already removed');
+    } else this.logger.error('Game Socket Server already removed');
   }
 
   // TODO: to combine with front-end

@@ -121,7 +121,7 @@ export class UsersController {
     @Body('base64Data') base64Data: string,
   ) {
     if (!base64Data) throw new BadRequestException('base64Data가 없습니다.');
-    this.logger.log('changeImage ${user}');
+    this.logger.log(`changeImage ${user}`);
     return await this.UsersService.changeImage(user, base64Data);
   }
 
