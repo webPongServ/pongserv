@@ -216,10 +216,11 @@ export class UsersService {
       let statusCode: string = null;
       if (currLogin) {
         statusCode = currLogin.stsCd; // '01'
-        if (this.gameService.isInGame(userId)) statusCode = '02';
+        if (await this.gameService.isInGame(userId)) statusCode = '02';
       } else {
         statusCode = '03';
       }
+      // console.log('Status Code', statusCode);
       const eachToPush = {
         nickname: eachFriendData.ua01mEntityAsFr.nickname,
         imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
@@ -232,8 +233,7 @@ export class UsersService {
 
   async getFriendUserIds(userId: string) {
     const user = await this.dbmanagerUsersService.getUserByUserId(userId);
-    if (!user)
-      throw new NotFoundException(`회원가입 된 유저가 아닙니다.`);
+    if (!user) throw new NotFoundException(`회원가입 된 유저가 아닙니다.`);
     const friendDatas = await this.dbmanagerUsersService.getFriendList(user);
     const retFrndUserIds: string[] = [];
     for (const eachData of friendDatas) {

@@ -72,7 +72,7 @@ export class AuthService {
       throw new UnauthorizedException('Token42OAuth You are not 42 User');
     const intraId: string = intraInfoResult.data.login;
     const intraImagePath: string = intraInfoResult.data.image.link;
-    this.logger.log('42 유저 정보 조회 성공 : ${intraId}');
+    this.logger.log(`42 유저 정보 조회 성공 : ${intraId}`);
     return { intraId, intraImagePath };
   }
 

@@ -76,8 +76,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       await this.initUserConnection(socket);
     } catch (err) {
       console.log(err);
-      return ;
-    } 
+      return;
+    }
   }
 
   async initUserConnection(@ConnectedSocket() socket: Socket) {
@@ -210,7 +210,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       await this.server.disconnectSockets();
     } else this.logger.log('Game Socket Server already removed');
   }
-  
+
   // TODO: to combine with front-end
   @SubscribeMessage('getFriendList')
   async getFriendList(@ConnectedSocket() socket: Socket) {
@@ -226,19 +226,19 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       socket.emit('errorGetFriendList', err.response.message);
       return;
     }
-
   }
 
   async notifyGameStartToFriends(userId: string) {
     try {
+      this.logger.log(`${userId} notify IN GAME to friends`);
       const myProfile = await this.usersService.getProfile(userId);
       const userSocketId = this.userIdToSocketIdMap.get(userId);
       const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+      if (!userSocket) return;
       const nameOfMyRoomForFriends = `friends_of_${userId}`;
       userSocket
         .to(nameOfMyRoomForFriends)
         .emit(`friendStatusGameStart`, myProfile.nickname);
-
     } catch (err) {
       this.logger.log(err);
     }
@@ -249,6 +249,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       const myProfile = await this.usersService.getProfile(userId);
       const userSocketId = this.userIdToSocketIdMap.get(userId);
       const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+      if (!userSocket) return;
+      this.logger.log(`${userId} notify END GAME to friends`);
       const nameOfMyRoomForFriends = `friends_of_${userId}`;
       userSocket
         .to(nameOfMyRoomForFriends)
