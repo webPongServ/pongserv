@@ -196,7 +196,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
 
     // 3
     // console.log(`process logout`);
-    this.logger.log(`process login`);
+    this.logger.log(`process logout`);
     this.usersService.processLogout(userId);
   }
 
@@ -230,23 +230,32 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
   }
 
   async notifyGameStartToFriends(userId: string) {
-    const myProfile = await this.usersService.getProfile(userId);
-    const userSocketId = this.userIdToSocketIdMap.get(userId);
-    const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
-    const nameOfMyRoomForFriends = `friends_of_${userId}`;
-    userSocket
-      .to(nameOfMyRoomForFriends)
-      .emit(`friendStatusGameStart`, myProfile.nickname);
+    try {
+      const myProfile = await this.usersService.getProfile(userId);
+      const userSocketId = this.userIdToSocketIdMap.get(userId);
+      const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+      const nameOfMyRoomForFriends = `friends_of_${userId}`;
+      userSocket
+        .to(nameOfMyRoomForFriends)
+        .emit(`friendStatusGameStart`, myProfile.nickname);
+
+    } catch (err) {
+      this.logger.log(err);
+    }
   }
 
   async notifyGameEndToFriends(userId: string) {
-    const myProfile = await this.usersService.getProfile(userId);
-    const userSocketId = this.userIdToSocketIdMap.get(userId);
-    const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
-    const nameOfMyRoomForFriends = `friends_of_${userId}`;
-    userSocket
-      .to(nameOfMyRoomForFriends)
-      .emit(`friendStatusGameEnd`, myProfile.nickname);
+    try {
+      const myProfile = await this.usersService.getProfile(userId);
+      const userSocketId = this.userIdToSocketIdMap.get(userId);
+      const userSocket: Socket = this.server.sockets.sockets.get(userSocketId);
+      const nameOfMyRoomForFriends = `friends_of_${userId}`;
+      userSocket
+        .to(nameOfMyRoomForFriends)
+        .emit(`friendStatusGameEnd`, myProfile.nickname);
+    } catch (err) {
+      this.logger.log(err);
+    }
   }
 
   @SubscribeMessage('chatroomDirectMessage')
