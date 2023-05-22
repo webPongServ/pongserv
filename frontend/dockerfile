@@ -3,12 +3,13 @@ FROM node:18
 WORKDIR /frontend
 
 COPY package*.json /frontend/
-
 RUN npm install
+
 COPY . /frontend/
+RUN npm run build
 
 VOLUME [ "/frontend" ]
 
 EXPOSE 3001
 
-CMD ["npm", "run", "build", "&&", "npm", "run", "start"]
+CMD ["npm", "run", "start"]
