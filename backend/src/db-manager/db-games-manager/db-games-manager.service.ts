@@ -258,7 +258,7 @@ export class DbGamesManagerService {
         { opUserId: userId, endType: In(['01', '04', '05']) },
       ],
     });
-    console.log('IsInGame', room, room.length > 0);
+    // console.log('IsInGame', room, room.length > 0);
     return room.length > 0;
   }
 

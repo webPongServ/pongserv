@@ -116,4 +116,15 @@ export class AuthController {
     // console.log('2Fa Activate', userId);
     return this.authService.activate2fa(userId, otpData.sixDigit);
   }
+
+  @ApiResponse({
+    status: 201,
+    description: '2차인증 해제 완료',
+  })
+  @ApiOperation({ summary: '2차인증 해제' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Post('/deactivate2fa')
+  async disable2FA(@CurrentUser() user: string, @Body() body: any) {
+    return await this.authService.disable2FA(user);
+  }
 }

@@ -211,8 +211,10 @@ export class UsersService {
     );
     // 2
     for (const eachFriendData of friendDatas) {
-      let statusCode: string = '03'; // default: logout
-      if (await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)) {
+      let statusCode = '03'; // default: logout
+      if (
+        await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)
+      ) {
         statusCode = '02';
       }
       // const currLogin = await this.dbmanagerUsersService.getCurrLoginData(
