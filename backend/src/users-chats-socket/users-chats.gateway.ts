@@ -166,19 +166,20 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     this.logger.log(`process logout`);
     await this.usersService.processLogout(userId);
     // 4
-    for (const eachRoom of socket.rooms) {
-      // 4-1
-      if (eachRoom.startsWith('chatroom_')) {
-        const parts = eachRoom.split('chatroom_');
-        let chtrmId: string = null;
-        if (parts.length > 1) chtrmId = parts[1];
-        const infoLeav: ChatroomLeavingDto = {
-          id: chtrmId,
-        };
-        // 4-2
-        await this.leaveChatroom(socket, infoLeav);
-      }
-    }
+    // NOTE: leaving chatroom 로직 제거 (logout 시에 chatroom을 나가게 만들면 안 디고 manual하게 버튼을 눌렀을 경우에만 나가게 해야한다.)
+    // for (const eachRoom of socket.rooms) {
+    //   // 4-1
+    //   if (eachRoom.startsWith('chatroom_')) {
+    //     const parts = eachRoom.split('chatroom_');
+    //     let chtrmId: string = null;
+    //     if (parts.length > 1) chtrmId = parts[1];
+    //     const infoLeav: ChatroomLeavingDto = {
+    //       id: chtrmId,
+    //     };
+    //     // 4-2
+    //     await this.leaveChatroom(socket, infoLeav);
+    //   }
+    // }
   }
 
   async onModuleDestroy() {
