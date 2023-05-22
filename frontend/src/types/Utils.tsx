@@ -48,3 +48,11 @@ export interface CustomProfileButtonProps {
   position: string;
   handleFunction: any;
 }
+
+export interface CustomProfilePreviewProps {
+  class: string;
+  nickname: string;
+  imgURL: string;
+  position: string;
+  handleFunction: any;
+}
