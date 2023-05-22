@@ -67,18 +67,20 @@ const FriendDrawer = () => {
   );
 
   const getFriends = async () => {
-    chattingSocket.emit("getFriendList", (data: serverFriend[]) => {
-      dispatch({
-        type: FriendsActionTypes.FRIENDS_GET,
-        payload: data.map(
-          (value: serverFriend): UserDetail => ({
-            nickname: value.nickname,
-            imgURL: value.imageUrl,
-            status: value.currStat,
-          })
-        ),
+    if (chattingSocket) {
+      chattingSocket.emit("getFriendList", (data: serverFriend[]) => {
+        dispatch({
+          type: FriendsActionTypes.FRIENDS_GET,
+          payload: data.map(
+            (value: serverFriend): UserDetail => ({
+              nickname: value.nickname,
+              imgURL: value.imageUrl,
+              status: value.currStat,
+            })
+          ),
+        });
       });
-    });
+    }
   };
 
   const socketFriendStatusLogin = (nickname: string) => {
@@ -111,9 +113,6 @@ const FriendDrawer = () => {
 
   useEffect(() => {
     getFriends();
-  }, []);
-
-  useEffect(() => {
     if (chattingSocket) {
       chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
       chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
@@ -132,7 +131,7 @@ const FriendDrawer = () => {
         chattingSocket.off("friendStatusGameEnd", socketFriendStatusGameEnd);
       }
     };
-  }, [friends]);
+  }, [chattingSocket]);
 
   return (
     <Drawer id="FriendDrawer" variant="permanent" open={true}>
