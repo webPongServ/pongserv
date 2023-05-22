@@ -24,10 +24,6 @@ const Search = () => {
   const [inputNickname, setInputNickname] = useState<string>("");
   const [searchedUsers, setSearchedUsers] = useState<UserDetail[]>([]);
 
-  dispatch({
-    type: LoginStatusActionTypes.STATUS_MAIN,
-  });
-
   const handleValue = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e) {
       const target: HTMLInputElement = e.target;
@@ -48,6 +44,12 @@ const Search = () => {
       )
     );
   };
+
+  useEffect(() => {
+    dispatch({
+      type: LoginStatusActionTypes.STATUS_MAIN,
+    });
+  }, []);
 
   return (
     <Box id="Search" className="flex-container">
