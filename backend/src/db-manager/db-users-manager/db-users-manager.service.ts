@@ -220,6 +220,7 @@ export class DbUsersManagerService {
         userId: user.userId,
         nickname: user.nickname,
         imgPath: user.imgPath,
+        isTwofactor: user.twofactor,
         // TODO : Change Needed
         total: 99,
         win: 99,
@@ -246,6 +247,7 @@ export class DbUsersManagerService {
         nickname: user.nickname,
         imgPath: user.imgPath,
         lastDttm: user.lastDttm,
+        isTwofactor: user.twofactor,
         //Debug Needed
         total: 0,
         win: 0,
