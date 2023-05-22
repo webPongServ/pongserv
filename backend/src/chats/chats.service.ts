@@ -708,7 +708,7 @@ export class ChatsService {
       target,
       infoBlck.boolToBlock,
     );
-    return;
+    return target.userId;
   }
 
   async getUserIdsForThisUserToBlock(userId: string) {
