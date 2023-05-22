@@ -103,7 +103,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     }
     // 1
     this.logger.log(`process login`);
-    this.usersService.processLogin(userId);
+    // this.usersService.processLogin(userId);
     // 2
     this.userIdToSocketIdMap.set(userId, socket.id);
     // 3
@@ -164,7 +164,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     this.userIdToSocketIdMap.delete(entry[0]);
     // 3
     this.logger.log(`process logout`);
-    await this.usersService.processLogout(userId);
+    // await this.usersService.processLogout(userId);
     // 4
     // NOTE: leaving chatroom 로직 제거 (logout 시에 chatroom을 나가게 만들면 안 디고 manual하게 버튼을 눌렀을 경우에만 나가게 해야한다.)
     // for (const eachRoom of socket.rooms) {
