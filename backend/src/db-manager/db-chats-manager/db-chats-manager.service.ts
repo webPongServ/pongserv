@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ArrayContains, In, Repository } from 'typeorm';
 import { TbCh01LEntity } from './entities/tb-ch-01-l.entity';
@@ -544,5 +544,26 @@ export class DbChatsManagerService {
       }
     }
     return false;
+  }
+
+  async isFrstUserBlockingScndUser(frst: TbUa01MEntity, scnd: TbUa01MEntity) {
+    if (!frst || !scnd)
+      throw new ForbiddenException(`frst or scnd is non in DbChatsManagerService.isFrstUserBlockingScndUser`);
+    const found = await this.ch04lRp.findOne({
+      where: {
+        ua01mEntity: {
+          id: frst.id,
+        },
+        ua01mEntityAsBlock: {
+          id: scnd.id,
+        },
+        stCd: '01',
+        delTf: false,
+      }
+    });
+    if (found)
+      return true;
+    else
+      return false;
   }
 }
