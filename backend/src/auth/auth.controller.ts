@@ -23,6 +23,7 @@ import { Code42OAuthData } from './dto/code.dto';
 import { Token42OAuthData } from './dto/token.dto';
 import { JwtAccessTokenGuard } from './guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
+import { UsersChatsGateway } from 'src/users-chats-socket/users-chats.gateway';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,6 +31,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly config: ConfigService,
+    private readonly usersChatsGateway: UsersChatsGateway,
   ) {}
 
   @ApiOperation({
@@ -71,6 +73,8 @@ export class AuthController {
     const intraImagePath = resultToken.imgPath;
     const isMember = resultToken.isMember;
     // console.log(accessToken);
+    // TODO: remove already connected socket
+    await this.usersChatsGateway.removeMappedUserSocketIfIs(resultToken.userId);
     if (OAuthData == true) {
       res.json({ OAuthData, intraId, intraImagePath });
     } else {

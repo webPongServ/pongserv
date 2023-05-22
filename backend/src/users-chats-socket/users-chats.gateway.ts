@@ -193,6 +193,14 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     } else this.logger.error('Game Socket Server already removed');
   }
 
+  async removeMappedUserSocketIfIs(userId: string) {
+    const socketId: string = this.userIdToSocketIdMap.get(userId);
+    if (socketId) {
+      const socketOfUser = this.server.sockets.sockets.get(socketId);
+      await this.handleDisconnecting(socketOfUser);
+    }
+  }
+
   isSocketOfUserConnected(userId: string) {
     const socketId: string = this.userIdToSocketIdMap.get(userId);
     if (socketId)

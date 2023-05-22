@@ -8,6 +8,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AccessTokenStrategy } from './strategy/jwt.access.strategy';
 import { DbUsersManagerService } from 'src/db-manager/db-users-manager/db-users-manager.service';
 import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-manager.module';
+import { UsersChatsSocketModule } from 'src/users-chats-socket/users-chats-socket.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { DbUsersManagerModule } from 'src/db-manager/db-users-manager/db-users-m
       }),
     }),
     DbUsersManagerModule,
+    UsersChatsSocketModule
   ],
   controllers: [AuthController],
   providers: [
