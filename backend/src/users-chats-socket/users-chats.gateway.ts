@@ -421,8 +421,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     // this.logger.log(`BlockingUserInChatsDto: `);
     // this.logger.log(infoBlck);
     try {
-      await this.chatsService.putBlockUserInChats(userId, infoBlck);
-      const nameOfblockingSocketRoom = `blocking_${infoBlck.nickname}`;
+      const targetUserId = await this.chatsService.putBlockUserInChats(userId, infoBlck);
+      const nameOfblockingSocketRoom = `blocking_${targetUserId}`;
       if (infoBlck.boolToBlock === true) socket.join(nameOfblockingSocketRoom);
       else socket.leave(nameOfblockingSocketRoom);
       return true;
