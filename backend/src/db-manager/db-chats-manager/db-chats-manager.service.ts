@@ -118,7 +118,7 @@ export class DbChatsManagerService {
   async getCurrUserListAndCount(chatroom: TbCh01LEntity) {
     const currUserListAndCount = await this.ch02lRp.findAndCount({
       relations: {
-        ch01lEntity: true,
+        // ch01lEntity: true,
         ua01mEntity: true,
       },
       relationLoadStrategy: 'query',
