@@ -7,7 +7,8 @@ import { LoginStatusActionTypes } from "types/redux/Login";
 import { AxiosResponse } from "axios";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 import UserService from "API/UserService";
-import CustomProfileButton from "components/utils/CustomProfileButton";
+import CustomProfilePreview from "components/utils/CustomProfilePreview";
+import LoadingCircle from "components/utils/LoadingCircle";
 import "styles/global.scss";
 import "styles/Login.scss";
 
@@ -89,8 +90,8 @@ const FirstRegisterModal = (props: FirstRegisterModalProps) => {
           payload: response.data,
         });
 
-        setFile(null);
-        setPreview(null);
+        // setFile(null);
+        // setPreview(null);
       } catch (e: any) {
         if (e.response.data.message === "Invalid file type")
           alert("png, jpg, jpeg, gif 파일만 가능합니다!");
@@ -107,12 +108,14 @@ const FirstRegisterModal = (props: FirstRegisterModalProps) => {
   }, []);
 
   useEffect(() => {
-    props.setResponse({ ...props.response, intraImagePath: preview });
+    if (props.response)
+      props.setResponse({ ...props.response, intraImagePath: preview });
   }, [preview]);
 
-  // useEffect(() => {
-  //   props.setResponse({ ...props.response, intraId: nickname });
-  // }, [nickname]);
+  useEffect(() => {
+    if (props.response)
+      props.setResponse({ ...props.response, intraId: nickname });
+  }, [nickname]);
 
   return (
     <Modal
@@ -120,7 +123,7 @@ const FirstRegisterModal = (props: FirstRegisterModalProps) => {
       onClose={() => dispatch({ type: LoginStatusActionTypes.STATUS_MAIN })}
     >
       <ModalDialog className="modal big-modal" variant="outlined">
-        <Box id="edit" className="outframe">
+        <Box id="first-register" className="outframe">
           <Box className="header flex-container">
             <b>신규 회원 설정</b>
             <CustomIconButton
@@ -131,59 +134,65 @@ const FirstRegisterModal = (props: FirstRegisterModalProps) => {
               }
             />
           </Box>
-          <Box className="body flex-container">
-            <Box sx={{ width: "50%", margin: "0 auto" }}>
-              <CustomProfileButton
-                class="login"
-                nickname={props.response.intraId}
-                imgURL={props.response.intraImagePath}
-                position="first-register"
-                handleFunction={() => {}}
-              />
-            </Box>
-            <Box
-              sx={{ display: "flex", flexDirection: "row", columnGap: "5%" }}
-            >
-              <Box id="new-nickname">
-                <Box className="inform">
-                  닉네임은 1 ~ 10자리 한글 / 영어(대, 소문자) / 숫자만
-                  가능합니다.
-                </Box>
-                <Box className="input">
-                  <CustomOnKeyUpInput
-                    placeholder="새 닉네임을 입력하세요."
-                    defaultValue={props.response.intraId}
-                    maxLength={10}
-                    handleFunction={handleNickname}
-                    handleDoneTyping={getNicknameDuplicate}
-                    isError={isError}
+          <Box className="body">
+            {props.response === null ? (
+              <LoadingCircle />
+            ) : (
+              <>
+                <Box id="preview" className="flex-container">
+                  <CustomProfilePreview
+                    class="big-font"
+                    nickname={props.response.intraId}
+                    imgURL={props.response.intraImagePath}
+                    position="first-register"
+                    handleFunction={() => {}}
                   />
                 </Box>
-                {nickname === "" && null}
-                {isError && (
-                  <Box className="inform fail">
-                    중복된 닉네임입니다. 다시 입력해주세요.
+                <Box id="register-form" className="flex-container">
+                  <Box id="new-nickname">
+                    <Box className="inform">
+                      닉네임은 1 ~ 10자리 한글 / 영어(대, 소문자) / 숫자만
+                      가능합니다.
+                    </Box>
+                    <Box className="input">
+                      <CustomOnKeyUpInput
+                        placeholder="새 닉네임을 입력하세요."
+                        defaultValue={props.response.intraId}
+                        maxLength={10}
+                        handleFunction={handleNickname}
+                        handleDoneTyping={getNicknameDuplicate}
+                        isError={isError}
+                      />
+                    </Box>
+                    {nickname === "" && null}
+                    {isError && (
+                      <Box className="inform fail">
+                        중복된 닉네임입니다. 다시 입력해주세요.
+                      </Box>
+                    )}
+                    {!(nickname === "" || isError) && (
+                      <Box className="inform success">
+                        사용 가능한 닉네임입니다.
+                      </Box>
+                    )}
+                    <Button onClick={handlePostNewNickname}>닉네임 수정</Button>
                   </Box>
-                )}
-                {!(nickname === "" || isError) && (
-                  <Box className="inform success">
-                    사용 가능한 닉네임입니다.
+                  <Box id="new-image">
+                    <Box className="inform">
+                      프로필 사진은 10MB 이내의 png, jpg, jpeg, gif 파일만
+                      가능합니다.
+                    </Box>
+                    <Box className="input">
+                      <input type="file" onChange={handleFileInputChange} />
+                    </Box>
+                    <Box className="preview flex-container"></Box>
+                    <Button onClick={handlePostNewImage}>
+                      프로필 이미지 수정
+                    </Button>
                   </Box>
-                )}
-                <Button onClick={handlePostNewNickname}>닉네임 수정</Button>
-              </Box>
-              <Box id="new-image">
-                <Box className="inform">
-                  프로필 사진은 10MB 이내의 png, jpg, jpeg, gif 파일만
-                  가능합니다.
                 </Box>
-                <Box className="input">
-                  <input type="file" onChange={handleFileInputChange} />
-                </Box>
-                <Box className="preview flex-container"></Box>
-                <Button onClick={handlePostNewImage}>프로필 이미지 수정</Button>
-              </Box>
-            </Box>
+              </>
+            )}
           </Box>
           <Box className="footer flex-container">
             <Button
