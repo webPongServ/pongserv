@@ -41,6 +41,7 @@ export class AuthService {
         {
           headers: {
             'content-type': 'application/json',
+			'Access-Control-Allow-Origin' : '*',
           },
         },
       );
@@ -67,6 +68,7 @@ export class AuthService {
         headers: {
           Authorization: `Bearer ${ftTokens.accessToken}`,
           'content-type': 'application/json',
+		  'Access-Control-Allow-Origin' : '*',
         },
       },
     );
