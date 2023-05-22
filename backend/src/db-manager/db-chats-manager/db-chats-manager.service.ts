@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { ArrayContains, In, Repository } from 'typeorm';
 import { TbCh01LEntity } from './entities/tb-ch-01-l.entity';
 import { TbCh02LEntity } from './entities/tb-ch-02-l.entity';
 import { TbCh02DEntity } from './entities/tb-ch-02-d.entity';
@@ -118,7 +118,7 @@ export class DbChatsManagerService {
   async getCurrUserListAndCount(chatroom: TbCh01LEntity) {
     const currUserListAndCount = await this.ch02lRp.findAndCount({
       relations: {
-        ch01lEntity: true,
+        // ch01lEntity: true,
         ua01mEntity: true,
       },
       relationLoadStrategy: 'query',
@@ -165,6 +165,8 @@ export class DbChatsManagerService {
   }
 
   async setUserToEnterRoom(user: TbUa01MEntity, room: TbCh01LEntity) {
+    if (!user || !room)
+      throw new ForbiddenException(`In DbChatsManagerService.setUserToEnterRoom, user or room is none`);
     let userInChtrm = await this.ch02lRp.findOne({
       where: {
         ch01lEntity: {
@@ -192,9 +194,11 @@ export class DbChatsManagerService {
       },
     });
     if (currCount === 0) userInChtrm.chtRmAuth = '01';
-    userInChtrm.chtRmJoinTf = true;
-    userInChtrm.entryDttm = new Date();
-    userInChtrm.authChgDttm = new Date();
+    if (userInChtrm.chtRmJoinTf === false) {
+      userInChtrm.chtRmJoinTf = true;
+      userInChtrm.entryDttm = new Date();
+      userInChtrm.authChgDttm = new Date();
+    }
     return await this.ch02lRp.save(userInChtrm);
   }
 
@@ -458,10 +462,10 @@ export class DbChatsManagerService {
   }
 
   async setBlockingData(
-    requester: TbUa01MEntity, 
-    target: TbUa01MEntity, 
-    toBlock: boolean
-    ) {
+    requester: TbUa01MEntity,
+    target: TbUa01MEntity,
+    toBlock: boolean,
+  ) {
     let blockingData = await this.ch04lRp.findOne({
       where: {
         ua01mEntity: {
@@ -470,10 +474,9 @@ export class DbChatsManagerService {
         ua01mEntityAsBlock: {
           id: target.id,
         },
-      }
+      },
     });
-    if (blockingData === null)
-    {
+    if (blockingData === null) {
       blockingData = this.ch04lRp.create({
         ua01mEntity: requester,
         ua01mEntityAsBlock: target,
@@ -481,43 +484,90 @@ export class DbChatsManagerService {
         rsstDttm: new Date(),
       });
     }
-    if (toBlock === true)
-      blockingData.stCd = '01';
-    else
-      blockingData.stCd = '02';
+    if (toBlock === true) blockingData.stCd = '01';
+    else blockingData.stCd = '02';
     this.ch04lRp.save(blockingData);
-    return ;
+    return;
   }
 
   async getBlockingData(requester: TbUa01MEntity, target: TbUa01MEntity) {
     const result = await this.ch04lRp.findOne({
       where: {
         ua01mEntity: {
-          id: requester.id
+          id: requester.id,
         },
         ua01mEntityAsBlock: {
           id: target.id,
         },
         delTf: false,
-      }
-    })
+      },
+    });
     return result;
   }
 
   async getListForThisUserToBlock(user: TbUa01MEntity) {
     const results = await this.ch04lRp.find({
       relations: {
-        ua01mEntityAsBlock: true
+        ua01mEntityAsBlock: true,
       },
       where: {
         ua01mEntity: {
-          id: user.id
+          id: user.id,
+        },
+        stCd: '01',
+        delTf: false,
+      },
+    });
+    return results;
+  }
+
+  async getLiveDmRoomOfThisUsers(
+    frstUser: TbUa01MEntity,
+    scndUser: TbUa01MEntity,
+  ) {
+    const dmRms = await this.ch01lRp.find({
+      relations: {
+        ch02lEntities: {
+          ua01mEntity: true,
+        },
+      },
+      where: {
+        chtRmTf: true,
+        chtRmType: '03',
+      },
+    });
+    for (const eachDmRm of dmRms) {
+      let count = 0;
+      for (const eachAttnd of eachDmRm.ch02lEntities) {
+        if (
+          eachAttnd.ua01mEntity.id == frstUser.id ||
+          eachAttnd.ua01mEntity.id == scndUser.id
+        )
+          ++count;
+        if (count == 2) return true;
+      }
+    }
+    return false;
+  }
+
+  async isFrstUserBlockingScndUser(frst: TbUa01MEntity, scnd: TbUa01MEntity) {
+    if (!frst || !scnd)
+      throw new ForbiddenException(`frst or scnd is non in DbChatsManagerService.isFrstUserBlockingScndUser`);
+    const found = await this.ch04lRp.findOne({
+      where: {
+        ua01mEntity: {
+          id: frst.id,
+        },
+        ua01mEntityAsBlock: {
+          id: scnd.id,
         },
         stCd: '01',
         delTf: false,
       }
-    })
-    return results;
+    });
+    if (found)
+      return true;
+    else
+      return false;
   }
-
 }

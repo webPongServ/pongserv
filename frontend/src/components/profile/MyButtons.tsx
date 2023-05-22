@@ -1,6 +1,10 @@
 import { Button } from "@mui/joy";
+import AuthService from "API/AuthService";
+import { ProfileDetail } from "types/Detail";
 
 interface MyButtonsProps {
+  profileDetail: ProfileDetail;
+  setProfileDetail: Function;
   setModalStatus: Function;
 }
 
@@ -9,8 +13,13 @@ const MyButtons = (props: MyButtonsProps) => {
     props.setModalStatus("edit-nickname");
   };
 
-  const handleTwoFactorButton = () => {
+  const handleActivateTwoFactorButton = () => {
     props.setModalStatus("set-twofactor");
+  };
+
+  const handleDeactivateTwoFactorButton = async () => {
+    const response = await AuthService.postDeactivate2fa();
+    props.setProfileDetail({ ...props.profileDetail, isTwofactor: false });
   };
 
   const handleEditImageButton = () => {
@@ -24,9 +33,15 @@ const MyButtons = (props: MyButtonsProps) => {
       <Button variant="outlined" onClick={handleEditImageButton}>
         프로필 이미지 수정
       </Button>
-      <Button variant="solid" onClick={handleTwoFactorButton}>
-        2차 인증 설정
-      </Button>
+      {props.profileDetail.isTwofactor ? (
+        <Button variant="outlined" onClick={handleDeactivateTwoFactorButton}>
+          2차 인증 해제
+        </Button>
+      ) : (
+        <Button variant="solid" onClick={handleActivateTwoFactorButton}>
+          2차 인증 설정
+        </Button>
+      )}
     </>
   );
 };

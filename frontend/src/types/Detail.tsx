@@ -11,6 +11,7 @@ export interface ChattingRoomDetail {
   type: string;
   currentCount: number;
   maxCount: number;
+  isAlrdyAttnd: boolean;
 }
 
 export interface ChattingUserDetail {
@@ -38,6 +39,7 @@ export interface ProfileDetail {
   winRate: number;
   status: string;
   isBlocked: boolean;
+  isTwofactor: boolean;
 }
 
 export interface RequesterDetail {

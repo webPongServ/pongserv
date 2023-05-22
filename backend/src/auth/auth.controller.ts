@@ -23,6 +23,7 @@ import { Code42OAuthData } from './dto/code.dto';
 import { Token42OAuthData } from './dto/token.dto';
 import { JwtAccessTokenGuard } from './guard/jwt.auth.guard';
 import { CurrentUser } from 'src/common/decorators/user.decorator';
+import { UsersChatsGateway } from 'src/users-chats-socket/users-chats.gateway';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -30,6 +31,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly config: ConfigService,
+    private readonly usersChatsGateway: UsersChatsGateway,
   ) {}
 
   @ApiOperation({
@@ -70,7 +72,8 @@ export class AuthController {
     const intraId = resultToken.userId;
     const intraImagePath = resultToken.imgPath;
     const isMember = resultToken.isMember;
-    // console.log(accessToken);
+    // NOTE: remove already connected socket
+    this.usersChatsGateway.removeMappedUserSocketIfIs(resultToken.userId);
     if (OAuthData == true) {
       res.json({ OAuthData, intraId, intraImagePath });
     } else {
@@ -111,5 +114,16 @@ export class AuthController {
   async activateOtp(@CurrentUser() userId: string, @Body() otpData: otpData) {
     // console.log('2Fa Activate', userId);
     return this.authService.activate2fa(userId, otpData.sixDigit);
+  }
+
+  @ApiResponse({
+    status: 201,
+    description: '2차인증 해제 완료',
+  })
+  @ApiOperation({ summary: '2차인증 해제' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Post('/deactivate2fa')
+  async disable2FA(@CurrentUser() user: string, @Body() body: any) {
+    return await this.authService.disable2FA(user);
   }
 }

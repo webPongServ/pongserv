@@ -14,4 +14,5 @@ export type Achievement = {
   achvTitle: string;
   achvContent: string;
   achvImg: string;
+  isAchvd: boolean;
 };

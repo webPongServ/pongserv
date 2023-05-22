@@ -47,10 +47,11 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.enableCors({
-    origin: 'http://localhost:3001',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    credentials: true,
+	origin: ['http://10.29.4.1:3001', 'http://localhost:3001'],
+	methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+	credentials: true,
   });
+
   const publicPath = join(__dirname, '..', 'images');
   app.use('/images', serveStatic(publicPath, { index: false }));
   app.use(express.json({ limit: '10mb' }));

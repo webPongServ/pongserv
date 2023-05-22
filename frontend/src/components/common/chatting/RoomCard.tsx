@@ -42,6 +42,7 @@ const RoomCard = (props: RoomCardProps) => {
               type: props.room.type,
               currentCount: props.room.currentCount,
               maxCount: props.room.maxCount,
+              isAlrdyAttnd: props.room.isAlrdyAttnd,
             },
           });
           dispatch({
@@ -78,6 +79,8 @@ const RoomCard = (props: RoomCardProps) => {
           {props.room.type === ChattingRoomType.protected && "비공개"}
           {props.room.type === ChattingRoomType.private && "DM"}
         </Box>
+        <Box className="divider">{props.room.isAlrdyAttnd && "|"}</Box>
+        <Box>{props.room.isAlrdyAttnd && "참여 중"}</Box>
       </Box>
     </Card>
   );

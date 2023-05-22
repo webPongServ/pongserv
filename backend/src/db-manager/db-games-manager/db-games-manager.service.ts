@@ -62,11 +62,15 @@ export class DbGamesManagerService {
 
     const updatedRoomList = await Promise.all(
       roomList.map(async (room) => {
-        const ownerImage = await this.Ua01MRp.findOne({
+        const ownerData = await this.Ua01MRp.findOne({
           where: { userId: room.owner },
-          select: ['imgPath'],
+          select: ['nickname', 'imgPath'],
         });
-        return { ...room, ownerImage: ownerImage ? ownerImage.imgPath : null };
+        return {
+          ...room,
+          ownerImage: ownerData.imgPath ? ownerData.imgPath : null,
+          owner: ownerData.nickname ? ownerData.nickname : null,
+        };
       }),
     );
     return updatedRoomList;

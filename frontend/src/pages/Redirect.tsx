@@ -16,13 +16,7 @@ import { LoginStatusActionTypes } from "types/redux/Login";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
 
 const Redirect = () => {
-  const [response, setResponse] = useState<any>({
-    isMember: false,
-    OAuthData: null,
-    intraId: "",
-    intraImagePath: "",
-    accessToken: "",
-  });
+  const [response, setResponse] = useState<any>(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 

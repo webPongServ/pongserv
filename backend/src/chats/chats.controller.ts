@@ -75,7 +75,7 @@ export class ChatsController {
   @UseGuards(JwtAccessTokenGuard)
   @ApiBearerAuth('accessToken')
   @Get('rooms')
-  async getChatroomsForAUser(@CurrentUser() userId: any) {
+  async getChatroomsForAUser(@CurrentUser() userId: string) {
     this.logger.log(`[GET /chats/rooms] ${userId}`);
     try {
       const result = await this.chatsService.getChatroomsForAUser(userId);

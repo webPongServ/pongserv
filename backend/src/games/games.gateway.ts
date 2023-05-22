@@ -100,9 +100,9 @@ export class GamesGateway
       for (const room of socket.rooms) {
         if (room !== socket.id) {
           this.logger.log(`${room} Game room removing actions`);
-          await socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
-          await this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
-          this.GamesService.endGame(room); // 해당 방 삭제
+          socket.to(room).emit('endGame'); // 해당 방에 있는 인원에게 게임 끝났음을 알림
+          this.server.socketsLeave(room); // 해당 방에 있는 전원 나가기
+          await this.GamesService.endGame(room); // 해당 방 삭제
           if (await this.gameQueue.removeAndCheckExistence(room))
             this.logger.log('gameQueue removed');
         }
@@ -199,9 +199,9 @@ export class GamesGateway
     @MessageBody() message: any,
   ) {
     await new Promise((resolve) => setTimeout(resolve, 1200));
-    await socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
-    await socket.emit('roomGuest');
-    await this.server.to(message.roomId).emit('gameStart');
+    socket.to(message.roomId).emit('roomOwner'); // 방장에게 방장임을 알려주는 것
+    socket.emit('roomGuest');
+    this.server.to(message.roomId).emit('gameStart');
     this.logger.log(`Game condition fulfilled: ${message.roomId} started`);
     const userId = socket.data;
     const roomId = message.roomId;
@@ -327,10 +327,10 @@ export class GamesGateway
       if (!requesterSocketId || !targetSocketId) {
         return 'OK';
       }
-      await this.server.to(requesterSocketId).emit('roomOwner');
-      await this.server.to(targetSocketId).emit('roomGuest');
-      await this.server.to(requesterSocketId).emit('gameStart');
-      await this.server.to(targetSocketId).emit('gameStart');
+      this.server.to(requesterSocketId).emit('roomOwner');
+      this.server.to(targetSocketId).emit('roomGuest');
+      this.server.to(requesterSocketId).emit('gameStart');
+      this.server.to(targetSocketId).emit('gameStart');
 
       await this.GamesService.enterRoom(targetId, roomId, '01');
       await this.GamesService.updateOpponent(targetId, roomId);
@@ -342,7 +342,7 @@ export class GamesGateway
       const requesterSocket: Socket = this.server.sockets.sockets.get(
         this.GameSocketId.get(requestId),
       );
-      await requesterSocket.emit('gameReject');
+      requesterSocket.emit('gameReject');
       // Reject하면 -> 프론트에서 다른 곳으로 나가고 -> 그렇게 함으로써 소켓 끊으면? 모두 해결
       return 'OK';
     }

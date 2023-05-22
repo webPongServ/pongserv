@@ -41,6 +41,7 @@ export class AuthService {
         {
           headers: {
             'content-type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
           },
         },
       );
@@ -51,7 +52,9 @@ export class AuthService {
       this.logger.log('42 token 발급 성공');
     } catch (err) {
       this.logger.log('42 token 발급 실패');
-      throw new HttpException(err, HttpStatus.UNAUTHORIZED);
+      throw new UnauthorizedException(
+        '42 Token 발급 과정 중 실패(감자서버 에러)',
+      );
     }
     return result;
   }
@@ -65,6 +68,7 @@ export class AuthService {
         headers: {
           Authorization: `Bearer ${ftTokens.accessToken}`,
           'content-type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
         },
       },
     );
@@ -148,5 +152,18 @@ export class AuthService {
 
   async verifyAsync(token) {
     return await this.jwtService.verifyAsync(token);
+  }
+
+  async disable2FA(intraId: string) {
+    const user = await this.dbmanagerUsersService.getUserByUserId(intraId);
+    if (user) {
+      user.twofactor = false;
+      await this.dbmanagerUsersService.saveUser(user);
+      this.logger.log(`2FA 비활성화: ${intraId}`);
+      return { twofactor: false };
+    } else {
+      this.logger.error(`사용자 정보를 찾을 수 없음: ${intraId}`);
+      // throw new BadRequestException('사용자의 정보를 확인할 수 없습니다.');
+    }
   }
 }

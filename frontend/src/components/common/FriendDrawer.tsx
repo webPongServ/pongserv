@@ -9,7 +9,6 @@ import EmptyListMessage from "components/utils/EmptyListMessage";
 import CustomIconButton from "components/utils/CustomIconButton";
 import CustomProfileButton from "components/utils/CustomProfileButton";
 import LoadingCircle from "components/utils/LoadingCircle";
-import UserService from "API/UserService";
 import "styles/AppHeader.scss";
 import "styles/global.scss";
 
@@ -68,19 +67,20 @@ const FriendDrawer = () => {
   );
 
   const getFriends = async () => {
-    const response = await UserService.getFriend();
-
-    // API 호출
-    dispatch({
-      type: FriendsActionTypes.FRIENDS_GET,
-      payload: response.data.map(
-        (value: serverFriend): UserDetail => ({
-          nickname: value.nickname,
-          imgURL: value.imageUrl,
-          status: value.currStat,
-        })
-      ),
-    });
+    if (chattingSocket) {
+      chattingSocket.emit("getFriendList", (data: serverFriend[]) => {
+        dispatch({
+          type: FriendsActionTypes.FRIENDS_GET,
+          payload: data.map(
+            (value: serverFriend): UserDetail => ({
+              nickname: value.nickname,
+              imgURL: value.imageUrl,
+              status: value.currStat,
+            })
+          ),
+        });
+      });
+    }
   };
 
   const socketFriendStatusLogin = (nickname: string) => {
@@ -113,9 +113,6 @@ const FriendDrawer = () => {
 
   useEffect(() => {
     getFriends();
-  }, []);
-
-  useEffect(() => {
     if (chattingSocket) {
       chattingSocket.on("friendStatusLogin", socketFriendStatusLogin);
       chattingSocket.on("friendStatusLogout", socketFriendStatusLogout);
@@ -134,7 +131,7 @@ const FriendDrawer = () => {
         chattingSocket.off("friendStatusGameEnd", socketFriendStatusGameEnd);
       }
     };
-  }, [friends]);
+  }, [chattingSocket]);
 
   return (
     <Drawer id="FriendDrawer" variant="permanent" open={true}>

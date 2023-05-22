@@ -143,7 +143,7 @@ export class DbUsersManagerService {
     if (user) {
       user.imgPath = imagePath;
       await this.ua01mRp.save(user);
-      console.log('Image path is sucessfuly saved');
+      // console.log('Image path is sucessfuly saved');
     } else {
       throw new BadRequestException('No User available');
     }
@@ -204,11 +204,9 @@ export class DbUsersManagerService {
 
   async checkNickname(nickname: string) {
     const isAvailable = await this.ua01mRp.findOne({
-      where: {
-        nickname: nickname,
-      },
+      where: [{ nickname: nickname }, { userId: nickname }],
     });
-    return isAvailable;
+    return isAvailable !== null;
   }
 
   async getProfile(userId) {
@@ -222,6 +220,7 @@ export class DbUsersManagerService {
         userId: user.userId,
         nickname: user.nickname,
         imgPath: user.imgPath,
+        isTwofactor: user.twofactor,
         // TODO : Change Needed
         total: 99,
         win: 99,
@@ -248,6 +247,7 @@ export class DbUsersManagerService {
         nickname: user.nickname,
         imgPath: user.imgPath,
         lastDttm: user.lastDttm,
+        isTwofactor: user.twofactor,
         //Debug Needed
         total: 0,
         win: 0,
@@ -347,6 +347,7 @@ export class DbUsersManagerService {
   }
 
   async findUserIdByNickname(nickname: string) {
+    if (!nickname) throw new BadRequestException('No nickname arg');
     const user = await this.ua01mRp.findOne({
       where: {
         nickname: nickname,
@@ -440,12 +441,13 @@ export class DbUsersManagerService {
       },
     });
     if (users.length == 0) {
-      return { result: 'no users' };
+      return [];
     }
     const result = users.map(({ nickname, imgPath }) => ({
       nickname,
       imgPath: imgPath ?? '', // imgPath가 null일 경우 빈 문자열("")을 할당
     }));
+    // console.log(result);
 
     return result;
   }

@@ -68,10 +68,7 @@ export class UsersController {
   @Post('/nickname')
   async changeNickname(@CurrentUser() user: string, @Body() body: any) {
     if (body.nickname.length > 10) {
-      throw new HttpException(
-        '닉네임은 8자 이하로 입력해주세요.',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('닉네임은 10자 이하로 작성해주세요.');
     }
     return this.UsersService.changeNickname(user, body.nickname);
   }
@@ -88,10 +85,7 @@ export class UsersController {
       return { result: false };
     }
     if (nickname.length > 10) {
-      throw new HttpException(
-        '닉네임은 8자 이하로 입력해주세요.',
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new BadRequestException('닉네임은 10자 이하로 작성해주세요.');
     }
     return this.UsersService.checkNickname(nickname);
   }
@@ -127,7 +121,7 @@ export class UsersController {
     @Body('base64Data') base64Data: string,
   ) {
     if (!base64Data) throw new BadRequestException('base64Data가 없습니다.');
-    this.logger.log('changeImage ${user}');
+    this.logger.log(`changeImage ${user}`);
     return await this.UsersService.changeImage(user, base64Data);
   }
 

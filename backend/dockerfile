@@ -6,9 +6,10 @@ COPY package*.json /app/
 RUN npm ci
 
 COPY . /app/
+RUN npm run build
 
 VOLUME [ "/app" ]
 
 EXPOSE 3000
 
-CMD ["npm", "run", "build", "&&", "npm", "run", "start"]
+CMD ["npm", "run", "start"]

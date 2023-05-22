@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useState, useRef } from "react";
 import io from "socket.io-client";
 import { useSelector } from "react-redux";
-import { useQuery } from "@tanstack/react-query";
 import { apiURL } from "API/api";
 import { IRootState } from "components/common/store";
 import GameCard from "components/game/GameCard";
@@ -47,22 +46,6 @@ const Game = () => {
   const dispatch = useDispatch();
   const notiRef = useRef<HTMLDivElement>(null);
 
-  const { data } = useQuery(
-    ["gameRooms"],
-    async () => {
-      const response = await GameService.getGameRooms();
-      return response.data;
-    },
-    {
-      staleTime: 5000, // 5초
-      cacheTime: Infinity, // 제한 없음
-    }
-  );
-
-  dispatch({
-    type: LoginStatusActionTypes.STATUS_MAIN,
-  });
-
   const getGameRooms = async () => {
     setGameRooms(null);
     const response = await GameService.getGameRooms();
@@ -103,13 +86,15 @@ const Game = () => {
   }, [gameSocket]);
 
   useEffect(() => {
+    dispatch({
+      type: LoginStatusActionTypes.STATUS_MAIN,
+    });
     getGameRooms();
     dispatch({ type: CurrentGameActionTypes.DELETE_GAMEROOM, payload: "" });
   }, []);
 
   return (
     <Box id="GameWaiting" className="flex-container">
-      {/* <ErrorNotification ref={notiRef} errorMessage={errorMessage} /> */}
       <Box id="game-box">
         <Box className="list flex-wrap-container">
           {gameRooms === null && <LoadingCircle />}

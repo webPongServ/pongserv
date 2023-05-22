@@ -166,7 +166,7 @@ export class UsersService {
       friendNickname,
     );
     Profile.ELO = gameSummary.ladder;
-    Profile.winRate = gameSummary.winRate * 100;
+    Profile.winRate = parseFloat((gameSummary.winRate * 100).toFixed(1));
     Profile.total = gameSummary.total;
     Profile.win = gameSummary.win;
     Profile.lose = gameSummary.lose;
@@ -183,7 +183,7 @@ export class UsersService {
       intraId,
     );
     Profile.ELO = gameSummary.ladder;
-    Profile.winRate = gameSummary.winRate * 100;
+    Profile.winRate = parseFloat((gameSummary.winRate * 100).toFixed(1));
     Profile.total = gameSummary.total;
     Profile.win = gameSummary.win;
     Profile.lose = gameSummary.lose;
@@ -199,6 +199,7 @@ export class UsersService {
       2. 각 친구별로 현재 로그인 상태 가져오기
     */
     const results: {
+      userId: string;
       nickname: string;
       imageUrl: string;
       currStat: string;
@@ -210,18 +211,27 @@ export class UsersService {
     );
     // 2
     for (const eachFriendData of friendDatas) {
-      const currLogin = await this.dbmanagerUsersService.getCurrLoginData(
-        eachFriendData.ua01mEntityAsFr,
-      );
-      let statusCode: string = null;
-      if (currLogin) {
-        statusCode = currLogin.stsCd; // '01'
-        if (await this.gameService.isInGame(userId)) statusCode = '02';
-      } else {
-        statusCode = '03';
+      let statusCode = '03'; // default: logout
+      if (
+        await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)
+      ) {
+        statusCode = '02';
       }
+      // const currLogin = await this.dbmanagerUsersService.getCurrLoginData(
+      //   eachFriendData.ua01mEntityAsFr,
+      // );
+      // let statusCode: string = null;
+      // if (currLogin) {
+      //   statusCode = currLogin.stsCd; // '01'
+      //   if (await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)) {
+      //     statusCode = '02';
+      //   }
+      // } else {
+      //   statusCode = '03';
+      // }
       // console.log('Status Code', statusCode);
       const eachToPush = {
+        userId: eachFriendData.ua01mEntityAsFr.userId,
         nickname: eachFriendData.ua01mEntityAsFr.nickname,
         imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
         currStat: statusCode,

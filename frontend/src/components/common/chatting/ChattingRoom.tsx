@@ -287,13 +287,15 @@ const ChattingRoom = () => {
   }, [chatting, roomStatus]);
 
   useEffect(() => {
-    setChatting([
-      ...chatting,
-      {
-        user: null,
-        message: myDetail.nickname + "님이 입장하셨습니다.",
-      },
-    ]);
+    if (!currentChatting.isAlrdyAttnd) {
+      setChatting([
+        ...chatting,
+        {
+          user: null,
+          message: myDetail.nickname + "님이 입장하셨습니다.",
+        },
+      ]);
+    }
   }, []);
 
   return (
