@@ -119,7 +119,7 @@ export class AuthController {
   })
   @ApiOperation({ summary: '2차인증 해제' })
   @UseGuards(JwtAccessTokenGuard)
-  @Post('/disable2fa')
+  @Post('/deactivate2fa')
   async disable2FA(@CurrentUser() user: string, @Body() body: any) {
     return await this.authService.disable2FA(user);
   }
