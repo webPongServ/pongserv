@@ -111,6 +111,7 @@ export class ChatsService {
 			2. public, protected type에 현재 존재하는 chatroom list 가져오기
 			3. 얻은 모든 chatroom 리스트에서 프론트에 건네줄 정보들만 추출해서 object list를 만들어서 반환
 				uuid, name, owner, type, current, max
+        + isAlrdyAttnd
 		*/
     // 1
     const user: TbUa01MEntity =
@@ -129,17 +130,19 @@ export class ChatsService {
       type: string;
       currentCount: number;
       maxCount: number;
+      isAlrdyAttnd: boolean; // TODO - to combine with front-end
     }[] = [];
     for (const eachChtrm of combinedChtrms) {
       const currUserListAndCount =
         await this.dbChatsManagerService.getCurrUserListAndCount(eachChtrm);
       if (currUserListAndCount[1] === 0) continue;
-      let owner: TbCh02LEntity;
+      let owner: TbCh02LEntity = null;
+      let isAlrdyAttnd: boolean = false;
       for (const eachUserInChtrm of currUserListAndCount[0]) {
-        if (eachUserInChtrm.chtRmAuth === '01') {
+        if (eachUserInChtrm.ua01mEntity.userId === user.userId)
+          isAlrdyAttnd = true;
+        if (eachUserInChtrm.chtRmAuth === '01')
           owner = eachUserInChtrm;
-          break;
-        }
       }
       results.push({
         id: eachChtrm.id,
@@ -148,6 +151,7 @@ export class ChatsService {
         type: eachChtrm.chtRmType,
         currentCount: currUserListAndCount[1],
         maxCount: eachChtrm.maxUserCnt,
+        isAlrdyAttnd: isAlrdyAttnd,
       });
     }
     return results;
