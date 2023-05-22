@@ -339,10 +339,17 @@ export class GamesGateway
       await this.GamesService.updateDirectGame(roomId);
       return 'OK';
     } else {
-      const requesterSocket: Socket = this.server.sockets.sockets.get(
-        this.GameSocketId.get(requestId),
-      );
-      requesterSocket.emit('gameReject');
+		try{
+		const requesterSocketId = this.GameSocketId.get(requestId);
+		this.server.to(requesterSocketId).emit('gameReject');
+		}
+		catch(e){
+			this.logger.error(`${requestId} 가 없습니다.`);
+		}
+    //   const requesterSocket: Socket = this.server.sockets.sockets.get(
+    //     this.GameSocketId.get(requestId),
+    //   );
+    //   requesterSocket.emit('gameReject');
       // Reject하면 -> 프론트에서 다른 곳으로 나가고 -> 그렇게 함으로써 소켓 끊으면? 모두 해결
       return 'OK';
     }
