@@ -50,6 +50,7 @@ const Profile = () => {
         winRate: response.data.winRate,
         status: response.data.status,
         isBlocked: response.data.isblocked,
+        isTwofactor: response.data.isTwofactor,
       });
       if (isNew)
         dispatch({
@@ -64,7 +65,6 @@ const Profile = () => {
 
   useEffect(() => {
     getProfile();
-    // check dependency list!!
   }, [nickname]);
 
   return (
@@ -81,7 +81,11 @@ const Profile = () => {
           {profileDetail === null && <SkeletonButtons />}
           {profileDetail !== null &&
             profileDetail.status === ProfileFriendType.self && (
-              <MyButtons setModalStatus={setModalStatus} />
+              <MyButtons
+                profileDetail={profileDetail}
+                setProfileDetail={setProfileDetail}
+                setModalStatus={setModalStatus}
+              />
             )}
           {profileDetail !== null &&
             profileDetail!.status !== ProfileFriendType.self && (
@@ -136,6 +140,8 @@ const Profile = () => {
         setProfileDetail={setProfileDetail}
       />
       <SetTwoFactorModal
+        profileDetail={profileDetail!}
+        setProfileDetail={setProfileDetail}
         modalStatus={modalStatus}
         setModalStatus={setModalStatus}
       />
