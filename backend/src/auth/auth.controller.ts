@@ -72,9 +72,8 @@ export class AuthController {
     const intraId = resultToken.userId;
     const intraImagePath = resultToken.imgPath;
     const isMember = resultToken.isMember;
-    // console.log(accessToken);
-    // TODO: remove already connected socket
-    await this.usersChatsGateway.removeMappedUserSocketIfIs(resultToken.userId);
+    // NOTE: remove already connected socket
+    this.usersChatsGateway.removeMappedUserSocketIfIs(resultToken.userId);
     if (OAuthData == true) {
       res.json({ OAuthData, intraId, intraImagePath });
     } else {
