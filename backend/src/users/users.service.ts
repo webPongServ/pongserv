@@ -211,6 +211,7 @@ export class UsersService {
     );
     // 2
     for (const eachFriendData of friendDatas) {
+<<<<<<< HEAD
       const currLogin = await this.dbmanagerUsersService.getCurrLoginData(
         eachFriendData.ua01mEntityAsFr,
       );
@@ -224,8 +225,25 @@ export class UsersService {
         }
       } else {
         statusCode = '03';
+=======
+      let statusCode: string = '03'; // default: logout
+      if (await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)) {
+        statusCode = '02';
+>>>>>>> 686bf746912bed960961d5744b83be0644a1dff1
       }
-      console.log('Status Code', statusCode);
+      // const currLogin = await this.dbmanagerUsersService.getCurrLoginData(
+      //   eachFriendData.ua01mEntityAsFr,
+      // );
+      // let statusCode: string = null;
+      // if (currLogin) {
+      //   statusCode = currLogin.stsCd; // '01'
+      //   if (await this.gameService.isInGame(eachFriendData.ua01mEntityAsFr.userId)) {
+      //     statusCode = '02';
+      //   }
+      // } else {
+      //   statusCode = '03';
+      // }
+      // console.log('Status Code', statusCode);
       const eachToPush = {
         userId: eachFriendData.ua01mEntityAsFr.userId,
         nickname: eachFriendData.ua01mEntityAsFr.nickname,
