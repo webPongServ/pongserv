@@ -14,59 +14,130 @@ interface AchievementsProps {
 }
 
 const Achievements = (props: AchievementsProps) => {
-  const achievementList: Achievement[] = [
-    {
-      achvTitle: "1승 업적",
-      achvContent: "1승 업적에 관한 내용입니다.",
-      achvImg: "../image.png",
-    },
-    {
-      achvTitle: "10승 업적",
-      achvContent: "10승 업적에 관한 내용입니다.",
-      achvImg: "../image.png",
-    },
-    {
-      achvTitle: "100승 업적",
-      achvContent: "100승 업적에 관한 내용입니다.",
-      achvImg: "../image.png",
-    },
-    {
-      achvTitle: "1패 업적",
-      achvContent: "1패 업적에 관한 내용입니다.",
-      achvImg: "../favicon.ico",
-    },
-    {
-      achvTitle: "10패 업적",
-      achvContent: "10패 업적에 관한 내용입니다.",
-      achvImg: "../favicon.ico",
-    },
-    {
-      achvTitle: "100패 업적",
-      achvContent: "100패 업적에 관한 내용입니다.",
-      achvImg: "../favicon.ico",
-    },
-    {
-      achvTitle: "친구 1명 업적",
-      achvContent: "친구 1명 업적에 관한 내용입니다.",
-      achvImg: "../swords.png",
-    },
-    {
-      achvTitle: "친구 10명 업적",
-      achvContent: "친구 10명 업적에 관한 내용입니다.",
-      achvImg: "../swords.png",
-    },
-    {
-      achvTitle: "친구 100명 업적",
-      achvContent: "친구 100명 업적에 관한 내용입니다.",
-      achvImg: "../swords.png",
-    },
-  ];
-
-  const [achieved, setAchieved] = useState<boolean[] | null>(null);
+  const [achievementList, setAchievementList] = useState<Map<
+    string,
+    Achievement
+  > | null>(null);
 
   const getAchievements = async () => {
     const response = await UserService.getAchievement(props.nickname);
-    setAchieved(null);
+    const newList = new Map([
+      [
+        "WIN1",
+        {
+          achvTitle: "1승 업적",
+          achvContent: "1승 업적에 관한 내용입니다.",
+          achvImg: "../image.png",
+          isAchvd: false,
+        },
+      ],
+      [
+        "WIN10",
+        {
+          achvTitle: "10승 업적",
+          achvContent: "10승 업적에 관한 내용입니다.",
+          achvImg: "../image.png",
+          isAchvd: false,
+        },
+      ],
+      [
+        "WIN100",
+        {
+          achvTitle: "100승 업적",
+          achvContent: "100승 업적에 관한 내용입니다.",
+          achvImg: "../image.png",
+          isAchvd: false,
+        },
+      ],
+      [
+        "WIN1000",
+        {
+          achvTitle: "1000승 업적",
+          achvContent: "1000승 업적에 관한 내용입니다.",
+          achvImg: "../image.png",
+          isAchvd: false,
+        },
+      ],
+      [
+        "LOSS1",
+        {
+          achvTitle: "1패 업적",
+          achvContent: "1패 업적에 관한 내용입니다.",
+          achvImg: "../image.png",
+          isAchvd: false,
+        },
+      ],
+      [
+        "LOSS10",
+        {
+          achvTitle: "10패 업적",
+          achvContent: "10패 업적에 관한 내용입니다.",
+          achvImg: "../favicon.ico",
+          isAchvd: false,
+        },
+      ],
+      [
+        "LOSS100",
+        {
+          achvTitle: "100패 업적",
+          achvContent: "100패 업적에 관한 내용입니다.",
+          achvImg: "../favicon.ico",
+          isAchvd: false,
+        },
+      ],
+      [
+        "LOSS1000",
+        {
+          achvTitle: "1000패 업적",
+          achvContent: "1000패 업적에 관한 내용입니다.",
+          achvImg: "../favicon.ico",
+          isAchvd: false,
+        },
+      ],
+      [
+        "FRIEND1",
+        {
+          achvTitle: "친구 1명 업적",
+          achvContent: "친구 1명 업적에 관한 내용입니다.",
+          achvImg: "../swords.png",
+          isAchvd: false,
+        },
+      ],
+      [
+        "FRIEND10",
+        {
+          achvTitle: "친구 10명 업적",
+          achvContent: "친구 10명 업적에 관한 내용입니다.",
+          achvImg: "../swords.png",
+          isAchvd: false,
+        },
+      ],
+      [
+        "FRIEND100",
+        {
+          achvTitle: "친구 100명 업적",
+          achvContent: "친구 100명 업적에 관한 내용입니다.",
+          achvImg: "../swords.png",
+          isAchvd: false,
+        },
+      ],
+      [
+        "FRIEND1000",
+        {
+          achvTitle: "친구 1000명 업적",
+          achvContent: "친구 1000명 업적에 관한 내용입니다.",
+          achvImg: "../swords.png",
+          isAchvd: false,
+        },
+      ],
+    ]);
+
+    for (let i = 0; i < response.data.length; i++) {
+      if (newList.get(response.data[i]) !== undefined) {
+        newList.get(response.data[i])!.isAchvd = true;
+      }
+    }
+    setAchievementList(newList);
   };
 
   useEffect(() => {
@@ -75,15 +146,10 @@ const Achievements = (props: AchievementsProps) => {
 
   return (
     <TabPanel value={1}>
-      {achieved === null && <LoadingCircle />}
-      {achieved !== null && achievementList.length === 0 && (
-        <Box className="flex-container empty-achievement">
-          <EmptyListMessage message="업적이 존재하지 않습니다!" />
-        </Box>
-      )}
-      {achieved !== null && achievementList.length !== 0 && (
+      {achievementList === null && <LoadingCircle />}
+      {achievementList !== null && (
         <Box className="flex-wrap-container flex-container">
-          {achievementList.map((value, index) => {
+          {Array.from(achievementList!).map(([key, value], index) => {
             return (
               <Card
                 className="achievement-card flex-container"
@@ -91,10 +157,20 @@ const Achievements = (props: AchievementsProps) => {
                 key={value.achvTitle + index}
               >
                 <Box className="flex-container">
-                  <img src={value.achvImg} alt="achievement_img" />
+                  <img
+                    className={value.isAchvd ? "" : "not-achieved"}
+                    src={value.achvImg}
+                    alt="achievement_img"
+                  />
                   <Box>
-                    <Typography className="title">{value.achvTitle}</Typography>
-                    <Typography>{value.achvContent}</Typography>
+                    <Typography
+                      className={`title ${value.isAchvd ? "" : "not-achieved"}`}
+                    >
+                      {value.achvTitle}
+                    </Typography>
+                    <Typography className={value.isAchvd ? "" : "not-achieved"}>
+                      {value.achvContent}
+                    </Typography>
                   </Box>
                 </Box>
               </Card>

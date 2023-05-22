@@ -89,7 +89,7 @@ const GameBoard = (props: GameBoardProps) => {
   let dyd: number = quadrant[random][1];
 
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (paddleRef.current || paddle2Ref.current) {
+    if (paddleRef.current || paddle2Ref.current || currentGame.currentGame) {
       const role: string =
         currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
 
@@ -104,16 +104,12 @@ const GameBoard = (props: GameBoardProps) => {
           selectedPaddle!.top + 150 + "px";
         selectedPaddle!.bottom = selectedPaddle!.top + 150;
 
-        gameSocket.emit(
-          "inGameReq",
-          {
-            roomId: currentGame.currentGame!.id,
-            data: { top: selectedPaddle!.top, bottom: selectedPaddle!.bottom },
-            role: role,
-            type: "paddle",
-          },
-          () => {}
-        );
+        gameSocket.emit("inGameReq", {
+          roomId: currentGame.currentGame!.id,
+          data: { top: selectedPaddle!.top, bottom: selectedPaddle!.bottom },
+          role: role,
+          type: "paddle",
+        });
       }
       if (event.key === "ArrowDown") {
         selectedPaddleRef!.current!.style.top =
@@ -128,16 +124,12 @@ const GameBoard = (props: GameBoardProps) => {
         selectedPaddleRef!.current!.style.bottom =
           selectedPaddle!.top + 150 + "px";
         selectedPaddle!.bottom = selectedPaddle!.top + 150;
-        gameSocket.emit(
-          "inGameReq",
-          {
-            roomId: currentGame.currentGame!.id,
-            data: { top: selectedPaddle!.top, bottom: selectedPaddle!.bottom },
-            role: role,
-            type: "paddle",
-          },
-          () => {}
-        );
+        gameSocket.emit("inGameReq", {
+          roomId: currentGame.currentGame!.id,
+          data: { top: selectedPaddle!.top, bottom: selectedPaddle!.bottom },
+          role: role,
+          type: "paddle",
+        });
       }
     }
   };
@@ -156,7 +148,6 @@ const GameBoard = (props: GameBoardProps) => {
       ) {
         // why 10?
         if (ball_rel.left <= 10) {
-          console.log("right case 2");
           score2++;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
@@ -184,6 +175,7 @@ const GameBoard = (props: GameBoardProps) => {
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
                 });
+                // window.location.href = "/game";
                 navigate("/game");
               }
             );
@@ -212,7 +204,6 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.bottom <= paddle2_rel.bottom
       ) {
         if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
-          console.log("left case 2");
           score1++;
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
@@ -240,8 +231,8 @@ const GameBoard = (props: GameBoardProps) => {
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
                 });
-                // 결과 페이지로 navigate => 10초간 보여주고 redirect, 버튼 누르면 redirect(초기화)
-                window.location.href = "/game";
+                // window.location.href = "/game";
+                navigate("/game");
               }
             );
             return;
@@ -265,7 +256,6 @@ const GameBoard = (props: GameBoardProps) => {
       }
       if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
         if (ball_rel.left <= 0) {
-          console.log("right case 1");
           score2++;
           dispatch({
             type: CurrentGameActionTypes.INCREMENT_SCORE,
@@ -307,7 +297,8 @@ const GameBoard = (props: GameBoardProps) => {
                 type: CurrentGameActionTypes.DELETE_GAMEROOM,
                 payload: "",
               });
-              window.location.href = "/game";
+              // window.location.href = "/game";
+              navigate("/game");
             }
           );
           return;
@@ -349,11 +340,9 @@ const GameBoard = (props: GameBoardProps) => {
         role: role,
         type: "ball",
       });
-      // setTimeout(() => {
       requestAnimationFrame(() => {
         moveBall(dx, dy, dxd, dyd);
       });
-      // }, 50);
     }
   };
 
@@ -388,21 +377,11 @@ const GameBoard = (props: GameBoardProps) => {
   const socketRoomOwner = () => {
     setSelectedPaddleRef(paddleRef);
     setSelectedPaddle(paddle1_rel);
-    console.log(
-      currentGame.currentGame!.owner,
-      myInfo.nickname,
-      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
-    );
   };
 
   const socketRoomGuest = () => {
     setSelectedPaddleRef(paddle2Ref);
     setSelectedPaddle(paddle2_rel);
-    console.log(
-      currentGame.currentGame!.owner,
-      myInfo.nickname,
-      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest"
-    );
   };
 
   const socketInGameRes = (data: {
@@ -473,6 +452,7 @@ const GameBoard = (props: GameBoardProps) => {
                     type: CurrentGameActionTypes.DELETE_GAMEROOM,
                     payload: "",
                   });
+                  // window.location.href = "/game";
                   navigate("/game");
                 }
               );
@@ -519,8 +499,8 @@ const GameBoard = (props: GameBoardProps) => {
                     type: CurrentGameActionTypes.DELETE_GAMEROOM,
                     payload: "",
                   });
-                  // 결과 페이지로 navigate => 10초간 보여주고 redirect, 버튼 누르면 redirect(초기화)
-                  window.location.href = "/game";
+                  // window.location.href = "/game";
+                  navigate("/game");
                 }
               );
             }
@@ -574,7 +554,8 @@ const GameBoard = (props: GameBoardProps) => {
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
                 });
-                window.location.href = "/game";
+                // window.location.href = "/game";
+                navigate("/game");
               }
             );
           }
@@ -603,7 +584,8 @@ const GameBoard = (props: GameBoardProps) => {
             type: CurrentGameActionTypes.DELETE_GAMEROOM,
             payload: "",
           });
-          window.location.href = "/game";
+          // window.location.href = "/game";
+          navigate("/game");
         }
       );
     };
@@ -615,7 +597,7 @@ const GameBoard = (props: GameBoardProps) => {
 
   useEffect(() => {
     if (divRef.current !== null) divRef.current.focus();
-    // 난이도에 따라 paddleRef의 height를 조절하기(css)
+
     if (gameSocket) {
       gameSocket.on("gameStart", socketGameStart);
       gameSocket.on("roomOwner", socketRoomOwner);
@@ -631,6 +613,8 @@ const GameBoard = (props: GameBoardProps) => {
       dispatch({ type: SocketsActionTypes.GAMESOCKET_DELETE, payload: "" });
     };
   }, []);
+
+  useEffect(() => {}, [timer]);
 
   useLayoutEffect(() => {
     if (!gameSocket) window.location.href = "/game?error=wrong_game_access";

@@ -95,6 +95,7 @@ const RoomCreator = () => {
             type: chattingRoomForm.type,
             maxCount: chattingRoomForm.maxCount,
             currentCount: 1,
+            isAlrdyAttnd: false,
           },
         });
         dispatch({

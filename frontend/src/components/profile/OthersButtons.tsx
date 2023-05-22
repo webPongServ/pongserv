@@ -40,6 +40,7 @@ const OthersButtons = (props: OthersButtonsProps) => {
             type: ChattingRoomType.private,
             maxCount: 2,
             currentCount: 1,
+            isAlrdyAttnd: false,
           },
         });
         dispatch({

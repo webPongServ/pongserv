@@ -2,9 +2,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { IRootState } from "components/common/store";
+import CustomProfilePreview from "components/utils/CustomProfilePreview";
 import { CurrentGameActionTypes } from "types/redux/CurrentGame";
 import { GameDifficultyType } from "constant";
-import CustomProfileButton from "components/utils/CustomProfileButton";
 import "styles/Game.scss";
 
 import { Button } from "@mui/joy";
@@ -79,7 +79,7 @@ const RequestGameModal = (props: RequestGameModalProps) => {
           </Box>
           <Box className="body flex-container">
             <Box>
-              <CustomProfileButton
+              <CustomProfilePreview
                 class="login"
                 nickname={props.requester.nickname}
                 imgURL={props.requester.imgURL}

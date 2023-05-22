@@ -149,6 +149,7 @@ export default function AppHeader() {
       chattingSocket.on("errorChatroomEmpowerment", alertMessage);
       chattingSocket.on("errorChatroomCreation", alertMessage);
       chattingSocket.on("errorChatroomRemovalBan", alertMessage);
+      chattingSocket.on("errorChatroomDirectMessage", alertMessage);
     }
     loadMyData();
 
@@ -168,6 +169,7 @@ export default function AppHeader() {
       chattingSocket.off("errorChatroomEmpowerment", alertMessage);
       chattingSocket.off("errorChatroomCreation", alertMessage);
       chattingSocket.off("errorChatroomRemovalBan", alertMessage);
+      chattingSocket.off("errorChatroomDirectMessage", alertMessage);
     };
   }, []);
 

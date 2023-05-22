@@ -48,6 +48,16 @@ body,
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
+.profile-preview-img {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  border: 0px solid #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
 .modal {
   width: 500px;
   height: 500px;
@@ -236,6 +246,109 @@ body,
         .inform {
           font-size: 12px;
           margin: 10px auto;
+        }
+      }
+    }
+
+    .footer {
+      height: 10%;
+
+      button {
+        width: 80%;
+      }
+    }
+  }
+
+  #first-register {
+    .header {
+      height: 10%;
+      font-size: 25px;
+    }
+
+    .body {
+      height: 80%;
+
+      span,
+      b {
+        font-size: 15px;
+      }
+
+      #preview {
+        width: 50%;
+        height: 40%;
+        margin: 0 auto;
+
+        .big-font {
+          font-size: 30px;
+        }
+      }
+
+      #register-form {
+        height: 50%;
+        column-gap: 5%;
+
+        #new-nickname {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 100%;
+
+          .title {
+            display: flex;
+            align-items: center;
+            width: 20%;
+          }
+
+          .input {
+            width: 90%;
+            margin: 0 auto;
+          }
+
+          .inform {
+            font-size: 15px;
+            margin: 10px auto;
+          }
+
+          .success {
+            color: blue;
+          }
+
+          .fail {
+            color: red;
+          }
+
+          button {
+            width: 50%;
+            margin: 0 auto;
+          }
+        }
+
+        #new-image {
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+          height: 100%;
+
+          .title {
+            display: flex;
+            align-items: center;
+            width: 30%;
+          }
+
+          .input {
+            width: 100%;
+            margin: 0 auto;
+          }
+
+          button {
+            width: 50%;
+            margin: 0 auto;
+          }
+
+          .inform {
+            font-size: 15px;
+            margin: 10px auto;
+          }
         }
       }
     }
