@@ -158,8 +158,9 @@ export class ChatsService {
 			1. 해당 uuid를 가진 채팅방을 찾음
 			2. 채팅방이 protected일 경우에 비밀번호 검증을 함
 			3. DM방일 경우에 유저가 해당 방의 user list에 속해있는지 검증을 함
-			4. 채팅방 인원이 꽉 찼는지 확인함
-			5. user가 ban(, kick) 등의 제약이 걸려있는지 확인한다.
+			4. user가 ban(, kick) 등의 제약이 걸려있는지 확인한다.
+      5. 기존에 참여중인지 확인함
+        5-1. 참여중이지 않을 경우에 채팅방 인원이 꽉 찼는지 확인함
 			6. 유저의 입장 정보를 저장하고 유저의 nickname을 반환한다.
 		*/
     // 1
@@ -189,14 +190,6 @@ export class ChatsService {
       }
     }
     // 4
-    const liveUserListAndCount: [TbCh02LEntity[], number] =
-      await this.dbChatsManagerService.getLiveUserListAndCountInARoom(
-        targetRoom,
-      );
-    if (liveUserListAndCount[1] >= targetRoom.maxUserCnt) {
-      throw new ForbiddenException('chatroom user count is full!');
-    }
-    // 5
     if (
       (await this.dbChatsManagerService.isUserBannedInARoom(
         user,
@@ -204,6 +197,22 @@ export class ChatsService {
       )) === true
     ) {
       throw new ForbiddenException("You're banned in the chatroom!");
+    }
+    // 5
+    let isAlreadyIn: boolean = false;
+    const liveUserListAndCount: [TbCh02LEntity[], number] =
+      await this.dbChatsManagerService.getLiveUserListAndCountInARoom(
+        targetRoom,
+      );
+    for (const eachAttnd of liveUserListAndCount[0]) {
+      if (eachAttnd.ua01mEntity.userId === user.userId) {
+        isAlreadyIn = true;
+        break ;
+      }
+    }
+      // 5-1
+    if (isAlreadyIn === false && liveUserListAndCount[1] >= targetRoom.maxUserCnt) {
+      throw new ForbiddenException('chatroom user count is full!');
     }
     // 6
     const userInTarget: TbCh02LEntity =

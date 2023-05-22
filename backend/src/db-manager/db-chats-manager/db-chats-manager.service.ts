@@ -165,6 +165,8 @@ export class DbChatsManagerService {
   }
 
   async setUserToEnterRoom(user: TbUa01MEntity, room: TbCh01LEntity) {
+    if (!user || !room)
+      throw new ForbiddenException(`In DbChatsManagerService.setUserToEnterRoom, user or room is none`);
     let userInChtrm = await this.ch02lRp.findOne({
       where: {
         ch01lEntity: {
@@ -192,9 +194,11 @@ export class DbChatsManagerService {
       },
     });
     if (currCount === 0) userInChtrm.chtRmAuth = '01';
-    userInChtrm.chtRmJoinTf = true;
-    userInChtrm.entryDttm = new Date();
-    userInChtrm.authChgDttm = new Date();
+    if (userInChtrm.chtRmJoinTf === false) {
+      userInChtrm.chtRmJoinTf = true;
+      userInChtrm.entryDttm = new Date();
+      userInChtrm.authChgDttm = new Date();
+    }
     return await this.ch02lRp.save(userInChtrm);
   }
 
