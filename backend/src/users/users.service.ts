@@ -199,6 +199,7 @@ export class UsersService {
       2. 각 친구별로 현재 로그인 상태 가져오기
     */
     const results: {
+      userId: string;
       nickname: string;
       imageUrl: string;
       currStat: string;
@@ -224,6 +225,7 @@ export class UsersService {
       }
       console.log('Status Code', statusCode);
       const eachToPush = {
+        userId: eachFriendData.ua01mEntityAsFr.userId,
         nickname: eachFriendData.ua01mEntityAsFr.nickname,
         imageUrl: eachFriendData.ua01mEntityAsFr.imgPath,
         currStat: statusCode,

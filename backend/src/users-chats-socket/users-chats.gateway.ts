@@ -193,6 +193,14 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     } else this.logger.error('Game Socket Server already removed');
   }
 
+  isSocketOfUserConnected(userId: string) {
+    const socketId: string = this.userIdToSocketIdMap.get(userId);
+    if (socketId)
+      return true;
+    else
+      return false;
+  }
+
   // TODO: to combine with front-end
   @SubscribeMessage('getFriendList')
   async getFriendList(@ConnectedSocket() socket: Socket) {
@@ -200,8 +208,21 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     if (!userId) return;
     this.logger.log(`[getFriendList] userId: [${userId}]`);
     try {
-      const result = await this.usersService.getFriendList(userId);
+      const result: {
+        userId: string;
+        nickname: string;
+        imageUrl: string;
+        currStat: string;
+      }[] = await this.usersService.getFriendList(userId);
       this.logger.log(`[getFriendList] result: ${result.length} Friends`);
+      for (const each of result) {
+        if (each.currStat !== '02') {
+          if (this.isSocketOfUserConnected(each.userId) === true)
+            each.currStat = '01';
+          else
+            each.currStat = '03';
+        }
+      }
       return result;
     } catch (err) {
       this.logger.error(`[getFriendList] excpt: ${err}`);
