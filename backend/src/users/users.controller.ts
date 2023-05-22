@@ -151,6 +151,18 @@ export class UsersController {
 
   @ApiResponse({
     status: 201,
+    description: '2차인증 해제 완료',
+  })
+  @ApiOperation({ summary: '2차인증 해제' })
+  @UseGuards(JwtAccessTokenGuard)
+  @Post('/disable2fa')
+  async disable2FA(@CurrentUser() user: string, @Body() body: any) {
+    this.logger.log(`[disable2FA] user: ${user}`);
+    return await this.UsersService.disable2FA(user);
+  }
+
+  @ApiResponse({
+    status: 201,
     description: '친구 목록 성공!',
   })
   @ApiOperation({ summary: '친구목록 가져오기' })
