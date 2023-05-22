@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Achievement } from "types/Profile";
-import EmptyListMessage from "components/utils/EmptyListMessage";
 import UserService from "API/UserService";
 import LoadingCircle from "components/utils/LoadingCircle";
 import "styles/global.scss";
@@ -25,108 +24,108 @@ const Achievements = (props: AchievementsProps) => {
       [
         "WIN1",
         {
-          achvTitle: "1승 업적",
-          achvContent: "1승 업적에 관한 내용입니다.",
-          achvImg: "../image.png",
+          achvTitle: "퍼스트 블러드!",
+          achvContent: "일반 / 래더 게임 1승 달성",
+          achvImg: "../award.png",
           isAchvd: false,
         },
       ],
       [
         "WIN10",
         {
-          achvTitle: "10승 업적",
-          achvContent: "10승 업적에 관한 내용입니다.",
-          achvImg: "../image.png",
+          achvTitle: "게임에 소질이 있으시군요?",
+          achvContent: "일반 / 래더 게임 10승 달성",
+          achvImg: "../award.png",
           isAchvd: false,
         },
       ],
       [
         "WIN100",
         {
-          achvTitle: "100승 업적",
-          achvContent: "100승 업적에 관한 내용입니다.",
-          achvImg: "../image.png",
+          achvTitle: "백전백승",
+          achvContent: "일반 / 래더 게임 100승 달성",
+          achvImg: "../award.png",
           isAchvd: false,
         },
       ],
       [
         "WIN1000",
         {
-          achvTitle: "1000승 업적",
-          achvContent: "1000승 업적에 관한 내용입니다.",
-          achvImg: "../image.png",
+          achvTitle: "역사상 최고, GOAT",
+          achvContent: "일반 / 래더 게임 1000승 달성",
+          achvImg: "../award.png",
           isAchvd: false,
         },
       ],
       [
         "LOSS1",
         {
-          achvTitle: "1패 업적",
-          achvContent: "1패 업적에 관한 내용입니다.",
-          achvImg: "../image.png",
+          achvTitle: "설마 두번 지나요?",
+          achvContent: "일반 / 래더 게임 1패",
+          achvImg: "../game-over.png",
           isAchvd: false,
         },
       ],
       [
         "LOSS10",
         {
-          achvTitle: "10패 업적",
-          achvContent: "10패 업적에 관한 내용입니다.",
-          achvImg: "../favicon.ico",
+          achvTitle: "와 10패 쉽지않은데..",
+          achvContent: "일반 / 래더 게임 10패",
+          achvImg: "../game-over.png",
           isAchvd: false,
         },
       ],
       [
         "LOSS100",
         {
-          achvTitle: "100패 업적",
-          achvContent: "100패 업적에 관한 내용입니다.",
-          achvImg: "../favicon.ico",
+          achvTitle: "이게 가능한거였나요?",
+          achvContent: "일반 / 래더 게임 100패",
+          achvImg: "../game-over.png",
           isAchvd: false,
         },
       ],
       [
         "LOSS1000",
         {
-          achvTitle: "1000패 업적",
-          achvContent: "1000패 업적에 관한 내용입니다.",
-          achvImg: "../favicon.ico",
+          achvTitle: "롤하면 아이언일듯;",
+          achvContent: "일반 / 래더 게임 1000패",
+          achvImg: "../game-over.png",
           isAchvd: false,
         },
       ],
       [
         "FRIEND1",
         {
-          achvTitle: "친구 1명 업적",
-          achvContent: "친구 1명 업적에 관한 내용입니다.",
-          achvImg: "../swords.png",
+          achvTitle: "친구가 있다니 대단해요",
+          achvContent: "친구 목록 1명 달성",
+          achvImg: "../friendship.png",
           isAchvd: false,
         },
       ],
       [
         "FRIEND10",
         {
-          achvTitle: "친구 10명 업적",
-          achvContent: "친구 10명 업적에 관한 내용입니다.",
-          achvImg: "../swords.png",
+          achvTitle: "인싸 기만자 OUT!",
+          achvContent: "친구 목록 10명 달성",
+          achvImg: "../friendship.png",
           isAchvd: false,
         },
       ],
       [
         "FRIEND100",
         {
-          achvTitle: "친구 100명 업적",
-          achvContent: "친구 100명 업적에 관한 내용입니다.",
-          achvImg: "../swords.png",
+          achvTitle: "그대는 코알리숑 마스터?",
+          achvContent: "친구 목록 100명 달성",
+          achvImg: "../friendship.png",
           isAchvd: false,
         },
       ],
       [
         "FRIEND1000",
         {
-          achvTitle: "친구 1000명 업적",
-          achvContent: "친구 1000명 업적에 관한 내용입니다.",
-          achvImg: "../swords.png",
+          achvTitle: "친구 이름 기억 가능?",
+          achvContent: "친구 목록 1000명 달성",
+          achvImg: "../friendship.png",
           isAchvd: false,
         },
       ],
@@ -156,13 +155,13 @@ const Achievements = (props: AchievementsProps) => {
                 variant="outlined"
                 key={value.achvTitle + index}
               >
-                <Box className="flex-container">
+                <Box className="achievement-container">
                   <img
                     className={value.isAchvd ? "" : "not-achieved"}
                     src={value.achvImg}
                     alt="achievement_img"
                   />
-                  <Box>
+                  <Box className="flex-container direction-column">
                     <Typography
                       className={`title ${value.isAchvd ? "" : "not-achieved"}`}
                     >
