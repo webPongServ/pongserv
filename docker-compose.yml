@@ -3,23 +3,24 @@ services:
   backend:
     container_name: backend
     build: ./backend
-    restart: always
     ports:
       - "3000:3000"
     depends_on:
       - pong_db
     networks:
       - total_network
+    env_file:
+      - ./backend/.env
   frontend:
     container_name: frontend
     build: ./frontend
-    restart: always
     ports:
       - "3001:3001"
+    env_file:
+      - ./frontend/.env
   pong_db:
     container_name: pong_db
     image: postgres
-    restart: always
     environment:
       POSTGRE_USER : postgres
       POSTGRES_PASSWORD: postgres
@@ -27,7 +28,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - total_network 
+      - total_network
     volumes:
       - postgres:/var/lib/postgresql/data
 
