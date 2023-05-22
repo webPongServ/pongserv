@@ -11,6 +11,7 @@ export interface ChattingRoomDetail {
   type: string;
   currentCount: number;
   maxCount: number;
+  isAlrdyAttnd: boolean;
 }
 
 export interface ChattingUserDetail {

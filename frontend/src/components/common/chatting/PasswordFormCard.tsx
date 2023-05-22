@@ -51,6 +51,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
             type: props.room.type,
             currentCount: props.room.currentCount,
             maxCount: props.room.maxCount,
+            isAlrdyAttnd: props.room.isAlrdyAttnd,
           },
         });
         dispatch({
@@ -73,7 +74,6 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
       "chatroomEntrance",
       { id: props.room.id, pwd: password },
       (response: any) => {
-        // response === failed ? alert : dispatch
         dispatch({
           type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
           payload: {
@@ -83,6 +83,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
             type: props.room.type,
             currentCount: props.room.currentCount,
             maxCount: props.room.maxCount,
+            isAlrdyAttnd: props.room.isAlrdyAttnd,
           },
         });
         dispatch({
