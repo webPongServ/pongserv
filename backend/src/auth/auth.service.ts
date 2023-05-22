@@ -160,7 +160,7 @@ export class AuthService {
       user.twofactor = false;
       await this.dbmanagerUsersService.saveUser(user);
       this.logger.log(`2FA 비활성화: ${intraId}`);
-      return { is2FA: false };
+      return { twofactor: false };
     } else {
       this.logger.error(`사용자 정보를 찾을 수 없음: ${intraId}`);
       // throw new BadRequestException('사용자의 정보를 확인할 수 없습니다.');
