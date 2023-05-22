@@ -416,6 +416,7 @@ body,
   transform: translateX(-50%);
   animation-duration: 0.5s;
   animation-iteration-count: 1;
+  animation-name: slidedown;
   animation-direction: alternate;
   animation-fill-mode: forwards;
   z-index: 5;
@@ -447,6 +448,51 @@ body,
     margin: 0 auto;
 
     .check {
+      margin: 0 1%;
+    }
+  }
+}
+
+#result {
+  position: fixed;
+  width: 800px;
+  left: 50%;
+  top: -10%;
+  transform: translateX(-50%);
+  animation-duration: 0.5s;
+  animation-name: slidedown;
+  animation-iteration-count: 1;
+  animation-direction: alternate;
+  animation-fill-mode: forwards;
+  z-index: 5;
+
+  @keyframes slidedown {
+    from {
+      top: -10%;
+    }
+
+    to {
+      top: 1%;
+    }
+  }
+
+  @keyframes slideup {
+    from {
+      top: 1%;
+    }
+
+    to {
+      top: -10%;
+    }
+  }
+
+  .container {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    margin: 0 auto;
+
+    .result {
       margin: 0 1%;
     }
   }

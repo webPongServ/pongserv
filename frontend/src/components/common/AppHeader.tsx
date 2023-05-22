@@ -7,6 +7,7 @@ import AppBar from "components/common/AppBar";
 import FriendDrawer from "components/common/FriendDrawer";
 import ChattingDrawer from "components/common/ChattingDrawer";
 import ErrorNotification from "components/utils/ErrorNotification";
+import ResultNotification from "components/utils/ResultNotification";
 import { ChattingDrawerWidth, FriendStatusType } from "constant";
 import { useDispatch, useSelector } from "react-redux";
 import { apiURL } from "API/api";
@@ -62,12 +63,26 @@ export const errorMessageCreator = (errorCode: string): string => {
   }
 };
 
+export const resultMessageCreator = (resultCode: string): string => {
+  switch (resultCode) {
+    case "win":
+      return "게임에서 승리하셨습니다! 🏆";
+    case "loss":
+      return "게임에서 패배하셨습니다! 😭";
+    default:
+      return "에러가 발생하였습니다.";
+  }
+};
+
 export default function AppHeader() {
   const [open, setOpen] = useState<boolean>(false);
   const [openModal, setOpenModal] = useState<boolean>(false);
-  const paramsCode: string | undefined = qs.parse(window.location.search)
+  const paramsCodeError: string | undefined = qs.parse(window.location.search)
     .error as string;
-  const notiRef = useRef<HTMLDivElement>(null);
+  const paramsCodeResult: string | undefined = qs.parse(window.location.search)
+    .result as string;
+  const errorRef = useRef<HTMLDivElement>(null);
+  const resultRef = useRef<HTMLDivElement>(null);
   const loginStatus = useSelector((state: IRootState) => state.loginStatus);
   const [requester, setRequester] = useState<RequesterDetail>({
     nickname: "",
@@ -94,7 +109,8 @@ export default function AppHeader() {
   };
 
   setTimeout(() => {
-    if (notiRef.current) notiRef.current.style.animationName = "slideup";
+    if (errorRef.current) errorRef.current.style.animationName = "slideup";
+    if (resultRef.current) resultRef.current.style.animationName = "slideup";
   }, 5000);
 
   useLayoutEffect(() => {
@@ -175,10 +191,16 @@ export default function AppHeader() {
 
   return (
     <>
-      {paramsCode === undefined ? null : (
+      {paramsCodeError !== undefined && paramsCodeResult === undefined && (
         <ErrorNotification
-          errorMessage={errorMessageCreator(paramsCode)}
-          ref={notiRef}
+          errorMessage={errorMessageCreator(paramsCodeError)}
+          ref={errorRef}
+        />
+      )}
+      {paramsCodeError === undefined && paramsCodeResult !== undefined && (
+        <ResultNotification
+          resultMessage={resultMessageCreator(paramsCodeResult)}
+          ref={resultRef}
         />
       )}
       <Box id="AppHeader-container" className="flex-container">

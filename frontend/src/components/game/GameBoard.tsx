@@ -175,8 +175,10 @@ const GameBoard = (props: GameBoardProps) => {
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
                 });
-                // window.location.href = "/game";
-                navigate("/game");
+                role === "owner"
+                  ? (window.location.href = "/game?result=loss")
+                  : (window.location.href = "/game?result=win");
+                // navigate("/game");
               }
             );
             return;
@@ -231,8 +233,10 @@ const GameBoard = (props: GameBoardProps) => {
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
                 });
-                // window.location.href = "/game";
-                navigate("/game");
+                role === "owner"
+                  ? (window.location.href = "/game?result=win")
+                  : (window.location.href = "/game?result=loss");
+                // navigate("/game");
               }
             );
             return;
@@ -264,7 +268,6 @@ const GameBoard = (props: GameBoardProps) => {
           random = 2;
         } else {
           console.log(ball_rel.left, ball_rel.right);
-          console.log("left case 1");
           score1++;
           dispatch({
             type: CurrentGameActionTypes.INCREMENT_SCORE,
@@ -297,8 +300,16 @@ const GameBoard = (props: GameBoardProps) => {
                 type: CurrentGameActionTypes.DELETE_GAMEROOM,
                 payload: "",
               });
-              // window.location.href = "/game";
-              navigate("/game");
+              if (score1 === currentGame.currentGame!.maxScore) {
+                role === "owner"
+                  ? (window.location.href = "/game?result=win")
+                  : (window.location.href = "/game?result=loss");
+              } else {
+                role === "owner"
+                  ? (window.location.href = "/game?result=loss")
+                  : (window.location.href = "/game?result=win");
+              }
+              // navigate("/game");
             }
           );
           return;
@@ -390,6 +401,9 @@ const GameBoard = (props: GameBoardProps) => {
     role: string;
     type: string;
   }) => {
+    const role: string =
+      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
+
     if (data.type === "paddle") {
       if (data.role === "owner") {
         paddleRef.current!.style.top = data.data.top + "px";
@@ -437,14 +451,8 @@ const GameBoard = (props: GameBoardProps) => {
                 "finishGame",
                 {
                   roomId: currentGame.currentGame!.id,
-                  myScore:
-                    currentGame.currentGame!.owner === myInfo.nickname
-                      ? score1
-                      : score2,
-                  opScore:
-                    currentGame.currentGame!.owner === myInfo.nickname
-                      ? score2
-                      : score1,
+                  myScore: role === "owner" ? score1 : score2,
+                  opScore: role === "owner" ? score2 : score1,
                 },
                 () => {
                   random = 2;
@@ -452,8 +460,10 @@ const GameBoard = (props: GameBoardProps) => {
                     type: CurrentGameActionTypes.DELETE_GAMEROOM,
                     payload: "",
                   });
-                  // window.location.href = "/game";
-                  navigate("/game");
+                  role === "owner"
+                    ? (window.location.href = "/game?result=loss")
+                    : (window.location.href = "/game?result=win");
+                  // navigate("/game");
                 }
               );
             }
@@ -484,14 +494,8 @@ const GameBoard = (props: GameBoardProps) => {
                 "finishGame",
                 {
                   roomId: currentGame.currentGame!.id,
-                  myScore:
-                    currentGame.currentGame!.owner === myInfo.nickname
-                      ? score1
-                      : score2,
-                  opScore:
-                    currentGame.currentGame!.owner === myInfo.nickname
-                      ? score2
-                      : score1,
+                  myScore: role === "owner" ? score1 : score2,
+                  opScore: role === "owner" ? score2 : score1,
                 },
                 () => {
                   random = 2;
@@ -499,8 +503,10 @@ const GameBoard = (props: GameBoardProps) => {
                     type: CurrentGameActionTypes.DELETE_GAMEROOM,
                     payload: "",
                   });
-                  // window.location.href = "/game";
-                  navigate("/game");
+                  role === "owner"
+                    ? (window.location.href = "/game?result=win")
+                    : (window.location.href = "/game?result=loss");
+                  // navigate("/game");
                 }
               );
             }
@@ -539,14 +545,8 @@ const GameBoard = (props: GameBoardProps) => {
               "finishGame",
               {
                 roomId: currentGame.currentGame!.id,
-                myScore:
-                  currentGame.currentGame!.owner === myInfo.nickname
-                    ? score1
-                    : score2,
-                opScore:
-                  currentGame.currentGame!.owner === myInfo.nickname
-                    ? score2
-                    : score1,
+                myScore: role === "owner" ? score1 : score2,
+                opScore: role === "owner" ? score2 : score1,
               },
               () => {
                 random = 2;
@@ -554,8 +554,16 @@ const GameBoard = (props: GameBoardProps) => {
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
                 });
-                // window.location.href = "/game";
-                navigate("/game");
+                if (score1 === currentGame.currentGame!.maxScore) {
+                  role === "owner"
+                    ? (window.location.href = "/game?result=win")
+                    : (window.location.href = "/game?result=loss");
+                } else {
+                  role === "owner"
+                    ? (window.location.href = "/game?result=loss")
+                    : (window.location.href = "/game?result=win");
+                }
+                // navigate("/game");
               }
             );
           }
@@ -584,8 +592,8 @@ const GameBoard = (props: GameBoardProps) => {
             type: CurrentGameActionTypes.DELETE_GAMEROOM,
             payload: "",
           });
-          // window.location.href = "/game";
-          navigate("/game");
+          window.location.href = "/game";
+          // navigate("/game");
         }
       );
     };
@@ -642,13 +650,16 @@ const GameBoard = (props: GameBoardProps) => {
           />
         </>
       ) : (
-        <Box className="board" ref={boardRef}>
-          <Box className="ball" ref={ballRef}></Box>
-          <Box className="paddle_1 paddle" ref={paddleRef}></Box>
-          <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
-          <h1 className="player_1_score">{currentGame!.score1}</h1>
-          <h1 className="player_2_score">{currentGame!.score2}</h1>
-        </Box>
+        <>
+          <Box>방향키 ↑ ↓를 이용하여 자신의 막대를 움직이세요.</Box>
+          <Box className="board" ref={boardRef}>
+            <Box className="ball" ref={ballRef}></Box>
+            <Box className="paddle_1 paddle" ref={paddleRef}></Box>
+            <Box className="paddle_2 paddle" ref={paddle2Ref}></Box>
+            <h1 className="player_1_score">{currentGame!.score1}</h1>
+            <h1 className="player_2_score">{currentGame!.score2}</h1>
+          </Box>
+        </>
       )}
     </Box>
   );
