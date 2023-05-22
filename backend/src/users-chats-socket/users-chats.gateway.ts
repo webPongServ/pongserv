@@ -306,10 +306,11 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     // this.logger.log(`ChatroomEntranceDto: `);
     // this.logger.log(infoEntr);
     try {
-      const nickname = await this.chatsService.setUserToEnter(userId, infoEntr);
+      const { userNick, isAlreadyIn } = await this.chatsService.setUserToEnter(userId, infoEntr);
       const nameOfChtrmSocketRoom = `chatroom_${infoEntr.id}`;
       socket.join(nameOfChtrmSocketRoom);
-      socket.to(nameOfChtrmSocketRoom).emit('chatroomWelcome', nickname);
+      if (isAlreadyIn == false)
+        socket.to(nameOfChtrmSocketRoom).emit('chatroomWelcome', userNick);
       return true;
     } catch (err) {
       this.logger.error(err);

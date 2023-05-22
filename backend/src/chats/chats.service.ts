@@ -223,7 +223,7 @@ export class ChatsService {
       await this.dbChatsManagerService.setUserToEnterRoom(user, targetRoom);
     if (userInTarget === null)
       throw new InternalServerErrorException('typeorm save error');
-    return user.nickname;
+    return { userNick: user.nickname, isAlreadyIn: isAlreadyIn };
   }
 
   async editChatroomInfo(userId: string, infoEdit: ChatroomEditingDto) {
