@@ -39,6 +39,7 @@ export interface ProfileDetail {
   winRate: number;
   status: string;
   isBlocked: boolean;
+  isTwofactor: boolean;
 }
 
 export interface RequesterDetail {

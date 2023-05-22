@@ -3,6 +3,7 @@ import CustomIconButton from "components/utils/CustomIconButton";
 import AuthService from "API/AuthService";
 import { useSelector } from "react-redux";
 import { IRootState } from "components/common/store";
+import { ProfileDetail } from "types/Detail";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -13,6 +14,8 @@ import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 interface SetTwoFactorModalProps {
+  profileDetail: ProfileDetail;
+  setProfileDetail: Function;
   modalStatus: string;
   setModalStatus: Function;
 }
@@ -30,6 +33,7 @@ const SetTwoFactorModal = (props: SetTwoFactorModalProps) => {
         sixDigit: value,
       });
       setIsDone(true);
+      props.setProfileDetail({ ...props.profileDetail, isTwofactor: true });
     } catch {
       alert("코드가 유효하지 않습니다. 다시 시도해 주세요.");
     }
