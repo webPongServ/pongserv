@@ -46,10 +46,6 @@ const Game = () => {
   const dispatch = useDispatch();
   const notiRef = useRef<HTMLDivElement>(null);
 
-  dispatch({
-    type: LoginStatusActionTypes.STATUS_MAIN,
-  });
-
   const getGameRooms = async () => {
     setGameRooms(null);
     const response = await GameService.getGameRooms();
@@ -90,6 +86,9 @@ const Game = () => {
   }, [gameSocket]);
 
   useEffect(() => {
+    dispatch({
+      type: LoginStatusActionTypes.STATUS_MAIN,
+    });
     getGameRooms();
     dispatch({ type: CurrentGameActionTypes.DELETE_GAMEROOM, payload: "" });
   }, []);

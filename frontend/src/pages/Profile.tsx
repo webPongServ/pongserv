@@ -33,10 +33,6 @@ const Profile = () => {
   const dispatch = useDispatch();
   const { nickname } = useParams();
 
-  dispatch({
-    type: LoginStatusActionTypes.STATUS_MAIN,
-  });
-
   const getProfile = async () => {
     try {
       const response = await UserService.getUserProfile(nickname!);
@@ -64,6 +60,10 @@ const Profile = () => {
   };
 
   useEffect(() => {
+    dispatch({
+      type: LoginStatusActionTypes.STATUS_MAIN,
+    });
+
     getProfile();
   }, [nickname]);
 
