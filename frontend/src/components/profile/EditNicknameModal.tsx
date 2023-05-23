@@ -23,6 +23,12 @@ interface EditNicknameModalProps {
   setIsNew: Function;
 }
 
+const checkNickname = (nickname: string): boolean => {
+  const regex = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]+$/;
+
+  return regex.test(nickname);
+};
+
 const EditNicknameModal = (props: EditNicknameModalProps) => {
   const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
   const [newNickname, setNewNickname] = useState<string>("");
@@ -42,9 +48,11 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
 
   const handlePostNewNickname = async () => {
     if (!newNickname) {
-      return alert("바꿀 닉네임을 입력해주세요!");
+      return alert("바꿀 닉네임을 입력해주세요.");
+    } else if (!checkNickname(newNickname)) {
+      return alert("사용할 수 없는 문자가 포함되어 있습니다.");
     } else if (isError) {
-      return alert("중복된 닉네임입니다!");
+      return alert("중복된 닉네임입니다.");
     }
     const response = await UserService.postNewNickname({
       nickname: newNickname,
