@@ -1,13 +1,13 @@
 import { GameRoomDetail } from "types/Detail";
 
 export interface CurrentGame {
-  currentGame: GameRoomDetail | null;
+  currentGameDetail: GameRoomDetail | null;
   score1: number;
   score2: number;
 }
 
 const INITIAL_CURRENTGAME: CurrentGame = {
-  currentGame: null,
+  currentGameDetail: null,
   score1: 0,
   score2: 0,
 };
@@ -43,9 +43,9 @@ export const CurrentGameReducer = (
 ): CurrentGame => {
   switch (action.type) {
     case CurrentGameActionTypes.UPDATE_GAMEROOM:
-      return { ...state, currentGame: action.payload };
+      return { ...state, currentGameDetail: action.payload };
     case CurrentGameActionTypes.DELETE_GAMEROOM:
-      return { currentGame: null, score1: 0, score2: 0 };
+      return { currentGameDetail: null, score1: 0, score2: 0 };
     case CurrentGameActionTypes.INCREMENT_SCORE:
       return action.payload === "score1"
         ? { ...state, score1: state.score1 + 1 }
