@@ -26,6 +26,7 @@ interface serverChattingUserDetail {
 }
 
 const BanList = (props: BanListProps) => {
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const currentChatting: CurrentChatting = useSelector(
     (state: IRootState) => state.currentChatting
   );
@@ -76,7 +77,7 @@ const BanList = (props: BanListProps) => {
 
   useEffect(() => {
     getBansList();
-  }, []);
+  }, [myInfo]);
 
   return currentChatting.banList.length === 0 ? (
     <EmptyListMessage message="차단한 사용자가 없습니다!" />

@@ -191,7 +191,7 @@ const UserList = (props: UserListProps) => {
 
   useEffect(() => {
     getUserList();
-  }, []);
+  }, [myInfo]);
 
   return currentChatting.userList.length === 0 ? (
     <EmptyListMessage message="채팅 중인 사용자가 없습니다!" />
