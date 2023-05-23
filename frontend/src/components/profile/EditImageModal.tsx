@@ -1,9 +1,12 @@
-import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { AxiosResponse } from "axios";
 import CustomIconButton from "components/utils/CustomIconButton";
 import { MyInfoActionTypes } from "types/redux/MyInfo";
+import CustomProfileButton from "components/utils/CustomProfileButton";
 import { ProfileDetail } from "types/Detail";
+import { IRootState } from "components/common/store";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -13,6 +16,7 @@ import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import UserService from "API/UserService";
+import { stat } from "fs";
 
 interface EditImageModalProps {
   modalStatus: string;
@@ -22,8 +26,9 @@ interface EditImageModalProps {
 }
 
 const EditImageModal = (props: EditImageModalProps) => {
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string | null>("");
   const dispatch = useDispatch();
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,6 +41,8 @@ const EditImageModal = (props: EditImageModalProps) => {
       setPreview(null);
     }
   };
+
+  console.log(props.profileDetail);
 
   const handlePostNewImage = async () => {
     if (!file) {
@@ -55,6 +62,10 @@ const EditImageModal = (props: EditImageModalProps) => {
           type: MyInfoActionTypes.MYINFO_UPDATE_IMAGE,
           payload: response.data,
         });
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_MYDETAIL_IMGURL,
+          payload: response.data,
+        });
         props.setProfileDetail({
           ...props.profileDetail,
           imgURL: response.data,
@@ -63,19 +74,27 @@ const EditImageModal = (props: EditImageModalProps) => {
         setFile(null);
         setPreview(null);
       } catch (e: any) {
-        if (e.response.data.message === "Invalid file type")
+        if (
+          e.response.data.message === "Invalid file type" ||
+          e.response.data.message === "Invalid base64 data"
+        )
           alert("png, jpg, jpeg, gif 파일만 가능합니다!");
-        // else
-        // alert(response)
       }
     };
     reader.readAsDataURL(file);
   };
 
+  useEffect(() => {
+    setPreview(myInfo.imgURL);
+  }, [myInfo]);
+
   return (
     <Modal
       open={props.modalStatus === "edit-image"}
-      onClose={() => props.setModalStatus("closed")}
+      onClose={() => {
+        setPreview(myInfo.imgURL);
+        props.setModalStatus("closed");
+      }}
     >
       <ModalDialog className="modal" variant="outlined">
         <Box id="edit" className="outframe">
@@ -84,20 +103,32 @@ const EditImageModal = (props: EditImageModalProps) => {
             <CustomIconButton
               class="red right"
               icon={<CloseIcon />}
-              handleFunction={() => props.setModalStatus("closed")}
+              handleFunction={() => {
+                setPreview(myInfo.imgURL);
+                props.setModalStatus("closed");
+              }}
             />
           </Box>
           <Box className="body flex-container">
             <Box id="new-image">
+              <Box className="preview">
+                <CustomProfileButton
+                  class="login"
+                  nickname={myInfo.nickname}
+                  imgURL={preview!}
+                  position="first-register"
+                  handleFunction={() => {}}
+                />
+              </Box>
               <Box className="inform">
                 프로필 사진은 10MB 이내의 png, jpg, jpeg, gif 파일만 가능합니다.
               </Box>
               <Box className="input">
                 <input type="file" onChange={handleFileInputChange} />
               </Box>
-              <Box className="preview flex-container">
+              {/* <Box className="preview flex-container">
                 <Box>{preview && <img src={preview} alt="Preview" />}</Box>
-              </Box>
+              </Box> */}
             </Box>
           </Box>
           <Box className="footer flex-container">

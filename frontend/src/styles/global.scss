@@ -204,6 +204,11 @@ body,
           color: red;
         }
 
+        .preview {
+          width: 50%;
+          margin: 5% auto;
+        }
+
         button {
           width: 50%;
           margin: 0 auto;
@@ -228,14 +233,8 @@ body,
         }
 
         .preview {
-          flex-direction: column;
-          width: 80%;
-          margin: 30px auto;
-
-          img {
-            width: 150px;
-            height: 150px;
-          }
+          width: 50%;
+          margin: 5% auto;
         }
 
         button {

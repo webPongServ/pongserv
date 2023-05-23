@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import CustomIconButton from "components/utils/CustomIconButton";
 import CustomOnKeyUpInput from "components/utils/CustomOnKeyUpInput";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { IRootState } from "components/common/store";
 import { UserDetail } from "types/Detail";
+import CustomProfileButton from "components/utils/CustomProfileButton";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -14,6 +15,7 @@ import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import UserService from "API/UserService";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 
 interface EditNicknameModalProps {
   modalStatus: string;
@@ -21,11 +23,18 @@ interface EditNicknameModalProps {
   setIsNew: Function;
 }
 
+const checkNickname = (nickname: string): boolean => {
+  const regex = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]+$/;
+
+  return regex.test(nickname);
+};
+
 const EditNicknameModal = (props: EditNicknameModalProps) => {
   const myInfo: UserDetail = useSelector((state: IRootState) => state.myInfo);
   const [newNickname, setNewNickname] = useState<string>("");
   const [isError, setIsError] = useState<boolean>(true);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const getNicknameDuplicate = async () => {
     const response = await UserService.getNicknameDup(newNickname);
@@ -39,9 +48,11 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
 
   const handlePostNewNickname = async () => {
     if (!newNickname) {
-      return alert("바꿀 닉네임을 입력해주세요!");
+      return alert("바꿀 닉네임을 입력해주세요.");
+    } else if (!checkNickname(newNickname)) {
+      return alert("사용할 수 없는 문자가 포함되어 있습니다.");
     } else if (isError) {
-      return alert("중복된 닉네임입니다!");
+      return alert("중복된 닉네임입니다.");
     }
     const response = await UserService.postNewNickname({
       nickname: newNickname,
@@ -50,18 +61,23 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
     props.setModalStatus("closed");
     props.setIsNew(true);
     setIsError(true);
+    // dispatch({
+    //   type: CurrentChattingActionTypes.UPDATE_MYDETAIL_NICKNAME,
+    //   payload: newNickname,
+    // });
     navigate(`/profile/${response.data.new}`);
   };
 
   useEffect(() => {
     setNewNickname(myInfo.nickname);
-  }, []);
+  }, [myInfo]);
 
   return (
     <Modal
       open={props.modalStatus === "edit-nickname"}
       onClose={() => {
         props.setModalStatus("closed");
+        setNewNickname(myInfo.nickname);
         setIsError(true);
       }}
     >
@@ -74,12 +90,22 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
               icon={<CloseIcon />}
               handleFunction={() => {
                 props.setModalStatus("closed");
+                setNewNickname(myInfo.nickname);
                 setIsError(true);
               }}
             />
           </Box>
           <Box className="body flex-container">
             <Box id="new-nickname">
+              <Box className="preview">
+                <CustomProfileButton
+                  class="login"
+                  nickname={newNickname}
+                  imgURL={myInfo.imgURL}
+                  position="first-register"
+                  handleFunction={() => {}}
+                />
+              </Box>
               <Box className="inform">
                 닉네임은 1 ~ 10자리 한글 / 영어(대, 소문자) / 숫자만 가능합니다.
               </Box>

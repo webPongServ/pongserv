@@ -3,7 +3,7 @@ import { Input } from "@mui/joy";
 
 const CustomOnKeyUpInput = (props: CustomOnKeyUpInputProps) => {
   let typingTimer: NodeJS.Timeout;
-  let doneTypingInterval: number = 300;
+  let doneTypingInterval: number = 100;
 
   const HandleKeyUP = () => {
     clearTimeout(typingTimer);
@@ -19,6 +19,7 @@ const CustomOnKeyUpInput = (props: CustomOnKeyUpInputProps) => {
       placeholder={props.placeholder}
       defaultValue={props.defaultValue}
       required
+      autoFocus
       slotProps={{ input: { maxLength: props.maxLength } }}
       onChange={props.handleFunction}
       onKeyUp={HandleKeyUP}

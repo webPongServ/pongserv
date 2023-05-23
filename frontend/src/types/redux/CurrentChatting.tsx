@@ -4,7 +4,7 @@ import { ChattingRoomEditForm } from "types/Form";
 export interface CurrentChatting {
   status: string;
   myDetail: ChattingUserDetail | null;
-  chattingRoom: ChattingRoomDetail | null;
+  chattingRoomDetail: ChattingRoomDetail | null;
   userList: ChattingUserDetail[];
   banList: ChattingUserDetail[];
 }
@@ -12,7 +12,7 @@ export interface CurrentChatting {
 const INITIAL_CURRENTCHATTING: CurrentChatting = {
   status: "waiting",
   myDetail: null,
-  chattingRoom: null,
+  chattingRoomDetail: null,
   userList: [],
   banList: [],
 };
@@ -30,7 +30,9 @@ export enum CurrentChattingActionTypes {
   ADD_BANLIST = "ADD_BANLIST",
   DELETE_BANLIST = "DELETE_BANLIST",
   ADD_MYDETAIL = "ADD_MYDETAIL",
-  UPDATE_MYDETAIL = "UPDATE_MYDETAIL",
+  UPDATE_MYDETAIL_NICKNAME = "UPDATE_MYDETAIL_NICKNAME",
+  UPDATE_MYDETAIL_IMGURL = "UPDATE_MYDETAIL_IMGURL",
+  UPDATE_MYDETAIL_ROLE = "UPDATE_MYDETAIL_ROLE",
   DELETE_MYDETAIL = "DELETE_MYDETAIL",
 }
 
@@ -91,8 +93,18 @@ export interface CurrentChatting_AddMyDetail {
   payload: ChattingUserDetail;
 }
 
-export interface CurrentChatting_UpdateMyDetail {
-  type: CurrentChattingActionTypes.UPDATE_MYDETAIL;
+export interface CurrentChatting_UpdateMyDetailNickname {
+  type: CurrentChattingActionTypes.UPDATE_MYDETAIL_NICKNAME;
+  payload: string;
+}
+
+export interface CurrentChatting_UpdateMyDetailImgURL {
+  type: CurrentChattingActionTypes.UPDATE_MYDETAIL_IMGURL;
+  payload: string;
+}
+
+export interface CurrentChatting_UpdateMyDetailRole {
+  type: CurrentChattingActionTypes.UPDATE_MYDETAIL_ROLE;
   payload: string;
 }
 
@@ -114,7 +126,9 @@ type CurrentChattingAction =
   | CurrentChatting_AddBanListAction
   | CurrentChatting_DeleteBanListAction
   | CurrentChatting_AddMyDetail
-  | CurrentChatting_UpdateMyDetail
+  | CurrentChatting_UpdateMyDetailNickname
+  | CurrentChatting_UpdateMyDetailImgURL
+  | CurrentChatting_UpdateMyDetailRole
   | CurrentChatting_DeleteMyDetail;
 
 export const CurrentChattingReducer = (
@@ -128,7 +142,7 @@ export const CurrentChattingReducer = (
       return {
         status: "creating",
         myDetail: null,
-        chattingRoom: null,
+        chattingRoomDetail: null,
         userList: [],
         banList: [],
       };
@@ -136,21 +150,21 @@ export const CurrentChattingReducer = (
       return {
         ...state,
         status: "chatting",
-        chattingRoom: action.payload,
+        chattingRoomDetail: action.payload,
       };
     case CurrentChattingActionTypes.UPDATE_STATUS_ERROR:
       return {
         status: action.payload,
         myDetail: null,
-        chattingRoom: null,
+        chattingRoomDetail: null,
         userList: [],
         banList: [],
       };
     case CurrentChattingActionTypes.EDIT_CHATTINGROOM:
       return {
         ...state,
-        chattingRoom: {
-          ...state.chattingRoom!,
+        chattingRoomDetail: {
+          ...state.chattingRoomDetail!,
           chatroomName: action.payload.chatroomName,
           type: action.payload.type,
           maxCount: action.payload.maxCount,
@@ -195,7 +209,17 @@ export const CurrentChattingReducer = (
         ...state,
         myDetail: action.payload,
       };
-    case CurrentChattingActionTypes.UPDATE_MYDETAIL:
+    case CurrentChattingActionTypes.UPDATE_MYDETAIL_NICKNAME:
+      return {
+        ...state,
+        myDetail: { ...state.myDetail!, nickname: action.payload },
+      };
+    case CurrentChattingActionTypes.UPDATE_MYDETAIL_IMGURL:
+      return {
+        ...state,
+        myDetail: { ...state.myDetail!, imgURL: action.payload },
+      };
+    case CurrentChattingActionTypes.UPDATE_MYDETAIL_ROLE:
       return {
         ...state,
         myDetail: { ...state.myDetail!, role: action.payload },

@@ -79,19 +79,26 @@ const GameBoard = (props: GameBoardProps) => {
       left: 500,
       right: 500 + GameBoardConst.BALL_DIAMETER,
     };
-  let dx: number = currentGame.currentGame
-    ? setDifficulty(currentGame.currentGame.difficulty)
+  let dx: number = currentGame.currentGameDetail
+    ? setDifficulty(currentGame.currentGameDetail.difficulty)
     : 5;
-  let dy: number = currentGame.currentGame
-    ? setDifficulty(currentGame.currentGame.difficulty)
+  let dy: number = currentGame.currentGameDetail
+    ? setDifficulty(currentGame.currentGameDetail.difficulty)
     : 5;
   let dxd: number = quadrant[random][0];
   let dyd: number = quadrant[random][1];
 
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (paddleRef.current || paddle2Ref.current || currentGame.currentGame) {
+    if (
+      paddleRef.current ||
+      paddle2Ref.current ||
+      currentGame.currentGameDetail ||
+      selectedPaddleRef
+    ) {
       const role: string =
-        currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
+        currentGame.currentGameDetail!.owner === myInfo.nickname
+          ? "owner"
+          : "guest";
 
       if (event.key === "ArrowUp") {
         selectedPaddleRef!.current!.style.top =
@@ -105,7 +112,7 @@ const GameBoard = (props: GameBoardProps) => {
         selectedPaddle!.bottom = selectedPaddle!.top + 150;
 
         gameSocket.emit("inGameReq", {
-          roomId: currentGame.currentGame!.id,
+          roomId: currentGame.currentGameDetail!.id,
           data: { top: selectedPaddle!.top, bottom: selectedPaddle!.bottom },
           role: role,
           type: "paddle",
@@ -125,7 +132,7 @@ const GameBoard = (props: GameBoardProps) => {
           selectedPaddle!.top + 150 + "px";
         selectedPaddle!.bottom = selectedPaddle!.top + 150;
         gameSocket.emit("inGameReq", {
-          roomId: currentGame.currentGame!.id,
+          roomId: currentGame.currentGameDetail!.id,
           data: { top: selectedPaddle!.top, bottom: selectedPaddle!.bottom },
           role: role,
           type: "paddle",
@@ -137,7 +144,9 @@ const GameBoard = (props: GameBoardProps) => {
   const moveBall = (dx: number, dy: number, dxd: number, dyd: number) => {
     if (ballRef.current) {
       const role: string =
-        currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
+        currentGame.currentGameDetail!.owner === myInfo.nickname
+          ? "owner"
+          : "guest";
 
       if (ball_rel.top <= 0) dyd = 1;
       if (ball_rel.bottom >= GameBoardConst.GAMEBOARD_HEIGHT) dyd = 0;
@@ -161,11 +170,11 @@ const GameBoard = (props: GameBoardProps) => {
             type: CurrentGameActionTypes.INCREMENT_SCORE,
             payload: "score2",
           });
-          if (score2 === currentGame.currentGame!.maxScore) {
+          if (score2 === currentGame.currentGameDetail!.maxScore) {
             gameSocket.emit(
               "finishGame",
               {
-                roomId: currentGame.currentGame!.id,
+                roomId: currentGame.currentGameDetail!.id,
                 myScore: role === "owner" ? score1 : score2,
                 opScore: role === "owner" ? score2 : score1,
               },
@@ -185,11 +194,11 @@ const GameBoard = (props: GameBoardProps) => {
           }
           setTimeout(() => {
             requestAnimationFrame(() => {
-              dx = currentGame.currentGame
-                ? setDifficulty(currentGame.currentGame.difficulty)
+              dx = currentGame.currentGameDetail
+                ? setDifficulty(currentGame.currentGameDetail.difficulty)
                 : 5;
-              dy = currentGame.currentGame
-                ? setDifficulty(currentGame.currentGame.difficulty)
+              dy = currentGame.currentGameDetail
+                ? setDifficulty(currentGame.currentGameDetail.difficulty)
                 : 5;
               random = 2;
               dxd = quadrant[random][0];
@@ -219,11 +228,11 @@ const GameBoard = (props: GameBoardProps) => {
             type: CurrentGameActionTypes.INCREMENT_SCORE,
             payload: "score1",
           });
-          if (score1 === currentGame.currentGame!.maxScore) {
+          if (score1 === currentGame.currentGameDetail!.maxScore) {
             gameSocket.emit(
               "finishGame",
               {
-                roomId: currentGame.currentGame!.id,
+                roomId: currentGame.currentGameDetail!.id,
                 myScore: role === "owner" ? score1 : score2,
                 opScore: role === "owner" ? score2 : score1,
               },
@@ -243,11 +252,11 @@ const GameBoard = (props: GameBoardProps) => {
           }
           setTimeout(() => {
             requestAnimationFrame(() => {
-              dx = currentGame.currentGame
-                ? setDifficulty(currentGame.currentGame.difficulty)
+              dx = currentGame.currentGameDetail
+                ? setDifficulty(currentGame.currentGameDetail.difficulty)
                 : 5;
-              dy = currentGame.currentGame
-                ? setDifficulty(currentGame.currentGame.difficulty)
+              dy = currentGame.currentGameDetail
+                ? setDifficulty(currentGame.currentGameDetail.difficulty)
                 : 5;
               random = 4;
               dxd = quadrant[random][0];
@@ -284,13 +293,13 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.left = 500;
         ball_rel.right = 515;
         if (
-          score1 === currentGame.currentGame!.maxScore ||
-          score2 === currentGame.currentGame!.maxScore
+          score1 === currentGame.currentGameDetail!.maxScore ||
+          score2 === currentGame.currentGameDetail!.maxScore
         ) {
           gameSocket.emit(
             "finishGame",
             {
-              roomId: currentGame.currentGame!.id,
+              roomId: currentGame.currentGameDetail!.id,
               myScore: role === "owner" ? score1 : score2,
               opScore: role === "owner" ? score2 : score1,
             },
@@ -300,7 +309,7 @@ const GameBoard = (props: GameBoardProps) => {
                 type: CurrentGameActionTypes.DELETE_GAMEROOM,
                 payload: "",
               });
-              if (score1 === currentGame.currentGame!.maxScore) {
+              if (score1 === currentGame.currentGameDetail!.maxScore) {
                 role === "owner"
                   ? (window.location.href = "/game?result=win")
                   : (window.location.href = "/game?result=loss");
@@ -316,11 +325,11 @@ const GameBoard = (props: GameBoardProps) => {
         }
         setTimeout(() => {
           requestAnimationFrame(() => {
-            dx = currentGame.currentGame
-              ? setDifficulty(currentGame.currentGame.difficulty)
+            dx = currentGame.currentGameDetail
+              ? setDifficulty(currentGame.currentGameDetail.difficulty)
               : 5;
-            dy = currentGame.currentGame
-              ? setDifficulty(currentGame.currentGame.difficulty)
+            dy = currentGame.currentGameDetail
+              ? setDifficulty(currentGame.currentGameDetail.difficulty)
               : 5;
             dxd = quadrant[random][0];
             dyd = quadrant[random][1];
@@ -341,7 +350,7 @@ const GameBoard = (props: GameBoardProps) => {
       ballRef.current!.style.right = ball_rel.left + 15 + "px";
       ball_rel.right = ball_rel.left + 15;
       gameSocket.emit("inGameReq", {
-        roomId: currentGame.currentGame!.id,
+        roomId: currentGame.currentGameDetail!.id,
         data: {
           top: ball_rel.top,
           bottom: ball_rel.bottom,
@@ -375,7 +384,7 @@ const GameBoard = (props: GameBoardProps) => {
       dispatch({
         type: LoginStatusActionTypes.STATUS_GAME,
       });
-      if (currentGame.currentGame!.owner === myInfo.nickname) {
+      if (currentGame.currentGameDetail!.owner === myInfo.nickname) {
         setTimeout(() => {
           requestAnimationFrame(() => {
             moveBall(dx, dy, dxd, dyd);
@@ -402,7 +411,9 @@ const GameBoard = (props: GameBoardProps) => {
     type: string;
   }) => {
     const role: string =
-      currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
+      currentGame.currentGameDetail!.owner === myInfo.nickname
+        ? "owner"
+        : "guest";
 
     if (data.type === "paddle") {
       if (data.role === "owner") {
@@ -446,11 +457,11 @@ const GameBoard = (props: GameBoardProps) => {
               type: CurrentGameActionTypes.INCREMENT_SCORE,
               payload: "score2",
             });
-            if (score2 === currentGame.currentGame!.maxScore) {
+            if (score2 === currentGame.currentGameDetail!.maxScore) {
               gameSocket.emit(
                 "finishGame",
                 {
-                  roomId: currentGame.currentGame!.id,
+                  roomId: currentGame.currentGameDetail!.id,
                   myScore: role === "owner" ? score1 : score2,
                   opScore: role === "owner" ? score2 : score1,
                 },
@@ -489,11 +500,11 @@ const GameBoard = (props: GameBoardProps) => {
               type: CurrentGameActionTypes.INCREMENT_SCORE,
               payload: "score1",
             });
-            if (score1 === currentGame.currentGame!.maxScore) {
+            if (score1 === currentGame.currentGameDetail!.maxScore) {
               gameSocket.emit(
                 "finishGame",
                 {
-                  roomId: currentGame.currentGame!.id,
+                  roomId: currentGame.currentGameDetail!.id,
                   myScore: role === "owner" ? score1 : score2,
                   opScore: role === "owner" ? score2 : score1,
                 },
@@ -538,13 +549,13 @@ const GameBoard = (props: GameBoardProps) => {
           ball_rel.left = 500;
           ball_rel.right = 515;
           if (
-            score1 === currentGame.currentGame!.maxScore ||
-            score2 === currentGame.currentGame!.maxScore
+            score1 === currentGame.currentGameDetail!.maxScore ||
+            score2 === currentGame.currentGameDetail!.maxScore
           ) {
             gameSocket.emit(
               "finishGame",
               {
-                roomId: currentGame.currentGame!.id,
+                roomId: currentGame.currentGameDetail!.id,
                 myScore: role === "owner" ? score1 : score2,
                 opScore: role === "owner" ? score2 : score1,
               },
@@ -554,7 +565,7 @@ const GameBoard = (props: GameBoardProps) => {
                   type: CurrentGameActionTypes.DELETE_GAMEROOM,
                   payload: "",
                 });
-                if (score1 === currentGame.currentGame!.maxScore) {
+                if (score1 === currentGame.currentGameDetail!.maxScore) {
                   role === "owner"
                     ? (window.location.href = "/game?result=win")
                     : (window.location.href = "/game?result=loss");
@@ -577,13 +588,13 @@ const GameBoard = (props: GameBoardProps) => {
       gameSocket.emit(
         "dodge",
         {
-          roomId: currentGame.currentGame!.id,
+          roomId: currentGame.currentGameDetail!.id,
           myScore:
-            currentGame.currentGame!.owner === myInfo.nickname
+            currentGame.currentGameDetail!.owner === myInfo.nickname
               ? currentGame.score1
               : currentGame.score2,
           opScore:
-            currentGame.currentGame!.owner === myInfo.nickname
+            currentGame.currentGameDetail!.owner === myInfo.nickname
               ? currentGame.score2
               : currentGame.score1,
         },

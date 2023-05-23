@@ -16,8 +16,8 @@ interface RoomLeaveProps {
 }
 
 const RoomLeave = (props: RoomLeaveProps) => {
-  const chattingRoom: ChattingRoomDetail = useSelector(
-    (state: IRootState) => state.currentChatting.chattingRoom!
+  const currentChattingRoomDetail: ChattingRoomDetail = useSelector(
+    (state: IRootState) => state.currentChatting.chattingRoomDetail!
   );
   const chattingSocket: any = useSelector(
     (state: IRootState) => state.sockets.chattingSocket!
@@ -34,7 +34,7 @@ const RoomLeave = (props: RoomLeaveProps) => {
   const handleLeaveRoom = async () => {
     chattingSocket.emit(
       "chatroomLeaving",
-      { id: chattingRoom.id },
+      { id: currentChattingRoomDetail.id },
       (response: any) => {
         dispatch({
           type: CurrentChattingActionTypes.UPDATE_STATUS_WAITING,

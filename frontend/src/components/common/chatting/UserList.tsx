@@ -70,7 +70,7 @@ const UserList = (props: UserListProps) => {
 
   const getUserList = async () => {
     const response = await ChattingService.getUsersList(
-      currentChatting.chattingRoom!.id
+      currentChatting.chattingRoomDetail!.id
     );
 
     dispatch({
@@ -94,7 +94,7 @@ const UserList = (props: UserListProps) => {
     chattingSocket.emit(
       "chatroomKick",
       {
-        id: currentChatting.chattingRoom?.id,
+        id: currentChatting.chattingRoomDetail?.id,
         nicknameToKick: selectedUser.nickname,
       },
       () => {
@@ -121,7 +121,7 @@ const UserList = (props: UserListProps) => {
     chattingSocket.emit(
       "chatroomRegisterBan",
       {
-        id: currentChatting.chattingRoom?.id,
+        id: currentChatting.chattingRoomDetail?.id,
         nicknameToBan: selectedUser.nickname,
       },
       () => {
@@ -142,7 +142,7 @@ const UserList = (props: UserListProps) => {
     chattingSocket.emit(
       "chatroomMute",
       {
-        id: currentChatting.chattingRoom?.id,
+        id: currentChatting.chattingRoomDetail?.id,
         nicknameToMute: selectedUser.nickname,
       },
       () => {
@@ -155,7 +155,7 @@ const UserList = (props: UserListProps) => {
     chattingSocket.emit(
       "chatroomEmpowerment",
       {
-        id: currentChatting.chattingRoom?.id,
+        id: currentChatting.chattingRoomDetail?.id,
         nicknameToEmpower: selectedUser.nickname,
       },
       () => {
@@ -168,7 +168,7 @@ const UserList = (props: UserListProps) => {
     chattingSocket.emit(
       "chatroomRequestGame",
       {
-        id: currentChatting.chattingRoom?.id,
+        id: currentChatting.chattingRoomDetail?.id,
         targetNickname: selectedUser.nickname,
       },
       (gmRmId: string) => {
@@ -191,7 +191,7 @@ const UserList = (props: UserListProps) => {
 
   useEffect(() => {
     getUserList();
-  }, []);
+  }, [myInfo]);
 
   return currentChatting.userList.length === 0 ? (
     <EmptyListMessage message="채팅 중인 사용자가 없습니다!" />

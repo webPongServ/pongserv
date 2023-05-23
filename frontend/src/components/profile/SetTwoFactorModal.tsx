@@ -66,6 +66,7 @@ const SetTwoFactorModal = (props: SetTwoFactorModalProps) => {
           <Box className="body flex-container">
             <Box dangerouslySetInnerHTML={{ __html: QR }}></Box>
             <Input
+              autoFocus
               type="password"
               slotProps={{
                 input: { maxLength: 6 },
