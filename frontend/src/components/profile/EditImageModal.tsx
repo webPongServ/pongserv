@@ -42,8 +42,6 @@ const EditImageModal = (props: EditImageModalProps) => {
     }
   };
 
-  console.log(props.profileDetail);
-
   const handlePostNewImage = async () => {
     if (!file) {
       return alert("새 프로필 사진을 등록해주세요!");

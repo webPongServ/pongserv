@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import EmptyListMessage from "components/utils/EmptyListMessage";
+import { useSelector } from "react-redux";
 import { History } from "types/Profile";
 import UserService from "API/UserService";
-import { GameRoomType, GameResultType } from "constant";
 import LoadingCircle from "components/utils/LoadingCircle";
+import { GameRoomType, GameResultType } from "constant";
+import { IRootState } from "components/common/store";
 import "styles/global.scss";
 import "styles/Profile.scss";
 
@@ -28,6 +30,7 @@ interface serverHistoryList {
 }
 
 const GameHistoryList = (props: GameHistoryListProps) => {
+  const myInfo = useSelector((state: IRootState) => state.myInfo);
   const [historyList, setHistoryList] = useState<History[] | null>(null);
 
   const userProfile = (nickname: string, imgURL: string): JSX.Element => {
@@ -66,7 +69,7 @@ const GameHistoryList = (props: GameHistoryListProps) => {
 
   useEffect(() => {
     getGameHistory();
-  }, [props.nickname]);
+  }, [props.nickname, myInfo]);
 
   return (
     <TabPanel value={0}>

@@ -276,7 +276,6 @@ const GameBoard = (props: GameBoardProps) => {
           });
           random = 2;
         } else {
-          console.log(ball_rel.left, ball_rel.right);
           score1++;
           dispatch({
             type: CurrentGameActionTypes.INCREMENT_SCORE,
