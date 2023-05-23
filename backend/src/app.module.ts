@@ -39,5 +39,6 @@ import { UsersChatsSocketModule } from './users-chats-socket/users-chats-socket.
   ],
   controllers: [AppController],
   providers: [AppService],
+  exports: [ConfigModule],
 })
 export class AppModule {}

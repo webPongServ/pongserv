@@ -43,7 +43,13 @@ export class UsersController {
       )}&redirect_uri=${this.config.get('REDIRECT_URI')}&response_type=code`;
     } else {
       // this.logger.error(`Already Logged in!`);
-      return 'http://localhost:3001/game';
+      return (
+        'http://' +
+        this.config.get('IPADDRESS') +
+        ':' +
+        this.config.get('FRONT_PORT') +
+        '/game'
+      );
     }
   }
 
