@@ -4,7 +4,7 @@ import { ChattingRoomEditForm } from "types/Form";
 export interface CurrentChatting {
   status: string;
   myDetail: ChattingUserDetail | null;
-  chattingRoom: ChattingRoomDetail | null;
+  chattingRoomDetail: ChattingRoomDetail | null;
   userList: ChattingUserDetail[];
   banList: ChattingUserDetail[];
 }
@@ -12,7 +12,7 @@ export interface CurrentChatting {
 const INITIAL_CURRENTCHATTING: CurrentChatting = {
   status: "waiting",
   myDetail: null,
-  chattingRoom: null,
+  chattingRoomDetail: null,
   userList: [],
   banList: [],
 };
@@ -142,7 +142,7 @@ export const CurrentChattingReducer = (
       return {
         status: "creating",
         myDetail: null,
-        chattingRoom: null,
+        chattingRoomDetail: null,
         userList: [],
         banList: [],
       };
@@ -150,21 +150,21 @@ export const CurrentChattingReducer = (
       return {
         ...state,
         status: "chatting",
-        chattingRoom: action.payload,
+        chattingRoomDetail: action.payload,
       };
     case CurrentChattingActionTypes.UPDATE_STATUS_ERROR:
       return {
         status: action.payload,
         myDetail: null,
-        chattingRoom: null,
+        chattingRoomDetail: null,
         userList: [],
         banList: [],
       };
     case CurrentChattingActionTypes.EDIT_CHATTINGROOM:
       return {
         ...state,
-        chattingRoom: {
-          ...state.chattingRoom!,
+        chattingRoomDetail: {
+          ...state.chattingRoomDetail!,
           chatroomName: action.payload.chatroomName,
           type: action.payload.type,
           maxCount: action.payload.maxCount,

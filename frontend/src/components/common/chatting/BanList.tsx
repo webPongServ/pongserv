@@ -61,7 +61,7 @@ const BanList = (props: BanListProps) => {
 
   const getBansList = async () => {
     const response = await ChattingService.getBansList(
-      currentChatting.chattingRoom!.id
+      currentChatting.chattingRoomDetail!.id
     );
     dispatch({
       type: CurrentChattingActionTypes.GET_BANLIST,
@@ -122,7 +122,7 @@ const BanList = (props: BanListProps) => {
               chattingSocket.emit(
                 "chatroomRemovalBan",
                 {
-                  id: currentChatting.chattingRoom?.id,
+                  id: currentChatting.chattingRoomDetail?.id,
                   nicknameToFree: selectedUser.nickname,
                 },
                 () => {

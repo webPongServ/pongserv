@@ -22,8 +22,8 @@ export interface ChatObject {
 }
 
 const ChattingRoom = () => {
-  const currentChatting: ChattingRoomDetail | null = useSelector(
-    (state: IRootState) => state.currentChatting.chattingRoom!
+  const currentChattingRoomDetail: ChattingRoomDetail | null = useSelector(
+    (state: IRootState) => state.currentChatting.chattingRoomDetail!
   );
   const myDetail: ChattingUserDetail = useSelector(
     (state: IRootState) => state.currentChatting.myDetail!
@@ -50,7 +50,7 @@ const ChattingRoom = () => {
     chattingSocket.emit(
       "chatroomMessage",
       {
-        id: currentChatting.id,
+        id: currentChattingRoomDetail.id,
         msg: chattingInput,
       },
       () => {
@@ -71,7 +71,7 @@ const ChattingRoom = () => {
     chattingSocket.emit(
       "chatroomMessage",
       {
-        id: currentChatting.id,
+        id: currentChattingRoomDetail.id,
         msg: chattingInput,
       },
       () => {
@@ -287,7 +287,7 @@ const ChattingRoom = () => {
   }, [chatting, roomStatus]);
 
   useEffect(() => {
-    if (!currentChatting.isAlrdyAttnd) {
+    if (!currentChattingRoomDetail.isAlrdyAttnd) {
       setChatting([
         ...chatting,
         {
@@ -303,7 +303,7 @@ const ChattingRoom = () => {
       {roomStatus === "chat" && (
         <>
           <Box className="page-header">
-            <Box>{currentChatting!.chatroomName}</Box>
+            <Box>{currentChattingRoomDetail!.chatroomName}</Box>
           </Box>
           <Box className="page-body chatting-box">
             <Box className="chatting-display overflow" ref={chattingRef}>
@@ -379,9 +379,9 @@ const ChattingRoom = () => {
       )}
       {roomStatus === "edit" && (
         <RoomEditor
-          chatroomName={currentChatting!.chatroomName}
-          type={currentChatting!.type}
-          maxCount={currentChatting!.maxCount}
+          chatroomName={currentChattingRoomDetail!.chatroomName}
+          type={currentChattingRoomDetail!.type}
+          maxCount={currentChattingRoomDetail!.maxCount}
           setRoomStatus={setRoomStatus}
         />
       )}

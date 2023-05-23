@@ -26,8 +26,8 @@ interface HandleRoomDetail {
 }
 
 const RoomEditor = (props: HandleRoomDetail) => {
-  const currentChatting: ChattingRoomDetail = useSelector(
-    (state: IRootState) => state.currentChatting.chattingRoom!
+  const currentChattingRoomDetail: ChattingRoomDetail = useSelector(
+    (state: IRootState) => state.currentChatting.chattingRoomDetail!
   );
   const [isPublic, setIsPublic] = useState<boolean>(
     props.type === ChattingRoomType.public
@@ -88,7 +88,7 @@ const RoomEditor = (props: HandleRoomDetail) => {
     )
       return alert("비밀번호를 입력해주세요!");
     const response = await ChattingService.patchChattingRoom({
-      id: currentChatting.id,
+      id: currentChattingRoomDetail.id,
       name: chattingRoomForm.chatroomName,
       type: chattingRoomForm.type,
       max: chattingRoomForm.maxCount,
