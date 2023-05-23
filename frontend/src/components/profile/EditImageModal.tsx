@@ -6,6 +6,7 @@ import { MyInfoActionTypes } from "types/redux/MyInfo";
 import CustomProfileButton from "components/utils/CustomProfileButton";
 import { ProfileDetail } from "types/Detail";
 import { IRootState } from "components/common/store";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -59,6 +60,10 @@ const EditImageModal = (props: EditImageModalProps) => {
         });
         dispatch({
           type: MyInfoActionTypes.MYINFO_UPDATE_IMAGE,
+          payload: response.data,
+        });
+        dispatch({
+          type: CurrentChattingActionTypes.UPDATE_MYDETAIL_IMGURL,
           payload: response.data,
         });
         props.setProfileDetail({

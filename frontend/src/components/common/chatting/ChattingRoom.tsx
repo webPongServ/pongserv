@@ -190,7 +190,7 @@ const ChattingRoom = () => {
     }) => {
       if (data.nickname === myDetail.nickname) {
         dispatch({
-          type: CurrentChattingActionTypes.UPDATE_MYDETAIL,
+          type: CurrentChattingActionTypes.UPDATE_MYDETAIL_ROLE,
           payload: ChattingUserRoleType.admin,
         });
       }
@@ -225,7 +225,7 @@ const ChattingRoom = () => {
     }) => {
       if (data.nickname === myDetail.nickname) {
         dispatch({
-          type: CurrentChattingActionTypes.UPDATE_MYDETAIL,
+          type: CurrentChattingActionTypes.UPDATE_MYDETAIL_ROLE,
           payload: data.auth,
         });
       }

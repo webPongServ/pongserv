@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import CustomIconButton from "components/utils/CustomIconButton";
 import CustomOnKeyUpInput from "components/utils/CustomOnKeyUpInput";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { IRootState } from "components/common/store";
 import { UserDetail } from "types/Detail";
@@ -15,6 +15,7 @@ import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import UserService from "API/UserService";
+import { CurrentChattingActionTypes } from "types/redux/CurrentChatting";
 
 interface EditNicknameModalProps {
   modalStatus: string;
@@ -27,6 +28,7 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
   const [newNickname, setNewNickname] = useState<string>("");
   const [isError, setIsError] = useState<boolean>(true);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const getNicknameDuplicate = async () => {
     const response = await UserService.getNicknameDup(newNickname);
@@ -51,6 +53,10 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
     props.setModalStatus("closed");
     props.setIsNew(true);
     setIsError(true);
+    // dispatch({
+    //   type: CurrentChattingActionTypes.UPDATE_MYDETAIL_NICKNAME,
+    //   payload: newNickname,
+    // });
     navigate(`/profile/${response.data.new}`);
   };
 
