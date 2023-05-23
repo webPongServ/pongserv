@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { IRootState } from "components/common/store";
 import { UserDetail } from "types/Detail";
+import CustomProfileButton from "components/utils/CustomProfileButton";
 import "styles/Game.scss";
 import "styles/global.scss";
 
@@ -55,13 +56,14 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
 
   useEffect(() => {
     setNewNickname(myInfo.nickname);
-  }, []);
+  }, [myInfo]);
 
   return (
     <Modal
       open={props.modalStatus === "edit-nickname"}
       onClose={() => {
         props.setModalStatus("closed");
+        setNewNickname(myInfo.nickname);
         setIsError(true);
       }}
     >
@@ -74,12 +76,22 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
               icon={<CloseIcon />}
               handleFunction={() => {
                 props.setModalStatus("closed");
+                setNewNickname(myInfo.nickname);
                 setIsError(true);
               }}
             />
           </Box>
           <Box className="body flex-container">
             <Box id="new-nickname">
+              <Box className="preview">
+                <CustomProfileButton
+                  class="login"
+                  nickname={newNickname}
+                  imgURL={myInfo.imgURL}
+                  position="first-register"
+                  handleFunction={() => {}}
+                />
+              </Box>
               <Box className="inform">
                 닉네임은 1 ~ 10자리 한글 / 영어(대, 소문자) / 숫자만 가능합니다.
               </Box>

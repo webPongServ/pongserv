@@ -62,6 +62,7 @@ const TwoFactorModal = () => {
           <Box className="body flex-container">
             <span>2차 인증 비밀번호를 입력하세요.</span>
             <Input
+              autoFocus
               type="password"
               slotProps={{ input: { maxLength: 6 } }}
               onChange={(e) => {
