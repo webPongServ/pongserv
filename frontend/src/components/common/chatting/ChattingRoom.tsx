@@ -337,6 +337,7 @@ const ChattingRoom = () => {
             <Box className="chatting-input flex-container">
               <form className="input" onSubmit={handleSubmitSend}>
                 <Input
+                  autoFocus
                   value={chattingInput}
                   placeholder="채팅을 입력하세요."
                   slotProps={{ input: { maxLength: 1000 } }}

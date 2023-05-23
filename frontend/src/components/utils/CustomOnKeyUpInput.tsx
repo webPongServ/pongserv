@@ -19,6 +19,7 @@ const CustomOnKeyUpInput = (props: CustomOnKeyUpInputProps) => {
       placeholder={props.placeholder}
       defaultValue={props.defaultValue}
       required
+      autoFocus
       slotProps={{ input: { maxLength: props.maxLength } }}
       onChange={props.handleFunction}
       onKeyUp={HandleKeyUP}
