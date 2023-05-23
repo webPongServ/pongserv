@@ -95,7 +95,21 @@ export class UsersService {
     if (!['gif', 'png', 'jpg', 'jpeg'].includes(fileExtension)) {
       throw new BadRequestException('Invalid file type');
     }
-    const fileName = `${userId}.${fileExtension}`;
+    const now = new Date();
+
+    let minutes = now.getMinutes().toString();
+    let seconds = now.getSeconds().toString();
+
+    // 분과 초가 한 자리수일 경우 앞에 '0'을 붙여줍니다.
+    if (minutes.length === 1) {
+      minutes = '0' + minutes;
+    }
+    if (seconds.length === 1) {
+      seconds = '0' + seconds;
+    }
+
+    const time = minutes + seconds;
+    const fileName = `${userId + time}.${fileExtension}`;
     const uploadPath = path.resolve(__dirname, '../../', 'images', fileName);
 
     await fs.ensureDir(path.dirname(uploadPath));
