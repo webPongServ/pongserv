@@ -164,10 +164,11 @@ const FirstRegisterModal = (props: FirstRegisterModalProps) => {
                         isError={isError}
                       />
                     </Box>
-                    {nickname === "" && null}
-                    {isError && (
+                    {(nickname === "" || isError) && (
                       <Box className="inform fail">
-                        중복된 닉네임입니다. 다시 입력해주세요.
+                        {nickname === ""
+                          ? " "
+                          : "중복된 닉네임입니다. 다시 입력해주세요."}
                       </Box>
                     )}
                     {!(nickname === "" || isError) && (
