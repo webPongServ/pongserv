@@ -89,7 +89,12 @@ const GameBoard = (props: GameBoardProps) => {
   let dyd: number = quadrant[random][1];
 
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (paddleRef.current || paddle2Ref.current || currentGame.currentGame) {
+    if (
+      paddleRef.current ||
+      paddle2Ref.current ||
+      currentGame.currentGame ||
+      selectedPaddleRef
+    ) {
       const role: string =
         currentGame.currentGame!.owner === myInfo.nickname ? "owner" : "guest";
 
