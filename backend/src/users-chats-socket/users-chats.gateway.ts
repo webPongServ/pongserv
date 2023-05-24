@@ -336,17 +336,16 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     // this.logger.log(`ChatroomEntranceDto: `);
     // this.logger.log(infoEntr);
     try {
-      const { userNick, isAlreadyIn } = await this.chatsService.setUserToEnter(userId, infoEntr);
+      const { userNick, isAlreadyIn, authInChtrm } = await this.chatsService.setUserToEnter(userId, infoEntr);
       const nameOfChtrmSocketRoom = `chatroom_${infoEntr.id}`;
       socket.join(nameOfChtrmSocketRoom);
       if (isAlreadyIn == false)
         socket.to(nameOfChtrmSocketRoom).emit('chatroomWelcome', userNick);
-      return true;
+      return authInChtrm;
     } catch (err) {
       this.logger.error(err);
       if (err?.response?.message)
         socket.emit('errorChatroomEntrance', err.response.message);
-      return;
     }
   }
 
@@ -452,7 +451,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       const targetSocket = this.server.sockets.sockets.get(targetSocketId);
       this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingKicked', {
         chtrmId: infoKick.id,
-        nicknameKicked: infoKick.nicknameToKick,
+        nickname: infoKick.nicknameToKick,
       }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       targetSocket.leave(nameOfChtrmSocketRoom); // REVIEW - chtrm에 대한 socket room에서 나가지게 하기
       return true;
@@ -478,7 +477,8 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       // target user의 socket에 muted 정보 emit
       // const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
-      this.server.to(infoMute.id).emit('chatroomBeingMuted', {
+      const nameOfChtrmSocketRoom = `chatroom_${infoMute.id}`;
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingMuted', {
         chtrmId: infoMute.id,
         nickname: targetNick,
       }); // TODO: to combine with front-end
@@ -507,19 +507,16 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       );
       const nameOfChtrmSocketRoom = `chatroom_${infoBan.id}`;
       const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRegisteredBan', {
+        chtrmId: infoBan.id,
+        nickname: targetNick,
+      }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       if (targetSocketId) {
         // TODO - targetSocketId가 해당 chatroom에 대한 socket room을 나가도록 처리
         const targetSocket: Socket =
           this.server.sockets.sockets.get(targetSocketId); // NOTE: Find socket by socket id
         targetSocket.leave(`chatroom_${infoBan.id}`);
-        this.server
-          .to(targetSocketId)
-          .emit('chatroomBeingRegisteredBan', { chtrmId: infoBan.id });
       }
-      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRegisteredBan', {
-        chtrmId: infoBan.id,
-        nickname: targetNick,
-      }); // REVIEW - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       return true;
     } catch (err) {
       this.logger.error(err);
@@ -569,7 +566,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
       // const targetSocketId = this.userIdToSocketIdMap.get(targetUserId);
       // TODO - chtrm에 참여한 다른 인원들도 이에 대한 정보 알 수 있도록 emit
       const nameOfChtrmSocketRoom = `chatroom_${infoEmpwr.id}`;
-      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingRegisteredBan', {
+      this.server.to(nameOfChtrmSocketRoom).emit('chatroomBeingEmpowered', {
         chtrmId: infoEmpwr.id,
         nickname: targetNick,
       }); // TODO: to combine with front-end
@@ -577,7 +574,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     } catch (err) {
       this.logger.error(err);
       if (err?.response?.message)
-        socket.emit('errorChatroomMute', err.response.message);
+        socket.emit('errorChatroomEmpowerment', err.response.message);
     }
   }
 
@@ -627,7 +624,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     } catch (err) {
       this.logger.error(err);
       if (err?.response?.message)
-        socket.emit('errorChatroomMute', err.response.message);
+        socket.emit('errorChatroomRequestGame', err.response.message);
     }
   }
 
@@ -655,7 +652,7 @@ export class UsersChatsGateway implements OnGatewayConnection, OnModuleDestroy {
     } catch (err) {
       this.logger.error(err);
       if (err?.response?.message)
-        socket.emit('errorChatroomMute', err.response.message);
+        socket.emit('errorChatroomResponseGame', err.response.message);
     }
   }
 
