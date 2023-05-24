@@ -152,6 +152,12 @@ const GameBoard = (props: GameBoardProps) => {
         // why 10?
         if (ball_rel.left <= 10) {
           score2++;
+          gameSocket.emit("inGameReq", {
+            roomId: currentGame.currentGameDetail!.id,
+            data: "guest",
+            role: role,
+            type: "score",
+          });
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
           ballRef.current!.style.left = "500px";
@@ -209,6 +215,12 @@ const GameBoard = (props: GameBoardProps) => {
       ) {
         if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
           score1++;
+          gameSocket.emit("inGameReq", {
+            roomId: currentGame.currentGameDetail!.id,
+            data: "owner",
+            role: role,
+            type: "score",
+          });
           ballRef.current!.style.top = "300px";
           ballRef.current!.style.bottom = "315px";
           ballRef.current!.style.left = "500px";
@@ -262,6 +274,12 @@ const GameBoard = (props: GameBoardProps) => {
       if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
         if (ball_rel.left <= 0) {
           score2++;
+          gameSocket.emit("inGameReq", {
+            roomId: currentGame.currentGameDetail!.id,
+            data: "guest",
+            role: role,
+            type: "score",
+          });
           dispatch({
             type: CurrentGameActionTypes.INCREMENT_SCORE,
             payload: "score2",
@@ -269,6 +287,12 @@ const GameBoard = (props: GameBoardProps) => {
           random = 2;
         } else {
           score1++;
+          gameSocket.emit("inGameReq", {
+            roomId: currentGame.currentGameDetail!.id,
+            data: "owner",
+            role: role,
+            type: "score",
+          });
           dispatch({
             type: CurrentGameActionTypes.INCREMENT_SCORE,
             payload: "score1",
@@ -417,7 +441,7 @@ const GameBoard = (props: GameBoardProps) => {
         paddle2Ref.current!.style.bottom = data.data.bottom + "px";
         paddle2_rel.bottom = data.data.bottom;
       }
-    } else {
+    } else if (data.type === "ball") {
       if (data.role === "owner") {
         ballRef.current!.style.left = data.data.left + "px";
         ball_rel.left = data.data.left;
@@ -427,145 +451,56 @@ const GameBoard = (props: GameBoardProps) => {
         ball_rel.top = data.data.top;
         ballRef.current!.style.bottom = data.data.bottom + "px";
         ball_rel.bottom = data.data.bottom;
-        if (
-          ball_rel.left <= paddle1_rel.right &&
-          ball_rel.top >= paddle1_rel.top &&
-          ball_rel.bottom <= paddle1_rel.bottom
-        ) {
-          // why 10?
-          if (ball_rel.left <= 10) {
-            score2++;
-            ballRef.current!.style.top = "300px";
-            ballRef.current!.style.bottom = "315px";
-            ballRef.current!.style.left = "500px";
-            ballRef.current!.style.right = "515px";
-            ball_rel.top = 300;
-            ball_rel.bottom = 315;
-            ball_rel.left = 500;
-            ball_rel.right = 515;
+      }
+    } else if (data.type === "score") {
+      if (data.data === "owner") {
+        score1++;
+        dispatch({
+          type: CurrentGameActionTypes.INCREMENT_SCORE,
+          payload: "score1",
+        });
+      } else {
+        score2++;
+        dispatch({
+          type: CurrentGameActionTypes.INCREMENT_SCORE,
+          payload: "score2",
+        });
+      }
+      ballRef.current!.style.top = "300px";
+      ballRef.current!.style.bottom = "315px";
+      ballRef.current!.style.left = "500px";
+      ballRef.current!.style.right = "515px";
+      ball_rel.top = 300;
+      ball_rel.bottom = 315;
+      ball_rel.left = 500;
+      ball_rel.right = 515;
+      if (
+        score1 === currentGame.currentGameDetail!.maxScore ||
+        score2 === currentGame.currentGameDetail!.maxScore
+      ) {
+        gameSocket.emit(
+          "finishGame",
+          {
+            roomId: currentGame.currentGameDetail!.id,
+            myScore: role === "owner" ? score1 : score2,
+            opScore: role === "owner" ? score2 : score1,
+          },
+          () => {
             dispatch({
-              type: CurrentGameActionTypes.INCREMENT_SCORE,
-              payload: "score2",
-            });
-            if (score2 === currentGame.currentGameDetail!.maxScore) {
-              gameSocket.emit(
-                "finishGame",
-                {
-                  roomId: currentGame.currentGameDetail!.id,
-                  myScore: role === "owner" ? score1 : score2,
-                  opScore: role === "owner" ? score2 : score1,
-                },
-                () => {
-                  random = 2;
-                  dispatch({
-                    type: CurrentGameActionTypes.DELETE_GAMEROOM,
-                    payload: "",
-                  });
-                  role === "owner"
-                    ? (window.location.href = "/game?result=loss")
-                    : (window.location.href = "/game?result=win");
-                }
-              );
-            }
-            return;
-          }
-        }
-        if (
-          ball_rel.right >= paddle2_rel.left &&
-          ball_rel.top >= paddle2_rel.top &&
-          ball_rel.bottom <= paddle2_rel.bottom
-        ) {
-          if (GameBoardConst.GAMEBOARD_WIDTH - ball_rel.right <= 10) {
-            score1++;
-            ballRef.current!.style.top = "300px";
-            ballRef.current!.style.bottom = "315px";
-            ballRef.current!.style.left = "500px";
-            ballRef.current!.style.right = "515px";
-            ball_rel.top = 300;
-            ball_rel.bottom = 315;
-            ball_rel.left = 500;
-            ball_rel.right = 515;
-            dispatch({
-              type: CurrentGameActionTypes.INCREMENT_SCORE,
-              payload: "score1",
+              type: CurrentGameActionTypes.DELETE_GAMEROOM,
+              payload: "",
             });
             if (score1 === currentGame.currentGameDetail!.maxScore) {
-              gameSocket.emit(
-                "finishGame",
-                {
-                  roomId: currentGame.currentGameDetail!.id,
-                  myScore: role === "owner" ? score1 : score2,
-                  opScore: role === "owner" ? score2 : score1,
-                },
-                () => {
-                  random = 2;
-                  dispatch({
-                    type: CurrentGameActionTypes.DELETE_GAMEROOM,
-                    payload: "",
-                  });
-                  role === "owner"
-                    ? (window.location.href = "/game?result=win")
-                    : (window.location.href = "/game?result=loss");
-                }
-              );
+              role === "owner"
+                ? (window.location.href = "/game?result=win")
+                : (window.location.href = "/game?result=loss");
+            } else {
+              role === "owner"
+                ? (window.location.href = "/game?result=loss")
+                : (window.location.href = "/game?result=win");
             }
-            return;
           }
-        }
-        if (ball_rel.left <= 0 || ball_rel.right >= 1000) {
-          if (ball_rel.left <= 0) {
-            score2++;
-            dispatch({
-              type: CurrentGameActionTypes.INCREMENT_SCORE,
-              payload: "score2",
-            });
-            random = 2;
-          } else {
-            score1++;
-            dispatch({
-              type: CurrentGameActionTypes.INCREMENT_SCORE,
-              payload: "score1",
-            });
-            random = 4;
-          }
-          ballRef.current!.style.top = "300px";
-          ballRef.current!.style.bottom = "315px";
-          ballRef.current!.style.left = "500px";
-          ballRef.current!.style.right = "515px";
-          ball_rel.top = 300;
-          ball_rel.bottom = 315;
-          ball_rel.left = 500;
-          ball_rel.right = 515;
-          if (
-            score1 === currentGame.currentGameDetail!.maxScore ||
-            score2 === currentGame.currentGameDetail!.maxScore
-          ) {
-            gameSocket.emit(
-              "finishGame",
-              {
-                roomId: currentGame.currentGameDetail!.id,
-                myScore: role === "owner" ? score1 : score2,
-                opScore: role === "owner" ? score2 : score1,
-              },
-              () => {
-                random = 2;
-                dispatch({
-                  type: CurrentGameActionTypes.DELETE_GAMEROOM,
-                  payload: "",
-                });
-                if (score1 === currentGame.currentGameDetail!.maxScore) {
-                  role === "owner"
-                    ? (window.location.href = "/game?result=win")
-                    : (window.location.href = "/game?result=loss");
-                } else {
-                  role === "owner"
-                    ? (window.location.href = "/game?result=loss")
-                    : (window.location.href = "/game?result=win");
-                }
-              }
-            );
-          }
-        }
+        );
       }
     }
   };
