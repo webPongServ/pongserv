@@ -243,12 +243,17 @@ export class DbGamesManagerService {
         },
       },
     });
+	if(room == null)
+		return ;
     room.gmRsltCd = result;
     room.getScr = myScore;
     room.lossScr = opScore;
     room.exitDttm = new Date();
     // console.log(room);
-    await this.Gm01DRp.save(room);
+    try { await this.Gm01DRp.save(room);}
+	catch(e){
+		console.log('NULL PROPERTY IN DB(GAME)');
+	}
   }
 
   async isInGame(userId: string) {
