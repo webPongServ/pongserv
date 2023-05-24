@@ -321,27 +321,21 @@ const ChattingRoom = () => {
           <Box className="page-body chatting-box">
             <Box className="chatting-display overflow" ref={chattingRef}>
               {chatting.map((value, index) => {
-                return (
-                  <>
-                    {value.user === null && (
-                      <InformMessage
-                        key={`inform-message-${index}`}
-                        informChat={value}
-                      />
-                    )}
-                    {value.user !== null && value.isMine && (
-                      <MyMessage
-                        key={`my-message-${value.user!.nickname}-${index}`}
-                        myChat={value}
-                      />
-                    )}
-                    {value.user !== null && !value.isMine && (
-                      <OtherMessage
-                        key={`other-message-${value.user!.nickname}-${index}`}
-                        otherChat={value}
-                      />
-                    )}
-                  </>
+                return value.user === null ? (
+                  <InformMessage
+                    key={`inform-message-${index}`}
+                    informChat={value}
+                  />
+                ) : value.isMine ? (
+                  <MyMessage
+                    key={`my-message-${value.user!.nickname}-${index}`}
+                    myChat={value}
+                  />
+                ) : (
+                  <OtherMessage
+                    key={`other-message-${value.user!.nickname}-${index}`}
+                    otherChat={value}
+                  />
                 );
               })}
             </Box>

@@ -199,8 +199,8 @@ const FirstRegisterModal = (props: FirstRegisterModalProps) => {
                       프로필 이미지 수정
                     </Button>
                   </Box>
-                  <Box>수정 버튼을 눌러야 변경 사항이 적용됩니다.</Box>
                 </Box>
+                <Box>수정 버튼을 눌러야 변경 사항이 적용됩니다.</Box>
               </>
             )}
           </Box>
