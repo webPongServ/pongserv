@@ -32,7 +32,7 @@ const RoomCard = (props: RoomCardProps) => {
       chattingSocket.emit(
         "chatroomEntrance",
         { id: props.room.id, pwd: "" },
-        () => {
+        (authInChtrm: string) => {
           dispatch({
             type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
             payload: {
@@ -50,7 +50,7 @@ const RoomCard = (props: RoomCardProps) => {
             payload: {
               nickname: myInfo.nickname,
               imgURL: myInfo.imgURL,
-              role: ChattingUserRoleType.normal,
+              role: authInChtrm,
             },
           });
         }
