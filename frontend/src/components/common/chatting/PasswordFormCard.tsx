@@ -40,8 +40,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
     chattingSocket.emit(
       "chatroomEntrance",
       { id: props.room.id, pwd: password },
-      (response: any) => {
-        // response === failed ? alert : dispatch
+      (authInChtrm: string) => {
         dispatch({
           type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
           payload: {
@@ -59,7 +58,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
           payload: {
             nickname: myInfo.nickname,
             imgURL: myInfo.imgURL,
-            role: ChattingUserRoleType.normal,
+            role: authInChtrm,
           },
         });
       }
@@ -73,7 +72,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
     chattingSocket.emit(
       "chatroomEntrance",
       { id: props.room.id, pwd: password },
-      (response: any) => {
+      (authInChtrm: string) => {
         dispatch({
           type: CurrentChattingActionTypes.UPDATE_STATUS_CHATTING,
           payload: {
@@ -91,7 +90,7 @@ const PasswordFormCard = (props: PasswordFormCardProps) => {
           payload: {
             nickname: myInfo.nickname,
             imgURL: myInfo.imgURL,
-            role: ChattingUserRoleType.normal,
+            role: authInChtrm,
           },
         });
       }
