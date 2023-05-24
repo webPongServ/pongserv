@@ -16,7 +16,6 @@ import ModalDialog from "@mui/joy/ModalDialog";
 import { Box } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import UserService from "API/UserService";
-import { stat } from "fs";
 
 interface EditImageModalProps {
   modalStatus: string;

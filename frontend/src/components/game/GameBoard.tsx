@@ -4,7 +4,6 @@ import { useParams } from "react-router-dom";
 import { IRootState } from "components/common/store";
 import { useNavigate } from "react-router-dom";
 import GameReady from "components/game/GameReady";
-// 난이도에 따라 paddle의 pixel const 조절하기(js) => constant에서 제거
 import { GameBoardConst } from "constant";
 import SuccessNotification from "components/utils/SuccessNotification";
 import { CurrentGameActionTypes } from "types/redux/CurrentGame";
@@ -89,12 +88,7 @@ const GameBoard = (props: GameBoardProps) => {
   let dyd: number = quadrant[random][1];
 
   const pressKey = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (
-      paddleRef.current ||
-      paddle2Ref.current ||
-      currentGame.currentGameDetail ||
-      selectedPaddleRef
-    ) {
+    if (currentGame.currentGameDetail || selectedPaddleRef) {
       const role: string =
         currentGame.currentGameDetail!.owner === myInfo.nickname
           ? "owner"
@@ -142,7 +136,7 @@ const GameBoard = (props: GameBoardProps) => {
   };
 
   const moveBall = (dx: number, dy: number, dxd: number, dyd: number) => {
-    if (ballRef.current) {
+    if (currentGame.currentGameDetail || ballRef.current) {
       const role: string =
         currentGame.currentGameDetail!.owner === myInfo.nickname
           ? "owner"
@@ -187,7 +181,6 @@ const GameBoard = (props: GameBoardProps) => {
                 role === "owner"
                   ? (window.location.href = "/game?result=loss")
                   : (window.location.href = "/game?result=win");
-                // navigate("/game");
               }
             );
             return;
@@ -245,7 +238,6 @@ const GameBoard = (props: GameBoardProps) => {
                 role === "owner"
                   ? (window.location.href = "/game?result=win")
                   : (window.location.href = "/game?result=loss");
-                // navigate("/game");
               }
             );
             return;
@@ -317,7 +309,6 @@ const GameBoard = (props: GameBoardProps) => {
                   ? (window.location.href = "/game?result=loss")
                   : (window.location.href = "/game?result=win");
               }
-              // navigate("/game");
             }
           );
           return;
@@ -473,7 +464,6 @@ const GameBoard = (props: GameBoardProps) => {
                   role === "owner"
                     ? (window.location.href = "/game?result=loss")
                     : (window.location.href = "/game?result=win");
-                  // navigate("/game");
                 }
               );
             }
@@ -516,7 +506,6 @@ const GameBoard = (props: GameBoardProps) => {
                   role === "owner"
                     ? (window.location.href = "/game?result=win")
                     : (window.location.href = "/game?result=loss");
-                  // navigate("/game");
                 }
               );
             }
@@ -573,13 +562,16 @@ const GameBoard = (props: GameBoardProps) => {
                     ? (window.location.href = "/game?result=loss")
                     : (window.location.href = "/game?result=win");
                 }
-                // navigate("/game");
               }
             );
           }
         }
       }
     }
+  };
+
+  const socketGameReject = () => {
+    window.location.href = "/game?error=direct_rejected";
   };
 
   useEffect(() => {
@@ -602,8 +594,7 @@ const GameBoard = (props: GameBoardProps) => {
             type: CurrentGameActionTypes.DELETE_GAMEROOM,
             payload: "",
           });
-          window.location.href = "/game";
-          // navigate("/game");
+          window.location.href = "/game?result=dodge";
         }
       );
     };
@@ -621,12 +612,14 @@ const GameBoard = (props: GameBoardProps) => {
       gameSocket.on("roomOwner", socketRoomOwner);
       gameSocket.on("roomGuest", socketRoomGuest);
       gameSocket.on("inGameRes", socketInGameRes);
+      gameSocket.on("gameReject", socketGameReject);
     }
     return () => {
       gameSocket.off("gameStart", socketGameStart);
       gameSocket.off("roomOwner", socketRoomOwner);
       gameSocket.off("roomGuest", socketRoomGuest);
       gameSocket.off("inGameRes", socketInGameRes);
+      gameSocket.off("gameReject", socketGameReject);
       gameSocket.disconnect();
       dispatch({ type: SocketsActionTypes.GAMESOCKET_DELETE, payload: "" });
     };

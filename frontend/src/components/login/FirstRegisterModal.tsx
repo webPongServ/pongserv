@@ -25,6 +25,12 @@ interface FirstRegisterModalProps {
   setResponse: Function;
 }
 
+const checkNickname = (nickname: string): boolean => {
+  const regex = /^[a-zA-Z0-9ㄱ-ㅎㅏ-ㅣ가-힣]+$/;
+
+  return regex.test(nickname);
+};
+
 const FirstRegisterModal = (props: FirstRegisterModalProps) => {
   const loginStatus = useSelector((state: IRootState) => state.loginStatus);
   const [nickname, setNickname] = useState<string>("");
@@ -58,6 +64,8 @@ const FirstRegisterModal = (props: FirstRegisterModalProps) => {
   const handlePostNewNickname = async () => {
     if (!nickname) {
       return alert("바꿀 닉네임을 입력해주세요!");
+    } else if (!checkNickname(nickname)) {
+      return alert("사용할 수 없는 문자가 포함되어 있습니다.");
     } else if (isError) {
       return alert("중복된 닉네임입니다!");
     }

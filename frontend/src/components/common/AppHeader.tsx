@@ -48,6 +48,8 @@ export const errorMessageCreator = (errorCode: string): string => {
       return "찾으려는 사용자가 존재하지 않습니다.";
     case "wrong_game_access":
       return "잘못된 접근입니다. 게임 생성 혹은 참가를 통해 시작해주세요.";
+    case "direct_rejected":
+      return "상대방이 대결 신청을 거절하였습니다.";
     case "auth_failed":
       return "로그인 정보가 올바르지 않습니다. 다시 로그인 해주세요.";
     case "twofactor_failed":
@@ -69,6 +71,8 @@ export const resultMessageCreator = (resultCode: string): string => {
       return "게임에서 승리하셨습니다! 🏆";
     case "loss":
       return "게임에서 패배하셨습니다! 😭";
+    case "dodge":
+      return "상대방이 게임에서 탈주하여 승리로 기록되었습니다.";
     default:
       return "에러가 발생하였습니다.";
   }
