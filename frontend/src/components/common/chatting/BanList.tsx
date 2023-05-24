@@ -130,10 +130,6 @@ const BanList = (props: BanListProps) => {
                     type: CurrentChattingActionTypes.DELETE_BANLIST,
                     payload: selectedUser.nickname,
                   });
-                  dispatch({
-                    type: CurrentChattingActionTypes.ADD_USERLIST,
-                    payload: selectedUser,
-                  });
                   setAnchorEl(null);
                 }
               );
