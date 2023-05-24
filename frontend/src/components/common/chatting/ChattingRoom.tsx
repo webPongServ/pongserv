@@ -19,6 +19,7 @@ import { Input, Button } from "@mui/joy";
 export interface ChatObject {
   user: ChattingUserDetail | null;
   message: string;
+  isMine: boolean | null;
 }
 
 const ChattingRoom = () => {
@@ -59,6 +60,7 @@ const ChattingRoom = () => {
           {
             user: myDetail,
             message: chattingInput,
+            isMine: true,
           },
         ]);
         setChattingInput("");
@@ -80,6 +82,7 @@ const ChattingRoom = () => {
           {
             user: myDetail,
             message: chattingInput,
+            isMine: true,
           },
         ]);
         setChattingInput("");
@@ -106,6 +109,7 @@ const ChattingRoom = () => {
             role: data.role,
           },
           message: data.msg,
+          isMine: false,
         },
       ]);
     };
@@ -116,6 +120,7 @@ const ChattingRoom = () => {
         {
           user: null,
           message: nickname + "님이 입장하셨습니다.",
+          isMine: null,
         },
       ]);
     };
@@ -126,6 +131,7 @@ const ChattingRoom = () => {
         {
           user: null,
           message: nickname + "님이 퇴장하셨습니다.",
+          isMine: null,
         },
       ]);
     };
@@ -145,6 +151,7 @@ const ChattingRoom = () => {
           {
             user: null,
             message: data.nickname + "님이 강제 퇴장당하였습니다.",
+            isMine: null,
           },
         ]);
       }
@@ -160,6 +167,7 @@ const ChattingRoom = () => {
         {
           user: null,
           message: data.nickname + "님이 60초간 벙어리가 되었습니다.",
+          isMine: null,
         },
       ]);
     };
@@ -179,6 +187,7 @@ const ChattingRoom = () => {
           {
             user: null,
             message: data.nickname + "님이 차단되었습니다.",
+            isMine: null,
           },
         ]);
       }
@@ -199,6 +208,7 @@ const ChattingRoom = () => {
         {
           user: null,
           message: data.nickname + "님이 관리자가 되었습니다.",
+          isMine: null,
         },
       ]);
     };
@@ -213,6 +223,7 @@ const ChattingRoom = () => {
           {
             user: null,
             message: data.nickname + "님이 차단 해제되었습니다.",
+            isMine: null,
           },
         ]);
       }
@@ -242,6 +253,7 @@ const ChattingRoom = () => {
                 ? "관리자"
                 : "일반 유저"
             }이 되었습니다.`,
+          isMine: null,
         },
       ]);
     };
@@ -293,6 +305,7 @@ const ChattingRoom = () => {
         {
           user: null,
           message: myDetail.nickname + "님이 입장하셨습니다.",
+          isMine: null,
         },
       ]);
     }
@@ -312,24 +325,22 @@ const ChattingRoom = () => {
                   <>
                     {value.user === null && (
                       <InformMessage
-                        key={"inform-message" + index}
+                        key={`inform-message-${index}`}
                         informChat={value}
                       />
                     )}
-                    {value.user !== null &&
-                      myDetail.nickname === value.user.nickname && (
-                        <MyMessage
-                          key={value.user!.nickname + index}
-                          myChat={value}
-                        />
-                      )}
-                    {value.user !== null &&
-                      myDetail.nickname !== value.user.nickname && (
-                        <OtherMessage
-                          key={value.user!.nickname + index}
-                          otherChat={value}
-                        />
-                      )}
+                    {value.user !== null && value.isMine && (
+                      <MyMessage
+                        key={`my-message-${value.user!.nickname}-${index}`}
+                        myChat={value}
+                      />
+                    )}
+                    {value.user !== null && !value.isMine && (
+                      <OtherMessage
+                        key={`other-message-${value.user!.nickname}-${index}`}
+                        otherChat={value}
+                      />
+                    )}
                   </>
                 );
               })}

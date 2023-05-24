@@ -61,10 +61,10 @@ const EditNicknameModal = (props: EditNicknameModalProps) => {
     props.setModalStatus("closed");
     props.setIsNew(true);
     setIsError(true);
-    // dispatch({
-    //   type: CurrentChattingActionTypes.UPDATE_MYDETAIL_NICKNAME,
-    //   payload: newNickname,
-    // });
+    dispatch({
+      type: CurrentChattingActionTypes.UPDATE_MYDETAIL_NICKNAME,
+      payload: newNickname,
+    });
     navigate(`/profile/${response.data.new}`);
   };
 
